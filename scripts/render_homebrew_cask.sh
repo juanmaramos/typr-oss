@@ -23,8 +23,7 @@ cask "typr" do
   sha256 arm:   "$arm_sha",
          intel: "$intel_sha"
 
-  url "https://github.com/juanmaramos/typr-oss/releases/download/v#{version}/Typr_#{version}_#{arch}.dmg",
-      verified: "github.com/juanmaramos/typr-oss/"
+  url "https://github.com/juanmaramos/typr-oss/releases/download/v#{version}/Typr_#{version}_#{arch}.dmg"
   name "Typr OSS"
   desc "AI notepad for meetings, notes, and follow-up work"
   homepage "https://github.com/juanmaramos/typr-oss"
