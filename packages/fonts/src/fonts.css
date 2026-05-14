@@ -1,0 +1,80 @@
+/**
+ * @typr/fonts - Font definitions for Typr applications
+ * 
+ * Futuria Design System v4 typography:
+ *   Sans:  Switzer (neo-grotesque UI)
+ *   Serif: Crimson Pro (body/editorial)
+ *   Mono:  JetBrains Mono (code)
+ */
+
+/* Switzer — self-hosted (ITF Free Font License via Fontshare) */
+@font-face {
+  font-family: "Switzer";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("./assets/switzer/Switzer-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Switzer";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("./assets/switzer/Switzer-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Switzer";
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("./assets/switzer/Switzer-SemiBold.woff2") format("woff2");
+}
+
+/* Crimson Pro — self-hosted (SIL Open Font License) */
+@font-face {
+  font-family: "Crimson Pro";
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+  src: url("./assets/crimson-pro/CrimsonPro-VariableFont_wght.ttf")
+    format("truetype");
+}
+@font-face {
+  font-family: "Crimson Pro";
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+  src: url("./assets/crimson-pro/CrimsonPro-Italic-VariableFont_wght.ttf")
+    format("truetype");
+}
+
+/* JetBrains Mono — self-hosted (SIL Open Font License) */
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  src: url("./assets/jetbrains-mono/JetBrainsMono-VariableFont_wght.ttf")
+    format("truetype");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-weight: 100 800;
+  font-style: italic;
+  font-display: swap;
+  src: url("./assets/jetbrains-mono/JetBrainsMono-Italic-VariableFont_wght.ttf")
+    format("truetype");
+}
+
+/* Font variable definitions */
+:root {
+  --font-sans:
+    "Switzer", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Crimson Pro", Georgia, serif;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+
+  /* Typography style variables — set by TypographyProvider */
+  --font-heading: var(--font-serif);
+  --font-body: var(--font-sans);
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@typr/plugin-obsidian",
+  "private": true,
+  "main": "./js/index.ts",
+  "scripts": {
+    "codegen": "cargo test -p tauri-plugin-obsidian"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.6.0",
+    "@typr/obsidian": "workspace:^"
+  }
+}

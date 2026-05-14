@@ -1,0 +1,506 @@
+[
+  {
+    "text": "Te",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 0,
+    "end_ms": 150
+  },
+  {
+    "text": "doy",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 150,
+    "end_ms": 400
+  },
+  {
+    "text": "la",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 400,
+    "end_ms": 500
+  },
+  {
+    "text": "bienvenida",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 500,
+    "end_ms": 1100
+  },
+  {
+    "text": "a",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 1100,
+    "end_ms": 1200
+  },
+  {
+    "text": "Typr.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.99,
+    "start_ms": 1200,
+    "end_ms": 1700
+  },
+  {
+    "text": "Mientras",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 2700,
+    "end_ms": 3200
+  },
+  {
+    "text": "hablo,",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 3200,
+    "end_ms": 3700
+  },
+  {
+    "text": "Typr",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.99,
+    "start_ms": 3900,
+    "end_ms": 4250
+  },
+  {
+    "text": "transcribe",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 4250,
+    "end_ms": 5000
+  },
+  {
+    "text": "cada",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 5000,
+    "end_ms": 5350
+  },
+  {
+    "text": "palabra",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 5350,
+    "end_ms": 5950
+  },
+  {
+    "text": "en",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 5950,
+    "end_ms": 6100
+  },
+  {
+    "text": "tiempo",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 6100,
+    "end_ms": 6500
+  },
+  {
+    "text": "real.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 6500,
+    "end_ms": 7100
+  },
+  {
+    "text": "Todo",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 7700,
+    "end_ms": 8100
+  },
+  {
+    "text": "ocurre",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 8100,
+    "end_ms": 8600
+  },
+  {
+    "text": "offline",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.99,
+    "start_ms": 8600,
+    "end_ms": 9300
+  },
+  {
+    "text": "en",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 9300,
+    "end_ms": 9450
+  },
+  {
+    "text": "tu",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 9450,
+    "end_ms": 9600
+  },
+  {
+    "text": "dispositivo.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 9600,
+    "end_ms": 10450
+  },
+  {
+    "text": "Cero",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 11100,
+    "end_ms": 11500
+  },
+  {
+    "text": "subidas",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 11500,
+    "end_ms": 12100
+  },
+  {
+    "text": "a",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 12100,
+    "end_ms": 12200
+  },
+  {
+    "text": "la",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 12200,
+    "end_ms": 12300
+  },
+  {
+    "text": "nube.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 12300,
+    "end_ms": 12900
+  },
+  {
+    "text": "Privacidad",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 13200,
+    "end_ms": 13950
+  },
+  {
+    "text": "absoluta.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 13950,
+    "end_ms": 14800
+  },
+  {
+    "text": "Observa",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 15800,
+    "end_ms": 16400
+  },
+  {
+    "text": "como",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.97,
+    "start_ms": 16400,
+    "end_ms": 16750
+  },
+  {
+    "text": "la",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 16750,
+    "end_ms": 16900
+  },
+  {
+    "text": "IA",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.99,
+    "start_ms": 16900,
+    "end_ms": 17300
+  },
+  {
+    "text": "transforma",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 17300,
+    "end_ms": 18050
+  },
+  {
+    "text": "esta",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 18050,
+    "end_ms": 18350
+  },
+  {
+    "text": "conversación",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.97,
+    "start_ms": 18350,
+    "end_ms": 19300
+  },
+  {
+    "text": "en",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 19500,
+    "end_ms": 19650
+  },
+  {
+    "text": "notas",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 19650,
+    "end_ms": 20100
+  },
+  {
+    "text": "estructuradas",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.97,
+    "start_ms": 20100,
+    "end_ms": 21050
+  },
+  {
+    "text": "con",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 21050,
+    "end_ms": 21250
+  },
+  {
+    "text": "puntos",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 21250,
+    "end_ms": 21750
+  },
+  {
+    "text": "clave",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 21750,
+    "end_ms": 22250
+  },
+  {
+    "text": "y",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 22250,
+    "end_ms": 22350
+  },
+  {
+    "text": "tareas.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 22350,
+    "end_ms": 23150
+  },
+  {
+    "text": "Typr",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.99,
+    "start_ms": 24200,
+    "end_ms": 24600
+  },
+  {
+    "text": "transcribe",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 24600,
+    "end_ms": 25350
+  },
+  {
+    "text": "audio",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 25350,
+    "end_ms": 25800
+  },
+  {
+    "text": "en",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 25800,
+    "end_ms": 25950
+  },
+  {
+    "text": "más",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 25950,
+    "end_ms": 26200
+  },
+  {
+    "text": "de",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 26200,
+    "end_ms": 26350
+  },
+  {
+    "text": "50",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.99,
+    "start_ms": 26350,
+    "end_ms": 26850
+  },
+  {
+    "text": "idiomas,",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.97,
+    "start_ms": 26850,
+    "end_ms": 27600
+  },
+  {
+    "text": "así",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 27900,
+    "end_ms": 28200
+  },
+  {
+    "text": "que",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 28200,
+    "end_ms": 28400
+  },
+  {
+    "text": "sólo",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 28400,
+    "end_ms": 28750
+  },
+  {
+    "text": "tienes",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 28750,
+    "end_ms": 29150
+  },
+  {
+    "text": "que",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 29150,
+    "end_ms": 29300
+  },
+  {
+    "text": "hacer",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 29300,
+    "end_ms": 29700
+  },
+  {
+    "text": "clic",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 29700,
+    "end_ms": 30050
+  },
+  {
+    "text": "en",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 30050,
+    "end_ms": 30200
+  },
+  {
+    "text": "Transcribir",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.99,
+    "start_ms": 30200,
+    "end_ms": 31050
+  },
+  {
+    "text": "en",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 31200,
+    "end_ms": 31350
+  },
+  {
+    "text": "tu",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 31350,
+    "end_ms": 31500
+  },
+  {
+    "text": "próxima",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.97,
+    "start_ms": 31500,
+    "end_ms": 32050
+  },
+  {
+    "text": "reunión",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 32050,
+    "end_ms": 32650
+  },
+  {
+    "text": "o",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 32650,
+    "end_ms": 32800
+  },
+  {
+    "text": "vídeo",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 32800,
+    "end_ms": 33250
+  },
+  {
+    "text": "de",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 33250,
+    "end_ms": 33400
+  },
+  {
+    "text": "Youtube",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.99,
+    "start_ms": 33400,
+    "end_ms": 34000
+  },
+  {
+    "text": "y",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 34100,
+    "end_ms": 34250
+  },
+  {
+    "text": "compruébalo",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.97,
+    "start_ms": 34250,
+    "end_ms": 35050
+  },
+  {
+    "text": "tú",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 35050,
+    "end_ms": 35250
+  },
+  {
+    "text": "mismo.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrador" } },
+    "confidence": 0.98,
+    "start_ms": 35250,
+    "end_ms": 36000
+  }
+]

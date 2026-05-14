@@ -1,0 +1,25 @@
+[default]
+description = "Default permissions for the plugin"
+permissions = [
+    "allow-list-microphone-devices",
+    "allow-get-current-microphone-device",
+    "allow-get-microphone-selection-mode",
+    "allow-set-microphone-device",
+    "allow-set-microphone-auto",
+    "allow-check-microphone-access",
+    "allow-check-system-audio-access",
+    "allow-request-microphone-access",
+    "allow-request-system-audio-access",
+    "allow-open-microphone-access-settings",
+    "allow-open-system-audio-access-settings",
+    "allow-start-session",
+    "allow-stop-session",
+    "allow-pause-session",
+    "allow-resume-session",
+    "allow-get-mic-muted",
+    "allow-set-mic-muted",
+    "allow-get-speaker-muted",
+    "allow-set-speaker-muted",
+    "allow-get-state",
+    "allow-get-pipeline-status",
+]

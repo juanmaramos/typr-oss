@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-list-ask-threads"
+description = "Enables the list_ask_threads command without any pre-configured scope."
+commands.allow = ["list_ask_threads"]
+
+[[permission]]
+identifier = "deny-list-ask-threads"
+description = "Denies the list_ask_threads command without any pre-configured scope."
+commands.deny = ["list_ask_threads"]

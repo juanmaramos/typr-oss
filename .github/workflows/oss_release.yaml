@@ -1,0 +1,185 @@
+name: OSS Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the official v<version> release instead of creating a draft test release"
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  NODE_OPTIONS: --max-old-space-size=8192
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS Apple Silicon
+            platform: macos
+            runner: macos-14
+            target: aarch64-apple-darwin
+          - name: macOS Intel
+            platform: macos
+            runner: macos-14
+            target: x86_64-apple-darwin
+          - name: Windows x64
+            platform: windows
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve release metadata
+        id: release
+        shell: bash
+        env:
+          DISPATCH_PUBLISH: ${{ github.event.inputs.publish || 'false' }}
+        run: |
+          VERSION=$(jq -r '.version' ./apps/desktop/src-tauri/tauri.conf.json)
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+            TAG_NAME="${GITHUB_REF_NAME}"
+            EXPECTED_TAG="v${VERSION}"
+            if [[ "${TAG_NAME}" != "${EXPECTED_TAG}" ]]; then
+              echo "::error::Tag ${TAG_NAME} does not match app version ${VERSION}"
+              exit 1
+            fi
+            echo "tag=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+            echo "draft=false" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          elif [[ "${DISPATCH_PUBLISH}" == "true" ]]; then
+            echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+            echo "draft=false" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=oss-test-v${VERSION}-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+            echo "draft=true" >> "$GITHUB_OUTPUT"
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - uses: arduino/setup-protoc@v3
+        with:
+          version: "25.7"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10.11.1"
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install Rust
+        run: |
+          rustup toolchain install 1.88.0 --profile minimal --no-self-update
+          rustup default 1.88.0
+          rustup target add ${{ matrix.target }}
+        shell: bash
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+          workspaces: |
+            . -> target
+            apps/desktop/src-tauri -> target
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        shell: bash
+
+      - name: Build frontend packages
+        run: |
+          pnpm -F @typr/desktop lingui:compile
+          pnpm -F @typr/fonts build
+          pnpm -F @typr/ui build
+        shell: bash
+
+      - name: Build MCP sidecar
+        run: ./scripts/build_mcp_sidecar.sh ${{ matrix.target }}
+        shell: bash
+
+      - uses: ./.github/actions/apple_cert
+        if: ${{ matrix.platform == 'macos' }}
+        with:
+          apple-certificate: ${{ secrets.APPLE_CERTIFICATE }}
+          apple-certificate-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+
+      - name: Create Apple API key file
+        if: ${{ matrix.platform == 'macos' }}
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s' "$APPLE_API_KEY_P8_B64" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${APPLE_API_KEY_ID}.p8
+        env:
+          APPLE_API_KEY_P8_B64: ${{ secrets.APPLE_API_KEY_P8_B64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+
+      - name: Build signed and notarized app
+        uses: tauri-apps/tauri-action@v0.6.2
+        env:
+          CI: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_KEY_PATH: ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          POSTHOG_PROJECT_API_KEY: ${{ secrets.POSTHOG_PROJECT_API_KEY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+          VITE_SENTRY_RELEASE: ${{ steps.release.outputs.tag }}
+          CODESIGN_TIMESTAMP_URL: "http://timestamp.apple.com/ts01"
+        with:
+          projectPath: apps/desktop
+          tauriScript: pnpm tauri
+          args: --target ${{ matrix.target }} --config ./src-tauri/tauri.conf.stable.json --verbose
+          tagName: ${{ steps.release.outputs.tag }}
+          releaseName: Typr OSS v${{ steps.release.outputs.version }}
+          releaseBody: Signed and notarized Typr OSS macOS builds, plus an unsigned Windows installer.
+          releaseDraft: ${{ steps.release.outputs.draft }}
+          prerelease: ${{ steps.release.outputs.prerelease }}
+          retryAttempts: 2
+          includeUpdaterJson: true
+
+      - name: Verify macOS signature and notarization
+        if: ${{ matrix.platform == 'macos' }}
+        run: |
+          APP_PATH="./apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/macos/Typr.app"
+          codesign --verify --deep --strict --verbose=2 "$APP_PATH"
+          spctl --assess --type execute --verbose "$APP_PATH"
+        shell: bash
+
+      - name: Verify Windows installer
+        if: ${{ matrix.platform == 'windows' }}
+        run: |
+          NSIS_DIR="./apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/nsis"
+          echo "Checking Windows installer output in $NSIS_DIR"
+          ls -la "$NSIS_DIR"
+          test -n "$(find "$NSIS_DIR" -maxdepth 1 -name '*.exe' -print -quit)"
+        shell: bash

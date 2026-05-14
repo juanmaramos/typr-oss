@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-create-space"
+description = "Enables the create_space command without any pre-configured scope."
+commands.allow = ["create_space"]
+
+[[permission]]
+identifier = "deny-create-space"
+description = "Denies the create_space command without any pre-configured scope."
+commands.deny = ["create_space"]

@@ -1,0 +1,11 @@
+.tiptap-normal {
+  a {
+    color: hsl(var(--primary));
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: hsl(var(--primary) / 0.8);
+    }
+  }
+}

@@ -1,0 +1,7 @@
+.tiptap-normal {
+  blockquote {
+    border-left: 3px solid hsl(var(--foreground));
+    padding-left: 0.5rem;
+    caret-color: hsl(var(--foreground));
+  }
+}

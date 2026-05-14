@@ -1,0 +1,13 @@
+export { default as About } from "./about";
+export { default as LocalAI } from "./ai";
+export { default as Calendar } from "./calendar";
+export { default as General } from "./general";
+export { default as Integrations } from "./integrations";
+export { default as Lab } from "./lab";
+export { default as Notifications } from "./notifications";
+export { default as Privacy } from "./privacy";
+export { default as Profile } from "./profile";
+export { default as Sound } from "./sound";
+export { default as Team } from "./team";
+export { default as TemplateEditor } from "./template";
+export { default as TemplatesView } from "./templates";

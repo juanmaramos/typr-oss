@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-groq-api-key"
+description = "Enables the get_groq_api_key command without any pre-configured scope."
+commands.allow = ["get_groq_api_key"]
+
+[[permission]]
+identifier = "deny-get-groq-api-key"
+description = "Denies the get_groq_api_key command without any pre-configured scope."
+commands.deny = ["get_groq_api_key"]

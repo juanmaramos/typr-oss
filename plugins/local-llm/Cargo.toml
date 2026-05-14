@@ -1,0 +1,54 @@
+[package]
+name = "tauri-plugin-local-llm"
+version = "0.1.0"
+authors = ["You"]
+edition = "2021"
+exclude = ["/js", "/node_modules"]
+links = "tauri-plugin-local-llm"
+description = ""
+
+[features]
+default = []
+metal = ["typr-llama/metal"]
+cuda = ["typr-llama/cuda"]
+vulkan = ["typr-llama/vulkan"]
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[dev-dependencies]
+dirs = { workspace = true }
+reqwest = { workspace = true, features = ["json", "stream"] }
+specta-typescript = { workspace = true }
+tauri-plugin-store = { workspace = true }
+
+[dependencies]
+typr-ai-retry = { workspace = true }
+typr-file = { workspace = true }
+typr-gbnf = { workspace = true }
+typr-llama = { workspace = true }
+
+tauri = { workspace = true, features = ["test"] }
+tauri-plugin-store2 = { workspace = true }
+tauri-specta = { workspace = true, features = ["derive", "typescript"] }
+
+thiserror = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+specta = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+
+async-openai = { workspace = true }
+async-stream = { workspace = true }
+axum = { workspace = true }
+
+chrono = { workspace = true, features = ["serde"] }
+futures-util = { workspace = true }
+reqwest = { workspace = true, features = ["stream"] }
+reqwest-streams = { workspace = true, features = ["json"] }
+tokio = { workspace = true, features = ["rt", "macros"] }
+tokio-util = { workspace = true }
+tower-http = { workspace = true, features = ["cors", "trace"] }

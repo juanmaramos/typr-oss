@@ -1,0 +1,134 @@
+[package]
+name = "desktop"
+version = "0.1.11"
+authors = ["you"]
+edition = "2021"
+description = "Typr Desktop App"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "typr_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+tauri-plugin-apple-calendar = { workspace = true }
+tauri-nspanel = { workspace = true }
+
+[dependencies]
+typr-data = { workspace = true, optional = true }
+typr-db-core = { workspace = true }
+typr-db-script = { workspace = true }
+typr-db-user = { workspace = true }
+
+tauri-plugin-analytics = { workspace = true }
+tauri-plugin-auth = { workspace = true }
+tauri-plugin-config = { workspace = true }
+tauri-plugin-connector = { workspace = true }
+tauri-plugin-db = { workspace = true }
+tauri-plugin-flags = { workspace = true }
+tauri-plugin-listener = { workspace = true }
+tauri-plugin-local-llm = { workspace = true }
+tauri-plugin-local-stt = { workspace = true }
+tauri-plugin-machine-uid = { workspace = true }
+tauri-plugin-misc = { workspace = true }
+tauri-plugin-notification = { workspace = true }
+tauri-plugin-obsidian = { workspace = true }
+tauri-plugin-opener = { workspace = true }
+tauri-plugin-sfx = { workspace = true }
+tauri-plugin-sse = { workspace = true }
+tauri-plugin-store2 = { workspace = true }
+tauri-plugin-task = { workspace = true }
+tauri-plugin-template = { workspace = true }
+tauri-plugin-tray = { workspace = true }
+tauri-plugin-windows = { workspace = true }
+
+tauri = { workspace = true, features = ["specta", "macos-private-api"] }
+tauri-plugin-autostart = "2"
+tauri-plugin-clipboard-manager = { workspace = true }
+tauri-plugin-deep-link = { workspace = true }
+tauri-plugin-dialog = { workspace = true }
+tauri-plugin-fs = { workspace = true, features = ["watch"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-http = { workspace = true }
+tauri-plugin-os = "2"
+tauri-plugin-prevent-default = { version = "1.2", features = ["unstable-windows"] }
+tauri-plugin-process = "2"
+tauri-plugin-sentry = { version = "0.4.1", features = ["tracing"] }
+tauri-plugin-shell = { workspace = true }
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
+tauri-plugin-store = { workspace = true }
+tauri-plugin-updater = "2"
+tauri-plugin-window-state = "2"
+
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter", "chrono"] }
+
+specta = { workspace = true }
+specta-typescript = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+tauri-specta = { workspace = true, features = ["derive", "typescript"] }
+
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_qs = { workspace = true }
+
+dotenvy = "0.15"
+dirs = { workspace = true }
+
+bytes = { workspace = true }
+chrono = { workspace = true }
+codes-iso-639 = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true }
+
+futures-util = { workspace = true }
+reqwest = { workspace = true, features = ["json", "stream"] }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+tokio-stream = { workspace = true }
+
+hound = { workspace = true }
+html-escape = "0.2"
+pdf-extract = "0.10.0"
+quick-xml = "0.36"
+regex = "1.10"
+zip = { version = "4.6.1", default-features = false, features = ["deflate-flate2"] }
+
+[features]
+# Platform-specific defaults - configured via tauri.{platform}.conf.json
+default = []
+
+# Platform-specific feature sets:
+# - macOS uses: tauri.macos.conf.json → macos-default
+# - Windows uses: tauri.windows.conf.json → windows-default
+macos-default = ["llm-metal", "stt-metal", "stt-coreml"]
+windows-default = [] # CPU-only on Windows (llm-native removed — CPU is automatic in llama-cpp-2 >= 0.1.140)
+
+load-dynamic = ["tauri-plugin-local-stt/load-dynamic", "tauri-plugin-listener/load-dynamic"]
+
+llm-metal = ["tauri-plugin-local-llm/metal"]
+llm-cuda = ["tauri-plugin-local-llm/cuda"]
+llm-vulkan = ["tauri-plugin-local-llm/vulkan"]
+llm-native = [] # Deprecated: native CPU is now default in llama-cpp-2 >= 0.1.140
+
+stt-coreml = ["tauri-plugin-local-stt/coreml"]
+stt-directml = ["tauri-plugin-local-stt/directml"]
+stt-cuda = ["tauri-plugin-local-stt/cuda"]
+stt-hipblas = ["tauri-plugin-local-stt/hipblas"]
+stt-openblas = ["tauri-plugin-local-stt/openblas"]
+stt-metal = ["tauri-plugin-local-stt/metal"]
+stt-vulkan = ["tauri-plugin-local-stt/vulkan"]
+stt-openmp = ["tauri-plugin-local-stt/openmp"]
+
+metal = ["llm-metal", "stt-metal"]
+cuda = ["llm-cuda", "stt-cuda"]
+vulkan = ["llm-vulkan", "stt-vulkan"]

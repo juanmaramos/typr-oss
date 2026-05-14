@@ -1,0 +1,5 @@
+import { FEATURES } from "@/lib/features";
+
+export const SHELL_CHROME_MAC_LEADING_INSET_CLASS = FEATURES.SHOW_PRIMARY_RAIL ? "pl-[92px]" : "pl-[84px]";
+export const COLLAPSED_MAIN_PANEL_MAC_TITLEBAR_INSET_CLASS = FEATURES.SHOW_PRIMARY_RAIL ? "pl-36" : "pl-32";
+export const COLLAPSED_MAIN_PANEL_TITLEBAR_INSET_CLASS = "pl-14";

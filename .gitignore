@@ -1,0 +1,35 @@
+target/
+node_modules/
+.DS_Store
+.shuttle/
+Secrets*.toml
+.env
+.env.local
+.env.prod
+.env.production
+.venv
+**/__pycache__/
+
+*storybook.log
+.cache/
+restate-data
+
+.windsurfrules
+.turbo
+*.tsbuildinfo
+
+# Model files are downloaded dynamically from public model repositories.
+*.bin
+*.gguf
+*.onnx
+!crates/aec/data/*.onnx
+!crates/denoise/data/*.onnx
+!crates/pyannote-local/src/data/*.onnx
+models/
+target/
+build/
+packages/fonts/dist/
+.DS_Store
+
+# Scraped documentation
+scraped_docs/

@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-archive-ask-thread"
+description = "Enables the archive_ask_thread command without any pre-configured scope."
+commands.allow = ["archive_ask_thread"]
+
+[[permission]]
+identifier = "deny-archive-ask-thread"
+description = "Denies the archive_ask_thread command without any pre-configured scope."
+commands.deny = ["archive_ask_thread"]

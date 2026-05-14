@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-set-cloud-model"
+description = "Enables the set_cloud_model command without any pre-configured scope."
+commands.allow = ["set_cloud_model"]
+
+[[permission]]
+identifier = "deny-set-cloud-model"
+description = "Denies the set_cloud_model command without any pre-configured scope."
+commands.deny = ["set_cloud_model"]

@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-upsert-ask-context-snapshot"
+description = "Enables the upsert_ask_context_snapshot command without any pre-configured scope."
+commands.allow = ["upsert_ask_context_snapshot"]
+
+[[permission]]
+identifier = "deny-upsert-ask-context-snapshot"
+description = "Denies the upsert_ask_context_snapshot command without any pre-configured scope."
+commands.deny = ["upsert_ask_context_snapshot"]

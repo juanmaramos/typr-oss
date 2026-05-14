@@ -1,0 +1,23 @@
+[package]
+name = "typr-mcp-server"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "typr-mcp"
+path = "src/main.rs"
+
+[dependencies]
+# Use stable rmcp 0.3 (simpler API)
+anyhow = "1.0"
+dirs = "5.0"
+rmcp = { version = "0.3", features = ["server", "macros", "transport-io"] }
+# Match schemars version that rmcp 0.3 uses
+schemars = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+
+# Reuse existing crates from workspace
+typr-db-core = { workspace = true }
+typr-db-user = { workspace = true }
+typr-listener-interface = { workspace = true }

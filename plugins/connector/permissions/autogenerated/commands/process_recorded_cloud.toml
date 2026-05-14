@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-process-recorded-cloud"
+description = "Enables the process_recorded_cloud command without any pre-configured scope."
+commands.allow = ["process_recorded_cloud"]
+
+[[permission]]
+identifier = "deny-process-recorded-cloud"
+description = "Denies the process_recorded_cloud command without any pre-configured scope."
+commands.deny = ["process_recorded_cloud"]

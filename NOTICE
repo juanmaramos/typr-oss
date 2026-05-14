@@ -1,0 +1,25 @@
+Typr OSS
+
+This project descends from work originally published by Fastrepl in the Anarlog / Hyprnote codebase:
+
+  https://github.com/fastrepl/anarlog
+
+The project is distributed under the GNU General Public License v3.0. See LICENSE.
+
+Typr-specific changes include OSS sanitization, BYOK cloud provider configuration, local-first defaults, documentation, and removal of private commercial infrastructure from the public source tree.
+
+Bundled runtime and test assets are listed in docs/bundled-assets.md.
+
+Selected bundled binary assets:
+
+- ONNX Runtime for Windows, MIT License, Microsoft Corporation:
+  https://github.com/microsoft/onnxruntime
+- DTLN denoise models, MIT License, Nils L. Westhausen:
+  https://github.com/breizhn/DTLN
+- DTLN-aec acoustic echo cancellation models, MIT License, Nils L. Westhausen:
+  https://github.com/breizhn/DTLN-aec
+- pyannote segmentation model / ONNX conversion, MIT License:
+  https://huggingface.co/pyannote/segmentation
+  https://huggingface.co/onnx-community/pyannote-segmentation-3.0
+- WeSpeaker VoxCeleb CAM++ speaker embedding model, Apache License 2.0:
+  https://huggingface.co/Wespeaker/wespeaker-voxceleb-campplus

@@ -1,0 +1,18 @@
+// Using global styles for the pushable button
+import { ButtonHTMLAttributes, type ReactNode } from "react";
+
+interface PushableButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
+}
+
+export default function PushableButton({
+  children,
+  className,
+  ...props
+}: PushableButtonProps) {
+  return (
+    <button className={`pushable cursor-pointer ${className || ""}`} {...props}>
+      <span className="front">{children}</span>
+    </button>
+  );
+}

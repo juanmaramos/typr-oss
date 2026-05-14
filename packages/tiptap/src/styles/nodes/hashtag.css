@@ -1,0 +1,13 @@
+.tiptap-normal {
+  .hashtag {
+    color: hsl(var(--warning));
+    text-decoration: underline;
+    text-decoration-color: hsl(var(--warning));
+    display: inline;
+    padding: 0 2px;
+    border-radius: 0;
+    background: none;
+    border: none;
+    font-weight: 500;
+  }
+}

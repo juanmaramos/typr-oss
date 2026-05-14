@@ -1,0 +1,37 @@
+[
+  {
+    "start": 0,
+    "end": 280,
+    "speaker": "speaker0"
+  },
+  {
+    "start": 320,
+    "end": 600,
+    "speaker": "speaker0"
+  },
+  {
+    "start": 640,
+    "end": 920,
+    "speaker": "speaker0"
+  },
+  {
+    "start": 1440,
+    "end": 1720,
+    "speaker": "speaker1"
+  },
+  {
+    "start": 1760,
+    "end": 2040,
+    "speaker": "speaker1"
+  },
+  {
+    "start": 2080,
+    "end": 2360,
+    "speaker": "speaker1"
+  },
+  {
+    "start": 2400,
+    "end": 2680,
+    "speaker": "speaker1"
+  }
+]

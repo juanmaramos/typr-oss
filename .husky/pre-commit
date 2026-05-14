@@ -1,0 +1,37 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# 1. Health check (database, build, error handlers)
+echo "🏥 Running health check..."
+npm run test:health
+if [ $? -ne 0 ]; then
+  echo "❌ Health check failed. Fix issues before committing."
+  exit 1
+fi
+
+# 2. Code formatting check (matches fmt.yaml workflow)
+echo "🎨 Checking code formatting..."
+if command -v dprint >/dev/null 2>&1; then
+  dprint check
+  if [ $? -ne 0 ]; then
+    echo "❌ Code formatting failed. Run 'dprint fmt' to fix."
+    exit 1
+  fi
+else
+  echo "⚠️  dprint not found, skipping formatting check"
+fi
+
+# 3. i18n synchronization check - REMOVED from pre-commit
+# Lingui extract has non-deterministic ordering that causes false positives
+# i18n is still validated in CI via .github/workflows/i18n.yaml
+# echo "🌍 Checking i18n synchronization..."
+
+# 4. Platform-specific compilation check - DISABLED
+# This check was catching whisper-rs build issues but has false positives
+# The actual Tauri build (which includes proper SDK paths) works fine
+# CI has full build validation in desktop_ci.yaml
+# echo "🔨 Checking platform compilation compatibility..."
+
+echo "✅ All pre-commit checks passed!"

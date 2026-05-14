@@ -1,0 +1,4615 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-05-15 16:09-0700\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+#: src/components/toast/use-check-for-updates.tsx:92
+msgid "The app will now restart"
+msgstr "The app will now restart"
+
+#. js-lingui-explicit-id
+#: src/components/toast/use-check-for-updates.tsx:92
+msgid "Update installed"
+msgstr "Update installed"
+
+#. js-lingui-explicit-id
+#: src/components/toast/use-check-for-updates.tsx:97
+msgid "Please move the app to the Applications folder and try again"
+msgstr "Please move the app to the Applications folder and try again"
+
+#. js-lingui-explicit-id
+#: src/components/toast/use-check-for-updates.tsx:99
+#: src/components/toast/use-check-for-updates.tsx:102
+msgid "Update installation failed"
+msgstr "Update installation failed"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:63
+#: ../../packages/utils/src/datetime.ts:401
+#: src/components/left-sidebar/notes-list.tsx:524
+#: src/components/right-panel/utils/chat-utils.ts:10
+msgid "Today"
+msgstr "Today"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:65
+#: ../../packages/utils/src/datetime.ts:180
+#: src/components/right-panel/utils/chat-utils.ts:15
+msgid "Yesterday"
+msgstr "Yesterday"
+
+#. js-lingui-explicit-id
+#: ../../packages/tiptap/src/transcript/utils.ts:128
+#: src/components/right-panel/views/transcript-view.tsx:695
+msgid "You"
+msgstr "You"
+
+#. js-lingui-explicit-id
+#: ../../packages/tiptap/src/transcript/utils.ts:130
+#: src/components/right-panel/views/transcript-view.tsx:695
+msgid "Them"
+msgstr "Them"
+
+#. js-lingui-explicit-id
+#: src/components/left-sidebar/notes-list.tsx:215
+msgid "No notes yet."
+msgstr "No notes yet."
+
+#. js-lingui-explicit-id
+#: src/components/left-sidebar/notes-list.tsx:525
+msgid "Last 7 days"
+msgstr "Last 7 days"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:411
+#: src/components/left-sidebar/notes-list.tsx:526
+msgid "This month"
+msgstr "This month"
+
+#. js-lingui-explicit-id
+#: src/components/left-sidebar/notes-list.tsx:527
+msgid "Coming up"
+msgstr "Coming up"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:22
+msgid "{days} day{plural} later"
+msgstr "{days} day{plural} later"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:27
+msgid "{hours} hour{plural} later"
+msgstr "{hours} hour{plural} later"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:32
+msgid "{minutes} minutes later"
+msgstr "{minutes} minutes later"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:36
+#: ../../packages/utils/src/datetime.ts:223
+msgid "Starting soon"
+msgstr "Starting soon"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:38
+#: ../../packages/utils/src/datetime.ts:207
+msgid "In progress"
+msgstr "In progress"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:44
+#: ../../packages/utils/src/datetime.ts:90
+#: ../../packages/utils/src/datetime.ts:287
+#: ../../packages/utils/src/datetime.ts:377
+msgid "Unknown date"
+msgstr "Unknown date"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:53
+#: ../../packages/utils/src/datetime.ts:98
+#: ../../packages/utils/src/datetime.ts:296
+#: ../../packages/utils/src/datetime.ts:342
+#: ../../packages/utils/src/datetime.ts:381
+#: ../../packages/utils/src/datetime.ts:390
+msgid "Invalid date"
+msgstr "Invalid date"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:67
+#: ../../packages/utils/src/datetime.ts:182
+msgid "{days} days ago"
+msgstr "{days} days ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:69
+#: ../../packages/utils/src/datetime.ts:236
+msgid "{days} days later"
+msgstr "{days} days later"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:76
+#: ../../packages/utils/src/datetime.ts:79
+msgid "{date}"
+msgstr "{date}"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:84
+#: ../../packages/utils/src/datetime.ts:130
+#: ../../packages/utils/src/datetime.ts:325
+#: ../../packages/utils/src/datetime.ts:371
+#: ../../packages/utils/src/datetime.ts:431
+msgid "Date error"
+msgstr "Date error"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:109
+msgid "Today ({dayOfWeek})"
+msgstr "Today ({dayOfWeek})"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:111
+msgid "Yesterday ({dayOfWeek})"
+msgstr "Yesterday ({dayOfWeek})"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:113
+msgid "{days} days ago ({dayOfWeek})"
+msgstr "{days} days ago ({dayOfWeek})"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:115
+msgid "{days} days later ({dayOfWeek})"
+msgstr "{days} days later ({dayOfWeek})"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:122
+#: ../../packages/utils/src/datetime.ts:125
+msgid "{date} ({dayOfWeek})"
+msgstr "{date} ({dayOfWeek})"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:168
+msgid "Just now"
+msgstr "Just now"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:170
+msgid "{seconds} seconds ago"
+msgstr "{seconds} seconds ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:172
+msgid "1 minute ago"
+msgstr "1 minute ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:174
+msgid "{minutes} minutes ago"
+msgstr "{minutes} minutes ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:176
+msgid "1 hour ago"
+msgstr "1 hour ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:178
+msgid "{hours} hours ago"
+msgstr "{hours} hours ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:184
+msgid "1 week ago"
+msgstr "1 week ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:186
+msgid "{weeks} weeks ago"
+msgstr "{weeks} weeks ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:188
+msgid "1 month ago"
+msgstr "1 month ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:190
+msgid "{months} months ago"
+msgstr "{months} months ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:192
+msgid "1 year ago"
+msgstr "1 year ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:194
+msgid "{years} years ago"
+msgstr "{years} years ago"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:225
+msgid "In 1 minute"
+msgstr "In 1 minute"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:227
+msgid "In {minutes} minutes"
+msgstr "In {minutes} minutes"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:229
+msgid "In 1 hour"
+msgstr "In 1 hour"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:231
+msgid "In {hours} hours"
+msgstr "In {hours} hours"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:234
+msgid "1 day later"
+msgstr "1 day later"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:239
+msgid "{weeks} weeks later"
+msgstr "{weeks} weeks later"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:308
+msgid "Today, {time}"
+msgstr "Today, {time}"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:310
+msgid "Yesterday, {time}"
+msgstr "Yesterday, {time}"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:317
+#: ../../packages/utils/src/datetime.ts:320
+msgid "{date}, {time}"
+msgstr "{date}, {time}"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:354
+msgid "{date}, {startTime}-{endTime}"
+msgstr "{date}, {startTime}-{endTime}"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:362
+msgid "{startDate}, {startTime} - {endDate}, {endTime}"
+msgstr "{startDate}, {startTime} - {endDate}, {endTime}"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:406
+msgid "This Week"
+msgstr "This Week"
+
+#. js-lingui-explicit-id
+#: ../../packages/utils/src/datetime.ts:424
+msgid "{month} {year}"
+msgstr "{month} {year}"
+
+#: src/routes/app.ask.$threadId.tsx:507
+msgid "· Failed"
+msgstr "· Failed"
+
+#: src/routes/app.ask.$threadId.tsx:508
+msgid "· Interrupted"
+msgstr "· Interrupted"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:311
+#: src/components/projects/project-summary-tab.tsx:79
+msgid "· Updated {updatedAt}"
+msgstr "· Updated {updatedAt}"
+
+#. placeholder {0}: !ongoingSessionMuted.micMuted ? "Transcribe" : "Don't transcribe"
+#. placeholder {0}: !ongoingSessionMuted.speakerMuted ? "Transcribe" : "Don't transcribe"
+#. placeholder {0}: !ongoingSessionState.micMuted ? "Transcribe" : "Don't transcribe"
+#: src/components/editor-area/note-header/listen-button.tsx:233
+#: src/components/editor-area/note-header/listen-button.tsx:255
+#: src/components/editor-area/note-header/listen-button.tsx:274
+#: src/components/editor-area/note-header/listen-button.tsx:500
+#: src/components/editor-area/note-header/listen-button.tsx:518
+#: src/components/editor-area/note-header/transcription-bar.tsx:333
+#: src/components/editor-area/note-header/transcription-bar.tsx:352
+#: src/components/settings/components/wer-modal.tsx:116
+#: src/components/shortcuts-window.tsx:138
+msgid "{0}"
+msgstr "{0}"
+
+#. placeholder {0}: calendarsQuery.data?.selectedCount ?? 0
+#: src/components/settings/components/calendar/calendar-selector.tsx:86
+msgid "{0} calendars selected"
+msgstr "{0} calendars selected"
+
+#. placeholder {0}: files.length
+#: src/components/projects/project-notes-panel.tsx:169
+msgid "{0} files"
+msgstr "{0} files"
+
+#. placeholder {0}: brief.sourceCount
+#: src/components/projects/project-brief-panel.tsx:41
+#: src/components/projects/project-summary-tab.tsx:38
+msgid "{0} note"
+msgstr "{0} note"
+
+#. placeholder {0}: brief?.sourceCount ?? 0
+#: src/components/projects/project-brief-panel.tsx:42
+#: src/components/projects/project-summary-tab.tsx:39
+msgid "{0} notes"
+msgstr "{0} notes"
+
+#. placeholder {0}: selectedTags.length
+#: src/components/left-sidebar/tag-filter-bar.tsx:154
+msgid "{0} selected"
+msgstr "{0} selected"
+
+#. placeholder {0}: brief.sourceCount
+#: src/components/projects/project-brief-sidebar-view.tsx:267
+msgid "{0} source"
+msgstr "{0} source"
+
+#. placeholder {0}: brief?.sourceCount ?? 0
+#. placeholder {0}: sources.length
+#: src/components/projects/project-brief-sidebar-view.tsx:268
+#: src/components/projects/project-source-citation-markdown.tsx:146
+msgid "{0} sources"
+msgstr "{0} sources"
+
+#: src/components/settings/views/sound.tsx:63
+msgid "{buttonText}"
+msgstr "{buttonText}"
+
+#: src/components/settings/components/wer-modal.tsx:103
+#: src/components/shortcuts-window.tsx:115
+msgid "{category}"
+msgstr "{category}"
+
+#: src/components/projects/project-notes-panel.tsx:160
+msgid "{count} notes"
+msgstr "{count} notes"
+
+#: src/components/spaces/space-notes-picker-dialog.tsx:223
+msgid "{selectedCount} selected"
+msgstr "{selectedCount} selected"
+
+#: src/components/projects/project-brief-panel.tsx:39
+#: src/components/projects/project-summary-tab.tsx:36
+msgid "{sourceCount} note"
+msgstr "{sourceCount} note"
+
+#: src/components/projects/project-brief-panel.tsx:39
+#: src/components/projects/project-summary-tab.tsx:36
+msgid "{sourceCount} notes"
+msgstr "{sourceCount} notes"
+
+#: src/components/projects/project-brief-row.tsx:38
+#: src/components/projects/project-brief-sidebar-view.tsx:265
+#: src/components/projects/project-brief-sidebar-view.tsx:395
+msgid "{sourceCount} source"
+msgstr "{sourceCount} source"
+
+#: src/components/projects/project-brief-row.tsx:38
+#: src/components/projects/project-brief-sidebar-view.tsx:265
+#: src/components/projects/project-brief-sidebar-view.tsx:395
+msgid "{sourceCount} sources"
+msgstr "{sourceCount} sources"
+
+#: src/components/shortcuts-window.tsx:97
+msgid "{totalCount} shortcuts"
+msgstr "{totalCount} shortcuts"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:495
+msgid "+ 10 more languages supported"
+msgstr "+ 10 more languages supported"
+
+#. placeholder {0}: Math.ceil(remainingMs / 60000)
+#: src/components/audio-upload-toast.tsx:40
+msgid "~{0}m remaining"
+msgstr "~{0}m remaining"
+
+#. placeholder {0}: Math.ceil(remainingMs / 1000)
+#: src/components/audio-upload-toast.tsx:38
+msgid "~{0}s remaining"
+msgstr "~{0}s remaining"
+
+#: src/components/editor-area/floating-button.tsx:67
+#: src/components/settings/components/template-list.tsx:39
+#: src/components/settings/components/templates-sidebar.tsx:35
+#: src/components/settings/views/templates.tsx:447
+msgid "1-on-1 Meeting"
+msgstr "1-on-1 Meeting"
+
+#: src/components/settings-dialog/content.tsx:42
+#: src/components/settings-dialog/sidebar.tsx:38
+msgid "About"
+msgstr "About"
+
+#: src/components/right-panel/components/chat/inline-diff-summary.tsx:111
+msgid "Accept"
+msgstr "Accept"
+
+#: src/components/right-panel/components/chat/inline-diff-summary.tsx:129
+msgid "Accepted"
+msgstr "Accepted"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:104
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:170
+msgid "Access granted"
+msgstr "Access granted"
+
+#: src/components/settings/views/sound.tsx:43
+msgid "Access Granted"
+msgstr "Access Granted"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:102
+msgid "Access many model providers through one API key."
+msgstr "Access many model providers through one API key."
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:383
+msgid "Access multiple AI models through OpenRouter with your API key"
+msgstr "Access multiple AI models through OpenRouter with your API key"
+
+#: src/components/settings/views/integrations.tsx:196
+msgid "Access your meeting notes directly from ChatGPT."
+msgstr "Access your meeting notes directly from ChatGPT."
+
+#: src/components/settings-dialog/sidebar.tsx:134
+msgid "Account"
+msgstr "Account"
+
+#: src/components/settings/components/ai/stt-view.tsx:304
+#: src/components/settings/components/ai/stt-view.tsx:548
+#: src/components/transcript/actions/STTLanguageSelector.tsx:270
+#: src/components/transcript/actions/STTLanguageSelector.tsx:393
+msgid "Accuracy"
+msgstr "Accuracy"
+
+#: src/components/shortcuts-window.tsx:127
+msgid "Action"
+msgstr "Action"
+
+#: src/components/command-palette.tsx:415
+msgid "Actions"
+msgstr "Actions"
+
+#: src/components/projects/project-notes-picker-dialog.tsx:255
+#: src/components/spaces/space-notes-picker-dialog.tsx:242
+msgid "Add {selectedCount} notes"
+msgstr "Add {selectedCount} notes"
+
+#: src/components/projects/project-header.tsx:92
+#: src/components/spaces/project-header.tsx:59
+msgid "Add a description"
+msgstr "Add a description"
+
+#: src/components/settings/views/template.tsx:239
+msgid "Add a description..."
+msgstr "Add a description..."
+
+#: src/components/spaces/space-empty-state.tsx:20
+msgid "Add a few notes to start collecting the context you want to reopen from this project."
+msgstr "Add a few notes to start collecting the context you want to reopen from this project."
+
+#: src/components/projects/project-brief-sidebar-view.tsx:275
+msgid "Add a few related notes, then Typr can keep a brief for this project."
+msgstr "Add a few related notes, then Typr can keep a brief for this project."
+
+#: src/components/settings/components/ai/stt-view.tsx:596
+msgid "Add a key to use AssemblyAI cloud transcription."
+msgstr "Add a key to use AssemblyAI cloud transcription."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:330
+msgid "Add a key to use this provider."
+msgstr "Add a key to use this provider."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:373
+msgid "Add API key above"
+msgstr "Add API key above"
+
+#: src/components/settings/views/general.tsx:285
+msgid "Add languages to improve accuracy. Leave empty for automatic detection."
+msgstr "Add languages to improve accuracy. Leave empty for automatic detection."
+
+#: src/components/settings/views/team.tsx:94
+msgid "Add members"
+msgstr "Add members"
+
+#: src/components/projects/project-notes-picker-dialog.tsx:255
+#: src/components/spaces/space-notes-picker-dialog.tsx:242
+msgid "Add note"
+msgstr "Add note"
+
+#: src/components/projects/project-empty-state.tsx:23
+#: src/components/projects/project-notes-panel.tsx:177
+#: src/components/projects/project-notes-picker-dialog.tsx:162
+#: src/components/spaces/project-notes-panel.tsx:36
+#: src/components/spaces/space-empty-state.tsx:25
+#: src/components/spaces/space-notes-picker-dialog.tsx:137
+msgid "Add notes"
+msgstr "Add notes"
+
+#: src/components/projects/project-ask-launcher.tsx:75
+msgid "Add notes or indexed files before asking this project"
+msgstr "Add notes or indexed files before asking this project"
+
+#: src/components/projects/project-summary-tab.tsx:45
+msgid "Add notes to this project before Typr builds a generated summary."
+msgstr "Add notes to this project before Typr builds a generated summary."
+
+#: src/components/finder/views/contact-view.tsx:882
+#: src/components/finder/views/contact-view.tsx:890
+msgid "Add organization"
+msgstr "Add organization"
+
+#: src/components/editor-area/note-header/chips/participants-chip.tsx:312
+#: src/components/editor-area/note-header/chips/participants-chip.tsx:319
+msgid "Add participant"
+msgstr "Add participant"
+
+#: src/components/projects/project-empty-state.tsx:18
+msgid "Add related notes so this project is easy to reopen later."
+msgstr "Add related notes so this project is easy to reopen later."
+
+#: src/components/settings/components/template-sections.tsx:84
+msgid "Add Section"
+msgstr "Add Section"
+
+#: src/components/settings/views/general.tsx:447
+msgid "Add specific terms or jargon that are used in your company. Used to improve the transcription accuracy."
+msgstr "Add specific terms or jargon that are used in your company. Used to improve the transcription accuracy."
+
+#: src/components/editor-area/note-header/chips/tag-chip.tsx:48
+msgid "Add tags"
+msgstr "Add tags"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:184
+msgid "Add this note to one or more projects."
+msgstr "Add this note to one or more projects."
+
+#: src/components/editor-area/selection-actions.tsx:248
+msgid "Add to Chat"
+msgstr "Add to Chat"
+
+#: src/components/right-panel/components/chat/message-wrapper.tsx:284
+msgid "Add to note"
+msgstr "Add to note"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:163
+#: src/components/editor-area/note-header/chips/project-chip.tsx:172
+#: src/components/left-sidebar/bulk-delete-button.tsx:129
+#: src/components/left-sidebar/bulk-delete-button.tsx:136
+msgid "Add to project"
+msgstr "Add to project"
+
+#: src/components/settings/views/templates.tsx:542
+msgid "Add to quick access in editor"
+msgstr "Add to quick access in editor"
+
+#: src/components/right-panel/components/chat/inline-diff-summary.tsx:61
+msgid "Added"
+msgstr "Added"
+
+#: src/components/right-panel/components/chat/diff-preview.tsx:219
+msgid "Added text"
+msgstr "Added text"
+
+#: src/components/settings/views/team.tsx:142
+#: src/components/settings/views/team.tsx:229
+msgid "Admin"
+msgstr "Admin"
+
+#: src/components/settings-dialog/content.tsx:35
+#: src/components/settings-dialog/sidebar.tsx:31
+#~ msgid "AI"
+#~ msgstr "AI"
+
+#: src/components/settings-dialog/content.tsx:35
+#: src/components/settings-dialog/sidebar.tsx:31
+msgid "AI models"
+msgstr "AI models"
+
+#: src/components/welcome-modal/download-progress-view.tsx:229
+msgid "AI models are ready"
+msgstr "AI models are ready"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:172
+msgid "AI models for answering questions and summarizing your meetings"
+msgstr "AI models for answering questions and summarizing your meetings"
+
+#: src/components/settings/views/about.tsx:106
+msgid "AI notepad for meetings, notes, and follow-up work."
+msgstr "AI notepad for meetings, notes, and follow-up work."
+
+#: src/components/editor-area/note-header/index.tsx:141
+msgid "AI notes"
+msgstr "AI notes"
+
+#: src/components/editor-area/editor-mode-indicator.tsx:63
+msgid "AI Summary"
+msgstr "AI Summary"
+
+#: src/components/audio-upload-toast.tsx:177
+msgid "AI summary is being generated…"
+msgstr "AI summary is being generated…"
+
+#: src/components/audio-upload-toast.tsx:204
+msgid "AI summary is ready"
+msgstr "AI summary is ready"
+
+#: src/components/settings/views/privacy.tsx:149
+msgid "AI training opt-out"
+msgstr "AI training opt-out"
+
+#: src/components/right-panel/components/chat/mode-selector.tsx:33
+msgid "AI writes and edits your notes with natural language"
+msgstr "AI writes and edits your notes with natural language"
+
+#: src/components/right-panel/components/chat/mode-selector.tsx:34
+msgid "AI writing agent"
+msgstr "AI writing agent"
+
+#: src/components/settings/views/lab.tsx:42
+msgid "AI writing assistant"
+msgstr "AI writing assistant"
+
+#: src/components/welcome-modal/download-progress-view.tsx:192
+msgid "AI writing setup failed"
+msgstr "AI writing setup failed"
+
+#: src/components/welcome-modal/rating-display.tsx:44
+msgid "All"
+msgstr "All"
+
+#: src/components/right-panel/components/chat/chat-history-view.tsx:39
+msgid "All chats"
+msgstr "All chats"
+
+#: src/components/projects/project-notes-picker-dialog.tsx:199
+msgid "All notes that are not already in this project appear here."
+msgstr "All notes that are not already in this project appear here."
+
+#: src/components/share-and-permission/participants-selector.tsx:31
+msgid "All Participants"
+msgstr "All Participants"
+
+#: src/routes/app.ask.tsx:232
+#: src/routes/app.ask.tsx:236
+msgid "All projects"
+msgstr "All projects"
+
+#: src/components/editor-area/floating-button.tsx:305
+#: src/components/editor-area/floating-button.tsx:530
+#: src/components/editor-area/note-header/index.tsx:292
+msgid "All templates..."
+msgstr "All templates..."
+
+#: src/components/settings/views/privacy.tsx:152
+msgid "Always enabled. Your chats and transcripts are never used to train AI models"
+msgstr "Always enabled. Your chats and transcripts are never used to train AI models"
+
+#: src/components/audio-upload-dialog.tsx:361
+msgid "An audio file is already being transcribed. Please wait for it to finish."
+msgstr "An audio file is already being transcribed. Please wait for it to finish."
+
+#. placeholder {0}: members.length - 5
+#: src/components/organization-profile/members-list.tsx:102
+msgid "and {0} more members"
+msgstr "and {0} more members"
+
+#: src/components/ui/thinking-bar.tsx:21
+msgid "Answer now"
+msgstr "Answer now"
+
+#: src/routes/app.ask.$threadId.tsx:693
+msgid "Answering from project notes"
+msgstr "Answering from project notes"
+
+#: src/components/share-and-permission/publish.tsx:18
+msgid "Anyone with the link can view this page"
+msgstr "Anyone with the link can view this page"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:493
+msgid "API Base URL"
+msgstr "API Base URL"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:314
+#: src/components/settings/components/ai/stt-view.tsx:584
+msgid "API key"
+msgstr "API key"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:201
+#: src/components/settings/components/ai/llm-custom-view.tsx:297
+#: src/components/settings/components/ai/llm-custom-view.tsx:403
+#: src/components/settings/components/ai/llm-custom-view.tsx:516
+msgid "API Key"
+msgstr "API Key"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:308
+#: src/components/settings/components/ai/llm-local-view.tsx:394
+#: src/components/settings/components/ai/stt-view.tsx:519
+#: src/components/settings/components/ai/task-defaults.tsx:310
+#: src/components/settings/components/ai/task-defaults.tsx:345
+msgid "API key required"
+msgstr "API key required"
+
+#: src/components/settings/views/general.tsx:245
+#: src/components/welcome-modal/user-setup-view.tsx:116
+msgid "App language"
+msgstr "App language"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:95
+msgid "Apple Calendar"
+msgstr "Apple Calendar"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:161
+msgid "Apple Contacts"
+msgstr "Apple Contacts"
+
+#: src/hooks/useNoteSelection.ts:71
+msgid "Are you sure you want to delete {count} notes?"
+msgstr "Are you sure you want to delete {count} notes?"
+
+#: src/hooks/useBulkDelete.ts:107
+msgid "Are you sure you want to delete {selectedCount} notes?"
+msgstr "Are you sure you want to delete {selectedCount} notes?"
+
+#: src/components/left-sidebar/notes-list.tsx:359
+#: src/components/toolbar/buttons/delete-note-button.tsx:52
+#: src/hooks/useBulkDelete.ts:106
+#: src/hooks/useNoteSelection.ts:70
+msgid "Are you sure you want to delete this note?"
+msgstr "Are you sure you want to delete this note?"
+
+#: src/components/left-sidebar/index.tsx:199
+#: src/components/right-panel/components/chat/mode-selector.tsx:24
+#: src/routes/app.ask.tsx:199
+msgid "Ask"
+msgstr "Ask"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:229
+#: src/components/meeting-assistant/floating-dock-variant.tsx:106
+#: src/components/meeting-assistant/floating-dock-variant.tsx:179
+#: src/components/meeting-assistant/floating-dock-variant.tsx:351
+msgid "Ask about this meeting"
+msgstr "Ask about this meeting"
+
+#: src/components/right-panel/components/chat/chat-input.tsx:232
+#: src/components/right-panel/components/chat/chat-input.tsx:326
+msgid "Ask about this meeting..."
+msgstr "Ask about this meeting..."
+
+#: src/components/spaces/scoped-prompt-composer.tsx:23
+msgid "Ask about this project..."
+msgstr "Ask about this project..."
+
+#: src/components/right-panel/components/chat/mode-selector.tsx:26
+msgid "Ask about your meeting content, transcript, and notes"
+msgstr "Ask about your meeting content, transcript, and notes"
+
+#: src/components/transcript/actions/TranscriptActionBar.tsx:216
+msgid "Ask AI"
+msgstr "Ask AI"
+
+#: src/routes/app.ask.$threadId.tsx:434
+msgid "Ask anything..."
+msgstr "Ask anything..."
+
+#: src/routes/app.ask.tsx:344
+msgid "Ask conversation"
+msgstr "Ask conversation"
+
+#: src/components/right-panel/views/chat-view.tsx:494
+msgid "Ask in context of this meeting"
+msgstr "Ask in context of this meeting"
+
+#: src/components/right-panel/components/chat/mode-selector.tsx:27
+msgid "Ask questions"
+msgstr "Ask questions"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:80
+msgid "Ask questions about your meeting or try one of these suggestions to get started."
+msgstr "Ask questions about your meeting or try one of these suggestions to get started."
+
+#: src/components/projects/project-ask-launcher.tsx:63
+msgid "Ask this project"
+msgstr "Ask this project"
+
+#: src/components/projects/project-ask-launcher.tsx:74
+#: src/routes/app.ask.$threadId.tsx:434
+msgid "Ask this project..."
+msgstr "Ask this project..."
+
+#: src/components/app-shell/context-pane.tsx:22
+msgid "Ask Typr"
+msgstr "Ask Typr"
+
+#: src/components/spaces/scoped-prompt-composer.tsx:46
+msgid "Ask Typr about this project"
+msgstr "Ask Typr about this project"
+
+#: src/routes/app.ask.tsx:202
+msgid "Ask uses project knowledge. Start from a project, or choose one here, to chat with its notes and files."
+msgstr "Ask uses project knowledge. Start from a project, or choose one here, to chat with its notes and files."
+
+#: src/components/settings/components/ai/stt-view.tsx:505
+#: src/components/settings/components/ai/task-defaults.tsx:341
+#: src/components/settings/components/ai/task-defaults.tsx:344
+msgid "AssemblyAI"
+msgstr "AssemblyAI"
+
+#: src/components/settings/views/lab.tsx:59
+msgid "Assign formal tags to notes and filter related notes from the sidebar."
+msgstr "Assign formal tags to notes and filter related notes from the sidebar."
+
+#: src/hooks/useTranscriptionFallback.ts:156
+msgid "Attempt {attempt} of {maxAttempts}"
+msgstr "Attempt {attempt} of {maxAttempts}"
+
+#: src/components/audio-upload-dialog.tsx:90
+msgid "Audio"
+msgstr "Audio"
+
+#: src/components/editor-area/note-header/listen-button.tsx:527
+#: src/components/editor-area/note-header/transcription-bar.tsx:371
+msgid "Audio input"
+msgstr "Audio input"
+
+#: src/components/transcript/actions/MicrophoneSelector.tsx:99
+msgid "Audio input settings"
+msgstr "Audio input settings"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:93
+msgid "Audio permissions"
+msgstr "Audio permissions"
+
+#: src/components/transcript/actions/AudioSettingsButton.tsx:29
+msgid "Audio Settings"
+msgstr "Audio Settings"
+
+#: src/components/right-panel/views/transcript-view.tsx:637
+msgid "Audio upload in progress"
+msgstr "Audio upload in progress"
+
+#: src/components/right-panel/views/transcript-view.tsx:667
+msgid "Audio upload in progress. Live transcription is unavailable until it finishes."
+msgstr "Audio upload in progress. Live transcription is unavailable until it finishes."
+
+#: src/components/audio-upload-dialog.tsx:342
+msgid "Audio upload requires a downloaded local model. <0>Download one in Settings</0>"
+msgstr "Audio upload requires a downloaded local model. <0>Download one in Settings</0>"
+
+#: src/components/editor-area/note-header/index.tsx:77
+#: src/components/editor-area/note-header/index.tsx:78
+#: src/components/editor-area/note-header/index.tsx:194
+#: src/components/editor-area/note-header/listen-button.tsx:545
+#: src/components/editor-area/note-header/listen-button.tsx:548
+#: src/components/editor-area/note-header/listen-button.tsx:557
+#: src/components/editor-area/note-header/transcription-bar.tsx:399
+#: src/components/editor-area/note-header/transcription-bar.tsx:402
+#: src/components/editor-area/note-header/transcription-bar.tsx:411
+#: src/components/settings/components/ai/task-defaults.tsx:214
+#: src/components/settings/components/ai/task-defaults.tsx:242
+#: src/components/settings/components/ai/task-defaults.tsx:243
+#: src/components/settings/components/ai/task-defaults.tsx:271
+#: src/components/settings/components/ai/task-defaults.tsx:297
+#: src/components/settings/components/ai/task-defaults.tsx:298
+#: src/components/transcript/actions/MicrophoneSelector.tsx:83
+#: src/components/transcript/actions/MicrophoneSelector.tsx:84
+msgid "Auto"
+msgstr "Auto"
+
+#: src/components/ui/model-selector.tsx:131
+msgid "Auto - Best available configured model"
+msgstr "Auto - Best available configured model"
+
+#: src/components/ui/model-selector.tsx:79
+#~ msgid "Auto - Best available model"
+#~ msgstr "Auto - Best available model"
+
+#: src/components/ui/model-selector.tsx:79
+#~ msgid "Auto - Recommended default model"
+#~ msgstr "Auto - Recommended default model"
+
+#: src/components/settings/components/ai/stt-view.tsx:608
+msgid "Auto language detection and switching"
+msgstr "Auto language detection and switching"
+
+#: src/components/settings/views/general.tsx:295
+msgid "Auto-detect"
+msgstr "Auto-detect"
+
+#: src/components/settings/views/notifications.tsx:102
+msgid "Auto-detect meetings"
+msgstr "Auto-detect meetings"
+
+#: src/components/settings/views/notifications.tsx:108
+msgid "Automatically starts, pauses, and stops transcription when meetings are detected."
+msgstr "Automatically starts, pauses, and stops transcription when meetings are detected."
+
+#: src/components/settings/views/templates.tsx:293
+#: src/components/welcome-modal/language-selection-view.tsx:186
+msgid "Back"
+msgstr "Back"
+
+#. placeholder {0}: projectQuery.data.name
+#: src/components/toolbar/bars/main-toolbar.tsx:92
+#: src/components/toolbar/bars/main-toolbar.tsx:105
+msgid "Back to {0}"
+msgstr "Back to {0}"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:130
+#: src/components/ask/ask-conversation-toolbar.tsx:131
+#: src/routes/app.ask.$threadId.tsx:380
+#: src/routes/app.ask.$threadId.tsx:398
+msgid "Back to Ask"
+msgstr "Back to Ask"
+
+#: src/components/settings/components/ai/stt-view.tsx:175
+msgid "Balanced English-only model for everyday offline use"
+msgstr "Balanced English-only model for everyday offline use"
+
+#: src/components/settings/components/ai/stt-view.tsx:173
+msgid "Balanced multilingual model for everyday offline use"
+msgstr "Balanced multilingual model for everyday offline use"
+
+#: src/hooks/cloud-model-catalog.ts:451
+msgid "Balanced speed and quality"
+msgstr "Balanced speed and quality"
+
+#: src/components/settings/components/ai/task-defaults.tsx:243
+#: src/components/settings/components/ai/task-defaults.tsx:298
+msgid "Best available model"
+msgstr "Best available model"
+
+#: src/hooks/cloud-model-catalog.ts:443
+msgid "Best default balance of speed and quality"
+msgstr "Best default balance of speed and quality"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:77
+msgid "Best for English-only, professional use"
+msgstr "Best for English-only, professional use"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:79
+msgid "Best for international meetings"
+msgstr "Best for international meetings"
+
+#: src/components/settings/components/ai/stt-view.tsx:411
+#: src/components/settings/components/ai/stt-view.tsx:688
+msgid "Best performance languages"
+msgstr "Best performance languages"
+
+#: src/hooks/cloud-model-catalog.ts:435
+msgid "Best quality for complex work"
+msgstr "Best quality for complex work"
+
+#: src/components/settings/views/lab.tsx:45
+#: src/components/settings/views/lab.tsx:61
+#: src/components/settings/views/lab.tsx:77
+#: src/components/settings/views/notifications.tsx:104
+msgid "Beta"
+msgstr "Beta"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:288
+msgid "Brief didn’t update"
+msgstr "Brief didn’t update"
+
+#: src/components/projects/project-brief-row.tsx:45
+msgid "Brief didn’t update. Retry after sources finish indexing."
+msgstr "Brief didn’t update. Retry after sources finish indexing."
+
+#: src/components/projects/project-brief-sidebar-view.tsx:300
+msgid "Brief not ready yet"
+msgstr "Brief not ready yet"
+
+#: src/routes/app.projects.tsx:121
+msgid "Browse grouped notes and reopen the context around a topic."
+msgstr "Browse grouped notes and reopen the context around a topic."
+
+#: src/components/projects/project-brief-row.tsx:100
+msgid "Build"
+msgstr "Build"
+
+#: src/components/projects/project-brief-building-status.tsx:11
+#: src/components/projects/project-brief-row.tsx:30
+#: src/routes/app.projects.$projectId.tsx:227
+msgid "Building"
+msgstr "Building"
+
+#. placeholder {0}: buildingProgress.ready
+#. placeholder {1}: buildingProgress.total
+#: src/routes/app.projects.$projectId.tsx:228
+msgid "Building {0}/{1}"
+msgstr "Building {0}/{1}"
+
+#: src/components/projects/project-brief-row.tsx:43
+msgid "Building project brief from included sources..."
+msgstr "Building project brief from included sources..."
+
+#: src/components/settings/components/ai/task-defaults.tsx:112
+msgid "Builds the project brief from included notes and files."
+msgstr "Builds the project brief from included notes and files."
+
+#: src/components/settings/views/templates.tsx:381
+msgid "Built-in templates"
+msgstr "Built-in templates"
+
+#: src/components/settings/components/templates-sidebar.tsx:90
+msgid "Built-in Templates"
+msgstr "Built-in Templates"
+
+#: src/components/settings-dialog/content.tsx:34
+#: src/components/settings-dialog/sidebar.tsx:30
+msgid "Calendar"
+msgstr "Calendar"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:100
+msgid "Calendar access"
+msgstr "Calendar access"
+
+#: src/components/audio-upload-dialog.tsx:369
+#: src/components/audio-upload-toast.tsx:142
+#: src/components/projects/create-project-dialog.tsx:179
+#: src/components/projects/project-notes-panel.tsx:232
+#: src/components/spaces/space-notes-picker-dialog.tsx:233
+#: src/components/youtube-import-dialog.tsx:77
+#: src/routes/app.projects.$projectId.tsx:524
+#: src/routes/app.projects.$projectId.tsx:564
+#: src/routes/app.projects.tsx:257
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/components/editor-area/writing-bar-overlay.tsx:109
+#: src/components/editor-area/writing-bar-overlay.tsx:123
+msgid "Cancel and restore previous notes"
+msgstr "Cancel and restore previous notes"
+
+#: src/components/right-panel/views/transcript-view.tsx:620
+msgid "Change"
+msgstr "Change"
+
+#: src/components/audio-upload-dialog.tsx:273
+msgid "Change file"
+msgstr "Change file"
+
+#: src/components/projects/project-icon-picker.tsx:36
+msgid "Change project icon"
+msgstr "Change project icon"
+
+#: src/components/right-panel/views/chat-view.tsx:474
+#: src/components/settings/components/ai/llm-local-view.tsx:169
+#: src/components/settings/views/ai.tsx:174
+#: src/components/transcript/actions/TranscriptActionBar.tsx:107
+msgid "Chat"
+msgstr "Chat"
+
+#: src/components/settings/components/ai/task-defaults.tsx:232
+msgid "Chat and Ask"
+msgstr "Chat and Ask"
+
+#: src/components/toast/shared.tsx:277
+msgid "Chat and meeting summaries"
+msgstr "Chat and meeting summaries"
+
+#: src/components/toast/shared.tsx:276
+msgid "Chat and meeting summaries · {modelSize}"
+msgstr "Chat and meeting summaries · {modelSize}"
+
+#. placeholder {0}: index + 1
+#: src/components/right-panel/components/chat/header/chat-header.tsx:105
+msgid "Chat Group {0}"
+msgstr "Chat Group {0}"
+
+#: src/components/settings/views/integrations.tsx:189
+msgid "ChatGPT"
+msgstr "ChatGPT"
+
+#: src/components/settings/views/about.tsx:192
+msgid "Check for Updates"
+msgstr "Check for Updates"
+
+#: src/components/toast/changelog.tsx:47
+msgid "Check out what's new in this release"
+msgstr "Check out what's new in this release"
+
+#: src/components/toast/shared.tsx:170
+#: src/components/toast/shared.tsx:254
+#: src/components/welcome-modal/download-progress-view.tsx:147
+#: src/components/welcome-modal/download-progress-view.tsx:185
+msgid "Check your connection and retry."
+msgstr "Check your connection and retry."
+
+#: src/components/settings/views/about.tsx:198
+msgid "Checking for a newer version..."
+msgstr "Checking for a newer version..."
+
+#: src/routes/app.ask.tsx:75
+msgid "Choose a project before starting a new Ask chat."
+msgstr "Choose a project before starting a new Ask chat."
+
+#: src/components/projects/project-icon-picker.tsx:59
+msgid "Choose a simple marker for this project."
+msgstr "Choose a simple marker for this project."
+
+#: src/components/projects/project-files-dropzone.tsx:111
+msgid "Choose files"
+msgstr "Choose files"
+
+#: src/components/settings/components/ai/task-defaults.tsx:134
+#~ msgid "Choose what Typr uses first. Feature selectors can still override these defaults."
+#~ msgstr "Choose what Typr uses first. Feature selectors can still override these defaults."
+
+#: src/components/settings/views/general.tsx:221
+msgid "Choose whether to save your recordings locally."
+msgstr "Choose whether to save your recordings locally."
+
+#: src/components/settings/views/integrations.tsx:126
+msgid "Claude Desktop"
+msgstr "Claude Desktop"
+
+#: src/components/settings/views/integrations.tsx:63
+msgid "Claude integration disabled"
+msgstr "Claude integration disabled"
+
+#: src/components/settings/views/integrations.tsx:37
+msgid "Claude integration enabled"
+msgstr "Claude integration enabled"
+
+#: src/components/left-sidebar/tag-filter-bar.tsx:163
+msgid "Clear"
+msgstr "Clear"
+
+#: src/routes/app.ask.tsx:184
+msgid "Clear filters"
+msgstr "Clear filters"
+
+#: src/components/right-panel/components/chat/chat-input.tsx:173
+msgid "Clear selection"
+msgstr "Clear selection"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:115
+msgid "Click anywhere to start typing your question"
+msgstr "Click anywhere to start typing your question"
+
+#: src/components/ui/inline-citation.tsx:87
+msgid "Click to open →"
+msgstr "Click to open →"
+
+#: src/components/editor-area/note-header/chips/youtube-chip.tsx:130
+msgid "Click to open in browser"
+msgstr "Click to open in browser"
+
+#: src/components/projects/create-project-dialog.tsx:121
+#: src/components/settings/components/wer-modal.tsx:126
+msgid "Close"
+msgstr "Close"
+
+#: src/components/right-panel/components/search/chat-search-header.tsx:159
+#: src/components/right-panel/components/search/search-header.tsx:180
+msgid "Close (Esc)"
+msgstr "Close (Esc)"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:166
+msgid "Close project brief"
+msgstr "Close project brief"
+
+#: src/components/right-panel/views/transcript-view.tsx:560
+#: src/components/settings/components/ai/llm-local-view.tsx:268
+#: src/components/settings/components/ai/stt-view.tsx:482
+msgid "Cloud"
+msgstr "Cloud"
+
+#: src/components/audio-upload-dialog.tsx:307
+msgid "Cloud · typically 1–3 min"
+msgstr "Cloud · typically 1–3 min"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:246
+#~ msgid "Cloud API keys"
+#~ msgstr "Cloud API keys"
+
+#: src/components/toast/model-download.tsx:116
+msgid "Cloud mode is already available. Download these only to use transcription and summaries offline."
+msgstr "Cloud mode is already available. Download these only to use transcription and summaries offline."
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:345
+#: src/components/ui/model-selector.tsx:386
+msgid "Cloud Models"
+msgstr "Cloud Models"
+
+#: src/hooks/useTranscriptionFallback.ts:61
+msgid "Cloud models unavailable, switching to local transcription"
+msgstr "Cloud models unavailable, switching to local transcription"
+
+#: src/components/toast/model-download.tsx:125
+msgid "Cloud summaries are already available. Download this model only if you want offline summaries."
+msgstr "Cloud summaries are already available. Download this model only if you want offline summaries."
+
+#: src/components/settings/components/ai/task-defaults.tsx:345
+msgid "Cloud transcription"
+msgstr "Cloud transcription"
+
+#: src/components/settings/components/ai/stt-view.tsx:476
+#~ msgid "Cloud transcription API keys"
+#~ msgstr "Cloud transcription API keys"
+
+#: src/hooks/useTranscriptionFallback.ts:99
+msgid "Cloud transcription failed"
+msgstr "Cloud transcription failed"
+
+#: src/components/toast/model-download.tsx:121
+msgid "Cloud transcription is already available. Download this model only if you want offline transcription."
+msgstr "Cloud transcription is already available. Download this model only if you want offline transcription."
+
+#: src/components/settings/components/ai/stt-view.tsx:509
+msgid "Cloud transcription using your AssemblyAI API key"
+msgstr "Cloud transcription using your AssemblyAI API key"
+
+#: src/components/settings/components/ai/stt-view.tsx:609
+msgid "Cloud-based transcription"
+msgstr "Cloud-based transcription"
+
+#: src/components/left-sidebar/events-list.tsx:97
+msgid "Collapse Coming up"
+msgstr "Collapse Coming up"
+
+#: src/components/left-sidebar/projects-section.tsx:70
+msgid "Collapse projects"
+msgstr "Collapse projects"
+
+#: src/components/settings/views/calendar.tsx:39
+msgid "Coming soon"
+msgstr "Coming soon"
+
+#: src/components/settings/views/integrations.tsx:192
+#: src/components/settings/views/team.tsx:69
+msgid "Coming Soon"
+msgstr "Coming Soon"
+
+#: src/components/settings/views/calendar.tsx:69
+msgid "Coming to Windows"
+msgstr "Coming to Windows"
+
+#: src/components/left-sidebar/events-list.tsx:100
+msgid "Coming up"
+msgstr "Coming up"
+
+#: src/components/settings/views/profile.tsx:204
+msgid "Company name"
+msgstr "Company name"
+
+#: src/components/settings/views/integrations.tsx:173
+#: src/components/settings/views/integrations.tsx:202
+msgid "Connect"
+msgstr "Connect"
+
+#: src/components/ui/model-selector.tsx:641
+msgid "Connect API key"
+msgstr "Connect API key"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:473
+msgid "Connect to a self-hosted or third-party LLM endpoint (OpenAI API compatible)"
+msgstr "Connect to a self-hosted or third-party LLM endpoint (OpenAI API compatible)"
+
+#: src/components/settings/views/integrations.tsx:111
+msgid "Connect Typr with AI assistants to access your meeting notes."
+msgstr "Connect Typr with AI assistants to access your meeting notes."
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:105
+msgid "Connect your calendar to sync events"
+msgstr "Connect your calendar to sync events"
+
+#: src/components/settings/views/integrations.tsx:131
+msgid "Connected"
+msgstr "Connected"
+
+#: src/hooks/useTranscriptionFallback.ts:154
+msgid "Connection lost. Reconnecting transcription…"
+msgstr "Connection lost. Reconnecting transcription…"
+
+#: src/hooks/useTranscriptionFallback.ts:100
+#~ msgid "Connection was lost. Download a local model in Settings → AI for offline transcription."
+#~ msgstr "Connection was lost. Download a local model in Settings → AI for offline transcription."
+
+#: src/hooks/useTranscriptionFallback.ts:100
+msgid "Connection was lost. Download a local model in Settings → AI models for offline transcription."
+msgstr "Connection was lost. Download a local model in Settings → AI models for offline transcription."
+
+#: src/components/settings/views/about.tsx:146
+msgid "Contact Support"
+msgstr "Contact Support"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:166
+msgid "Contacts Access"
+msgstr "Contacts Access"
+
+#: src/components/right-panel/components/chat/inline-diff-summary.tsx:76
+msgid "content"
+msgstr "content"
+
+#: src/routes/app.ask.$threadId.tsx:614
+msgid "Context"
+msgstr "Context"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:108
+#: src/components/welcome-modal/language-selection-view.tsx:194
+#: src/components/welcome-modal/user-setup-view.tsx:95
+#: src/components/welcome-modal/welcome-view.tsx:20
+msgid "Continue"
+msgstr "Continue"
+
+#: src/components/meeting-assistant/floating-dock-variant.tsx:106
+#: src/components/meeting-assistant/floating-dock-variant.tsx:179
+msgid "Continue chat"
+msgstr "Continue chat"
+
+#. placeholder {0}: bestFallback.label
+#: src/hooks/useTranscriptionFallback.ts:62
+msgid "Continuing with {0}"
+msgstr "Continuing with {0}"
+
+#: src/components/settings/views/privacy.tsx:86
+msgid "Control how your data is used and stored"
+msgstr "Control how your data is used and stored"
+
+#: src/routes/app.ask.tsx:365
+msgid "Conversation actions"
+msgstr "Conversation actions"
+
+#: src/routes/app.ask.$threadId.tsx:377
+msgid "Conversation not found"
+msgstr "Conversation not found"
+
+#: src/components/app-shell/context-pane.tsx:22
+msgid "Conversations"
+msgstr "Conversations"
+
+#: src/components/right-panel/views/transcript-view.tsx:598
+msgid "Convert your audio to text in real-time."
+msgstr "Convert your audio to text in real-time."
+
+#: src/components/settings/components/ai/stt-view.tsx:193
+msgid "Convert your meeting audio into written text in real-time"
+msgstr "Convert your meeting audio into written text in real-time"
+
+#: src/components/editor-area/note-header/share-menu.tsx:88
+#: src/routes/app.ask.$threadId.tsx:570
+#: src/routes/app.ask.$threadId.tsx:577
+msgid "Copied"
+msgstr "Copied"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:134
+msgid "Copied brief"
+msgstr "Copied brief"
+
+#: src/components/right-panel/views/chat-view.tsx:549
+#: src/components/transcript/actions/TranscriptActionBar.tsx:199
+#: src/utils/consent-notification.tsx:44
+msgid "Copied!"
+msgstr "Copied!"
+
+#: src/components/right-panel/views/chat-view.tsx:549
+msgid "Copy"
+msgstr "Copy"
+
+#: src/components/editor-area/note-header/share-menu.tsx:91
+msgid "Copy AI notes"
+msgstr "Copy AI notes"
+
+#: src/components/transcript/actions/TranscriptActionBar.tsx:199
+msgid "Copy All"
+msgstr "Copy All"
+
+#: src/components/settings/components/data-path-block.tsx:61
+msgid "Copy database path"
+msgstr "Copy database path"
+
+#: src/routes/app.ask.$threadId.tsx:570
+#: src/routes/app.ask.$threadId.tsx:577
+msgid "Copy message"
+msgstr "Copy message"
+
+#: src/utils/consent-notification.tsx:44
+msgid "Copy notice"
+msgstr "Copy notice"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:194
+msgid "Copy project brief"
+msgstr "Copy project brief"
+
+#: src/components/editor-area/note-header/share-menu.tsx:90
+msgid "Copying..."
+msgstr "Copying..."
+
+#: src/components/settings/views/about.tsx:206
+msgid "Could not check for updates. Try again."
+msgstr "Could not check for updates. Try again."
+
+#: src/components/left-sidebar/bulk-delete-button.tsx:115
+#: src/components/projects/project-notes-picker-dialog.tsx:114
+#: src/components/spaces/space-notes-picker-dialog.tsx:93
+msgid "Couldn’t add notes"
+msgstr "Couldn’t add notes"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:83
+msgid "Couldn’t add project"
+msgstr "Couldn’t add project"
+
+#: src/routes/app.ask.$threadId.tsx:172
+msgid "Couldn’t answer"
+msgstr "Couldn’t answer"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:142
+msgid "Couldn’t copy brief"
+msgstr "Couldn’t copy brief"
+
+#: src/routes/app.ask.$threadId.tsx:259
+msgid "Couldn’t copy message"
+msgstr "Couldn’t copy message"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:131
+#: src/components/projects/create-project-dialog.tsx:80
+msgid "Couldn’t create project"
+msgstr "Couldn’t create project"
+
+#: src/routes/app.projects.$projectId.tsx:190
+#: src/routes/app.projects.tsx:83
+msgid "Couldn’t delete project"
+msgstr "Couldn’t delete project"
+
+#: src/routes/app.ask.$threadId.tsx:232
+msgid "Couldn’t open file source"
+msgstr "Couldn’t open file source"
+
+#: src/routes/app.ask.tsx:116
+msgid "Couldn’t remove conversation"
+msgstr "Couldn’t remove conversation"
+
+#: src/components/projects/project-notes-panel.tsx:118
+msgid "Couldn’t remove file"
+msgstr "Couldn’t remove file"
+
+#: src/routes/app.projects.$projectId.tsx:325
+msgid "Couldn’t remove note"
+msgstr "Couldn’t remove note"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:102
+msgid "Couldn’t remove project"
+msgstr "Couldn’t remove project"
+
+#: src/components/projects/project-notes-panel.tsx:142
+msgid "Couldn’t retry indexing"
+msgstr "Couldn’t retry indexing"
+
+#: src/components/projects/project-notes-panel.tsx:92
+msgid "Couldn’t save files"
+msgstr "Couldn’t save files"
+
+#: src/routes/app.ask.$threadId.tsx:121
+msgid "Couldn’t send message"
+msgstr "Couldn’t send message"
+
+#: src/components/projects/project-ask-launcher.tsx:54
+msgid "Couldn’t start Ask"
+msgstr "Couldn’t start Ask"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:99
+#: src/routes/app.ask.tsx:97
+msgid "Couldn’t start new chat"
+msgstr "Couldn’t start new chat"
+
+#: src/routes/app.projects.$projectId.tsx:170
+msgid "Couldn’t update project"
+msgstr "Couldn’t update project"
+
+#: src/routes/app.projects.$projectId.tsx:299
+msgid "Couldn’t update source"
+msgstr "Couldn’t update source"
+
+#: src/components/editor-area/note-header/chips/participants-chip.tsx:400
+#: src/components/editor-area/note-header/chips/project-chip.tsx:243
+#: src/components/projects/create-project-dialog.tsx:186
+#: src/routes/app.human.$id.tsx:535
+msgid "Create"
+msgstr "Create"
+
+#: src/components/editor-area/note-header/chips/tag-chip.tsx:147
+msgid "Create \"{value}\""
+msgstr "Create \"{value}\""
+
+#: src/routes/app.projects.tsx:157
+msgid "Create a project to group notes around a topic, client, or initiative."
+msgstr "Create a project to group notes around a topic, client, or initiative."
+
+#: src/components/settings/views/templates.tsx:461
+#: src/components/settings/views/templates.tsx:476
+msgid "Create and customize your meeting notes"
+msgstr "Create and customize your meeting notes"
+
+#: src/components/settings/views/templates.tsx:333
+msgid "Create custom templates and pin them for quick access in your editor dock"
+msgstr "Create custom templates and pin them for quick access in your editor dock"
+
+#: src/components/left-sidebar/projects-section.tsx:161
+msgid "Create first project"
+msgstr "Create first project"
+
+#: src/components/command-palette.tsx:423
+#: src/components/toolbar/buttons/new-note-button.tsx:58
+msgid "Create new note"
+msgstr "Create new note"
+
+#: src/components/workspace-calendar/event-card.tsx:151
+msgid "Create Note"
+msgstr "Create Note"
+
+#: src/components/spaces/space-notes-picker-dialog.tsx:174
+msgid "Create or unassign a note first, then it will appear here."
+msgstr "Create or unassign a note first, then it will appear here."
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:228
+#: src/components/left-sidebar/projects-section.tsx:81
+#: src/components/projects/create-project-dialog.tsx:110
+#: src/routes/app.projects.tsx:166
+msgid "Create project"
+msgstr "Create project"
+
+#: src/components/settings/views/templates.tsx:370
+msgid "Create your first template to get started"
+msgstr "Create your first template to get started"
+
+#: src/components/settings/views/about.tsx:165
+msgid "Created by <0>Juan M. Ramos</0> in Malaga, Spain"
+msgstr "Created by <0>Juan M. Ramos</0> in Malaga, Spain"
+
+#: src/components/app-shell/context-pane.tsx:27
+msgid "Cross-meeting conversations will live here. The main canvas shows the active thread."
+msgstr "Cross-meeting conversations will live here. The main canvas shows the active thread."
+
+#: src/components/projects/project-brief-panel.tsx:60
+#: src/components/projects/project-summary-tab.tsx:74
+#: src/components/settings/components/ai/stt-view.tsx:260
+#: src/components/settings/components/ai/stt-view.tsx:526
+msgid "Current"
+msgstr "Current"
+
+#: src/components/right-panel/views/chat-view.tsx:491
+msgid "Current note"
+msgstr "Current note"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:150
+msgid "Custom Endpoints"
+msgstr "Custom Endpoints"
+
+#: src/components/settings/views/general.tsx:444
+msgid "Custom vocabulary"
+msgstr "Custom vocabulary"
+
+#: src/components/editor-area/floating-button.tsx:69
+#: src/components/settings/components/template-list.tsx:41
+#: src/components/settings/components/templates-sidebar.tsx:37
+#: src/components/settings/views/templates.tsx:449
+msgid "Customer Call"
+msgstr "Customer Call"
+
+#: src/components/left-sidebar/theme-toggle.tsx:17
+msgid "Dark"
+msgstr "Dark"
+
+#: src/hooks/cloud-model-catalog.ts:385
+#~ msgid "Deepest reasoning, best for complex tasks"
+#~ msgstr "Deepest reasoning, best for complex tasks"
+
+#: src/hooks/cloud-model-catalog.ts:426
+msgid "DeepSeek V4 Flash"
+msgstr "DeepSeek V4 Flash"
+
+#: src/components/settings/views/templates.tsx:559
+msgid "Default"
+msgstr "Default"
+
+#: src/components/toolbar/buttons/share-button.tsx:296
+#: src/components/toolbar/buttons/share-button.tsx:300
+msgid "Default (root)"
+msgstr "Default (root)"
+
+#: src/components/settings/components/ai/task-defaults.tsx:222
+msgid "Defaults"
+msgstr "Defaults"
+
+#: src/components/left-sidebar/notes-list.tsx:466
+#: src/components/settings/views/team.tsx:165
+#: src/components/settings/views/template.tsx:214
+msgid "Delete"
+msgstr "Delete"
+
+#. placeholder {0}: project.name
+#: src/routes/app.projects.$projectId.tsx:553
+msgid "Delete “{0}”?"
+msgstr "Delete “{0}”?"
+
+#: src/routes/app.projects.tsx:246
+msgid "Delete “{projectDeleteName}”?"
+msgstr "Delete “{projectDeleteName}”?"
+
+#: src/components/left-sidebar/bulk-delete-button.tsx:200
+msgid "Delete {count} notes"
+msgstr "Delete {count} notes"
+
+#: src/components/left-sidebar/bulk-delete-button.tsx:200
+msgid "Delete note"
+msgstr "Delete note"
+
+#: src/components/toolbar/buttons/delete-note-button.tsx:65
+msgid "Delete Note"
+msgstr "Delete Note"
+
+#: src/components/projects/project-header.tsx:116
+#: src/components/spaces/project-header.tsx:82
+#: src/routes/app.projects.$projectId.tsx:574
+#: src/routes/app.projects.tsx:222
+#: src/routes/app.projects.tsx:269
+msgid "Delete project"
+msgstr "Delete project"
+
+#: src/components/right-panel/components/chat/chat-input.tsx:231
+#: src/components/right-panel/components/chat/chat-input.tsx:325
+msgid "Describe the changes you want to make..."
+msgstr "Describe the changes you want to make..."
+
+#: src/components/projects/create-project-dialog.tsx:161
+#: src/components/settings/components/template-sections.tsx:148
+#: src/components/settings/views/template.tsx:233
+msgid "Description"
+msgstr "Description"
+
+#: src/components/left-sidebar/notes-list.tsx:459
+msgid "Deselect note"
+msgstr "Deselect note"
+
+#: src/components/editor-area/note-header/chips/event-chip.tsx:212
+msgid "Detach event"
+msgstr "Detach event"
+
+#. placeholder {0}: field.value.length
+#: src/components/settings/views/general.tsx:384
+msgid "Detects among {0} specified languages, with automatic fallback."
+msgstr "Detects among {0} specified languages, with automatic fallback."
+
+#: src/components/settings/views/general.tsx:370
+msgid "Detects any language automatically. Specify languages for faster, more accurate transcription."
+msgstr "Detects any language automatically. Specify languages for faster, more accurate transcription."
+
+#: src/components/settings/views/integrations.tsx:211
+msgid "Direct access"
+msgstr "Direct access"
+
+#: src/components/settings/views/integrations.tsx:163
+msgid "Disconnect"
+msgstr "Disconnect"
+
+#: src/components/settings/views/integrations.tsx:73
+msgid "Disconnect failed"
+msgstr "Disconnect failed"
+
+#: src/components/settings/views/integrations.tsx:163
+msgid "Disconnecting..."
+msgstr "Disconnecting..."
+
+#: src/components/audio-upload-toast.tsx:184
+#: src/components/audio-upload-toast.tsx:211
+#: src/components/toast/changelog.tsx:65
+#: src/components/toast/model-download.tsx:160
+msgid "Dismiss"
+msgstr "Dismiss"
+
+#: src/components/settings/views/about.tsx:285
+msgid "Dismiss update status"
+msgstr "Dismiss update status"
+
+#: src/components/settings/views/privacy.tsx:130
+msgid "Display a notification to remind you to inform participants when transcription starts"
+msgstr "Display a notification to remind you to inform participants when transcription starts"
+
+#: src/utils/consent-notification.tsx:123
+msgid "Don't remind me again"
+msgstr "Don't remind me again"
+
+#: src/components/settings/views/about.tsx:123
+#: src/components/transcript/hooks/useSTTModel.ts:172
+msgid "Download"
+msgstr "Download"
+
+#: src/components/right-panel/views/transcript-view.tsx:643
+msgid "Download a model first"
+msgstr "Download a model first"
+
+#: src/components/audio-upload-dialog.tsx:196
+msgid "Download a speech-to-text model in Settings → AI models to transcribe audio files."
+msgstr "Download a speech-to-text model in Settings → AI models to transcribe audio files."
+
+#: src/components/audio-upload-dialog.tsx:196
+#~ msgid "Download a speech-to-text model in Settings → AI to transcribe audio files."
+#~ msgstr "Download a speech-to-text model in Settings → AI to transcribe audio files."
+
+#: src/components/audio-upload-dialog.tsx:154
+msgid "Download a speech-to-text model to transcribe audio files."
+msgstr "Download a speech-to-text model to transcribe audio files."
+
+#: src/components/right-panel/views/transcript-view.tsx:684
+msgid "Download a transcription model above to begin"
+msgstr "Download a transcription model above to begin"
+
+#: src/components/toast/shared.tsx:318
+msgid "Download failed. Please try again."
+msgstr "Download failed. Please try again."
+
+#: src/components/settings/components/ai/task-defaults.tsx:357
+msgid "Download in Transcription settings"
+msgstr "Download in Transcription settings"
+
+#: src/components/toast/model-download.tsx:115
+msgid "Download offline AI models"
+msgstr "Download offline AI models"
+
+#: src/components/toast/model-download.tsx:122
+#: src/components/toast/model-download.tsx:126
+msgid "Download offline model"
+msgstr "Download offline model"
+
+#: src/components/toast/model-download.tsx:117
+msgid "Download offline models"
+msgstr "Download offline models"
+
+#: src/components/toast/model-download.tsx:124
+msgid "Download offline summary model"
+msgstr "Download offline summary model"
+
+#: src/components/toast/model-download.tsx:119
+msgid "Download offline transcription model"
+msgstr "Download offline transcription model"
+
+#. placeholder {0}: latestUpdate.version
+#: src/components/toast/ota.tsx:72
+msgid "Downloading update {0}"
+msgstr "Downloading update {0}"
+
+#. placeholder {0}: updateCheck.progress
+#: src/components/settings/views/about.tsx:204
+msgid "Downloading update {0}%."
+msgstr "Downloading update {0}%."
+
+#: src/components/settings/components/ai/task-defaults.tsx:355
+#: src/components/ui/model-selector.tsx:281
+msgid "Downloading..."
+msgstr "Downloading..."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:239
+#: src/components/settings/components/ai/stt-view.tsx:281
+msgid "Downloading…"
+msgstr "Downloading…"
+
+#: src/components/projects/project-files-dropzone.tsx:102
+msgid "Drop files here"
+msgstr "Drop files here"
+
+#: src/components/audio-upload-dialog.tsx:285
+msgid "Drop here or <0>browse</0>"
+msgstr "Drop here or <0>browse</0>"
+
+#: src/components/settings/views/template.tsx:202
+msgid "Duplicate"
+msgstr "Duplicate"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:491
+msgid "Dutch, French, Indonesian, Ukrainian, Turkish, Swedish, Mandarin, Finnish"
+msgstr "Dutch, French, Indonesian, Ukrainian, Turkish, Swedish, Mandarin, Finnish"
+
+#: src/components/settings/components/ai/stt-view.tsx:406
+#: src/components/settings/components/ai/stt-view.tsx:683
+msgid "Dynamically switches between these languages in a single conversation"
+msgstr "Dynamically switches between these languages in a single conversation"
+
+#: src/components/right-panel/components/chat/mode-selector.tsx:31
+msgid "Edit"
+msgstr "Edit"
+
+#: src/components/editor-area/selection-actions.tsx:248
+msgid "Edit in Chat"
+msgstr "Edit in Chat"
+
+#: src/hooks/useEditModeModelSwitch.tsx:36
+msgid "Edit mode uses cloud models for better AI writing"
+msgstr "Edit mode uses cloud models for better AI writing"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:163
+msgid "Edit projects"
+msgstr "Edit projects"
+
+#: src/components/right-panel/components/chat/inline-diff-summary.tsx:62
+msgid "Edited"
+msgstr "Edited"
+
+#: src/hooks/cloud-model-catalog.ts:459
+msgid "Efficient reasoning model through OpenRouter"
+msgstr "Efficient reasoning model through OpenRouter"
+
+#: src/components/toolbar/buttons/share-button.tsx:90
+msgid "Email"
+msgstr "Email"
+
+#: src/components/settings/views/team.tsx:201
+msgid "Email addresses"
+msgstr "Email addresses"
+
+#: src/components/share-and-permission/invite-list.tsx:23
+msgid "Email separated by commas"
+msgstr "Email separated by commas"
+
+#: src/components/settings/views/template.tsx:158
+msgid "Emoji"
+msgstr "Emoji"
+
+#: src/components/editor-area/note-header/transcription-bar.tsx:364
+msgid "Enable at least one voice source to capture audio"
+msgstr "Enable at least one voice source to capture audio"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:138
+msgid "Enable Microphone"
+msgstr "Enable Microphone"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:165
+msgid "Enable System Audio"
+msgstr "Enable System Audio"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:135
+#: src/components/welcome-modal/audio-permissions-view.tsx:164
+msgid "Enabled"
+msgstr "Enabled"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:131
+#: src/components/welcome-modal/audio-permissions-view.tsx:160
+msgid "Enabling..."
+msgstr "Enabling..."
+
+#: src/components/settings/views/general.tsx:263
+msgid "English"
+msgstr "English"
+
+#: src/components/editor-area/note-header/transcription-bar.tsx:530
+#: src/components/right-panel/views/transcript-view.tsx:568
+#: src/components/transcript/actions/STTLanguageSelector.tsx:62
+msgid "English high accuracy"
+msgstr "English high accuracy"
+
+#: src/components/toast/model-select.tsx:34
+msgid "English-only model cannot be used with non-English languages."
+msgstr "English-only model cannot be used with non-English languages."
+
+#: src/components/right-panel/views/transcript-view.tsx:183
+msgid "Enhancing transcript with speaker labels..."
+msgstr "Enhancing transcript with speaker labels..."
+
+#: src/components/settings/views/profile.tsx:211
+msgid "Enter company name"
+msgstr "Enter company name"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:519
+msgid "Enter the API key for your custom LLM endpoint"
+msgstr "Enter the API key for your custom LLM endpoint"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:496
+msgid "Enter the base URL for your custom LLM endpoint"
+msgstr "Enter the base URL for your custom LLM endpoint"
+
+#: src/components/settings/views/profile.tsx:163
+msgid "Enter your full name"
+msgstr "Enter your full name"
+
+#: src/components/settings/views/profile.tsx:187
+msgid "Enter your job title"
+msgstr "Enter your job title"
+
+#: src/components/editor-area/note-header/share-menu.tsx:63
+#: src/components/toolbar/buttons/share-button.tsx:208
+msgid "Error"
+msgstr "Error"
+
+#: src/components/settings/views/general.tsx:266
+msgid "Español"
+msgstr "Español"
+
+#: src/components/command-palette.tsx:499
+msgid "Events"
+msgstr "Events"
+
+#: src/components/settings/views/privacy.tsx:169
+msgid "Everything stays on your device. Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
+msgstr "Everything stays on your device. Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
+
+#: src/components/settings/components/ai/stt-view.tsx:450
+msgid "Excellent"
+msgstr "Excellent"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:480
+msgid "Excellent (2.8-5.0% error)"
+msgstr "Excellent (2.8-5.0% error)"
+
+#: src/routes/app.projects.$projectId.tsx:721
+msgid "Exclude from brief"
+msgstr "Exclude from brief"
+
+#: src/routes/app.projects.$projectId.tsx:684
+msgid "Excluded from brief"
+msgstr "Excluded from brief"
+
+#: src/components/left-sidebar/events-list.tsx:97
+msgid "Expand Coming up"
+msgstr "Expand Coming up"
+
+#: src/components/left-sidebar/projects-section.tsx:70
+msgid "Expand projects"
+msgstr "Expand projects"
+
+#: src/components/settings/views/lab.tsx:17
+msgid "Experimental features"
+msgstr "Experimental features"
+
+#: src/components/toolbar/buttons/share-button.tsx:319
+msgid "Export"
+msgstr "Export"
+
+#: src/components/editor-area/note-header/share-menu.tsx:102
+msgid "Export as PDF"
+msgstr "Export as PDF"
+
+#: src/components/toolbar/buttons/share-button.tsx:100
+msgid "Export to Obsidian"
+msgstr "Export to Obsidian"
+
+#: src/components/editor-area/note-header/share-menu.tsx:102
+msgid "Exporting..."
+msgstr "Exporting..."
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:27
+msgid "Extract action items"
+msgstr "Extract action items"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:28
+msgid "Extract action items from this meeting"
+msgstr "Extract action items from this meeting"
+
+#: src/components/projects/project-brief-row.tsx:71
+msgid "Failed"
+msgstr "Failed"
+
+#: src/components/right-panel/views/transcript-view.tsx:199
+msgid "Failed to add speaker labels"
+msgstr "Failed to add speaker labels"
+
+#: src/components/settings/views/integrations.tsx:74
+msgid "Failed to disconnect Claude integration"
+msgstr "Failed to disconnect Claude integration"
+
+#: src/components/toast/shared.tsx:406
+msgid "Failed to enhance meeting notes"
+msgstr "Failed to enhance meeting notes"
+
+#: src/components/right-panel/index.tsx:25
+#: src/components/right-panel/views/transcript-view.tsx:353
+msgid "Failed to load transcription"
+msgstr "Failed to load transcription"
+
+#: src/components/settings/views/profile.tsx:323
+msgid "Failed to save profile"
+msgstr "Failed to save profile"
+
+#: src/components/settings/views/integrations.tsx:48
+msgid "Failed to set up Claude integration"
+msgstr "Failed to set up Claude integration"
+
+#: src/components/toast/shared.tsx:456
+msgid "Failed to start recording"
+msgstr "Failed to start recording"
+
+#: src/components/settings/components/ai/stt-view.tsx:456
+msgid "Fair"
+msgstr "Fair"
+
+#: src/hooks/cloud-model-catalog.ts:391
+#~ msgid "Fast and lightweight, good for everyday tasks"
+#~ msgstr "Fast and lightweight, good for everyday tasks"
+
+#: src/hooks/cloud-model-catalog.ts:379
+#~ msgid "Fast general-purpose model"
+#~ msgstr "Fast general-purpose model"
+
+#: src/hooks/cloud-model-catalog.ts:455
+msgid "Fast long-context model through OpenRouter"
+msgstr "Fast long-context model through OpenRouter"
+
+#: src/hooks/cloud-model-catalog.ts:457
+msgid "Fast, low-cost model through OpenRouter"
+msgstr "Fast, low-cost model through OpenRouter"
+
+#: src/hooks/cloud-model-catalog.ts:439
+msgid "Fastest Groq text model for everyday tasks"
+msgstr "Fastest Groq text model for everyday tasks"
+
+#: src/hooks/cloud-model-catalog.ts:449
+msgid "Fastest responses, great for quick tasks"
+msgstr "Fastest responses, great for quick tasks"
+
+#: src/hooks/cloud-model-catalog.ts:437
+msgid "Fastest, lowest-cost OpenAI option"
+msgstr "Fastest, lowest-cost OpenAI option"
+
+#: src/components/settings-dialog/sidebar.tsx:110
+msgid "Features"
+msgstr "Features"
+
+#: src/components/left-sidebar/nav-user.tsx:187
+#: src/components/settings-dialog/content.tsx:40
+#: src/components/settings-dialog/sidebar.tsx:36
+msgid "Feedback"
+msgstr "Feedback"
+
+#: src/components/projects/project-source-citation-markdown.tsx:163
+msgid "File"
+msgstr "File"
+
+#: src/components/projects/project-files-dropzone.tsx:119
+#: src/components/projects/project-notes-panel.tsx:163
+msgid "Files"
+msgstr "Files"
+
+#: src/components/projects/project-files-dropzone.tsx:105
+msgid "Files are stored locally and attached only to this project."
+msgstr "Files are stored locally and attached only to this project."
+
+#: src/components/editor-area/writing-bar-overlay.tsx:41
+msgid "Finalizing"
+msgstr "Finalizing"
+
+#: src/components/editor-area/index.tsx:609
+#: src/components/right-panel/components/search/chat-search-header.tsx:119
+#: src/components/right-panel/components/search/search-header.tsx:112
+#: src/components/right-panel/views/transcript-view.tsx:398
+msgid "Find"
+msgstr "Find"
+
+#: src/components/transcript/actions/TranscriptActionBar.tsx:187
+msgid "Find & Replace"
+msgstr "Find & Replace"
+
+#: src/components/search-bar.tsx:29
+msgid "Find notes and actions..."
+msgstr "Find notes and actions..."
+
+#: src/components/welcome-modal/download-progress-view.tsx:232
+msgid "Finish setup"
+msgstr "Finish setup"
+
+#: src/components/toolbar/buttons/right-sidebar-button.tsx:76
+msgid "Floating"
+msgstr "Floating"
+
+#: src/components/settings/components/ai/task-defaults.tsx:272
+#: src/components/settings/components/ai/task-defaults.tsx:290
+#: src/components/settings/components/ai/task-defaults.tsx:293
+msgid "Follow Chat and Ask"
+msgstr "Follow Chat and Ask"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:81
+#: src/components/meeting-assistant/floating-dock-variant.tsx:195
+msgid "Follow-up email"
+msgstr "Follow-up email"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:31
+msgid "Follow-up items"
+msgstr "Follow-up items"
+
+#: src/components/settings/views/profile.tsx:159
+msgid "Full name"
+msgstr "Full name"
+
+#: src/hooks/cloud-model-catalog.ts:422
+msgid "Gemini 3.1 Flash Lite"
+msgstr "Gemini 3.1 Flash Lite"
+
+#: src/hooks/cloud-model-catalog.ts:420
+msgid "Gemini 3.1 Pro"
+msgstr "Gemini 3.1 Pro"
+
+#: src/hooks/cloud-model-catalog.ts:366
+#~ msgid "Gemma 4"
+#~ msgstr "Gemma 4"
+
+#: src/components/settings-dialog/content.tsx:31
+#: src/components/settings-dialog/sidebar.tsx:27
+#: src/components/settings-dialog/sidebar.tsx:62
+msgid "General"
+msgstr "General"
+
+#: src/components/settings/views/templates.tsx:466
+msgid "General-purpose template for meeting notes with agenda, discussion points, and action items"
+msgstr "General-purpose template for meeting notes with agenda, discussion points, and action items"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:310
+msgid "Generated from {briefSourceCountLabel}"
+msgstr "Generated from {briefSourceCountLabel}"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:401
+msgid "Generating from {sourceCountLabel}"
+msgstr "Generating from {sourceCountLabel}"
+
+#: src/components/editor-area/note-header/title-input.tsx:30
+msgid "Generating title..."
+msgstr "Generating title..."
+
+#: src/components/toast/shared.tsx:410
+msgid "Go to AI models settings to check the status."
+msgstr "Go to AI models settings to check the status."
+
+#: src/components/toast/shared.tsx:341
+#~ msgid "Go to AI settings to check the status."
+#~ msgstr "Go to AI settings to check the status."
+
+#: src/components/control.tsx:21
+msgid "Go to home"
+msgstr "Go to home"
+
+#: src/routes/app.ask.$threadId.tsx:416
+msgid "Go to latest message"
+msgstr "Go to latest message"
+
+#: src/components/settings/components/ai/stt-view.tsx:452
+msgid "Good"
+msgstr "Good"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:488
+msgid "Good (5.2-7.8% error)"
+msgstr "Good (5.2-7.8% error)"
+
+#: src/components/settings/components/ai/stt-view.tsx:401
+#: src/components/settings/components/ai/stt-view.tsx:678
+msgid "Good accuracy (10-25% error)"
+msgstr "Good accuracy (10-25% error)"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:75
+msgid "Good for most meetings and calls"
+msgstr "Good for most meetings and calls"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:273
+msgid "Google Gemini"
+msgstr "Google Gemini"
+
+#: src/hooks/cloud-model-catalog.ts:350
+#~ msgid "GPT-5 Nano"
+#~ msgstr "GPT-5 Nano"
+
+#: src/hooks/cloud-model-catalog.ts:362
+#~ msgid "GPT-5.4"
+#~ msgstr "GPT-5.4"
+
+#: src/hooks/cloud-model-catalog.ts:410
+msgid "GPT-5.4 Mini"
+msgstr "GPT-5.4 Mini"
+
+#: src/hooks/cloud-model-catalog.ts:404
+msgid "GPT-5.4 Nano"
+msgstr "GPT-5.4 Nano"
+
+#: src/hooks/cloud-model-catalog.ts:402
+msgid "GPT-5.5"
+msgstr "GPT-5.5"
+
+#: src/hooks/cloud-model-catalog.ts:352
+#~ msgid "GPT-OSS"
+#~ msgstr "GPT-OSS"
+
+#: src/hooks/cloud-model-catalog.ts:408
+msgid "GPT-OSS 120B"
+msgstr "GPT-OSS 120B"
+
+#: src/hooks/cloud-model-catalog.ts:406
+msgid "GPT-OSS 20B"
+msgstr "GPT-OSS 20B"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:116
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:182
+msgid "Grant Access"
+msgstr "Grant Access"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:111
+msgid "Grant both permissions to continue."
+msgstr "Grant both permissions to continue."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:263
+#~ msgid "Groq"
+#~ msgstr "Groq"
+
+#: src/components/projects/create-project-dialog.tsx:113
+msgid "Group related notes around a client, topic, initiative, or area of work."
+msgstr "Group related notes around a client, topic, initiative, or area of work."
+
+#: src/hooks/cloud-model-catalog.ts:416
+msgid "Haiku 4.5"
+msgstr "Haiku 4.5"
+
+#: src/components/settings/views/profile.tsx:183
+msgid "Helps AI provide better context in meeting summaries"
+msgstr "Helps AI provide better context in meeting summaries"
+
+#: src/components/settings/components/ai/stt-view.tsx:350
+#: src/components/settings/components/ai/stt-view.tsx:627
+msgid "Hide languages"
+msgstr "Hide languages"
+
+#: src/components/settings/components/ai/stt-view.tsx:400
+#: src/components/settings/components/ai/stt-view.tsx:677
+msgid "High accuracy (≤10% error)"
+msgstr "High accuracy (≤10% error)"
+
+#: src/components/settings/components/ai/stt-view.tsx:177
+msgid "Highest quality for English meetings"
+msgstr "Highest quality for English meetings"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:216
+#: src/components/right-panel/views/chat-view.tsx:521
+msgid "History"
+msgstr "History"
+
+#: src/utils/consent-notification.tsx:15
+msgid "I'm using www.typrapp.com to take notes. It transcribes the meeting but doesn't record it. If you prefer not to be transcribed just let me know."
+msgstr "I'm using www.typrapp.com to take notes. It transcribes the meeting but doesn't record it. If you prefer not to be transcribed just let me know."
+
+#: src/utils/consent-notification.tsx:109
+msgid "I've notified participants"
+msgstr "I've notified participants"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:24
+msgid "Identify key decisions made in this meeting"
+msgstr "Identify key decisions made in this meeting"
+
+#: src/components/youtube-import-dialog.tsx:87
+msgid "Import Video"
+msgstr "Import Video"
+
+#: src/components/youtube-import-dialog.tsx:84
+msgid "Importing..."
+msgstr "Importing..."
+
+#: src/components/editor-area/selection-actions.tsx:235
+msgid "Improve writing"
+msgstr "Improve writing"
+
+#: src/routes/app.projects.$projectId.tsx:715
+msgid "Include in brief"
+msgstr "Include in brief"
+
+#: src/components/right-panel/views/transcript-view.tsx:658
+msgid "Initializing model..."
+msgstr "Initializing model..."
+
+#: src/components/settings/views/about.tsx:189
+msgid "Installing Update"
+msgstr "Installing Update"
+
+#: src/components/settings-dialog/content.tsx:39
+#: src/components/settings-dialog/sidebar.tsx:35
+#: src/components/settings/views/integrations.tsx:108
+msgid "Integrations"
+msgstr "Integrations"
+
+#: src/components/editor-area/floating-button.tsx:71
+#: src/components/settings/components/template-list.tsx:43
+#: src/components/settings/components/templates-sidebar.tsx:39
+#: src/components/settings/views/templates.tsx:451
+msgid "Interview Debrief"
+msgstr "Interview Debrief"
+
+#: src/components/share-and-permission/invite-list.tsx:30
+msgid "Invite"
+msgstr "Invite"
+
+#: src/components/settings/views/team.tsx:189
+msgid "Invite members"
+msgstr "Invite members"
+
+#: src/components/settings/views/profile.tsx:180
+msgid "Job title"
+msgstr "Job title"
+
+#: src/components/finder/views/contact-view.tsx:462
+msgid "John Doe"
+msgstr "John Doe"
+
+#: src/components/editor-area/note-header/chips/event-chip.tsx:231
+msgid "Join meeting"
+msgstr "Join meeting"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:308
+msgid "Key configured"
+msgstr "Key configured"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:23
+msgid "Key decisions"
+msgstr "Key decisions"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:329
+msgid "Key stored locally and used directly with this provider."
+msgstr "Key stored locally and used directly with this provider."
+
+#: src/components/settings/components/ai/stt-view.tsx:595
+msgid "Key stored locally. Audio is sent directly to AssemblyAI."
+msgstr "Key stored locally. Audio is sent directly to AssemblyAI."
+
+#: src/components/meeting-assistant/floating-assistant.tsx:82
+#: src/components/meeting-assistant/floating-dock-variant.tsx:196
+msgid "Key takeaways"
+msgstr "Key takeaways"
+
+#: src/components/shortcuts-window.tsx:94
+msgid "Keyboard Shortcuts"
+msgstr "Keyboard Shortcuts"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:249
+#~ msgid "Keys are stored locally and used directly with each provider."
+#~ msgstr "Keys are stored locally and used directly with each provider."
+
+#: src/components/settings-dialog/content.tsx:41
+#: src/components/settings-dialog/sidebar.tsx:37
+msgid "Lab"
+msgstr "Lab"
+
+#: src/components/welcome-modal/rating-display.tsx:34
+msgid "Language"
+msgstr "Language"
+
+#: src/components/settings/views/general.tsx:414
+msgid "Language for AI-generated meeting summaries"
+msgstr "Language for AI-generated meeting summaries"
+
+#: src/components/settings/components/ai/stt-view.tsx:375
+#: src/components/settings/components/ai/stt-view.tsx:652
+msgid "Languages & features"
+msgstr "Languages & features"
+
+#: src/components/projects/project-summary-tab.tsx:78
+msgid "Latest understanding from {briefSourceCountLabel}"
+msgstr "Latest understanding from {briefSourceCountLabel}"
+
+#: src/components/projects/project-brief-panel.tsx:66
+msgid "Latest understanding from {briefSourceCountLabel}."
+msgstr "Latest understanding from {briefSourceCountLabel}."
+
+#: src/components/projects/project-brief-panel.tsx:67
+msgid "Latest understanding will appear from {sourceCountLabel}."
+msgstr "Latest understanding will appear from {sourceCountLabel}."
+
+#: src/components/toolbar/buttons/share-button.tsx:278
+msgid "Learn more"
+msgstr "Learn more"
+
+#: src/components/toolbar/buttons/share-button.tsx:242
+msgid "Let us know if you want other ways to share."
+msgstr "Let us know if you want other ways to share."
+
+#: src/components/left-sidebar/theme-toggle.tsx:17
+msgid "Light"
+msgstr "Light"
+
+#: src/components/settings/components/ai/stt-view.tsx:457
+msgid "Limited"
+msgstr "Limited"
+
+#: src/components/ui/inline-citation.tsx:29
+msgid "Line {start}"
+msgstr "Line {start}"
+
+#: src/components/ui/inline-citation.tsx:28
+msgid "Lines {start}-{end}"
+msgstr "Lines {start}-{end}"
+
+#: src/components/right-panel/views/transcript-view.tsx:432
+msgid "Listening. Text appears after speech pauses."
+msgstr "Listening. Text appears after speech pauses."
+
+#: src/components/right-panel/views/transcript-view.tsx:440
+#~ msgid "Listening. Text appears as Typr processes speech."
+#~ msgstr "Listening. Text appears as Typr processes speech."
+
+#: src/components/transcript/components/HeaderTranscribingIndicator.tsx:34
+msgid "Live"
+msgstr "Live"
+
+#: src/hooks/cloud-model-catalog.ts:414
+msgid "Llama 3.1 8B"
+msgstr "Llama 3.1 8B"
+
+#: src/hooks/cloud-model-catalog.ts:412
+msgid "Llama 3.3 70B"
+msgstr "Llama 3.3 70B"
+
+#: src/components/right-panel/views/transcript-view.tsx:686
+msgid "Loading AI model into memory... This may take a few seconds on first start"
+msgstr "Loading AI model into memory... This may take a few seconds on first start"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:552
+#: src/components/settings/components/ai/task-defaults.tsx:384
+msgid "Loading available models..."
+msgstr "Loading available models..."
+
+#: src/components/transcript/actions/MicrophoneSelector.tsx:120
+msgid "Loading devices..."
+msgstr "Loading devices..."
+
+#: src/components/editor-area/note-header/chips/event-chip.tsx:279
+msgid "Loading events..."
+msgstr "Loading events..."
+
+#: src/components/transcript/actions/MicrophoneSelector.tsx:99
+msgid "Loading microphones..."
+msgstr "Loading microphones..."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:202
+#: src/components/settings/components/ai/llm-local-view.tsx:276
+msgid "Loading models…"
+msgstr "Loading models…"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:192
+#: src/components/left-sidebar/bulk-delete-button.tsx:141
+msgid "Loading projects…"
+msgstr "Loading projects…"
+
+#: src/components/settings/views/templates.tsx:316
+msgid "Loading templates..."
+msgstr "Loading templates..."
+
+#: src/components/right-panel/views/transcript-view.tsx:341
+msgid "Loading transcription..."
+msgstr "Loading transcription..."
+
+#: src/components/settings/components/calendar/calendar-selector.tsx:95
+#: src/components/transcript/actions/MicrophoneSelector.tsx:80
+#: src/components/ui/model-selector.tsx:235
+msgid "Loading..."
+msgstr "Loading..."
+
+#: src/components/audio-upload-dialog.tsx:323
+msgid "Local · typically 5–15 min"
+msgstr "Local · typically 5–15 min"
+
+#: src/hooks/cloud-model-catalog.ts:453
+msgid "Long context, strong at analysis"
+msgstr "Long context, strong at analysis"
+
+#: src/hooks/cloud-model-catalog.ts:447
+msgid "Lowest-latency Groq option"
+msgstr "Lowest-latency Groq option"
+
+#: src/components/share-and-permission/publish.tsx:24
+msgid "Make it public"
+msgstr "Make it public"
+
+#: src/components/app-shell/context-pane.tsx:26
+msgid "Meeting chat threads will live here while the note stays visible in the main canvas."
+msgstr "Meeting chat threads will live here while the note stays visible in the main canvas."
+
+#: src/components/editor-area/floating-button.tsx:65
+#: src/components/settings/components/template-list.tsx:37
+#: src/components/settings/components/templates-sidebar.tsx:33
+#: src/components/settings/views/templates.tsx:445
+msgid "Meeting Notes"
+msgstr "Meeting Notes"
+
+#: src/components/settings/components/ai/task-defaults.tsx:118
+msgid "Meeting summaries"
+msgstr "Meeting summaries"
+
+#: src/components/settings/views/team.tsx:145
+#: src/components/settings/views/team.tsx:232
+msgid "Member"
+msgstr "Member"
+
+#: src/components/organization-profile/members-list.tsx:27
+msgid "Members"
+msgstr "Members"
+
+#: src/components/settings/views/sound.tsx:129
+msgid "Microphone Access"
+msgstr "Microphone Access"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:209
+#: src/components/meeting-assistant/floating-dock-variant.tsx:332
+#: src/components/right-panel/views/chat-view.tsx:577
+#: src/components/transcript/actions/TranscriptActionBar.tsx:241
+msgid "Minimize"
+msgstr "Minimize"
+
+#: src/components/projects/project-ask-launcher.tsx:29
+#: src/routes/app.ask.tsx:71
+msgid "Missing user"
+msgstr "Missing user"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:221
+#: src/components/settings/components/ai/llm-custom-view.tsx:317
+#: src/components/settings/components/ai/llm-custom-view.tsx:423
+msgid "Model"
+msgstr "Model"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:540
+msgid "Model Name"
+msgstr "Model Name"
+
+#: src/components/settings/components/ai/stt-view.tsx:454
+msgid "Moderate"
+msgstr "Moderate"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:418
+#: src/components/ui/model-selector.tsx:437
+msgid "More models"
+msgstr "More models"
+
+#: src/components/editor-area/note-header/listen-button.tsx:396
+#: src/components/editor-area/note-header/transcription-bar.tsx:212
+msgid "More settings"
+msgstr "More settings"
+
+#: src/components/shortcuts-window.tsx:161
+msgid "Most shortcuts work even when typing in text fields"
+msgstr "Most shortcuts work even when typing in text fields"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:202
+#: src/components/meeting-assistant/floating-dock-variant.tsx:325
+msgid "Move chat to sidebar"
+msgstr "Move chat to sidebar"
+
+#: src/components/right-panel/views/chat-view.tsx:565
+#: src/components/transcript/actions/TranscriptActionBar.tsx:230
+msgid "Move to sidebar"
+msgstr "Move to sidebar"
+
+#: src/components/editor-area/note-header/transcription-bar.tsx:528
+#: src/components/right-panel/views/transcript-view.tsx:566
+#: src/components/transcript/actions/STTLanguageSelector.tsx:60
+#: src/components/transcript/actions/STTLanguageSelector.tsx:66
+msgid "Multilingual"
+msgstr "Multilingual"
+
+#: src/components/settings/components/ai/stt-view.tsx:398
+#: src/components/settings/components/ai/stt-view.tsx:675
+msgid "Multilingual code-switching"
+msgstr "Multilingual code-switching"
+
+#: src/components/editor-area/note-header/transcription-bar.tsx:532
+#: src/components/transcript/actions/STTLanguageSelector.tsx:64
+msgid "Multilingual high accuracy"
+msgstr "Multilingual high accuracy"
+
+#: src/components/toast/shared.tsx:143
+#~ msgid "Multilingual voice recognition"
+#~ msgstr "Multilingual voice recognition"
+
+#: src/components/left-sidebar/top-area/settings-button.tsx:90
+msgid "My Profile"
+msgstr "My Profile"
+
+#: src/components/settings/components/template-list.tsx:79
+msgid "My Templates"
+msgstr "My Templates"
+
+#: src/components/projects/create-project-dialog.tsx:136
+msgid "Name and icon"
+msgstr "Name and icon"
+
+#: src/components/projects/project-brief-panel.tsx:60
+#: src/components/projects/project-brief-row.tsx:66
+#: src/components/projects/project-summary-tab.tsx:74
+msgid "Needs refresh"
+msgstr "Needs refresh"
+
+#: src/routes/app.projects.$projectId.tsx:689
+msgid "Needs review"
+msgstr "Needs review"
+
+#: src/components/toast/shared.tsx:425
+msgid "New audio device detected"
+msgstr "New audio device detected"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:162
+#: src/components/ask/ask-conversation-toolbar.tsx:163
+#: src/components/right-panel/views/chat-view.tsx:507
+#: src/routes/app.ask.tsx:216
+msgid "New chat"
+msgstr "New chat"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:77
+msgid "New chat is only available for project-scoped Ask threads."
+msgstr "New chat is only available for project-scoped Ask threads."
+
+#: src/components/editor-area/note-header/title-input.tsx:32
+#: src/components/left-sidebar/index.tsx:181
+#: src/components/left-sidebar/notes-list.tsx:403
+#: src/components/left-sidebar/ongoing-session.tsx:45
+#: src/components/right-panel/views/chat-view.tsx:607
+#: src/components/toolbar/buttons/new-note-button.tsx:53
+msgid "New note"
+msgstr "New note"
+
+#: src/components/toolbar/buttons/new-note-button.tsx:49
+msgid "New Note"
+msgstr "New Note"
+
+#: src/components/editor-area/floating-button.tsx:316
+#: src/components/editor-area/floating-button.tsx:541
+#: src/components/editor-area/note-header/index.tsx:308
+msgid "New template"
+msgstr "New template"
+
+#: src/components/right-panel/components/search/chat-search-header.tsx:150
+#: src/components/right-panel/components/search/search-header.tsx:156
+msgid "Next (Enter)"
+msgstr "Next (Enter)"
+
+#: src/routes/app.ask.tsx:283
+msgid "No Ask conversations yet"
+msgstr "No Ask conversations yet"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:231
+msgid "No Ask conversations yet."
+msgstr "No Ask conversations yet."
+
+#: src/components/settings/components/calendar/calendar-selector.tsx:101
+msgid "No calendars found"
+msgstr "No calendars found"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:194
+#: src/components/meeting-assistant/floating-dock-variant.tsx:315
+msgid "No chat history yet"
+msgstr "No chat history yet"
+
+#: src/components/app-shell/context-pane.tsx:38
+msgid "No conversations yet"
+msgstr "No conversations yet"
+
+#: src/components/settings/views/templates.tsx:408
+msgid "No default template selected. Auto mode lets the AI structure your notes freely, which works great for most use cases."
+msgstr "No default template selected. Auto mode lets the AI structure your notes freely, which works great for most use cases."
+
+#: src/components/transcript/actions/MicrophoneSelector.tsx:87
+msgid "No device"
+msgstr "No device"
+
+#: src/components/command-palette.tsx:509
+msgid "No events found"
+msgstr "No events found"
+
+#: src/components/left-sidebar/tag-filter-bar.tsx:155
+msgid "No filters active"
+msgstr "No filters active"
+
+#: src/components/settings/views/general.tsx:338
+#: src/components/welcome-modal/language-selection-view.tsx:151
+msgid "No language found."
+msgstr "No language found."
+
+#: src/components/ui/ai-setup-indicator.tsx:38
+msgid "No local AI models available - download one in the models selector below"
+msgstr "No local AI models available - download one in the models selector below"
+
+#: src/routes/app.ask.tsx:282
+msgid "No matching conversations"
+msgstr "No matching conversations"
+
+#: src/components/app-shell/context-pane.tsx:38
+msgid "No meeting chats yet"
+msgstr "No meeting chats yet"
+
+#: src/components/settings/views/team.tsx:175
+msgid "No members found"
+msgstr "No members found"
+
+#: src/components/transcript/actions/MicrophoneSelector.tsx:59
+msgid "No microphone selected"
+msgstr "No microphone selected"
+
+#: src/components/transcript/actions/MicrophoneSelector.tsx:128
+msgid "No microphones found"
+msgstr "No microphones found"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:404
+#: src/components/ui/model-selector.tsx:423
+msgid "No models found"
+msgstr "No models found"
+
+#: src/components/command-palette.tsx:483
+msgid "No notes found"
+msgstr "No notes found"
+
+#: src/components/projects/project-empty-state.tsx:15
+#: src/components/spaces/space-empty-state.tsx:17
+msgid "No notes here yet"
+msgstr "No notes here yet"
+
+#: src/components/projects/project-notes-picker-dialog.tsx:194
+#: src/components/spaces/space-notes-picker-dialog.tsx:169
+msgid "No notes ready to add"
+msgstr "No notes ready to add"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:274
+msgid "No notes to brief"
+msgstr "No notes to brief"
+
+#: src/components/editor-area/note-header/chips/event-chip.tsx:304
+msgid "No past events found"
+msgstr "No past events found"
+
+#: src/routes/app.projects.tsx:143
+msgid "No projects found"
+msgstr "No projects found"
+
+#: src/routes/app.projects.tsx:154
+msgid "No projects yet"
+msgstr "No projects yet"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:198
+#: src/components/left-sidebar/bulk-delete-button.tsx:147
+msgid "No projects yet."
+msgstr "No projects yet."
+
+#: src/components/organization-profile/recent-notes.tsx:70
+msgid "No recent notes for this organization"
+msgstr "No recent notes for this organization"
+
+#: src/components/projects/project-summary-tab.tsx:44
+msgid "No summary yet"
+msgstr "No summary yet"
+
+#: src/components/editor-area/note-header/chips/tag-chip.tsx:146
+#: src/components/left-sidebar/tag-filter-bar.tsx:132
+msgid "No tags found."
+msgstr "No tags found."
+
+#: src/components/settings/views/templates.tsx:367
+msgid "No templates yet"
+msgstr "No templates yet"
+
+#: src/components/audio-upload-dialog.tsx:153
+#: src/components/audio-upload-dialog.tsx:194
+msgid "No transcription model available"
+msgstr "No transcription model available"
+
+#: src/components/organization-profile/upcoming-events.tsx:86
+msgid "No upcoming events for this organization"
+msgstr "No upcoming events for this organization"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:263
+#: src/components/transcript/actions/STTLanguageSelector.tsx:386
+msgid "Not downloaded"
+msgstr "Not downloaded"
+
+#: src/components/projects/project-brief-panel.tsx:61
+msgid "Not generated"
+msgstr "Not generated"
+
+#: src/components/transcript/actions/MicrophoneSelector.tsx:175
+msgid "Not seeing your device?"
+msgstr "Not seeing your device?"
+
+#: src/components/projects/project-source-citation-markdown.tsx:163
+msgid "Note"
+msgstr "Note"
+
+#: src/components/left-sidebar/notes-list.tsx:433
+msgid "Note actions"
+msgstr "Note actions"
+
+#: src/components/command-palette.tsx:473
+#: src/components/editor-area/editor-mode-indicator.tsx:49
+#: src/components/left-sidebar/index.tsx:221
+#: src/components/left-sidebar/tag-filter-bar.tsx:85
+#: src/components/projects/project-notes-panel.tsx:155
+#: src/components/spaces/project-notes-panel.tsx:23
+msgid "Notes"
+msgstr "Notes"
+
+#: src/components/settings-dialog/content.tsx:36
+#: src/components/settings-dialog/sidebar.tsx:32
+msgid "Notifications"
+msgstr "Notifications"
+
+#: src/components/settings/components/template-list.tsx:123
+msgid "Official Templates"
+msgstr "Official Templates"
+
+#: src/components/right-panel/components/chat/chat-history-view.tsx:82
+msgid "Older"
+msgstr "Older"
+
+#: src/components/right-panel/views/transcript-view.tsx:561
+#: src/components/settings/components/ai/llm-local-view.tsx:192
+#: src/components/settings/components/ai/stt-view.tsx:213
+#: src/components/transcript/actions/STTLanguageSelector.tsx:222
+#: src/components/ui/model-selector.tsx:351
+msgid "On-device"
+msgstr "On-device"
+
+#: src/components/settings/components/ai/task-defaults.tsx:359
+msgid "On-device English"
+msgstr "On-device English"
+
+#: src/components/settings/components/ai/task-defaults.tsx:257
+msgid "On-device model"
+msgstr "On-device model"
+
+#: src/components/settings/components/ai/task-defaults.tsx:360
+msgid "On-device multilingual"
+msgstr "On-device multilingual"
+
+#: src/routes/app.ask.$threadId.tsx:542
+msgid "One answer was interrupted. Retry it from the message above."
+msgstr "One answer was interrupted. Retry it from the message above."
+
+#. placeholder {0}: sttMetadata?.size || "250 MB"
+#: src/components/welcome-modal/download-progress-view.tsx:148
+msgid "One-time download, {0}"
+msgstr "One-time download, {0}"
+
+#: src/components/welcome-modal/download-progress-view.tsx:186
+msgid "One-time download, 5.0 GB"
+msgstr "One-time download, 5.0 GB"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:195
+msgid "Only GGUF chat models are supported locally."
+msgstr "Only GGUF chat models are supported locally."
+
+#: src/components/control.tsx:19
+msgid "Oops! Nothing here."
+msgstr "Oops! Nothing here."
+
+#: src/routes/app.ask.tsx:288
+msgid "Open a project and ask a question grounded in its notes and files."
+msgstr "Open a project and ask a question grounded in its notes and files."
+
+#: src/components/toast/model-select.tsx:40
+msgid "Open AI models"
+msgstr "Open AI models"
+
+#: src/components/toast/model-select.tsx:40
+#~ msgid "Open AI Settings"
+#~ msgstr "Open AI Settings"
+
+#: src/components/left-sidebar/top-area/finder-button.tsx:40
+msgid "Open finder view"
+msgstr "Open finder view"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:183
+#: src/components/settings/components/ai/stt-view.tsx:204
+#: src/components/settings/components/data-path-block.tsx:74
+msgid "Open folder"
+msgstr "Open folder"
+
+#: src/components/settings/views/about.tsx:147
+msgid "Open GitHub Issues."
+msgstr "Open GitHub Issues."
+
+#: src/components/left-sidebar/search-list.tsx:298
+#: src/components/left-sidebar/search-list.tsx:368
+#: src/components/toolbar/buttons/new-window-button.tsx:29
+#: src/components/toolbar/buttons/new-window-button.tsx:35
+msgid "Open in new window"
+msgstr "Open in new window"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:176
+#: src/components/ask/ask-conversation-toolbar.tsx:177
+msgid "Open project"
+msgstr "Open project"
+
+#: src/components/projects/project-brief-row.tsx:111
+msgid "Open project brief"
+msgstr "Open project brief"
+
+#: src/routes/app.ask.tsx:185
+msgid "Open projects"
+msgstr "Open projects"
+
+#: src/components/audio-upload-dialog.tsx:155
+#: src/components/toast/shared.tsx:413
+#: src/components/toast/shared.tsx:463
+#: src/components/welcome-modal/audio-permissions-view.tsx:137
+msgid "Open Settings"
+msgstr "Open Settings"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:328
+#: src/components/meeting-assistant/floating-dock-variant.tsx:93
+#: src/components/meeting-assistant/floating-dock-variant.tsx:155
+#: src/components/meeting-assistant/floating-dock-variant.tsx:295
+msgid "Open transcript"
+msgstr "Open transcript"
+
+#: src/components/toolbar/buttons/transcript-panel-button.tsx:45
+msgid "Open transcript panel"
+msgstr "Open transcript panel"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:177
+msgid "OpenAI"
+msgstr "OpenAI"
+
+#: src/hooks/cloud-model-catalog.ts:375
+#~ msgid "OpenAI's fastest model"
+#~ msgstr "OpenAI's fastest model"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:379
+msgid "OpenRouter"
+msgstr "OpenRouter"
+
+#: src/components/projects/create-project-dialog.tsx:163
+msgid "optional"
+msgstr "optional"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:171
+msgid "Optional for participant suggestions"
+msgstr "Optional for participant suggestions"
+
+#: src/components/left-sidebar/nav-user.tsx:169
+msgid "Options"
+msgstr "Options"
+
+#: src/hooks/cloud-model-catalog.ts:360
+#~ msgid "Opus 4.7"
+#~ msgstr "Opus 4.7"
+
+#: src/components/finder/views/contact-view.tsx:794
+msgid "Organization name"
+msgstr "Organization name"
+
+#: src/components/left-sidebar/nav-user.tsx:172
+msgid "OSS"
+msgstr "OSS"
+
+#: src/components/editor-area/note-header/listen-button.tsx:508
+#: src/components/editor-area/note-header/transcription-bar.tsx:341
+msgid "Other's voice"
+msgstr "Other's voice"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:470
+msgid "Others"
+msgstr "Others"
+
+#: src/components/settings/views/calendar.tsx:34
+msgid "Outlook Calendar"
+msgstr "Outlook Calendar"
+
+#: src/components/settings/views/team.tsx:139
+#: src/components/settings/views/team.tsx:226
+msgid "Owner"
+msgstr "Owner"
+
+#: src/components/right-panel/components/chat/chat-history-view.tsx:56
+msgid "Past 30 days"
+msgstr "Past 30 days"
+
+#: src/components/editor-area/note-header/listen-button.tsx:345
+msgid "Pause"
+msgstr "Pause"
+
+#: src/components/toolbar/buttons/share-button.tsx:83
+msgid "PDF"
+msgstr "PDF"
+
+#: src/components/toolbar/buttons/share-button.tsx:316
+msgid "Pending..."
+msgstr "Pending..."
+
+#: src/components/share-and-permission/participants-selector.tsx:35
+msgid "people"
+msgstr "people"
+
+#: src/components/settings/views/templates.tsx:384
+msgid "Pin a template to access it directly from the AI summary dock in your editor"
+msgstr "Pin a template to access it directly from the AI summary dock in your editor"
+
+#: src/utils/consent-notification.tsx:31
+msgid "Please inform all participants that this session is being transcribed for meeting summarization purposes."
+msgstr "Please inform all participants that this session is being transcribed for meeting summarization purposes."
+
+#: src/components/right-panel/views/transcript-view.tsx:329
+msgid "Please open a note to view its transcription."
+msgstr "Please open a note to view its transcription."
+
+#: src/components/right-panel/index.tsx:28
+msgid "Please try opening a note first or refresh the app"
+msgstr "Please try opening a note first or refresh the app"
+
+#: src/components/control.tsx:90
+msgid "Please use the error dialog to refresh the application."
+msgstr "Please use the error dialog to refresh the application."
+
+#: src/components/settings/components/ai/stt-view.tsx:423
+#: src/components/settings/components/ai/stt-view.tsx:700
+msgid "Plus 50+ additional languages with moderate to fair accuracy. Total 99 languages supported."
+msgstr "Plus 50+ additional languages with moderate to fair accuracy. Total 99 languages supported."
+
+#. placeholder {0}: LANGUAGES_ISO_639_1[field.value[0] as ISO_639_1_CODE]?.name
+#: src/components/settings/views/general.tsx:377
+msgid "Prefers <0>{0}</0> but falls back to auto-detection if needed."
+msgstr "Prefers <0>{0}</0> but falls back to auto-detection if needed."
+
+#: src/components/welcome-modal/download-progress-view.tsx:205
+msgid "Preparing AI writing"
+msgstr "Preparing AI writing"
+
+#: src/components/editor-area/writing-bar-overlay.tsx:37
+msgid "Preparing notes"
+msgstr "Preparing notes"
+
+#: src/components/welcome-modal/download-progress-view.tsx:167
+msgid "Preparing transcription"
+msgstr "Preparing transcription"
+
+#: src/components/editor-area/note-header/share-menu.tsx:113
+msgid "Preparing..."
+msgstr "Preparing..."
+
+#: src/components/shortcuts-window.tsx:158
+msgid "Press Cmd+0 (Ctrl+0 on Windows/Linux) anytime to open this window"
+msgstr "Press Cmd+0 (Ctrl+0 on Windows/Linux) anytime to open this window"
+
+#: src/components/right-panel/components/search/chat-search-header.tsx:140
+#: src/components/right-panel/components/search/search-header.tsx:146
+msgid "Previous (Shift+Enter)"
+msgstr "Previous (Shift+Enter)"
+
+#: src/components/settings/views/general.tsx:248
+msgid "Primary language for the interface"
+msgstr "Primary language for the interface"
+
+#: src/components/settings-dialog/content.tsx:33
+#: src/components/settings-dialog/sidebar.tsx:29
+#: src/components/settings-dialog/sidebar.tsx:86
+#: src/components/settings/views/privacy.tsx:83
+msgid "Privacy"
+msgstr "Privacy"
+
+#: src/components/editor-area/note-header/index.tsx:135
+msgid "Private notes"
+msgstr "Private notes"
+
+#: src/components/settings-dialog/content.tsx:32
+#: src/components/settings-dialog/sidebar.tsx:28
+msgid "Profile"
+msgstr "Profile"
+
+#: src/components/settings/views/profile.tsx:317
+msgid "Profile saved"
+msgstr "Profile saved"
+
+#: src/components/projects/project-header.tsx:74
+#: src/components/spaces/project-header.tsx:44
+msgid "Project"
+msgstr "Project"
+
+#: src/components/projects/project-header.tsx:104
+#: src/components/spaces/project-header.tsx:70
+msgid "Project actions"
+msgstr "Project actions"
+
+#. placeholder {0}: project.name
+#: src/routes/app.projects.tsx:211
+msgid "Project actions for {0}"
+msgstr "Project actions for {0}"
+
+#: src/components/projects/project-brief-row.tsx:62
+#: src/components/projects/project-brief-sidebar-view.tsx:153
+msgid "Project brief"
+msgstr "Project brief"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:135
+msgid "Project brief copied to clipboard."
+msgstr "Project brief copied to clipboard."
+
+#: src/components/projects/project-brief-row.tsx:46
+msgid "Project brief will appear after Typr reviews these sources."
+msgstr "Project brief will appear after Typr reviews these sources."
+
+#: src/components/settings/components/ai/task-defaults.tsx:111
+msgid "Project briefs"
+msgstr "Project briefs"
+
+#: src/components/spaces/scoped-prompt-composer.tsx:89
+msgid "Project chat is coming next."
+msgstr "Project chat is coming next."
+
+#: src/components/spaces/scoped-prompt-composer.tsx:22
+msgid "Project chat will use notes added here as context."
+msgstr "Project chat will use notes added here as context."
+
+#: src/components/projects/project-files-dropzone.tsx:128
+msgid "Project files"
+msgstr "Project files"
+
+#: src/components/projects/project-icon-picker.tsx:56
+msgid "Project icon"
+msgstr "Project icon"
+
+#: src/components/projects/project-icon-picker.tsx:63
+msgid "Project icon color"
+msgstr "Project icon color"
+
+#: src/components/projects/project-icon-picker.tsx:92
+msgid "Project icons"
+msgstr "Project icons"
+
+#: src/components/editor-area/floating-button.tsx:73
+#: src/components/settings/components/template-list.tsx:45
+#: src/components/settings/components/templates-sidebar.tsx:41
+#: src/components/settings/views/templates.tsx:453
+msgid "Project Kickoff"
+msgstr "Project Kickoff"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:234
+#: src/components/projects/create-project-dialog.tsx:153
+msgid "Project name"
+msgstr "Project name"
+
+#: src/routes/app.ask.$threadId.tsx:392
+msgid "Project no longer available"
+msgstr "Project no longer available"
+
+#: src/routes/app.projects.$projectId.tsx:473
+msgid "Project notes"
+msgstr "Project notes"
+
+#: src/components/projects/project-brief-panel.tsx:50
+#: src/components/projects/project-summary-tab.tsx:65
+msgid "Project summary"
+msgstr "Project summary"
+
+#: src/components/editor-area/note-header/chips/project-chip.tsx:181
+#: src/components/left-sidebar/projects-section.tsx:56
+#: src/routes/app.projects.tsx:118
+msgid "Projects"
+msgstr "Projects"
+
+#: src/components/settings/views/profile.tsx:207
+msgid "Provides business context for AI-generated notes"
+msgstr "Provides business context for AI-generated notes"
+
+#: src/components/share-and-permission/publish.tsx:15
+msgid "Publish your note"
+msgstr "Publish your note"
+
+#: src/hooks/cloud-model-catalog.ts:424
+msgid "Qwen3.6 Flash"
+msgstr "Qwen3.6 Flash"
+
+#: src/components/settings/views/about.tsx:133
+msgid "Read what changed in recent releases."
+msgstr "Read what changed in recent releases."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:232
+#: src/components/settings/components/ai/stt-view.tsx:253
+#: src/components/welcome-modal/download-progress-view.tsx:145
+#: src/components/welcome-modal/download-progress-view.tsx:183
+msgid "Ready"
+msgstr "Ready"
+
+#: src/components/right-panel/views/transcript-view.tsx:570
+msgid "Real-time multilingual"
+msgstr "Real-time multilingual"
+
+#: src/components/editor-area/note-header/transcription-bar.tsx:534
+msgid "Real-time Universal"
+msgstr "Real-time Universal"
+
+#: src/components/organization-profile/recent-notes.tsx:42
+msgid "Recent Notes"
+msgstr "Recent Notes"
+
+#: src/components/ui/model-selector.tsx:78
+#~ msgid "Recommended default model"
+#~ msgstr "Recommended default model"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:303
+#~ msgid "Recommended models first"
+#~ msgstr "Recommended models first"
+
+#: src/components/settings/components/ai/stt-view.tsx:180
+msgid "Recommended multilingual model for most meetings"
+msgstr "Recommended multilingual model for most meetings"
+
+#: src/components/toast/shared.tsx:460
+msgid "Recording could not be started. Check your audio settings."
+msgstr "Recording could not be started. Check your audio settings."
+
+#: src/components/editor-area/index.tsx:888
+msgid "Recording too short"
+msgstr "Recording too short"
+
+#: src/components/transcript/actions/MicrophoneSelector.tsx:184
+msgid "Refresh"
+msgstr "Refresh"
+
+#: src/components/left-sidebar/events-list.tsx:116
+msgid "Refresh events"
+msgstr "Refresh events"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:211
+msgid "Refresh project brief"
+msgstr "Refresh project brief"
+
+#. placeholder {0}: template.title || t`Untitled template`
+#: src/components/editor-area/note-header/index.tsx:255
+msgid "Regenerate with {0}"
+msgstr "Regenerate with {0}"
+
+#: src/components/editor-area/note-header/index.tsx:205
+msgid "Regenerate with Auto"
+msgstr "Regenerate with Auto"
+
+#: src/components/right-panel/components/chat/inline-diff-summary.tsx:120
+msgid "Reject"
+msgstr "Reject"
+
+#: src/components/right-panel/components/chat/inline-diff-summary.tsx:135
+msgid "Rejected"
+msgstr "Rejected"
+
+#: src/hooks/cloud-model-catalog.ts:445
+msgid "Reliable general-purpose Groq model"
+msgstr "Reliable general-purpose Groq model"
+
+#: src/components/settings/components/ai/stt-view.tsx:412
+#: src/components/settings/components/ai/stt-view.tsx:689
+msgid "Reliable transcription quality"
+msgstr "Reliable transcription quality"
+
+#: src/components/right-panel/components/listening-indicator.tsx:83
+#: src/components/right-panel/views/transcript-view.tsx:474
+msgid "remaining"
+msgstr "remaining"
+
+#: src/components/projects/project-notes-panel.tsx:221
+msgid "Remove “{fileToRemoveName}”?"
+msgstr "Remove “{fileToRemoveName}”?"
+
+#: src/routes/app.projects.$projectId.tsx:513
+msgid "Remove “{sourceToRemoveTitle}” from this project?"
+msgstr "Remove “{sourceToRemoveTitle}” from this project?"
+
+#. placeholder {0}: file.name
+#: src/components/projects/project-files-dropzone.tsx:189
+msgid "Remove {0}"
+msgstr "Remove {0}"
+
+#: src/routes/app.ask.tsx:377
+msgid "Remove conversation"
+msgstr "Remove conversation"
+
+#: src/components/projects/project-notes-panel.tsx:244
+msgid "Remove file"
+msgstr "Remove file"
+
+#: src/routes/app.projects.$projectId.tsx:536
+#: src/routes/app.projects.$projectId.tsx:729
+msgid "Remove from project"
+msgstr "Remove from project"
+
+#: src/components/settings/views/templates.tsx:542
+msgid "Remove from quick access"
+msgstr "Remove from quick access"
+
+#: src/components/right-panel/components/chat/inline-diff-summary.tsx:63
+msgid "Removed"
+msgstr "Removed"
+
+#: src/components/right-panel/components/chat/diff-preview.tsx:230
+msgid "Removed text"
+msgstr "Removed text"
+
+#: src/components/right-panel/components/search/search-header.tsx:169
+msgid "Replace All"
+msgstr "Replace All"
+
+#: src/components/right-panel/components/search/search-header.tsx:125
+msgid "Replace..."
+msgstr "Replace..."
+
+#: src/components/left-sidebar/top-area/settings-button.tsx:96
+msgid "Report an issue"
+msgstr "Report an issue"
+
+#: src/components/settings/views/sound.tsx:60
+msgid "Requesting..."
+msgstr "Requesting..."
+
+#: src/components/settings/views/sound.tsx:140
+msgid "Required to transcribe other people's voice during meetings"
+msgstr "Required to transcribe other people's voice during meetings"
+
+#: src/components/settings/views/sound.tsx:130
+msgid "Required to transcribe your voice during meetings"
+msgstr "Required to transcribe your voice during meetings"
+
+#: src/components/settings/views/about.tsx:112
+msgid "Resources"
+msgstr "Resources"
+
+#: src/components/editor-area/note-header/listen-button.tsx:145
+#: src/components/editor-area/note-header/transcription-bar.tsx:186
+msgid "Resume"
+msgstr "Resume"
+
+#: src/components/projects/project-brief-row.tsx:100
+#: src/components/projects/project-files-dropzone.tsx:175
+#: src/components/right-panel/views/transcript-view.tsx:364
+#: src/components/toast/shared.tsx:178
+#: src/components/toast/shared.tsx:262
+#: src/components/welcome-modal/download-progress-view.tsx:157
+#: src/components/welcome-modal/download-progress-view.tsx:195
+#: src/routes/app.ask.$threadId.tsx:530
+#: src/routes/app.ask.$threadId.tsx:719
+msgid "Retry"
+msgstr "Retry"
+
+#: src/components/settings/views/team.tsx:104
+#: src/components/settings/views/team.tsx:213
+msgid "Role"
+msgstr "Role"
+
+#: src/components/settings/views/templates.tsx:293
+msgid "Save and close"
+msgstr "Save and close"
+
+#: src/components/toolbar/buttons/share-button.tsx:85
+msgid "Save as PDF document"
+msgstr "Save as PDF document"
+
+#: src/components/finder/views/contact-view.tsx:802
+msgid "Save organization"
+msgstr "Save organization"
+
+#: src/components/settings/views/profile.tsx:301
+msgid "Save Profile"
+msgstr "Save Profile"
+
+#: src/components/settings/views/general.tsx:218
+msgid "Save recordings"
+msgstr "Save recordings"
+
+#: src/components/settings/components/ai/task-defaults.tsx:319
+msgid "Saved model"
+msgstr "Saved model"
+
+#: src/components/projects/project-files-dropzone.tsx:123
+msgid "Saving"
+msgstr "Saving"
+
+#: src/components/projects/project-files-dropzone.tsx:111
+#: src/components/settings/views/profile.tsx:298
+#: src/components/settings/views/profile.tsx:311
+msgid "Saving..."
+msgstr "Saving..."
+
+#: src/components/app-shell/primary-rail.tsx:112
+#: src/components/right-panel/components/chat/chat-input.tsx:279
+#: src/components/right-panel/components/chat/chat-input.tsx:364
+#: src/components/right-panel/views/chat-view.tsx:535
+msgid "Search"
+msgstr "Search"
+
+#: src/components/editor-area/note-header/chips/event-chip.tsx:268
+msgid "Search and link to past events..."
+msgstr "Search and link to past events..."
+
+#: src/components/settings/views/integrations.tsx:146
+msgid "Search and query your meeting notes from Claude Desktop."
+msgstr "Search and query your meeting notes from Claude Desktop."
+
+#: src/components/projects/project-notes-picker-dialog.tsx:165
+msgid "Search and select notes to add to this project."
+msgstr "Search and select notes to add to this project."
+
+#: src/routes/app.ask.tsx:224
+msgid "Search conversations"
+msgstr "Search conversations"
+
+#: src/components/settings/views/general.tsx:336
+#: src/components/welcome-modal/language-selection-view.tsx:149
+msgid "Search languages..."
+msgstr "Search languages..."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:338
+#: src/components/ui/model-selector.tsx:404
+msgid "Search models"
+msgstr "Search models"
+
+#: src/components/settings/views/team.tsx:204
+msgid "Search names or emails"
+msgstr "Search names or emails"
+
+#: src/components/finder/views/table-view.tsx:188
+msgid "Search notes and events..."
+msgstr "Search notes and events..."
+
+#: src/components/spaces/space-notes-picker-dialog.tsx:154
+msgid "Search notes to add..."
+msgstr "Search notes to add..."
+
+#: src/components/command-palette.tsx:405
+msgid "Search notes, events, people..."
+msgstr "Search notes, events, people..."
+
+#: src/components/left-sidebar/top-area/index.tsx:32
+#: src/components/projects/project-notes-picker-dialog.tsx:179
+msgid "Search notes..."
+msgstr "Search notes..."
+
+#: src/components/finder/views/contact-view.tsx:659
+msgid "Search or add company"
+msgstr "Search or add company"
+
+#: src/components/editor-area/note-header/chips/tag-chip.tsx:156
+msgid "Search or add tags"
+msgstr "Search or add tags"
+
+#: src/components/editor-area/note-header/chips/tag-chip.tsx:145
+msgid "Search or add tags..."
+msgstr "Search or add tags..."
+
+#: src/components/right-panel/components/chat/chat-history-view.tsx:48
+msgid "Search or start new chat"
+msgstr "Search or start new chat"
+
+#: src/routes/app.projects.tsx:129
+msgid "Search projects"
+msgstr "Search projects"
+
+#: src/components/spaces/space-notes-picker-dialog.tsx:140
+msgid "Search recent notes and add the ones you want to keep in this project. Only unassigned notes appear here."
+msgstr "Search recent notes and add the ones you want to keep in this project. Only unassigned notes appear here."
+
+#: src/components/left-sidebar/tag-filter-bar.tsx:124
+msgid "Search tags..."
+msgstr "Search tags..."
+
+#: src/components/settings/components/template-list.tsx:66
+#: src/components/settings/components/templates-sidebar.tsx:55
+msgid "Search templates..."
+msgstr "Search templates..."
+
+#: src/components/command-palette.tsx:477
+#: src/components/command-palette.tsx:503
+msgid "Searching..."
+msgstr "Searching..."
+
+#: src/components/settings/components/template-sections.tsx:139
+msgid "Section title"
+msgstr "Section title"
+
+#: src/components/settings/views/template.tsx:249
+msgid "Sections"
+msgstr "Sections"
+
+#. placeholder {0}: upcomingEvents.length - INITIAL_DISPLAY_LIMIT
+#: src/components/left-sidebar/events-list.tsx:199
+msgid "See {0} more"
+msgstr "See {0} more"
+
+#: src/components/left-sidebar/events-list.tsx:198
+msgid "See less"
+msgstr "See less"
+
+#: src/components/settings/views/about.tsx:209
+msgid "See whether a newer version is available."
+msgstr "See whether a newer version is available."
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:543
+msgid "Select a model from the dropdown (if available) or manually enter the model name required by your endpoint."
+msgstr "Select a model from the dropdown (if available) or manually enter the model name required by your endpoint."
+
+#: src/components/audio-upload-dialog.tsx:87
+msgid "Select Audio File"
+msgstr "Select Audio File"
+
+#: src/components/left-sidebar/events-list.tsx:85
+msgid "Select calendars"
+msgstr "Select calendars"
+
+#: src/components/settings/components/calendar/calendar-selector.tsx:69
+msgid "Select Calendars"
+msgstr "Select Calendars"
+
+#: src/components/toolbar/buttons/share-button.tsx:291
+msgid "Select folder"
+msgstr "Select folder"
+
+#: src/components/welcome-modal/language-selection-view.tsx:107
+msgid "Select languages used in your meetings. The model will automatically detect which one is being spoken."
+msgstr "Select languages used in your meetings. The model will automatically detect which one is being spoken."
+
+#: src/components/editor-area/note-header/listen-button.tsx:619
+#: src/components/editor-area/note-header/transcription-bar.tsx:483
+msgid "Select microphone..."
+msgstr "Select microphone..."
+
+#: src/components/editor-area/note-header/transcription-bar.tsx:545
+#: src/components/settings/components/ai/task-defaults.tsx:237
+#: src/components/settings/components/ai/task-defaults.tsx:285
+#: src/components/settings/components/ai/task-defaults.tsx:336
+#: src/components/transcript/actions/STTLanguageSelector.tsx:162
+#: src/components/transcript/actions/STTLanguageSelector.tsx:176
+#: src/components/ui/model-selector.tsx:293
+#: src/components/ui/model-selector.tsx:305
+msgid "Select model"
+msgstr "Select model"
+
+#: src/components/left-sidebar/notes-list.tsx:459
+msgid "Select note"
+msgstr "Select note"
+
+#: src/components/spaces/space-notes-picker-dialog.tsx:223
+msgid "Select one or more notes"
+msgstr "Select one or more notes"
+
+#: src/components/editor-area/note-header/chips/tag-chip.tsx:152
+msgid "Select tags"
+msgstr "Select tags"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:389
+msgid "Selected"
+msgstr "Selected"
+
+#: src/components/editor-area/note-header/index.tsx:77
+msgid "Selected template"
+msgstr "Selected template"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:272
+#: src/components/meeting-assistant/floating-dock-variant.tsx:378
+#: src/components/toolbar/buttons/share-button.tsx:318
+msgid "Send"
+msgstr "Send"
+
+#: src/components/editor-area/note-header/share-menu.tsx:113
+msgid "Send by email"
+msgstr "Send by email"
+
+#: src/components/settings/views/about.tsx:139
+msgid "Send Feedback"
+msgstr "Send Feedback"
+
+#: src/components/settings/views/team.tsx:240
+msgid "Send invite"
+msgstr "Send invite"
+
+#: src/components/ask/ask-composer.tsx:63
+#: src/components/right-panel/components/chat/chat-input.tsx:285
+#: src/components/right-panel/components/chat/chat-input.tsx:372
+msgid "Send message"
+msgstr "Send message"
+
+#: src/components/spaces/scoped-prompt-composer.tsx:83
+msgid "Send project question"
+msgstr "Send project question"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:283
+#: src/components/meeting-assistant/floating-dock-variant.tsx:389
+msgid "Send prompt"
+msgstr "Send prompt"
+
+#: src/components/settings/views/templates.tsx:559
+msgid "Set as default"
+msgstr "Set as default"
+
+#: src/components/welcome-modal/user-setup-view.tsx:85
+msgid "Set up your profile to personalize your experience."
+msgstr "Set up your profile to personalize your experience."
+
+#: src/components/toast/shared.tsx:382
+#: src/components/ui/model-download-banner.tsx:34
+msgid "Setting up AI assistant"
+msgstr "Setting up AI assistant"
+
+#: src/components/ui/ai-setup-indicator.tsx:37
+msgid "Setting up offline AI models - you'll be able to chat soon"
+msgstr "Setting up offline AI models - you'll be able to chat soon"
+
+#: src/components/toast/shared.tsx:348
+msgid "Setting up transcription"
+msgstr "Setting up transcription"
+
+#: src/components/settings/views/integrations.tsx:173
+msgid "Setting up..."
+msgstr "Setting up..."
+
+#: src/components/left-sidebar/nav-user.tsx:124
+#: src/components/left-sidebar/nav-user.tsx:127
+#: src/components/left-sidebar/nav-user.tsx:201
+#: src/components/left-sidebar/top-area/settings-button.tsx:83
+#: src/components/settings-dialog/content.tsx:55
+#: src/components/settings-dialog/sidebar.tsx:55
+msgid "Settings"
+msgstr "Settings"
+
+#: src/components/settings/views/integrations.tsx:47
+msgid "Setup failed"
+msgstr "Setup failed"
+
+#: src/components/editor-area/note-header/share-menu.tsx:74
+#: src/components/toolbar/buttons/share-button.tsx:223
+msgid "Share"
+msgstr "Share"
+
+#: src/components/toolbar/buttons/share-button.tsx:235
+msgid "Share enhanced note"
+msgstr "Share enhanced note"
+
+#: src/components/settings/views/privacy.tsx:103
+msgid "Share feature usage to help improve the product. No personal information, conversations, or audio collected"
+msgstr "Share feature usage to help improve the product. No personal information, conversations, or audio collected"
+
+#: src/components/settings/views/about.tsx:140
+msgid "Share ideas, issues, and feature requests."
+msgstr "Share ideas, issues, and feature requests."
+
+#: src/components/toolbar/buttons/share-button.tsx:92
+msgid "Share via email"
+msgstr "Share via email"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:83
+#: src/components/meeting-assistant/floating-dock-variant.tsx:197
+msgid "Short recap"
+msgstr "Short recap"
+
+#: src/components/shortcuts-window.tsx:130
+msgid "Shortcut"
+msgstr "Shortcut"
+
+#: src/components/left-sidebar/nav-user.tsx:194
+msgid "Shortcuts"
+msgstr "Shortcuts"
+
+#: src/components/settings/views/lab.tsx:75
+msgid "Show a small recording status control while transcription is active, with stop access."
+msgstr "Show a small recording status control while transcription is active, with stop access."
+
+#. placeholder {0}: files.length
+#: src/components/projects/project-files-dropzone.tsx:208
+msgid "Show all {0} files"
+msgstr "Show all {0} files"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:215
+msgid "Show Ask history"
+msgstr "Show Ask history"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:194
+#: src/components/meeting-assistant/floating-dock-variant.tsx:315
+msgid "Show chat history"
+msgstr "Show chat history"
+
+#: src/components/projects/project-files-dropzone.tsx:208
+#: src/components/settings/components/ai/llm-local-view.tsx:418
+#: src/components/ui/model-selector.tsx:437
+msgid "Show fewer"
+msgstr "Show fewer"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:140
+msgid "Show notes from upcoming calendar events above your notes list."
+msgstr "Show notes from upcoming calendar events above your notes list."
+
+#: src/components/right-panel/components/chat/message-wrapper.tsx:94
+msgid "Show reasoning"
+msgstr "Show reasoning"
+
+#: src/components/settings/views/privacy.tsx:127
+msgid "Show transcription consent reminder"
+msgstr "Show transcription consent reminder"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:137
+msgid "Show upcoming events in sidebar"
+msgstr "Show upcoming events in sidebar"
+
+#: src/components/toolbar/buttons/right-sidebar-button.tsx:66
+msgid "Sidebar"
+msgstr "Sidebar"
+
+#: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:132
+msgid "Sidebar Calendar"
+msgstr "Sidebar Calendar"
+
+#: src/components/settings/components/ai/stt-view.tsx:171
+msgid "Small English-only model for faster offline transcription"
+msgstr "Small English-only model for faster offline transcription"
+
+#: src/components/settings/components/ai/stt-view.tsx:169
+msgid "Small multilingual model for faster offline transcription"
+msgstr "Small multilingual model for faster offline transcription"
+
+#: src/components/finder/views/contact-view.tsx:475
+msgid "Software Engineer"
+msgstr "Software Engineer"
+
+#: src/components/shortcuts-window.tsx:164
+msgid "Some shortcuts may vary based on your operating system"
+msgstr "Some shortcuts may vary based on your operating system"
+
+#: src/components/audio-upload-dialog.tsx:138
+#: src/components/audio-upload-dialog.tsx:197
+#: src/components/audio-upload-dialog.tsx:206
+msgid "Something went wrong"
+msgstr "Something went wrong"
+
+#: src/hooks/cloud-model-catalog.ts:418
+msgid "Sonnet 4.6"
+msgstr "Sonnet 4.6"
+
+#: src/components/settings-dialog/content.tsx:37
+#: src/components/settings-dialog/sidebar.tsx:33
+msgid "Sound"
+msgstr "Sound"
+
+#: src/components/projects/project-source-citation-markdown.tsx:146
+msgid "Source"
+msgstr "Source"
+
+#: src/routes/app.projects.$projectId.tsx:706
+msgid "Source actions for {sourceTitle}"
+msgstr "Source actions for {sourceTitle}"
+
+#: src/components/editor-area/note-header/listen-button.tsx:483
+#: src/components/editor-area/note-header/transcription-bar.tsx:316
+msgid "Sources"
+msgstr "Sources"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:483
+msgid "Spanish, Italian, Korean, Portuguese, English, Polish, Japanese, German, Russian"
+msgstr "Spanish, Italian, Korean, Portuguese, English, Polish, Japanese, German, Russian"
+
+#: src/components/right-panel/views/transcript-view.tsx:188
+msgid "Speaker labels added"
+msgstr "Speaker labels added"
+
+#: src/components/toast/model-select.tsx:30
+msgid "Speech-to-Text Model Mismatch"
+msgstr "Speech-to-Text Model Mismatch"
+
+#: src/components/settings/components/ai/stt-view.tsx:320
+#: src/components/settings/components/ai/stt-view.tsx:564
+#: src/components/transcript/actions/STTLanguageSelector.tsx:284
+#: src/components/transcript/actions/STTLanguageSelector.tsx:407
+msgid "Speed"
+msgstr "Speed"
+
+#: src/components/app-shell/context-pane.tsx:43
+msgid "Start a chat from the sidebar assistant and your note-specific threads will appear in this list."
+msgstr "Start a chat from the sidebar assistant and your note-specific threads will appear in this list."
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:71
+msgid "Start a conversation"
+msgstr "Start a conversation"
+
+#: src/components/app-shell/context-pane.tsx:48
+msgid "Start a cross-meeting query from the main canvas and your threads will appear in this list."
+msgstr "Start a cross-meeting query from the main canvas and your threads will appear in this list."
+
+#: src/components/right-panel/views/transcript-view.tsx:595
+msgid "Start a transcription"
+msgstr "Start a transcription"
+
+#: src/components/command-palette.tsx:435
+msgid "Start new transcription"
+msgstr "Start new transcription"
+
+#: src/components/editor-area/note-header/listen-button.tsx:206
+msgid "Start recording"
+msgstr "Start recording"
+
+#: src/components/editor-area/index.tsx:666
+msgid "Start taking notes..."
+msgstr "Start taking notes..."
+
+#: src/components/right-panel/views/transcript-view.tsx:644
+#: src/components/right-panel/views/transcript-view.tsx:658
+msgid "Start transcribing"
+msgstr "Start transcribing"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:328
+#: src/components/meeting-assistant/floating-dock-variant.tsx:93
+msgid "Start transcription"
+msgstr "Start transcription"
+
+#: src/components/right-panel/views/transcript-view.tsx:641
+msgid "Starting..."
+msgstr "Starting..."
+
+#: src/components/editor-area/note-header/listen-button.tsx:368
+msgid "Stop"
+msgstr "Stop"
+
+#: src/components/right-panel/components/chat/chat-input.tsx:285
+#: src/components/right-panel/components/chat/chat-input.tsx:372
+msgid "Stop generating"
+msgstr "Stop generating"
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:205
+msgid "Stop or pause recording to change transcription model"
+msgstr "Stop or pause recording to change transcription model"
+
+#: src/components/meeting-assistant/floating-assistant.tsx:361
+#: src/components/meeting-assistant/floating-dock-variant.tsx:170
+#: src/components/meeting-assistant/floating-dock-variant.tsx:309
+msgid "Stop transcription"
+msgstr "Stop transcription"
+
+#: src/components/editor-area/note-header/listen-button.tsx:587
+msgid "Stop with selected template"
+msgstr "Stop with selected template"
+
+#: src/hooks/cloud-model-catalog.ts:387
+#~ msgid "Strong all-around, large context window"
+#~ msgstr "Strong all-around, large context window"
+
+#: src/hooks/cloud-model-catalog.ts:441
+msgid "Stronger open-weight reasoning on Groq"
+msgstr "Stronger open-weight reasoning on Groq"
+
+#: src/components/settings/views/templates.tsx:472
+msgid "Structured candidate assessment from interview conversations"
+msgstr "Structured candidate assessment from interview conversations"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:19
+msgid "Summarize meeting"
+msgstr "Summarize meeting"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:20
+msgid "Summarize this meeting"
+msgstr "Summarize this meeting"
+
+#: src/components/editor-area/enhancement-banner.tsx:55
+msgid "Summarizing"
+msgstr "Summarizing"
+
+#: src/components/settings/views/general.tsx:411
+msgid "Summary language"
+msgstr "Summary language"
+
+#: src/components/projects/project-summary-tab.tsx:53
+msgid "Summary not generated"
+msgstr "Summary not generated"
+
+#: src/components/editor-area/note-header/listen-button.tsx:538
+#: src/components/editor-area/note-header/transcription-bar.tsx:392
+msgid "Summary template"
+msgstr "Summary template"
+
+#: src/components/settings/components/ai/stt-view.tsx:653
+msgid "Supported languages"
+msgstr "Supported languages"
+
+#: src/components/settings/components/ai/stt-view.tsx:376
+msgid "Supported languages by performance"
+msgstr "Supported languages by performance"
+
+#. placeholder {0}: AUDIO_EXTENSIONS.join(", ")
+#: src/components/audio-upload-dialog.tsx:116
+msgid "Supported: {0}"
+msgstr "Supported: {0}"
+
+#: src/hooks/useEditModeModelSwitch.tsx:35
+msgid "Switched to cloud model"
+msgstr "Switched to cloud model"
+
+#: src/components/toast/shared.tsx:430
+msgid "Switched to your new audio device. Transcription continues."
+msgstr "Switched to your new audio device. Transcription continues."
+
+#: src/components/settings/views/sound.tsx:139
+msgid "System Audio Access"
+msgstr "System Audio Access"
+
+#: src/components/settings/views/sound.tsx:107
+#: src/components/welcome-modal/audio-permissions-view.tsx:59
+msgid "System audio status changed"
+msgstr "System audio status changed"
+
+#: src/components/editor-area/note-header/listen-button.tsx:605
+#: src/components/editor-area/note-header/listen-button.tsx:606
+#: src/components/editor-area/note-header/transcription-bar.tsx:460
+#: src/components/editor-area/note-header/transcription-bar.tsx:461
+#: src/components/transcript/actions/MicrophoneSelector.tsx:146
+msgid "System Default (Auto)"
+msgstr "System Default (Auto)"
+
+#: src/components/settings/views/lab.tsx:58
+msgid "Tags system"
+msgstr "Tags system"
+
+#: src/components/toolbar/buttons/share-button.tsx:287
+msgid "Target folder"
+msgstr "Target folder"
+
+#: src/components/settings/views/team.tsx:72
+msgid "Team management features are currently under development and will be available in a future update."
+msgstr "Team management features are currently under development and will be available in a future update."
+
+#: src/components/share-and-permission/participants-selector.tsx:34
+msgid "Teamspace"
+msgstr "Teamspace"
+
+#: src/components/settings/views/templates.tsx:470
+msgid "Template for customer calls, discovery sessions, and sales conversations"
+msgstr "Template for customer calls, discovery sessions, and sales conversations"
+
+#: src/components/settings/views/templates.tsx:474
+msgid "Template for project kickoffs, planning sessions, and requirement discussions"
+msgstr "Template for project kickoffs, planning sessions, and requirement discussions"
+
+#: src/components/settings/views/templates.tsx:468
+msgid "Template for recurring one-on-one meetings between a manager and direct report"
+msgstr "Template for recurring one-on-one meetings between a manager and direct report"
+
+#: src/components/editor-area/note-header/index.tsx:170
+#: src/components/settings-dialog/content.tsx:38
+#: src/components/settings-dialog/sidebar.tsx:34
+msgid "Templates"
+msgstr "Templates"
+
+#: src/components/projects/project-files-dropzone.tsx:108
+msgid "Text, Markdown, CSV, JSON, YAML, HTML, logs, PDF, and DOCX files are indexed locally for Ask."
+msgstr "Text, Markdown, CSV, JSON, YAML, HTML, logs, PDF, and DOCX files are indexed locally for Ask."
+
+#: src/components/settings/views/sound.tsx:105
+#: src/components/welcome-modal/audio-permissions-view.tsx:57
+msgid "The app will now restart to apply the changes"
+msgstr "The app will now restart to apply the changes"
+
+#: src/components/projects/project-brief-sidebar-view.tsx:290
+msgid "The brief failed to refresh. Try again after the sources finish indexing."
+msgstr "The brief failed to refresh. Try again after the sources finish indexing."
+
+#: src/components/projects/project-brief-panel.tsx:74
+msgid "The generated brief will summarize the current state, decisions, open questions, and follow-ups from this project's notes."
+msgstr "The generated brief will summarize the current state, decisions, open questions, and follow-ups from this project's notes."
+
+#: src/components/projects/project-summary-tab.tsx:54
+msgid "The generated summary will appear from {sourceCountLabel} once the brief pipeline is connected."
+msgstr "The generated summary will appear from {sourceCountLabel} once the brief pipeline is connected."
+
+#: src/components/settings/components/ai/task-defaults.tsx:233
+msgid "The model used when you ask questions or edit notes from chat."
+msgstr "The model used when you ask questions or edit notes from chat."
+
+#: src/routes/app.projects.$projectId.tsx:516
+msgid "The note stays in Notes and any other projects. It will no longer be used by this project’s brief or Ask, and the brief will refresh without it."
+msgstr "The note stays in Notes and any other projects. It will no longer be used by this project’s brief or Ask, and the brief will refresh without it."
+
+#: src/components/settings/components/ai/task-defaults.tsx:332
+msgid "The speech-to-text model used when a recording or upload starts."
+msgstr "The speech-to-text model used when a recording or upload starts."
+
+#: src/components/right-panel/components/chat/message-wrapper.tsx:81
+#: src/components/ui/thinking-bar.tsx:20
+msgid "Thinking"
+msgstr "Thinking"
+
+#: src/routes/app.ask.$threadId.tsx:180
+#: src/routes/app.ask.$threadId.tsx:709
+msgid "This answer was interrupted before it finished."
+msgstr "This answer was interrupted before it finished."
+
+#: src/routes/app.ask.$threadId.tsx:395
+msgid "This conversation belonged to a project that has been deleted."
+msgstr "This conversation belonged to a project that has been deleted."
+
+#: src/routes/app.projects.tsx:249
+msgid "This deletes the project, its brief, source membership, and local project file copies. Notes stay in Notes and can be added to another project later."
+msgstr "This deletes the project, its brief, source membership, and local project file copies. Notes stay in Notes and can be added to another project later."
+
+#: src/routes/app.projects.$projectId.tsx:556
+msgid "This deletes the project, its brief, source membership, and local project file copies. Notes stay in Typr and can be added to another project later."
+msgstr "This deletes the project, its brief, source membership, and local project file copies. Notes stay in Typr and can be added to another project later."
+
+#: src/components/projects/project-notes-panel.tsx:224
+msgid "This deletes the project’s local copy and indexed text from this device. The original file outside Typr is unchanged, and the project brief will refresh without this source."
+msgstr "This deletes the project’s local copy and indexed text from this device. The original file outside Typr is unchanged, and the project brief will refresh without this source."
+
+#: src/components/projects/project-notes-panel.tsx:63
+msgid "this file"
+msgstr "this file"
+
+#: src/routes/app.ask.$threadId.tsx:233
+msgid "This file is no longer available in the project."
+msgstr "This file is no longer available in the project."
+
+#: src/components/youtube-import-dialog.tsx:94
+msgid "This may take a few seconds..."
+msgstr "This may take a few seconds..."
+
+#: src/components/toast/ota.tsx:76
+msgid "This might take a few minutes depending on your Internet speed"
+msgstr "This might take a few minutes depending on your Internet speed"
+
+#: src/routes/app.projects.$projectId.tsx:397
+msgid "this note"
+msgstr "this note"
+
+#: src/routes/app.projects.tsx:102
+msgid "this project"
+msgstr "this project"
+
+#: src/components/settings/views/general.tsx:391
+msgid "This setting only affects offline transcription models."
+msgstr "This setting only affects offline transcription models."
+
+#: src/components/shortcuts-window.tsx:154
+msgid "Tips:"
+msgstr "Tips:"
+
+#: src/components/finder/views/calendar-view.tsx:64
+msgid "Today"
+msgstr "Today"
+
+#: src/components/toolbar/buttons/chat-panel-button.tsx:52
+msgid "Toggle chat panel"
+msgstr "Toggle chat panel"
+
+#: src/components/toolbar/buttons/left-sidebar-button.tsx:28
+msgid "Toggle left sidebar"
+msgstr "Toggle left sidebar"
+
+#: src/components/audio-upload-dialog.tsx:372
+#: src/components/editor-area/note-header/transcription-bar.tsx:186
+msgid "Transcribe"
+msgstr "Transcribe"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:117
+msgid "Transcribe my voice"
+msgstr "Transcribe my voice"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:146
+msgid "Transcribe other people's voices"
+msgstr "Transcribe other people's voices"
+
+#: src/components/command-palette.tsx:462
+msgid "Transcribe YouTube video"
+msgstr "Transcribe YouTube video"
+
+#: src/components/youtube-import-dialog.tsx:44
+msgid "Transcribe YouTube Video"
+msgstr "Transcribe YouTube Video"
+
+#: src/components/right-panel/components/listening-indicator.tsx:46
+#: src/components/transcript/components/FloatingTranscribingBadge.tsx:47
+msgid "Transcribing"
+msgstr "Transcribing"
+
+#: src/components/audio-upload-toast.tsx:148
+msgid "Transcribing — this may take a moment…"
+msgstr "Transcribing — this may take a moment…"
+
+#: src/components/audio-upload-toast.tsx:136
+msgid "Transcribing audio…"
+msgstr "Transcribing audio…"
+
+#: src/components/transcript/components/FloatingTranscribingBadge.tsx:55
+msgid "Transcribing your speech. Words appear after natural pauses."
+msgstr "Transcribing your speech. Words appear after natural pauses."
+
+#: src/components/right-panel/views/chat-view.tsx:480
+#: src/components/spaces/space-notes-picker-dialog.tsx:205
+#: src/components/transcript/actions/TranscriptActionBar.tsx:113
+msgid "Transcript"
+msgstr "Transcript"
+
+#: src/hooks/useYouTubeImport.tsx:55
+msgid "Transcript imported successfully. AI summary is being generated..."
+msgstr "Transcript imported successfully. AI summary is being generated..."
+
+#: src/hooks/useYouTubeImport.tsx:56
+msgid "Transcript imported successfully. Click 'Enhance' to generate summary."
+msgstr "Transcript imported successfully. Click 'Enhance' to generate summary."
+
+#: src/components/settings/components/ai/stt-view.tsx:190
+#: src/components/settings/components/ai/task-defaults.tsx:331
+#: src/components/settings/views/ai.tsx:171
+msgid "Transcription"
+msgstr "Transcription"
+
+#: src/components/welcome-modal/download-progress-view.tsx:230
+msgid "Transcription and AI writing are ready to use."
+msgstr "Transcription and AI writing are ready to use."
+
+#: src/components/audio-upload-toast.tsx:174
+msgid "Transcription complete"
+msgstr "Transcription complete"
+
+#: src/components/editor-area/note-header/transcription-bar.tsx:159
+msgid "Transcription controls"
+msgstr "Transcription controls"
+
+#: src/components/settings/views/general.tsx:282
+msgid "Transcription languages (optional)"
+msgstr "Transcription languages (optional)"
+
+#: src/components/editor-area/note-header/transcription-bar.tsx:382
+#: src/components/right-panel/views/transcript-view.tsx:610
+#: src/components/transcript/actions/STTLanguageSelector.tsx:191
+msgid "Transcription model"
+msgstr "Transcription model"
+
+#: src/components/transcript/hooks/useSTTModel.ts:154
+msgid "Transcription model changed"
+msgstr "Transcription model changed"
+
+#: src/hooks/useTranscriptionFallback.ts:164
+msgid "Transcription reconnected"
+msgstr "Transcription reconnected"
+
+#: src/components/welcome-modal/download-progress-view.tsx:154
+msgid "Transcription setup failed"
+msgstr "Transcription setup failed"
+
+#: src/utils/consent-notification.tsx:105
+msgid "Transcription started"
+msgstr "Transcription started"
+
+#: src/components/settings/views/lab.tsx:74
+msgid "Transcription status notch"
+msgstr "Transcription status notch"
+
+#: src/routes/app.ask.tsx:287
+msgid "Try a different search or project filter."
+msgstr "Try a different search or project filter."
+
+#: src/routes/app.projects.tsx:146
+msgid "Try a different search."
+msgstr "Try a different search."
+
+#: src/components/ask/ask-conversation-toolbar.tsx:100
+#: src/routes/app.ask.$threadId.tsx:122
+#: src/routes/app.ask.$threadId.tsx:173
+#: src/routes/app.ask.$threadId.tsx:260
+#: src/routes/app.ask.tsx:98
+#: src/routes/app.ask.tsx:117
+msgid "Try again."
+msgstr "Try again."
+
+#: src/components/projects/project-notes-picker-dialog.tsx:198
+#: src/components/spaces/space-notes-picker-dialog.tsx:173
+msgid "Try another search."
+msgstr "Try another search."
+
+#: src/components/settings/views/lab.tsx:20
+msgid "Try new capabilities currently in development. These features may have occasional issues and are refined based on your feedback."
+msgstr "Try new capabilities currently in development. These features may have occasional issues and are refined based on your feedback."
+
+#: src/components/right-panel/views/transcript-view.tsx:639
+msgid "Try the demo video above first!"
+msgstr "Try the demo video above first!"
+
+#: src/components/right-panel/components/chat/chat-input-old.tsx:119
+msgid "Type a message..."
+msgstr "Type a message..."
+
+#: src/components/settings/views/team.tsx:192
+msgid "Type or paste email addresses below, separated by commas."
+msgstr "Type or paste email addresses below, separated by commas."
+
+#: src/components/settings/views/general.tsx:461
+msgid "Type terms separated by commas (e.g., Project Phoenix, OKR cadence)"
+msgstr "Type terms separated by commas (e.g., Project Phoenix, OKR cadence)"
+
+#: src/components/settings/views/team.tsx:83
+msgid "Type to search..."
+msgstr "Type to search..."
+
+#: src/components/settings/views/integrations.tsx:138
+msgid "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
+msgstr "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
+
+#: src/components/editor-area/index.tsx:889
+msgid "Typr needs at least {wordsThreshold} words to enhance your note"
+msgstr "Typr needs at least {wordsThreshold} words to enhance your note"
+
+#: src/components/welcome-modal/audio-permissions-view.tsx:95
+msgid "Typr transcribes audio directly from your device. Grant microphone and system audio access to get started."
+msgstr "Typr transcribes audio directly from your device. Grant microphone and system audio access to get started."
+
+#: src/components/welcome-modal/welcome-view.tsx:14
+msgid "Typr turns your meetings into organized, searchable notes. Focus on the conversation, we'll handle the rest."
+msgstr "Typr turns your meetings into organized, searchable notes. Focus on the conversation, we'll handle the rest."
+
+#: src/components/settings/components/ai/task-defaults.tsx:225
+msgid "Typr uses these AI models by default for chat, project briefs, meeting summaries, and transcription. You can override them later by choosing a different model inside each feature."
+msgstr "Typr uses these AI models by default for chat, project briefs, meeting summaries, and transcription. You can override them later by choosing a different model inside each feature."
+
+#: src/components/projects/project-brief-sidebar-view.tsx:301
+msgid "Typr will build this from {sourceCountLabel} in this project."
+msgstr "Typr will build this from {sourceCountLabel} in this project."
+
+#: src/hooks/cloud-model-catalog.ts:377
+#~ msgid "Ultra-fast responses for any question"
+#~ msgstr "Ultra-fast responses for any question"
+
+#: src/components/right-panel/views/transcript-view.tsx:356
+msgid "Unable to access session data"
+msgstr "Unable to access session data"
+
+#: src/components/audio-upload-dialog.tsx:115
+msgid "Unsupported file type"
+msgstr "Unsupported file type"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:137
+#: src/components/ask/ask-conversation-toolbar.tsx:277
+#: src/routes/app.ask.tsx:327
+msgid "Untitled conversation"
+msgstr "Untitled conversation"
+
+#: src/components/projects/project-notes-picker-dialog.tsx:230
+#: src/components/spaces/space-notes-picker-dialog.tsx:198
+#: src/routes/app.projects.$projectId.tsx:661
+#: src/routes/app.projects.$projectId.tsx:678
+msgid "Untitled note"
+msgstr "Untitled note"
+
+#: src/components/editor-area/note-header/index.tsx:243
+#: src/components/editor-area/note-header/index.tsx:255
+msgid "Untitled template"
+msgstr "Untitled template"
+
+#: src/components/editor-area/floating-button.tsx:60
+#: src/components/editor-area/floating-button.tsx:75
+#: src/components/editor-area/floating-button.tsx:339
+#: src/components/editor-area/floating-button.tsx:370
+#: src/components/editor-area/floating-button.tsx:572
+#: src/components/settings/components/template-list.tsx:32
+#: src/components/settings/components/template-list.tsx:47
+#: src/components/settings/components/template-list.tsx:104
+#: src/components/settings/components/template-list.tsx:148
+#: src/components/settings/components/templates-sidebar.tsx:28
+#: src/components/settings/components/templates-sidebar.tsx:43
+#: src/components/settings/components/templates-sidebar.tsx:80
+#: src/components/settings/components/templates-sidebar.tsx:103
+#: src/components/settings/views/template.tsx:187
+#: src/components/settings/views/templates.tsx:440
+#: src/components/settings/views/templates.tsx:455
+#: src/components/settings/views/templates.tsx:515
+msgid "Untitled Template"
+msgstr "Untitled Template"
+
+#: src/components/organization-profile/upcoming-events.tsx:51
+msgid "Upcoming Events"
+msgstr "Upcoming Events"
+
+#: src/components/toast/ota.tsx:59
+msgid "Update available"
+msgstr "Update available"
+
+#: src/components/settings/views/about.tsx:185
+msgid "Update Available"
+msgstr "Update Available"
+
+#: src/components/toast/ota.tsx:63
+msgid "Update now"
+msgstr "Update now"
+
+#: src/components/right-panel/views/transcript-view.tsx:498
+msgid "Upload audio file"
+msgstr "Upload audio file"
+
+#: src/components/command-palette.tsx:450
+msgid "Upload audio for transcription"
+msgstr "Upload audio for transcription"
+
+#: src/components/audio-upload-dialog.tsx:230
+msgid "Upload Audio for Transcription"
+msgstr "Upload Audio for Transcription"
+
+#: src/components/audio-upload-dialog.tsx:137
+#: src/components/audio-upload-dialog.tsx:194
+#: src/components/audio-upload-dialog.tsx:205
+msgid "Upload failed"
+msgstr "Upload failed"
+
+#: src/components/settings/views/privacy.tsx:100
+msgid "Usage analytics"
+msgstr "Usage analytics"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:389
+#: src/components/settings/components/ai/stt-view.tsx:274
+#: src/components/settings/components/ai/stt-view.tsx:539
+msgid "Use"
+msgstr "Use"
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:277
+msgid "Use Google's Gemini models with your API key"
+msgstr "Use Google's Gemini models with your API key"
+
+#: src/components/settings/components/ai/llm-local-view.tsx:106
+msgid "Use Groq-hosted fast inference models with your API key."
+msgstr "Use Groq-hosted fast inference models with your API key."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:109
+msgid "Use OpenAI models directly with your API key."
+msgstr "Use OpenAI models directly with your API key."
+
+#: src/components/settings/components/ai/llm-custom-view.tsx:181
+msgid "Use OpenAI's GPT models with your API key"
+msgstr "Use OpenAI's GPT models with your API key"
+
+#: src/components/settings/views/integrations.tsx:214
+msgid "Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
+msgstr "Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
+
+#. placeholder {0}: sources.length
+#: src/components/ui/sources.tsx:20
+msgid "Used {0} source"
+msgstr "Used {0} source"
+
+#. placeholder {0}: sources.length
+#: src/components/ui/sources.tsx:21
+msgid "Used {0} sources"
+msgstr "Used {0} sources"
+
+#: src/components/settings/views/team.tsx:101
+msgid "User"
+msgstr "User"
+
+#: src/components/ui/model-selector.tsx:130
+msgid "Uses connected cloud models first, then on-device models"
+msgstr "Uses connected cloud models first, then on-device models"
+
+#: src/components/settings/components/ai/task-defaults.tsx:294
+msgid "Uses the chat default above"
+msgstr "Uses the chat default above"
+
+#: src/components/settings/views/about.tsx:102
+msgid "Version"
+msgstr "Version"
+
+#. placeholder {0}: update.version
+#: src/components/toast/ota.tsx:60
+msgid "Version {0} is available to install"
+msgstr "Version {0} is available to install"
+
+#. placeholder {0}: updateCheck.update.version
+#: src/components/settings/views/about.tsx:202
+msgid "Version {0} is available."
+msgstr "Version {0} is available."
+
+#: src/components/settings/views/about.tsx:102
+msgid "Version {appVersion}"
+msgstr "Version {appVersion}"
+
+#: src/components/settings/components/ai/stt-view.tsx:363
+msgid "View 50+ supported languages"
+msgstr "View 50+ supported languages"
+
+#: src/components/left-sidebar/projects-section.tsx:147
+msgid "View all projects"
+msgstr "View all projects"
+
+#: src/components/toast/changelog.tsx:53
+msgid "View changelog"
+msgstr "View changelog"
+
+#: src/components/settings/views/about.tsx:132
+msgid "View Changelog"
+msgstr "View Changelog"
+
+#: src/components/editor-area/note-header/chips/event-chip.tsx:236
+#: src/components/left-sidebar/events-list.tsx:283
+msgid "View in calendar"
+msgstr "View in calendar"
+
+#: src/components/audio-upload-toast.tsx:187
+#: src/components/audio-upload-toast.tsx:214
+msgid "View note"
+msgstr "View note"
+
+#: src/components/organization-profile/recent-notes.tsx:59
+msgid "View Note"
+msgstr "View Note"
+
+#: src/components/settings/views/template.tsx:226
+msgid "View only"
+msgstr "View only"
+
+#. placeholder {0}: source.number
+#: src/components/right-panel/components/chat/citations/inline-citation.tsx:30
+msgid "View source {0}"
+msgstr "View source {0}"
+
+#: src/components/projects/project-source-citation-markdown.tsx:133
+msgid "View source {label}"
+msgstr "View source {label}"
+
+#: src/components/settings/components/ai/stt-view.tsx:357
+#: src/components/settings/components/ai/stt-view.tsx:634
+#: src/components/settings/components/ai/stt-view.tsx:640
+msgid "View supported languages"
+msgstr "View supported languages"
+
+#: src/components/toast/shared.tsx:193
+msgid "Voice transcription"
+msgstr "Voice transcription"
+
+#: src/components/toast/shared.tsx:192
+msgid "Voice transcription · {modelSize}"
+msgstr "Voice transcription · {modelSize}"
+
+#: src/components/right-panel/views/transcript-view.tsx:682
+msgid "Watch the demo video above to see how Typr transcription works!"
+msgstr "Watch the demo video above to see how Typr transcription works!"
+
+#: src/components/settings/views/calendar.tsx:72
+msgid "We're working on bringing Outlook calendar integration to Windows. This feature will let you sync your events and meetings automatically."
+msgstr "We're working on bringing Outlook calendar integration to Windows. This feature will let you sync your events and meetings automatically."
+
+#: src/components/right-panel/components/chat/chat-input.tsx:269
+#: src/components/right-panel/components/chat/chat-input.tsx:354
+msgid "Web search"
+msgstr "Web search"
+
+#: src/components/welcome-modal/index.tsx:233
+#: src/components/welcome-modal/user-setup-view.tsx:84
+#: src/components/welcome-modal/welcome-view.tsx:12
+msgid "Welcome to Typr"
+msgstr "Welcome to Typr"
+
+#: src/components/toast/changelog.tsx:43
+msgid "Welcome to Typr {newVersion}"
+msgstr "Welcome to Typr {newVersion}"
+
+#: src/components/right-panel/components/chat/empty-chat-state.tsx:32
+msgid "What follow-up items came out of this meeting"
+msgstr "What follow-up items came out of this meeting"
+
+#: src/components/projects/create-project-dialog.tsx:170
+msgid "What is this project for?"
+msgstr "What is this project for?"
+
+#: src/components/welcome-modal/language-selection-view.tsx:103
+msgid "What languages are your meetings in?"
+msgstr "What languages are your meetings in?"
+
+#: src/components/settings/components/wer-modal.tsx:69
+msgid "Whisper Model Language Performance (WER)"
+msgstr "Whisper Model Language Performance (WER)"
+
+#: src/routes/app.ask.$threadId.tsx:594
+#: src/routes/app.ask.tsx:253
+msgid "Whole project"
+msgstr "Whole project"
+
+#: src/components/settings/views/calendar.tsx:43
+msgid "Windows Outlook calendar integration"
+msgstr "Windows Outlook calendar integration"
+
+#: src/components/settings/components/wer-modal.tsx:72
+msgid "Word Error Rate (WER) indicates transcription accuracy (lower is better). Data based on the FLEURS dataset, measured with OpenAI's Whisper <0>large-v3-turbo</0> model. <1>More info</1>"
+msgstr "Word Error Rate (WER) indicates transcription accuracy (lower is better). Data based on the FLEURS dataset, measured with OpenAI's Whisper <0>large-v3-turbo</0> model. <1>More info</1>"
+
+#: src/components/right-panel/components/listening-indicator.tsx:53
+#: src/components/transcript/components/HeaderTranscribingIndicator.tsx:40
+msgid "Words appear after pauses in speech. Keep talking naturally—the AI processes in batches for better accuracy."
+msgstr "Words appear after pauses in speech. Keep talking naturally—the AI processes in batches for better accuracy."
+
+#: src/components/transcript/actions/STTLanguageSelector.tsx:81
+msgid "Works with any language automatically"
+msgstr "Works with any language automatically"
+
+#: src/components/audio-upload-dialog.tsx:329
+msgid "Works without internet"
+msgstr "Works without internet"
+
+#: src/components/settings/views/lab.tsx:43
+msgid "Write and refine your notes by chatting with AI. Select Edit mode in the chat sidebar to start editing."
+msgstr "Write and refine your notes by chatting with AI. Select Edit mode in the chat sidebar to start editing."
+
+#: src/components/settings/components/ai/task-defaults.tsx:119
+msgid "Writes AI notes after recordings, uploads, and imported videos."
+msgstr "Writes AI notes after recordings, uploads, and imported videos."
+
+#: src/components/editor-area/writing-bar-overlay.tsx:43
+msgid "Writing"
+msgstr "Writing"
+
+#: src/components/editor-area/writing-bar-overlay.tsx:39
+msgid "Writing notes"
+msgstr "Writing notes"
+
+#: src/components/welcome-modal/language-selection-view.tsx:174
+msgid "You can always change this later in Settings"
+msgstr "You can always change this later in Settings"
+
+#: src/components/toast/use-check-for-updates.tsx:124
+msgid "You have the latest version of Typr"
+msgstr "You have the latest version of Typr"
+
+#: src/components/ui/model-download-banner.tsx:37
+msgid "You'll be able to chat when the download completes"
+msgstr "You'll be able to chat when the download completes"
+
+#: src/components/toast/use-check-for-updates.tsx:123
+msgid "You're up to date"
+msgstr "You're up to date"
+
+#: src/components/settings/views/about.tsx:200
+msgid "You're up to date."
+msgstr "You're up to date."
+
+#: src/components/welcome-modal/welcome-view.tsx:23
+msgid "Your audio is processed locally and notes stay private on your device."
+msgstr "Your audio is processed locally and notes stay private on your device."
+
+#: src/components/right-panel/components/chat/chat-input.tsx:408
+msgid "Your conversations are private and never used for AI models training. Typr may make mistakes, so verify its responses."
+msgstr "Your conversations are private and never used for AI models training. Typr may make mistakes, so verify its responses."
+
+#: src/components/settings/views/privacy.tsx:166
+msgid "Your data"
+msgstr "Your data"
+
+#: src/components/audio-upload-dialog.tsx:313
+msgid "Your data is never used to train AI"
+msgstr "Your data is never used to train AI"
+
+#: src/components/welcome-modal/user-setup-view.tsx:101
+msgid "Your full name"
+msgstr "Your full name"
+
+#: src/components/welcome-modal/user-setup-view.tsx:105
+msgid "Your name"
+msgstr "Your name"
+
+#: src/components/settings/views/templates.tsx:330
+msgid "Your templates"
+msgstr "Your templates"
+
+#: src/components/settings/components/templates-sidebar.tsx:67
+msgid "Your Templates"
+msgstr "Your Templates"
+
+#: src/components/toast/shared.tsx:435
+msgid "Your transcription continues — still using the selected audio device."
+msgstr "Your transcription continues — still using the selected audio device."
+
+#: src/components/editor-area/note-header/listen-button.tsx:489
+#: src/components/editor-area/note-header/transcription-bar.tsx:322
+msgid "Your voice"
+msgstr "Your voice"
+
+#: src/components/editor-area/note-header/chips/youtube-chip.tsx:116
+msgid "YouTube"
+msgstr "YouTube"
+
+#: src/components/youtube-import-dialog.tsx:51
+msgid "YouTube URL"
+msgstr "YouTube URL"
+
+#: src/components/editor-area/note-header/chips/youtube-chip.tsx:123
+msgid "YouTube Video"
+msgstr "YouTube Video"
+
+#: src/hooks/useYouTubeImport.tsx:53
+msgid "YouTube Video Imported"
+msgstr "YouTube Video Imported"

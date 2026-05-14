@@ -1,0 +1,32 @@
+[
+  {
+    "start": 0,
+    "end": 280,
+    "text": " alternate"
+  },
+  {
+    "start": 320,
+    "end": 600,
+    "text": " korean"
+  },
+  {
+    "start": 640,
+    "end": 920,
+    "text": " sample"
+  },
+  {
+    "start": 1440,
+    "end": 1720,
+    "text": " local"
+  },
+  {
+    "start": 1760,
+    "end": 2040,
+    "text": " test"
+  },
+  {
+    "start": 2080,
+    "end": 2360,
+    "text": " fixture"
+  }
+]

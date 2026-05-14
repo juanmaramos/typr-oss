@@ -1,0 +1,77 @@
+[package]
+name = "tauri-plugin-local-stt"
+version = "0.1.0"
+authors = ["You"]
+edition = "2021"
+exclude = ["/js", "/node_modules"]
+links = "tauri-plugin-local-stt"
+description = ""
+
+[[bench]]
+name = "simple"
+harness = false
+
+[features]
+default = []
+coreml = ["dep:typr-pyannote-local", "typr-whisper-local/coreml", "typr-pyannote-local/coreml"]
+directml = ["dep:typr-pyannote-local", "typr-whisper-local/directml", "typr-pyannote-local/directml"]
+cuda = ["typr-whisper-local/cuda"]
+hipblas = ["typr-whisper-local/hipblas"]
+openblas = ["typr-whisper-local/openblas"]
+metal = ["typr-whisper-local/metal"]
+vulkan = ["typr-whisper-local/vulkan"]
+openmp = ["typr-whisper-local/openmp"]
+load-dynamic = ["dep:typr-pyannote-local", "typr-pyannote-local/load-dynamic"]
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[dev-dependencies]
+typr-data = { workspace = true }
+typr-language = { workspace = true, features = ["whisper"] }
+
+tauri-plugin-listener = { workspace = true }
+tauri-plugin-store = { workspace = true }
+
+dirs = { workspace = true }
+inventory = { workspace = true }
+reqwest = { workspace = true }
+rodio = { workspace = true }
+similar = { workspace = true }
+specta-typescript = { workspace = true }
+tokio-tungstenite = { workspace = true }
+
+[dependencies]
+typr-audio-utils = { workspace = true }
+typr-chunker = { workspace = true }
+typr-file = { workspace = true }
+typr-listener-interface = { workspace = true }
+typr-pyannote-local = { workspace = true, optional = true }
+typr-whisper = { workspace = true }
+typr-whisper-local = { workspace = true }
+typr-ws-utils = { workspace = true }
+
+tauri = { workspace = true, features = ["test"] }
+tauri-specta = { workspace = true, features = ["derive", "typescript"] }
+
+tauri-plugin-shell = { workspace = true }
+tauri-plugin-store2 = { workspace = true }
+tauri-plugin-task = { workspace = true }
+
+dirs = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+specta = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
+
+rodio = { workspace = true, features = ["symphonia", "symphonia-all"] }
+
+axum = { workspace = true, features = ["ws", "multipart"] }
+axum-extra = { workspace = true, features = ["query"] }
+tower-http = { workspace = true, features = ["cors", "trace"] }
+
+futures-util = { workspace = true }
+tokio = { workspace = true, features = ["rt", "macros"] }
+tokio-util = { workspace = true }
+tracing = { workspace = true }

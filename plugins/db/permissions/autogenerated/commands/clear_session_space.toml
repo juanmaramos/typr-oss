@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-clear-session-space"
+description = "Enables the clear_session_space command without any pre-configured scope."
+commands.allow = ["clear_session_space"]
+
+[[permission]]
+identifier = "deny-clear-session-space"
+description = "Denies the clear_session_space command without any pre-configured scope."
+commands.deny = ["clear_session_space"]

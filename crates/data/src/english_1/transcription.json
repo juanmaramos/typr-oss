@@ -1,0 +1,37 @@
+[
+  {
+    "start": 0,
+    "end": 280,
+    "text": " synthetic"
+  },
+  {
+    "start": 320,
+    "end": 600,
+    "text": " audio"
+  },
+  {
+    "start": 640,
+    "end": 920,
+    "text": " sample"
+  },
+  {
+    "start": 1440,
+    "end": 1720,
+    "text": " used"
+  },
+  {
+    "start": 1760,
+    "end": 2040,
+    "text": " for"
+  },
+  {
+    "start": 2080,
+    "end": 2360,
+    "text": " local"
+  },
+  {
+    "start": 2400,
+    "end": 2680,
+    "text": " tests"
+  }
+]

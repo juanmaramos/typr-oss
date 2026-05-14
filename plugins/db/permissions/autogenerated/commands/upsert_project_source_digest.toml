@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-upsert-project-source-digest"
+description = "Enables the upsert_project_source_digest command without any pre-configured scope."
+commands.allow = ["upsert_project_source_digest"]
+
+[[permission]]
+identifier = "deny-upsert-project-source-digest"
+description = "Denies the upsert_project_source_digest command without any pre-configured scope."
+commands.deny = ["upsert_project_source_digest"]

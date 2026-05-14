@@ -1,0 +1,50 @@
+[package]
+name = "whisper-local"
+version = "0.1.0"
+edition = "2021"
+
+# https://github.com/tazz4843/whisper-rs/blob/0c509ec/Cargo.toml
+[features]
+default = []
+actual = ["dep:whisper-rs"]
+
+coreml = ["actual", "whisper-rs/coreml"]
+directml = ["actual"] # DirectML is Windows-native, no special whisper-rs feature needed
+cuda = ["actual", "whisper-rs/cuda"]
+hipblas = ["actual", "whisper-rs/hipblas"]
+openblas = ["actual", "whisper-rs/openblas"]
+metal = ["actual", "whisper-rs/metal"]
+vulkan = ["actual", "whisper-rs/vulkan"]
+openmp = ["actual", "whisper-rs/openmp"]
+
+[dev-dependencies]
+typr-data = { workspace = true }
+typr-llama = { workspace = true }
+
+dirs = { workspace = true }
+futures-util = { workspace = true }
+tokio = { workspace = true }
+
+[dependencies]
+typr-audio-utils = { workspace = true }
+typr-whisper = { workspace = true }
+
+dasp = { workspace = true }
+kalosm-sound = { workspace = true, default-features = false }
+rodio = { workspace = true }
+# https://github.com/tazz4843/whisper-rs/blob/0c509ec/Cargo.toml
+whisper-rs = { git = "https://codeberg.org/tazz4843/whisper-rs", rev = "0c509ec", features = ["raw-api", "tracing_backend"], default-features = false, optional = true }
+
+futures-util = { workspace = true }
+tracing = { workspace = true }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+specta = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
+
+hound = { workspace = true }
+lazy_static = { workspace = true }
+once_cell = { workspace = true }
+regex = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }

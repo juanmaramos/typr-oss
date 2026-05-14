@@ -1,0 +1,4 @@
+ALTER TABLE
+  sessions
+ADD
+  COLUMN needs_enhance INTEGER NOT NULL DEFAULT 0;

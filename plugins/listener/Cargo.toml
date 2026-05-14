@@ -1,0 +1,76 @@
+[package]
+name = "tauri-plugin-listener"
+version = "0.1.0"
+authors = ["You"]
+edition = "2021"
+exclude = ["/js", "/node_modules"]
+links = "tauri-plugin-listener"
+description = ""
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[dev-dependencies]
+tauri-plugin-local-stt = { workspace = true }
+
+rodio = { workspace = true, features = ["wav"] }
+serde_json = { workspace = true }
+specta-typescript = { workspace = true }
+uuid = { workspace = true }
+
+[dependencies]
+typr-aec = { workspace = true }
+typr-audio = { workspace = true }
+typr-audio-utils = { workspace = true }
+typr-chunker = { workspace = true }
+typr-data = { workspace = true }
+typr-db-core = { workspace = true }
+typr-db-user = { workspace = true }
+typr-language = { workspace = true }
+typr-listener-interface = { workspace = true }
+typr-tcc = { workspace = true }
+typr-ws = { workspace = true }
+
+tauri-plugin-analytics = { workspace = true }
+tauri-plugin-auth = { workspace = true }
+tauri-plugin-config = { workspace = true }
+tauri-plugin-connector = { workspace = true }
+tauri-plugin-db = { workspace = true }
+tauri-plugin-flags = { workspace = true }
+tauri-plugin-shell = { workspace = true }
+tauri-plugin-tray = { workspace = true }
+tauri-plugin-windows = { workspace = true }
+
+tauri = { workspace = true, features = ["specta", "test"] }
+
+specta = { workspace = true }
+tauri-specta = { workspace = true, features = ["derive", "typescript"] }
+
+bytes = { workspace = true }
+chrono = { workspace = true }
+codes-iso-639 = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
+url = { workspace = true }
+
+async-stream = { workspace = true }
+futures-util = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "sync"] }
+tracing = { workspace = true }
+
+hound = { workspace = true }
+
+flume = { workspace = true }
+once_cell = { workspace = true }
+statig = { workspace = true, features = ["async"] }
+
+[target."cfg(target_os = \"macos\")".dependencies]
+cidre = { workspace = true }
+objc2 = { workspace = true }
+objc2-foundation = { workspace = true }
+
+[features]
+default = []
+load-dynamic = ["typr-aec/load-dynamic"]

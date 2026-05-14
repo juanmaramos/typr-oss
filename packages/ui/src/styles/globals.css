@@ -1,0 +1,832 @@
+/* Import animations and fonts */
+@import "./animations.css";
+@import "../../../fonts/src/fonts.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Media query breakpoints */
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+
+    /* Animation & transition variables */
+    --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Hover effect variables */
+    --hover-bg-opacity: 0.9;
+    --hover-border-opacity: 0.3;
+    --hover-text-opacity: 0.9;
+    --hover-accent-color: 231 83.5% 59.8%;
+
+    /* === Futuria Design System v4 — Light Mode === */
+
+    /* Core UI colors */
+    --background: 0 0% 100%;
+    --foreground: 60 2.8% 21%;
+    --card: 0 0% 100%;
+    --card-foreground: 60 2.8% 21%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 60 2.8% 21%;
+    --primary: 231 83.5% 59.8%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 5.6% 91%;
+    --secondary-foreground: 60 2.8% 21%;
+    --muted: 30 5.3% 94.5%;
+    --muted-foreground: 270 2.6% 46.3%;
+    --accent: 30 4.2% 95.5%;
+    --accent-foreground: 60 2.8% 21%;
+    --destructive: 353 74% 57%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 156 63% 33%;
+    --success-foreground: 0 0% 100%;
+    --warning: 47.9 95.8% 53.1%;
+    --warning-foreground: 0 0% 14.1%;
+    --info: 213 100% 65%;
+    --info-foreground: 0 0% 100%;
+    --blue-dark: 231 83.5% 59.8%;
+    --blue-dark-foreground: 0 0% 100%;
+    --border: 40 5.6% 91%;
+    --input: 40 5.6% 91%;
+    --ring: 231 83.5% 59.8%;
+
+    /* Futuria cursor aliases — named surface tokens */
+    --cursor-dark: 240 10.5%
+      10.6%; /* #18181c — deepest surface / cover pages */
+    --cursor-cream: 40 11.1% 97.6%; /* #f9f8f7 — page background */
+    --cursor-light: 40 5.6% 91%; /* #eae9e7 — hover / alt surface */
+
+    /* Futuria surface scale */
+    --surface-100: 0 0% 100%;
+    --surface-200: 40 11.1% 97.6%;
+    --surface-300: 30 5.3% 94.5%;
+    --surface-400: 40 5.6% 91%;
+    --surface-500: 36 4.1% 88.2%;
+    --surface-600: 36 3.5% 85%;
+
+    /* Futuria semantic text tiers — alpha-based, use via var() directly */
+    --text-secondary: rgba(55, 55, 52, 0.62);
+    --text-tertiary: rgba(55, 55, 52, 0.42);
+
+    /* Futuria border tiers — alpha-based, use via var() directly */
+    --border-default: rgba(24, 24, 28, 0.10);
+    --border-medium: rgba(24, 24, 28, 0.18);
+    --border-strong: rgba(24, 24, 28, 0.50);
+
+    /* Futuria AI-state colors */
+    --thinking: 228 60% 81%; /* #b0baed — AI thinking indicator */
+    --grep: 123 27% 71%; /* #9fc9a2 — grep/search tool */
+    --read: 210 52% 75%; /* #9fbbe0 — read/fetch tool */
+    --edit: 275 39% 76%; /* #c0a8dd — edit/write tool */
+
+    /* Futuria marker palette — calm object identity colors */
+    --marker-neutral: 270 2.6% 46.3%;
+    --marker-neutral-surface: 30 5.3% 94.5%;
+    --marker-ink: 240 10.5% 10.6%;
+    --marker-ink-surface: 240 6% 94%;
+    --marker-indigo: 231 70% 56%;
+    --marker-indigo-surface: 231 70% 96%;
+    --marker-blue: 209 72% 48%;
+    --marker-blue-surface: 209 80% 96%;
+    --marker-teal: 163 58% 31%;
+    --marker-teal-surface: 164 46% 94%;
+    --marker-violet: 266 42% 52%;
+    --marker-violet-surface: 266 58% 96%;
+    --marker-rose: 350 66% 51%;
+    --marker-rose-surface: 350 72% 96%;
+    --marker-amber: 39 82% 38%;
+    --marker-amber-surface: 42 82% 94%;
+
+    /* Brand accent (vivid CTA blue — #4361ee) */
+    --brand: 231 83.5% 59.8%;
+    --brand-foreground: 0 0% 100%;
+    --brand-hover: 228 61.7% 50.8%;
+
+    /* Diff colors */
+    --diff-added: 156 63% 33%;
+    --diff-added-foreground: 0 0% 100%;
+    --diff-added-bg: 142.1 76.2% 36.3% / 0.15;
+    --diff-removed: 10.1 88.4% 62.9%;
+    --diff-removed-foreground: 0 0% 100%;
+    --diff-removed-bg: 353 74% 57% / 0.15;
+
+    /* Search highlight */
+    --highlight: 60 100% 50% / 0.3;
+    --highlight-current: 30 100% 50% / 0.5;
+
+    /* Chart colors */
+    --chart-1: 238.7 83.5% 66.7%;
+    --chart-2: 243.4 75.4% 58.6%;
+    --chart-3: 244.5 57.9% 50.6%;
+    --chart-4: 243.7 54.5% 41.4%;
+    --chart-5: 242.2 47.4% 34.3%;
+
+    /* Sidebar colors */
+    --sidebar: 40 11.1% 97.6%;
+    --sidebar-foreground: 60 2.8% 21%;
+    --sidebar-primary: 231 83.5% 59.8%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 30 4.2% 95.5%;
+    --sidebar-accent-foreground: 60 2.8% 21%;
+    --sidebar-border: 40 5.6% 91%;
+    --sidebar-ring: 231 83.5% 59.8%;
+
+    /* Font variables are inherited from @typr/fonts package */
+
+    /* Sizing and shape */
+    --radius: 0.5rem;
+    --radius-composer: 1.5rem;
+    --radius-floating-pill: 1.875rem;
+    --radius-floating-surface: 2rem;
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+
+    /* Shadows — Futuria multi-layer system */
+    --shadow-2xs: rgba(24, 24, 28, 0.10) 0px 0px 0px 1px;
+    --shadow-xs:
+      rgba(0, 0, 0, 0.02) 0px 0px 16px, rgba(0, 0, 0, 0.008) 0px 0px 8px;
+    --shadow-sm:
+      rgba(0, 0, 0, 0.02) 0px 0px 16px, rgba(0, 0, 0, 0.008) 0px 0px 8px;
+    --shadow:
+      rgba(0, 0, 0, 0.02) 0px 0px 16px, rgba(0, 0, 0, 0.008) 0px 0px 8px;
+    --shadow-md:
+      rgba(0, 0, 0, 0.06) 0px 8px 24px, rgba(0, 0, 0, 0.04) 0px 4px 12px, rgba(
+      24,
+      24,
+      28,
+      0.10
+    ) 0px 0px 0px 1px;
+    --shadow-lg:
+      rgba(0, 0, 0, 0.08) 0px 16px 48px, rgba(0, 0, 0, 0.06) 0px 8px 24px, rgba(
+      24,
+      24,
+      28,
+      0.10
+    ) 0px 0px 0px 1px;
+    --shadow-xl:
+      rgba(0, 0, 0, 0.12) 0px 28px 70px, rgba(0, 0, 0, 0.08) 0px 14px 32px,
+      rgba(24, 24, 28, 0.10) 0px 0px 0px 1px;
+    --shadow-2xl:
+      rgba(0, 0, 0, 0.16) 0px 36px 80px, rgba(0, 0, 0, 0.10) 0px 18px 40px;
+    --shadow-focus: rgba(67, 97, 238, 0.15) 0px 4px 12px;
+
+    /* Floating surface shadows — references existing scale, no duplication */
+    --shadow-float-pill: var(--shadow-md); /* downward, sits on canvas */
+    --shadow-float-surface:
+      rgba(0, 0, 0, 0.06) 0px -8px 24px, rgba(0, 0, 0, 0.04) 0px -4px 12px,
+      rgba(24, 24, 28, 0.10) 0px 0px 0px
+      1px; /* upward, bottom-anchored panel */
+    --shadow-float-dock: var(--shadow-float-surface);
+  }
+
+  .dark {
+    /* === Futuria Design System v4 — Dark Mode === */
+
+    /* Core UI colors */
+    --background: 0 0% 7.8%;
+    --foreground: 37 5.6% 90.6%;
+    --card: 240 3.1% 15.3%;
+    --card-foreground: 37 5.6% 90.6%;
+    --popover: 240 3.1% 15.3%;
+    --popover-foreground: 37 5.6% 90.6%;
+    --primary: 209.2 100% 58%;
+    --primary-foreground: 0 0% 7.8%;
+    --secondary: 240 3.6% 18.8%;
+    --secondary-foreground: 37 5.6% 90.6%;
+    --muted: 240 3.6% 18.8%;
+    --muted-foreground: 270 2.6% 58.8%;
+    --accent: 240 6.3% 15.5%;
+    --accent-foreground: 37 5.6% 90.6%;
+    --destructive: 353 74% 60%;
+    --destructive-foreground: 0 0% 7.8%;
+    --success: 156 63% 43%;
+    --success-foreground: 0 0% 100%;
+    --warning: 47.9 95.8% 53.1%;
+    --warning-foreground: 0 0% 7.8%;
+    --info: 213 100% 70%;
+    --info-foreground: 0 0% 7.8%;
+    --blue-dark: 209.2 100% 58%;
+    --blue-dark-foreground: 0 0% 7.8%;
+    --border: 240 3.6% 18.8%;
+    --input: 240 3.6% 18.8%;
+    --ring: 209.2 100% 58%;
+
+    /* Futuria cursor aliases — dark */
+    --cursor-dark: 37 5.6% 90.6%; /* #e8e7e5 — inverted: lightest text */
+    --cursor-cream: 0 0% 7.8%; /* #141414 — page background */
+    --cursor-light: 240 6.3% 13.3%; /* #1e1e22 — hover / alt surface */
+
+    /* Futuria surface scale — dark */
+    --surface-100: 240 2.2% 9.2%;
+    --surface-200: 0 0% 7.8%;
+    --surface-300: 240 3.6% 18.8%;
+    --surface-400: 240 3.1% 15.3%;
+    --surface-500: 240 3.1% 21.4%;
+    --surface-600: 240 3.1% 25%;
+
+    /* Futuria semantic text tiers — dark */
+    --text-secondary: rgba(232, 231, 229, 0.55);
+    --text-tertiary: rgba(232, 231, 229, 0.35);
+
+    /* Futuria border tiers — dark */
+    --border-default: rgba(232, 231, 229, 0.10);
+    --border-medium: rgba(232, 231, 229, 0.18);
+    --border-strong: rgba(232, 231, 229, 0.50);
+
+    /* Futuria AI-state colors — dark */
+    --thinking: 244 30% 58%; /* #7872b8 */
+    --grep: 123 28% 49%; /* #5a9e5e */
+    --read: 210 36% 54%; /* #5a8ab8 */
+    --edit: 270 31% 58%; /* #8a6fb8 */
+
+    /* Futuria marker palette — dark */
+    --marker-neutral: 270 2.6% 58.8%;
+    --marker-neutral-surface: 240 3.6% 18.8%;
+    --marker-ink: 37 5.6% 90.6%;
+    --marker-ink-surface: 240 3.1% 21.4%;
+    --marker-indigo: 231 74% 68%;
+    --marker-indigo-surface: 231 42% 22%;
+    --marker-blue: 209 86% 68%;
+    --marker-blue-surface: 209 42% 22%;
+    --marker-teal: 164 54% 55%;
+    --marker-teal-surface: 164 34% 20%;
+    --marker-violet: 266 48% 70%;
+    --marker-violet-surface: 266 34% 22%;
+    --marker-rose: 350 72% 66%;
+    --marker-rose-surface: 350 36% 22%;
+    --marker-amber: 39 78% 60%;
+    --marker-amber-surface: 39 34% 20%;
+
+    /* Brand accent — constant across modes */
+    --brand: 231 83.5% 59.8%;
+    --brand-foreground: 0 0% 100%;
+    --brand-hover: 228 61.7% 50.8%;
+
+    /* Diff colors */
+    --diff-added: 156 63% 43%;
+    --diff-added-foreground: 0 0% 100%;
+    --diff-added-bg: 142.1 70.6% 45.3% / 0.2;
+    --diff-removed: 10.1 88.4% 72.9%;
+    --diff-removed-foreground: 0 0% 100%;
+    --diff-removed-bg: 353 74% 60% / 0.2;
+
+    /* Search highlight */
+    --highlight: 60 100% 50% / 0.25;
+    --highlight-current: 30 100% 50% / 0.5;
+
+    /* Chart colors */
+    --chart-1: 238.7 83.5% 66.7%;
+    --chart-2: 243.4 75.4% 58.6%;
+    --chart-3: 244.5 57.9% 50.6%;
+    --chart-4: 243.7 54.5% 41.4%;
+    --chart-5: 243.7 54.5% 41.4%;
+
+    /* Sidebar colors */
+    --sidebar: 240 10.5% 10.6%;
+    --sidebar-foreground: 37 5.6% 90.6%;
+    --sidebar-primary: 209.2 100% 58%;
+    --sidebar-primary-foreground: 0 0% 7.8%;
+    --sidebar-accent: 240 3.1% 15.3%;
+    --sidebar-accent-foreground: 37 5.6% 90.6%;
+    --sidebar-border: 240 3.6% 18.8%;
+    --sidebar-ring: 209.2 100% 58%;
+
+    /* Font variables are inherited from @typr/fonts package */
+
+    /* Sizing and shape - same as light mode */
+    --radius: 0.5rem;
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+
+    /* Shadows — Futuria dark mode */
+    --shadow-2xs: rgba(232, 231, 229, 0.08) 0px 0px 0px 1px;
+    --shadow-xs:
+      rgba(0, 0, 0, 0.10) 0px 0px 16px, rgba(0, 0, 0, 0.05) 0px 0px 8px;
+    --shadow-sm:
+      rgba(0, 0, 0, 0.10) 0px 0px 16px, rgba(0, 0, 0, 0.05) 0px 0px 8px;
+    --shadow: rgba(0, 0, 0, 0.10) 0px 0px 16px, rgba(0, 0, 0, 0.05) 0px 0px 8px;
+    --shadow-md:
+      rgba(0, 0, 0, 0.20) 0px 8px 24px, rgba(0, 0, 0, 0.14) 0px 4px 12px, rgba(
+      232,
+      231,
+      229,
+      0.08
+    ) 0px 0px 0px 1px;
+    --shadow-lg:
+      rgba(0, 0, 0, 0.28) 0px 16px 48px, rgba(0, 0, 0, 0.20) 0px 8px 24px, rgba(
+      232,
+      231,
+      229,
+      0.08
+    ) 0px 0px 0px 1px;
+    --shadow-xl:
+      rgba(0, 0, 0, 0.40) 0px 28px 70px, rgba(0, 0, 0, 0.28) 0px 14px 32px,
+      rgba(232, 231, 229, 0.08) 0px 0px 0px 1px;
+    --shadow-2xl:
+      rgba(0, 0, 0, 0.50) 0px 36px 80px, rgba(0, 0, 0, 0.32) 0px 18px 40px;
+    --shadow-focus: rgba(41, 151, 255, 0.32) 0px 4px 12px;
+
+    /* Floating surface shadows — dark, references existing scale */
+    --shadow-float-pill: var(--shadow-md);
+    --shadow-float-surface:
+      rgba(0, 0, 0, 0.20) 0px -8px 24px, rgba(0, 0, 0, 0.14) 0px -4px 12px,
+      rgba(232, 231, 229, 0.08) 0px 0px 0px 1px;
+    --shadow-float-dock: var(--shadow-float-surface);
+  }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: var(--font-sans);
+  }
+
+  /* Icon fixes */
+  .ri,
+  [class^="ri-"],
+  [class*=" ri-"] {
+    /* Reset font settings that might cause bold appearance */
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+
+    /* Ensure proper alignment */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+
+    /* Prevent inheritance of text styles that might affect icons */
+    font-weight: normal;
+  }
+
+  /* Fix italic style being applied to icons */
+  i.ri,
+  i[class^="ri-"],
+  i[class*=" ri-"] {
+    font-style: normal;
+  }
+}
+
+@layer components {
+  /* Component state classes */
+  .is-active {
+    @apply ring-2 ring-ring bg-accent/20;
+  }
+
+  .is-selected {
+    @apply ring-2 ring-primary bg-accent/30;
+  }
+
+  .is-disabled {
+    @apply opacity-50 pointer-events-none;
+  }
+
+  .is-loading {
+    @apply relative pointer-events-none;
+  }
+
+  /* Button variants */
+  .btn {
+    @apply relative h-9 px-[11px] py-[5px] rounded-lg flex items-baseline
+      justify-center gap-2 font-medium text-sm leading-6 isolate
+      transition-colors;
+    transition-duration: var(--transition-base);
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-primary-foreground border border-transparent
+      hover:bg-primary/90;
+    position: relative;
+  }
+
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary text-secondary-foreground border border-transparent
+      hover:bg-secondary/90;
+  }
+
+  .btn-outline {
+    @apply btn bg-transparent text-foreground border border-input
+      hover:bg-accent/20;
+  }
+
+  /* Input variants */
+  .input {
+    @apply appearance-none h-9 px-[11px] py-[5px] bg-transparent border
+      border-input rounded-lg text-foreground text-sm leading-6 block w-full
+      transition-colors;
+    transition-duration: var(--transition-base);
+  }
+
+  .input:hover {
+    @apply border-ring/50;
+  }
+
+  .input:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 border-primary;
+  }
+
+  /* Card variants */
+  .card {
+    @apply bg-card border border-border rounded-lg p-6 shadow-sm transition-all
+      hover:shadow-md;
+    transition-duration: var(--transition-base);
+  }
+
+  /* Selection card - like the model cards in your image */
+  .selection-card {
+    @apply bg-card border border-border rounded-lg p-4 shadow-sm transition-all
+      cursor-pointer;
+    transition-duration: var(--transition-base);
+  }
+
+  .selection-card:hover {
+    @apply shadow-md border-ring/50;
+  }
+
+  .selection-card.is-selected {
+    @apply ring-2 ring-primary border-transparent;
+  }
+
+  .selection-card .indicator {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .selection-card .indicator.green {
+    @apply bg-primary;
+  }
+
+  .selection-card .indicator.blue {
+    @apply bg-primary;
+  }
+
+  .card-header {
+    @apply space-y-1.5 pb-4;
+  }
+
+  .card-title {
+    @apply text-lg font-semibold;
+  }
+
+  .card-description {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .card-content {
+    @apply pt-0;
+  }
+
+  .card-footer {
+    @apply flex items-center pt-4;
+  }
+
+  /* Focus styles */
+  .focus-ring {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
+  }
+
+  /* Link styles */
+  .link {
+    @apply text-foreground underline-offset-4 hover:underline
+      hover:text-foreground/80;
+  }
+
+  /* Pushable button */
+  .pushable {
+    background: hsl(var(--foreground));
+    border: none;
+    border-radius: 12px;
+    padding: 0;
+    cursor: pointer;
+    outline-offset: 4px;
+    position: relative;
+  }
+
+  .pushable:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .pushable .front {
+    display: block;
+    padding: 12px 42px;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    background: hsl(var(--foreground) / 0.8);
+    color: hsl(var(--background));
+    transform: translateY(-6px);
+    transition-property: transform;
+    transition-duration: var(--transition-fast);
+    position: relative;
+  }
+
+  .pushable .front::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: 11px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+  }
+
+  .pushable:active .front {
+    transform: translateY(-2px);
+  }
+
+  .pushable:disabled {
+    background: rgb(75 85 99); /* neutral-600 */
+    cursor: not-allowed;
+  }
+
+  .pushable:disabled .front {
+    background: rgb(156 163 175); /* neutral-400 */
+    transform: translateY(-2px);
+  }
+
+  /* Form components */
+  .form-group {
+    @apply space-y-2 mb-4;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-foreground mb-1;
+  }
+
+  .form-hint {
+    @apply text-xs text-muted-foreground mt-1;
+  }
+
+  .form-error {
+    @apply text-xs text-destructive mt-1;
+  }
+
+  .form-indicator {
+    @apply flex items-center gap-1.5 text-xs font-medium;
+  }
+
+  .form-indicator .dot {
+    @apply w-1.5 h-1.5 rounded-full;
+  }
+
+  /* Form indicators matching the UI in your image */
+  .accuracy-indicator, .speed-indicator {
+    @apply flex items-center gap-1;
+  }
+
+  .accuracy-indicator .dot {
+    @apply w-2 h-2 rounded-full bg-primary;
+  }
+
+  .accuracy-indicator .dot.empty {
+    @apply bg-border;
+  }
+
+  .speed-indicator .dot {
+    @apply w-2 h-2 rounded-full bg-primary;
+  }
+
+  .speed-indicator .dot.empty {
+    @apply bg-border;
+  }
+}
+
+@layer utilities {
+  /* Typography utility classes — Futuria weight discipline: 400 display, 500 emphasis, 600 max */
+  .typography-h1 {
+    @apply text-4xl font-normal tracking-[-1.68px];
+    font-family: var(--font-heading);
+  }
+
+  .typography-h2 {
+    @apply text-3xl font-normal tracking-[-0.56px];
+    font-family: var(--font-heading);
+  }
+
+  .typography-h3 {
+    @apply text-2xl font-medium tracking-[-0.325px];
+    font-family: var(--font-heading);
+  }
+
+  .typography-h4 {
+    @apply text-xl font-medium tracking-tight;
+    font-family: var(--font-heading);
+  }
+
+  .typography-title {
+    font-size: 1.75rem;
+    @apply font-medium tracking-tight;
+    font-family: var(--font-heading);
+  }
+
+  .typography-p {
+    @apply text-base leading-7;
+    font-family: var(--font-body);
+  }
+
+  .typography-blockquote {
+    @apply border-l-2 pl-6 italic;
+  }
+
+  .typography-list {
+    @apply my-6 ml-6 list-disc [&>li]:mt-2;
+  }
+
+  .typography-code {
+    @apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm;
+  }
+
+  .typography-lead {
+    @apply text-xl text-muted-foreground;
+  }
+
+  .typography-large {
+    @apply text-lg font-semibold;
+  }
+
+  .typography-small {
+    @apply text-sm font-medium leading-none;
+  }
+
+  .typography-muted {
+    @apply text-sm text-muted-foreground;
+  }
+
+  /* Responsive icon utilities */
+  .icon-fixed {
+    height: 12px;
+    width: 12px;
+    flex-shrink: 0;
+  }
+
+  .icon-tiny {
+    height: 10px;
+    width: 10px;
+    flex-shrink: 0;
+  }
+
+  .button-min-width {
+    min-width: 28px;
+  }
+
+  .responsive-container {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  /* Scrollbar styling */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+  }
+
+  /* Text truncation */
+  .truncate-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Background patterns */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .bg-dots {
+    background-image: radial-gradient(
+      hsl(var(--border) / 0.2) 1px,
+      transparent 1px
+    );
+    background-size: 20px 20px;
+  }
+
+  /* Essential hover utilities */
+  .hover-bg-ring:hover {
+    background-color: hsl(var(--hover-accent-color) / 0.2);
+  }
+
+  .hover-border-ring:hover {
+    border-color: hsl(var(--hover-accent-color) / 0.5);
+  }
+
+  .hover-text-ring:hover {
+    color: hsl(var(--hover-accent-color));
+  }
+
+  /* Responsive utility classes */
+  @media (max-width: 640px) {
+    .sm-only\:hidden {
+      display: none !important;
+    }
+
+    .sm-only\:block {
+      display: block !important;
+    }
+
+    .sm-only\:flex {
+      display: flex !important;
+    }
+  }
+
+  @media (min-width: 641px) {
+    .md-up\:hidden {
+      display: none !important;
+    }
+
+    .md-up\:block {
+      display: block !important;
+    }
+
+    .md-up\:flex {
+      display: flex !important;
+    }
+  }
+
+  /* File size display classes (for your UI) */
+  .file-size {
+    @apply text-sm text-muted-foreground font-medium;
+  }
+
+  /* Button variants for your UI */
+  .finder-button {
+    @apply inline-flex items-center px-3 py-1.5 border border-input
+      bg-background hover:bg-accent/10 rounded-md text-sm font-medium;
+    transition-duration: var(--transition-base);
+  }
+
+  /* Neon gradient card animation */
+  .animate-background-position-spin {
+    animation: background-position-spin 3000ms infinite alternate;
+  }
+
+  @keyframes background-position-spin {
+    0% {
+      background-position: top center;
+    }
+    100% {
+      background-position: bottom center;
+    }
+  }
+}

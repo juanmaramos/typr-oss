@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-release-project-knowledge-job"
+description = "Enables the release_project_knowledge_job command without any pre-configured scope."
+commands.allow = ["release_project_knowledge_job"]
+
+[[permission]]
+identifier = "deny-release-project-knowledge-job"
+description = "Denies the release_project_knowledge_job command without any pre-configured scope."
+commands.deny = ["release_project_knowledge_job"]

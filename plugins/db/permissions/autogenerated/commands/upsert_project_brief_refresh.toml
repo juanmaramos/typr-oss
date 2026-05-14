@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-upsert-project-brief-refresh"
+description = "Enables the upsert_project_brief_refresh command without any pre-configured scope."
+commands.allow = ["upsert_project_brief_refresh"]
+
+[[permission]]
+identifier = "deny-upsert-project-brief-refresh"
+description = "Denies the upsert_project_brief_refresh command without any pre-configured scope."
+commands.deny = ["upsert_project_brief_refresh"]

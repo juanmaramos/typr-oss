@@ -1,0 +1,14 @@
+# Default permissions for the config plugin
+"$schema" = "../schemas/schema.json"
+
+[default]
+description = "Default permissions for the config plugin - allows all config operations"
+permissions = [
+  "allow-get-general-config",
+  "allow-set-general-config",
+  "allow-get-notification-config",
+  "allow-set-notification-config",
+  "allow-get-ai-config",
+  "allow-set-ai-config"
+]
+

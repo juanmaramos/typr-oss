@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-list-spaces"
+description = "Enables the list_spaces command without any pre-configured scope."
+commands.allow = ["list_spaces"]
+
+[[permission]]
+identifier = "deny-list-spaces"
+description = "Denies the list_spaces command without any pre-configured scope."
+commands.deny = ["list_spaces"]

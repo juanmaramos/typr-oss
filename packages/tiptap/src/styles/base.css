@@ -1,0 +1,35 @@
+.tiptap-normal {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  hyphens: auto;
+  padding-bottom: 24px;
+  caret-color: hsl(var(--foreground));
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5rem;
+
+  /* Hide cursor during AI streaming to prevent visual distraction */
+  &[data-ai-writing="true"] {
+    caret-color: transparent;
+  }
+
+  /* Hide placeholder during AI streaming */
+  &[data-ai-writing="true"] .is-empty::before {
+    content: "" !important;
+  }
+
+  :first-child {
+    margin-top: 0;
+  }
+
+  /* focus states */
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  p {
+    margin-bottom: 0.25rem;
+  }
+}

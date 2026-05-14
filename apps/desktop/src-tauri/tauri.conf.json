@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "version": "0.1.11",
+  "productName": "Typr Dev",
+  "mainBinaryName": "Typr Dev",
+  "identifier": "com.typr.dev",
+  "build": {
+    "beforeDevCommand": "pnpm -F desktop dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "pnpm -F desktop build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "publisher": "Typr",
+    "active": true,
+    "createUpdaterArtifacts": true,
+    "targets": ["nsis", "dmg", "app"],
+    "externalBin": [
+      "../../../target/release/typr-mcp"
+    ],
+    "resources": [
+      "../public/assets/*.woff2",
+      "../public/assets/inter/*.woff2"
+    ],
+    "icon": [
+      "icons/stable/32x32.png",
+      "icons/stable/128x128.png",
+      "icons/stable/128x128@2x.png",
+      "icons/stable/icon.icns",
+      "icons/stable/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "14.2",
+      "entitlements": "./Entitlements.plist",
+      "dmg": {
+        "background": "assets/dmg-background-stable.png",
+        "windowSize": {
+          "width": 660,
+          "height": 430
+        },
+        "appPosition": {
+          "x": 177,
+          "y": 200
+        },
+        "applicationFolderPosition": {
+          "x": 483,
+          "y": 200
+        }
+      }
+    },
+    "windows": {
+      "webviewInstallMode": {
+        "type": "offlineInstaller"
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false,
+        "languages": ["English"],
+        "installerHooks": "./windows/nsis/registry-hooks.nsi"
+      }
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["typr"]
+      }
+    },
+    "updater": {
+      "active": true,
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVBODdBMTdFMDc0OERDNjAKUldSZzNFZ0hmcUdIV3RFWkNhTldjRUFQcGVYdW1BMVhlaFBKSFJDMWYwbU1JdFFYdWl0NTNrVlUK",
+      "endpoints": [
+        "https://github.com/juanmaramos/typr-oss/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}

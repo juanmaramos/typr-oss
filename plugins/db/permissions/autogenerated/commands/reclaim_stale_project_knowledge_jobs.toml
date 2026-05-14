@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-reclaim-stale-project-knowledge-jobs"
+description = "Enables the reclaim_stale_project_knowledge_jobs command without any pre-configured scope."
+commands.allow = ["reclaim_stale_project_knowledge_jobs"]
+
+[[permission]]
+identifier = "deny-reclaim-stale-project-knowledge-jobs"
+description = "Denies the reclaim_stale_project_knowledge_jobs command without any pre-configured scope."
+commands.deny = ["reclaim_stale_project_knowledge_jobs"]

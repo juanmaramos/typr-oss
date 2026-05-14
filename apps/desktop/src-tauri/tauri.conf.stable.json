@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Typr",
+  "mainBinaryName": "Typr",
+  "identifier": "com.typr.stable",
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/juanmaramos/typr-oss/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}

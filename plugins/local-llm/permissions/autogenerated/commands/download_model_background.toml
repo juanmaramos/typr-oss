@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-download-model-background"
+description = "Enables the download_model_background command without any pre-configured scope."
+commands.allow = ["download_model_background"]
+
+[[permission]]
+identifier = "deny-download-model-background"
+description = "Denies the download_model_background command without any pre-configured scope."
+commands.deny = ["download_model_background"]

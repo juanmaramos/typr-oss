@@ -1,0 +1,13 @@
+[package]
+name = "tcc"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tracing = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.build-dependencies]
+swift-rs = { git = "https://github.com/Brendonovich/swift-rs", rev = "01980f9", features = ["build"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+swift-rs = { git = "https://github.com/Brendonovich/swift-rs", rev = "01980f9" }

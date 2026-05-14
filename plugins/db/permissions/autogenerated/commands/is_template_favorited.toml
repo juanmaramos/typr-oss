@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-is-template-favorited"
+description = "Enables the is_template_favorited command without any pre-configured scope."
+commands.allow = ["is_template_favorited"]
+
+[[permission]]
+identifier = "deny-is-template-favorited"
+description = "Denies the is_template_favorited command without any pre-configured scope."
+commands.deny = ["is_template_favorited"]

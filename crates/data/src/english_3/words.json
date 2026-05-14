@@ -1,0 +1,122 @@
+[
+  {
+    "text": "project",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 0,
+    "end_ms": 280
+  },
+  {
+    "text": "update",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 320,
+    "end_ms": 600
+  },
+  {
+    "text": "ship",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 1120,
+    "end_ms": 1400
+  },
+  {
+    "text": "the",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 1440,
+    "end_ms": 1720
+  },
+  {
+    "text": "local",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 1760,
+    "end_ms": 2040
+  },
+  {
+    "text": "model",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 2080,
+    "end_ms": 2360
+  },
+  {
+    "text": "document",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 2880,
+    "end_ms": 3160
+  },
+  {
+    "text": "the",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 3200,
+    "end_ms": 3480
+  },
+  {
+    "text": "setup",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 3520,
+    "end_ms": 3800
+  },
+  {
+    "text": "steps",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 3840,
+    "end_ms": 4120
+  }
+]

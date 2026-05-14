@@ -1,0 +1,15 @@
+[package]
+name = "ws-utils"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+typr-audio-utils = { workspace = true }
+typr-listener-interface = { workspace = true }
+
+axum = { workspace = true, features = ["ws"] }
+kalosm-sound = { workspace = true, default-features = false }
+serde_json = { workspace = true }
+
+futures-util = { workspace = true }
+tokio = { workspace = true }

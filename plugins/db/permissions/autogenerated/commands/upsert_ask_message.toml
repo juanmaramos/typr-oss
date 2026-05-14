@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-upsert-ask-message"
+description = "Enables the upsert_ask_message command without any pre-configured scope."
+commands.allow = ["upsert_ask_message"]
+
+[[permission]]
+identifier = "deny-upsert-ask-message"
+description = "Denies the upsert_ask_message command without any pre-configured scope."
+commands.deny = ["upsert_ask_message"]

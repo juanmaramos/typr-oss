@@ -1,0 +1,22 @@
+{
+  "name": "@typr/plugin-config",
+  "version": "0.1.0",
+  "description": "User configuration storage",
+  "type": "module",
+  "types": "./js/index.ts",
+  "exports": {
+    ".": "./js/index.ts"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "files": [
+    "js"
+  ],
+  "dependencies": {
+    "@tauri-apps/api": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

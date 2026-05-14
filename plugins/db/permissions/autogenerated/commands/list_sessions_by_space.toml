@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-list-sessions-by-space"
+description = "Enables the list_sessions_by_space command without any pre-configured scope."
+commands.allow = ["list_sessions_by_space"]
+
+[[permission]]
+identifier = "deny-list-sessions-by-space"
+description = "Denies the list_sessions_by_space command without any pre-configured scope."
+commands.deny = ["list_sessions_by_space"]

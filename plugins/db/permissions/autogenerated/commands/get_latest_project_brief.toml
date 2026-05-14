@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-latest-project-brief"
+description = "Enables the get_latest_project_brief command without any pre-configured scope."
+commands.allow = ["get_latest_project_brief"]
+
+[[permission]]
+identifier = "deny-get-latest-project-brief"
+description = "Denies the get_latest_project_brief command without any pre-configured scope."
+commands.deny = ["get_latest_project_brief"]

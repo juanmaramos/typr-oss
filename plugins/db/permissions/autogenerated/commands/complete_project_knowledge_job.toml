@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-complete-project-knowledge-job"
+description = "Enables the complete_project_knowledge_job command without any pre-configured scope."
+commands.allow = ["complete_project_knowledge_job"]
+
+[[permission]]
+identifier = "deny-complete-project-knowledge-job"
+description = "Denies the complete_project_knowledge_job command without any pre-configured scope."
+commands.deny = ["complete_project_knowledge_job"]

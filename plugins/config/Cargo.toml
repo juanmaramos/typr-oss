@@ -1,0 +1,28 @@
+[package]
+name = "tauri-plugin-config"
+version = "0.1.0"
+authors = ["You"]
+edition = "2021"
+exclude = ["/js", "/node_modules"]
+links = "tauri-plugin-config"
+description = "User configuration storage using tauri-plugin-store"
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+
+[dev-dependencies]
+specta-typescript = { workspace = true }
+tauri-plugin-store = { workspace = true }
+
+[dependencies]
+typr-language = { workspace = true }
+tauri = { workspace = true, features = ["test"] }
+tauri-plugin-store2 = { workspace = true }
+tauri-specta = { workspace = true, features = ["derive", "typescript"] }
+
+schemars = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+specta = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }

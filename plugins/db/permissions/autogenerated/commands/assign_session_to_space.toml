@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-assign-session-to-space"
+description = "Enables the assign_session_to_space command without any pre-configured scope."
+commands.allow = ["assign_session_to_space"]
+
+[[permission]]
+identifier = "deny-assign-session-to-space"
+description = "Denies the assign_session_to_space command without any pre-configured scope."
+commands.deny = ["assign_session_to_space"]

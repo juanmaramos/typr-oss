@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-load-demo-transcript"
+description = "Enables the load_demo_transcript command without any pre-configured scope."
+commands.allow = ["load_demo_transcript"]
+
+[[permission]]
+identifier = "deny-load-demo-transcript"
+description = "Denies the load_demo_transcript command without any pre-configured scope."
+commands.deny = ["load_demo_transcript"]

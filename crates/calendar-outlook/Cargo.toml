@@ -1,0 +1,9 @@
+[package]
+name = "calendar-outlook"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+typr-calendar-interface = { path = "../calendar-interface", package = "calendar-interface" }
+
+graph-rs-sdk = { workspace = true }

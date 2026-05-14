@@ -1,0 +1,499 @@
+[
+  {
+    "text": "Welcome",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 0,
+    "end_ms": 350
+  },
+  {
+    "text": "to",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 350,
+    "end_ms": 480
+  },
+  {
+    "text": "Typr.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.99,
+    "start_ms": 480,
+    "end_ms": 900
+  },
+  {
+    "text": "I'm",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 1100,
+    "end_ms": 1250
+  },
+  {
+    "text": "about",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 1250,
+    "end_ms": 1450
+  },
+  {
+    "text": "to",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 1450,
+    "end_ms": 1550
+  },
+  {
+    "text": "show",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 1550,
+    "end_ms": 1750
+  },
+  {
+    "text": "you",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 1750,
+    "end_ms": 1900
+  },
+  {
+    "text": "something",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 1900,
+    "end_ms": 2300
+  },
+  {
+    "text": "amazing.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 2300,
+    "end_ms": 2850
+  },
+  {
+    "text": "As",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 3200,
+    "end_ms": 3350
+  },
+  {
+    "text": "I",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 3350,
+    "end_ms": 3430
+  },
+  {
+    "text": "speak",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 3430,
+    "end_ms": 3680
+  },
+  {
+    "text": "right",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 3680,
+    "end_ms": 3930
+  },
+  {
+    "text": "now,",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 3930,
+    "end_ms": 4230
+  },
+  {
+    "text": "Typr",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.99,
+    "start_ms": 4400,
+    "end_ms": 4700
+  },
+  {
+    "text": "is",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 4700,
+    "end_ms": 4830
+  },
+  {
+    "text": "transcribing",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 4830,
+    "end_ms": 5480
+  },
+  {
+    "text": "every",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 5480,
+    "end_ms": 5730
+  },
+  {
+    "text": "word,",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 5730,
+    "end_ms": 6100
+  },
+  {
+    "text": "completely",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 6300,
+    "end_ms": 6950
+  },
+  {
+    "text": "offline",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 6950,
+    "end_ms": 7500
+  },
+  {
+    "text": "on",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 7500,
+    "end_ms": 7630
+  },
+  {
+    "text": "your",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 7630,
+    "end_ms": 7800
+  },
+  {
+    "text": "device.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 7800,
+    "end_ms": 8400
+  },
+  {
+    "text": "No",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 8700,
+    "end_ms": 8900
+  },
+  {
+    "text": "cloud",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 8900,
+    "end_ms": 9200
+  },
+  {
+    "text": "uploads,",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 9200,
+    "end_ms": 9750
+  },
+  {
+    "text": "total",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 9900,
+    "end_ms": 10200
+  },
+  {
+    "text": "privacy.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 10200,
+    "end_ms": 10800
+  },
+  {
+    "text": "But",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 11200,
+    "end_ms": 11400
+  },
+  {
+    "text": "here's",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 11400,
+    "end_ms": 11750
+  },
+  {
+    "text": "the",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 11750,
+    "end_ms": 11880
+  },
+  {
+    "text": "magic",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 11880,
+    "end_ms": 12300
+  },
+  {
+    "text": "-",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.95,
+    "start_ms": 12300,
+    "end_ms": 12420
+  },
+  {
+    "text": "Typr",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.99,
+    "start_ms": 12550,
+    "end_ms": 12850
+  },
+  {
+    "text": "doesn't",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 12850,
+    "end_ms": 13200
+  },
+  {
+    "text": "just",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 13200,
+    "end_ms": 13450
+  },
+  {
+    "text": "transcribe;",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 13450,
+    "end_ms": 14100
+  },
+  {
+    "text": "it",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 14250,
+    "end_ms": 14380
+  },
+  {
+    "text": "transforms",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 14380,
+    "end_ms": 15050
+  },
+  {
+    "text": "meetings",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 15050,
+    "end_ms": 15500
+  },
+  {
+    "text": "into",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 15500,
+    "end_ms": 15730
+  },
+  {
+    "text": "organized",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 15730,
+    "end_ms": 16350
+  },
+  {
+    "text": "notes,",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 16350,
+    "end_ms": 16750
+  },
+  {
+    "text": "action",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 16850,
+    "end_ms": 17200
+  },
+  {
+    "text": "items,",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 17200,
+    "end_ms": 17650
+  },
+  {
+    "text": "and",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 17750,
+    "end_ms": 17880
+  },
+  {
+    "text": "key",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 17880,
+    "end_ms": 18100
+  },
+  {
+    "text": "insights.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 18100,
+    "end_ms": 18800
+  },
+  {
+    "text": "Ready",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 19500,
+    "end_ms": 19900
+  },
+  {
+    "text": "to",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 19900,
+    "end_ms": 20030
+  },
+  {
+    "text": "try",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 20030,
+    "end_ms": 20280
+  },
+  {
+    "text": "it",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 20280,
+    "end_ms": 20400
+  },
+  {
+    "text": "yourself?",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 20400,
+    "end_ms": 21100
+  },
+  {
+    "text": "Click",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 21500,
+    "end_ms": 21750
+  },
+  {
+    "text": "Transcribe",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.99,
+    "start_ms": 21750,
+    "end_ms": 22300
+  },
+  {
+    "text": "on",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 22300,
+    "end_ms": 22400
+  },
+  {
+    "text": "your",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 22400,
+    "end_ms": 22550
+  },
+  {
+    "text": "next",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 22550,
+    "end_ms": 22750
+  },
+  {
+    "text": "meeting",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 22750,
+    "end_ms": 23150
+  },
+  {
+    "text": "or",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 23150,
+    "end_ms": 23250
+  },
+  {
+    "text": "YouTube",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.99,
+    "start_ms": 23250,
+    "end_ms": 23650
+  },
+  {
+    "text": "video",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 23650,
+    "end_ms": 23950
+  },
+  {
+    "text": "and",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 23950,
+    "end_ms": 24050
+  },
+  {
+    "text": "experience",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 24050,
+    "end_ms": 24550
+  },
+  {
+    "text": "the",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 24550,
+    "end_ms": 24650
+  },
+  {
+    "text": "future",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 24650,
+    "end_ms": 24980
+  },
+  {
+    "text": "of",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 24980,
+    "end_ms": 25080
+  },
+  {
+    "text": "private",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.98,
+    "start_ms": 25080,
+    "end_ms": 25420
+  },
+  {
+    "text": "note-taking.",
+    "speaker": { "type": "assigned", "value": { "id": "narrator", "label": "Narrator" } },
+    "confidence": 0.97,
+    "start_ms": 25420,
+    "end_ms": 26200
+  }
+]

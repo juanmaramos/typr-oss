@@ -1,0 +1,21 @@
+.tiptap-normal h2 {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  font-size: 1.125rem;
+  font-family: var(--font-body);
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  min-height: 1.25rem;
+  position: relative;
+}
+
+.tiptap-normal h3 {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+  min-height: 1.25rem;
+  position: relative;
+}

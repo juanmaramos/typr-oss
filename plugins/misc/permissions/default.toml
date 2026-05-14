@@ -1,0 +1,11 @@
+[default]
+description = "Default permissions for the plugin"
+permissions = [
+    "allow-get-git-hash",
+    "allow-get-fingerprint",
+    "allow-opinionated-md-to-html",
+    "allow-audio-open",
+    "allow-audio-exist",
+    "allow-delete-session-folder",
+    "allow-parse-meeting-link",
+]

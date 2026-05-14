@@ -1,0 +1,68 @@
+/* 
+ * Diff Mark Styles
+ * Highlights AI-generated changes in the editor
+ * Muted green for additions, elegant muted red for deletions
+ * Apple/Linear style: clear semantic meaning without being aggressive
+ */
+
+/* Inserted text - muted green highlight */
+span[data-diff-type="1"] {
+  background-color: hsl(var(--diff-added-bg));
+  color: hsl(var(--diff-added));
+  padding: 2px 0;
+  border-radius: 2px;
+  animation: diffFadeIn 0.3s ease-out;
+  animation-fill-mode: both;
+
+  /* Linear-style Snap-Transition: Instant content, smooth color shift (150ms max) */
+  transition:
+    background-color 150ms ease-out,
+    color 150ms ease-out,
+    opacity 150ms ease-out;
+}
+
+/* Deleted text - elegant muted red (clearly deletion, not alarming) */
+span[data-diff-type="-1"] {
+  background-color: hsl(var(--diff-removed-bg));
+  color: hsl(var(--diff-removed));
+  text-decoration: line-through;
+  text-decoration-color: hsl(var(--diff-removed) / 0.5);
+  text-decoration-thickness: 1px;
+  padding: 2px 0;
+  opacity: 0.7;
+  border-radius: 2px;
+
+  /* Linear-style Snap-Transition: Instant removal, smooth fade out (150ms max) */
+  transition: opacity 150ms ease-out, background-color 150ms ease-out;
+}
+
+/* Subtle stagger effect for multiple items (optional polish) */
+span[data-diff-type="1"]:nth-of-type(2) {
+  animation-delay: 0.02s;
+}
+span[data-diff-type="1"]:nth-of-type(3) {
+  animation-delay: 0.04s;
+}
+span[data-diff-type="1"]:nth-of-type(4) {
+  animation-delay: 0.06s;
+}
+span[data-diff-type="1"]:nth-of-type(5) {
+  animation-delay: 0.08s;
+}
+span[data-diff-type="1"]:nth-of-type(n+6) {
+  animation-delay: 0.1s;
+}
+
+/* Fade-in animation */
+@keyframes diffFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode handled by CSS variable overrides in .dark class */

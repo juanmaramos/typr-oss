@@ -1,0 +1,29 @@
+[package]
+name = "aec"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["256"]
+128 = []
+256 = []
+512 = []
+load-dynamic = ["typr-onnx/load-dynamic"]
+
+[dependencies]
+typr-onnx = { workspace = true }
+
+realfft = { workspace = true }
+
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+dasp = { workspace = true }
+hound = { workspace = true }
+rodio = { workspace = true }
+
+[[bench]]
+name = "aec_bench"
+harness = false

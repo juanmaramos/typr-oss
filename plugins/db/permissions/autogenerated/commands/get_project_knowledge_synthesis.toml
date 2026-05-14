@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-project-knowledge-synthesis"
+description = "Enables the get_project_knowledge_synthesis command without any pre-configured scope."
+commands.allow = ["get_project_knowledge_synthesis"]
+
+[[permission]]
+identifier = "deny-get-project-knowledge-synthesis"
+description = "Denies the get_project_knowledge_synthesis command without any pre-configured scope."
+commands.deny = ["get_project_knowledge_synthesis"]

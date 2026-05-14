@@ -1,0 +1,10 @@
+[package]
+name = "calendar-google"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+typr-calendar-interface = { path = "../calendar-interface", package = "calendar-interface" }
+
+chrono = { workspace = true }
+google-calendar = "0.7.0"

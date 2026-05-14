@@ -1,0 +1,210 @@
+[profile.dev]
+incremental = true
+opt-level = 0
+debug = true
+
+[profile.dev.package."*"]
+opt-level = 1
+debug = false
+
+[workspace]
+resolver = "2"
+members = [
+  "apps/desktop/src-tauri",
+  "crates/*",
+  "plugins/*",
+]
+exclude = [
+  "crates/db-admin",
+  "crates/lago",
+]
+
+[workspace.package]
+rust-version = "1.86.0"
+
+[workspace.dependencies]
+typr-aec = { path = "crates/aec", package = "aec" }
+typr-ai-retry = { path = "crates/ai-retry" }
+typr-analytics = { path = "crates/analytics", package = "analytics" }
+typr-audio = { path = "crates/audio", package = "audio" }
+typr-audio-utils = { path = "crates/audio-utils", package = "audio-utils" }
+typr-buffer = { path = "crates/buffer", package = "buffer" }
+typr-calendar-apple = { path = "crates/calendar-apple", package = "calendar-apple" }
+typr-calendar-google = { path = "crates/calendar-google", package = "calendar-google" }
+typr-calendar-interface = { path = "crates/calendar-interface", package = "calendar-interface" }
+typr-calendar-outlook = { path = "crates/calendar-outlook", package = "calendar-outlook" }
+typr-chunker = { path = "crates/chunker", package = "chunker" }
+typr-data = { path = "crates/data", package = "data" }
+typr-db-core = { path = "crates/db-core", package = "db-core" }
+typr-db-script = { path = "crates/db-script", package = "db-script" }
+typr-db-user = { path = "crates/db-user", package = "db-user" }
+typr-detect = { path = "crates/detect", package = "detect" }
+typr-file = { path = "crates/file", package = "file" }
+typr-gbnf = { path = "crates/gbnf", package = "gbnf" }
+typr-gguf = { path = "crates/gguf", package = "gguf" }
+typr-host = { path = "crates/host", package = "host" }
+typr-language = { path = "crates/language", package = "language" }
+typr-llama = { path = "crates/llama", package = "llama" }
+typr-network = { path = "crates/network", package = "network" }
+typr-notification = { path = "crates/notification", package = "notification" }
+typr-notification2 = { path = "crates/notification2", package = "notification2" }
+typr-notion = { path = "crates/notion", package = "notion" }
+typr-onnx = { path = "crates/onnx", package = "onnx" }
+typr-openai = { path = "crates/openai", package = "openai" }
+typr-pyannote-local = { path = "crates/pyannote-local", package = "pyannote-local" }
+typr-rtzr = { path = "crates/rtzr", package = "rtzr" }
+typr-tcc = { path = "crates/tcc", package = "tcc" }
+typr-template = { path = "crates/template", package = "template" }
+typr-whisper = { path = "crates/whisper", package = "whisper" }
+typr-whisper-local = { path = "crates/whisper-local", package = "whisper-local", default-features = false }
+typr-ws = { path = "crates/ws", package = "ws" }
+typr-ws-utils = { path = "crates/ws-utils", package = "ws-utils" }
+
+typr-listener-interface = { path = "plugins/listener-interface", package = "listener-interface" }
+
+tauri = "2.6"
+tauri-build = "2.3"
+tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2" }
+tauri-plugin = "2.3"
+tauri-plugin-clipboard-manager = "2.3"
+tauri-plugin-deep-link = "2.4"
+tauri-plugin-dialog = "2.3"
+tauri-plugin-fs = "2.4"
+tauri-plugin-http = { version = "2.5", features = ["unsafe-headers"] }
+tauri-plugin-machine-uid = "0.1.1"
+tauri-plugin-opener = "2.4"
+tauri-plugin-shell = "2.3"
+tauri-plugin-store = "2.3"
+
+tauri-plugin-analytics = { path = "plugins/analytics" }
+tauri-plugin-apple-calendar = { path = "plugins/apple-calendar" }
+tauri-plugin-auth = { path = "plugins/auth" }
+tauri-plugin-config = { path = "plugins/config" }
+tauri-plugin-connector = { path = "plugins/connector" }
+tauri-plugin-db = { path = "plugins/db" }
+tauri-plugin-flags = { path = "plugins/flags" }
+tauri-plugin-listener = { path = "plugins/listener" }
+tauri-plugin-local-llm = { path = "plugins/local-llm" }
+tauri-plugin-local-stt = { path = "plugins/local-stt" }
+tauri-plugin-misc = { path = "plugins/misc" }
+tauri-plugin-notification = { path = "plugins/notification" }
+tauri-plugin-obsidian = { path = "plugins/obsidian" }
+tauri-plugin-sfx = { path = "plugins/sfx" }
+tauri-plugin-sse = { path = "plugins/sse" }
+tauri-plugin-store2 = { path = "plugins/store2" }
+tauri-plugin-task = { path = "plugins/task" }
+tauri-plugin-template = { path = "plugins/template" }
+tauri-plugin-tray = { path = "plugins/tray" }
+tauri-plugin-windows = { path = "plugins/windows" }
+
+async-stream = "0.3.6"
+futures-channel = "0.3.31"
+futures-core = "0.3.31"
+futures-util = "0.3.31"
+reqwest = "0.12"
+reqwest-streams = "0.10.0"
+tokio = "1"
+tokio-stream = "0.1.17"
+tokio-tungstenite = "0.26.0"
+tokio-util = "0.7.15"
+
+anyhow = "1"
+approx = "0.5.1"
+backon = "1.4.1"
+bytes = "1.9.0"
+cached = "0.55.1"
+codes-iso-639 = "0.1.5"
+derive_more = "2"
+dirs = "6.0.0"
+dotenv = "0.15.0"
+include_url_macro = "0.1.0"
+indoc = "2"
+itertools = "0.14.0"
+lazy_static = "1.5.0"
+once_cell = "1.20.3"
+regex = "1.11.1"
+schemars = "0.8.21"
+serde = "1"
+serde_bytes = "0.11.15"
+serde_json = "1"
+serde_qs = "1.0.0-rc.3"
+similar = "2.7.0"
+statig = { version = "0.3.0" }
+strum = "0.26"
+tempfile = "3"
+thiserror = "2"
+url = "2"
+uuid = "1"
+
+criterion = "0.6"
+insta = "1.42"
+inventory = "0.3.20"
+serial_test = "3"
+testcontainers-modules = "0.11.5"
+
+axum = "0.8.4"
+axum-extra = "0.10.1"
+tower = "0.5.2"
+tower-http = "0.6.2"
+
+chrono = "0.4.39"
+chrono-tz = "0.10.1"
+
+prost = "0.13.4"
+prost-build = "0.13.4"
+tonic = "0.12.3"
+tonic-build = "0.12.3"
+
+async-openai = { git = "https://github.com/fastrepl/async-openai", rev = "6404d307f3f706e818ad91544dc82fac5c545aee", default-features = false }
+gbnf-validator = { git = "https://github.com/fastrepl/gbnf-validator", rev = "3dec055" }
+graph-rs-sdk = "2.0.3"
+
+sentry = "0.38.1"
+sentry-rust-minidump = "0.11.0"
+
+markdown = { git = "https://github.com/wooorm/markdown-rs.git", rev = "5c9eba146f06b2e0531a901cb586c0a877edb3ea" }
+mdast_util_to_markdown = { git = "https://github.com/wooorm/markdown-rs.git", rev = "5c9eba146f06b2e0531a901cb586c0a877edb3ea" }
+minijinja = "2.7.0"
+minijinja-contrib = "2.7.0"
+
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"
+
+apalis = "0.7.0"
+apalis-cron = "0.7.0"
+apalis-sql = "0.7.0"
+
+specta = "2.0.0-rc.21"
+specta-typescript = "0.0.9"
+tauri-specta = "2.0.0-rc.21"
+
+cidre = { git = "https://github.com/yury/cidre", rev = "6f9d1f4" }
+cpal = "0.15.3"
+dasp = "0.11.0"
+flume = "0.11.1"
+hound = "3.5.1"
+realfft = "3.5.0"
+ringbuf = "0.4.8"
+rodio = { version = "0.20.1", features = ["symphonia"] }
+screencapturekit = "1.5"
+silero-rs = { git = "https://github.com/emotechlab/silero-rs", rev = "26a6460", package = "silero" }
+
+kalosm-common = { git = "https://github.com/floneum/floneum", rev = "52967ae" }
+kalosm-llama = { git = "https://github.com/floneum/floneum", rev = "52967ae" }
+kalosm-model-types = { git = "https://github.com/floneum/floneum", rev = "52967ae" }
+kalosm-sound = { git = "https://github.com/floneum/floneum", rev = "52967ae", default-features = false }
+kalosm-streams = { git = "https://github.com/floneum/floneum", rev = "52967ae" }
+
+libsql = "0.9.17"
+
+block2 = "0.6"
+objc2 = "0.6"
+objc2-app-kit = "0.3"
+objc2-application-services = "0.3"
+objc2-core-foundation = "0.3"
+objc2-foundation = "0.3"
+objc2-user-notifications = "0.3"
+
+[patch.crates-io]
+cpal = { git = "https://github.com/RustAudio/cpal", rev = "51c3b43" }
+esaxx-rs = { git = "https://github.com/thewh1teagle/esaxx-rs.git", branch = "feat/dynamic-msvc-link" }

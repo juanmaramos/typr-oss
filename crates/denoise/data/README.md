@@ -1,0 +1,4 @@
+- `https://github.com/breizhn/DTLN/blob/master/pretrained_model/model_1.onnx`
+- `https://github.com/breizhn/DTLN/blob/master/pretrained_model/model_2.onnx`
+
+Upstream license: MIT.

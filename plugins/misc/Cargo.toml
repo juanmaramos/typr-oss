@@ -1,0 +1,28 @@
+[package]
+name = "tauri-plugin-misc"
+version = "0.1.0"
+authors = ["You"]
+edition = "2021"
+exclude = ["/js", "/node_modules"]
+links = "tauri-plugin-misc"
+description = ""
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
+vergen-gix = { version = "1.0.0", features = ["build"] }
+
+[dev-dependencies]
+indoc = { workspace = true }
+specta-typescript = { workspace = true }
+
+[dependencies]
+typr-buffer = { workspace = true }
+typr-detect = { workspace = true }
+typr-host = { workspace = true }
+
+tauri = { workspace = true, features = ["test"] }
+tauri-plugin-opener = { workspace = true }
+tauri-specta = { workspace = true, features = ["derive", "typescript"] }
+
+regex = { workspace = true }
+specta = { workspace = true }

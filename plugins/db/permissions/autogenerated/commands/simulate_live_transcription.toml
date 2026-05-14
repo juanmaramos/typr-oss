@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-simulate-live-transcription"
+description = "Enables the simulate_live_transcription command without any pre-configured scope."
+commands.allow = ["simulate_live_transcription"]
+
+[[permission]]
+identifier = "deny-simulate-live-transcription"
+description = "Denies the simulate_live_transcription command without any pre-configured scope."
+commands.deny = ["simulate_live_transcription"]

@@ -1,0 +1,11 @@
+* text=auto eol=lf
+*.dll binary
+*.gguf binary
+*.onnx binary
+*.otf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.mp3 binary
+*.ogg binary
+*.wav binary

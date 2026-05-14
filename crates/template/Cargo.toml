@@ -1,0 +1,21 @@
+[package]
+name = "template"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+typr-listener-interface = { workspace = true }
+
+codes-iso-639 = { workspace = true }
+itertools = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
+
+minijinja = { workspace = true, features = ["loader", "preserve_order", "json"] }
+minijinja-contrib = { workspace = true, features = ["pycompat"] }
+
+[dev-dependencies]
+typr-data = { workspace = true }
+insta = { workspace = true }

@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-toggle-template-favorite"
+description = "Enables the toggle_template_favorite command without any pre-configured scope."
+commands.allow = ["toggle_template_favorite"]
+
+[[permission]]
+identifier = "deny-toggle-template-favorite"
+description = "Denies the toggle_template_favorite command without any pre-configured scope."
+commands.deny = ["toggle_template_favorite"]

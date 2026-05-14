@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-demo-audio-path"
+description = "Enables the get_demo_audio_path command without any pre-configured scope."
+commands.allow = ["get_demo_audio_path"]
+
+[[permission]]
+identifier = "deny-get-demo-audio-path"
+description = "Denies the get_demo_audio_path command without any pre-configured scope."
+commands.deny = ["get_demo_audio_path"]

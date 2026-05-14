@@ -1,0 +1,98 @@
+[
+  {
+    "text": "offline",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 0,
+    "end_ms": 280
+  },
+  {
+    "text": "summary",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 320,
+    "end_ms": 600
+  },
+  {
+    "text": "ready",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 0
+      }
+    },
+    "confidence": 1,
+    "start_ms": 640,
+    "end_ms": 920
+  },
+  {
+    "text": "bring",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 1440,
+    "end_ms": 1720
+  },
+  {
+    "text": "your",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 1760,
+    "end_ms": 2040
+  },
+  {
+    "text": "own",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 2080,
+    "end_ms": 2360
+  },
+  {
+    "text": "key",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 2400,
+    "end_ms": 2680
+  },
+  {
+    "text": "enabled",
+    "speaker": {
+      "type": "unassigned",
+      "value": {
+        "index": 1
+      }
+    },
+    "confidence": 1,
+    "start_ms": 2720,
+    "end_ms": 3000
+  }
+]

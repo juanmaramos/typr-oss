@@ -1,0 +1,11 @@
+{
+  "name": "@typr/plugin-local-llm",
+  "private": true,
+  "main": "./js/index.ts",
+  "scripts": {
+    "codegen": "cargo test -p tauri-plugin-local-llm"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.6.0"
+  }
+}

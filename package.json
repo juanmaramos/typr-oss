@@ -1,0 +1,20 @@
+{
+  "packageManager": "pnpm@10.11.1",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "turbo": "^2.5.4"
+  },
+  "dependencies": {
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-tabs": "^1.1.12",
+    "cmdk": "^1.1.1",
+    "node-fetch": "^3.3.2",
+    "remixicon": "^4.9.1"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "test:health": "pnpm -F @typr/desktop test",
+    "test:db": "cargo test --package db-user",
+    "tauri": "pnpm -F @typr/desktop tauri"
+  }
+}

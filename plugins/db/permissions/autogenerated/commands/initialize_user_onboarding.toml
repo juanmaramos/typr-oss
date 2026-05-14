@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-initialize-user-onboarding"
+description = "Enables the initialize_user_onboarding command without any pre-configured scope."
+commands.allow = ["initialize_user_onboarding"]
+
+[[permission]]
+identifier = "deny-initialize-user-onboarding"
+description = "Denies the initialize_user_onboarding command without any pre-configured scope."
+commands.deny = ["initialize_user_onboarding"]

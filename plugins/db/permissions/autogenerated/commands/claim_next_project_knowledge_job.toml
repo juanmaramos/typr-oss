@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-claim-next-project-knowledge-job"
+description = "Enables the claim_next_project_knowledge_job command without any pre-configured scope."
+commands.allow = ["claim_next_project_knowledge_job"]
+
+[[permission]]
+identifier = "deny-claim-next-project-knowledge-job"
+description = "Denies the claim_next_project_knowledge_job command without any pre-configured scope."
+commands.deny = ["claim_next_project_knowledge_job"]

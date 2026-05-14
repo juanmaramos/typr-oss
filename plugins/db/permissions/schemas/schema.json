@@ -1,0 +1,1506 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PermissionFile",
+  "description": "Permission file that can define a default permission, a set of permissions or a list of inlined permissions.",
+  "type": "object",
+  "properties": {
+    "default": {
+      "description": "The default permission set for the plugin",
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DefaultPermission"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "set": {
+      "description": "A list of permissions sets defined",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PermissionSet"
+      }
+    },
+    "permission": {
+      "description": "A list of inlined permissions",
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Permission"
+      }
+    }
+  },
+  "definitions": {
+    "DefaultPermission": {
+      "description": "The default permission set of the plugin.\n\nWorks similarly to a permission with the \"default\" identifier.",
+      "type": "object",
+      "required": [
+        "permissions"
+      ],
+      "properties": {
+        "version": {
+          "description": "The version of the permission.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 1.0
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does. Tauri convention is to use `<h4>` headings in markdown content for Tauri documentation generation purposes.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "permissions": {
+          "description": "All permissions this set contains.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "PermissionSet": {
+      "description": "A set of direct permissions grouped together under a new name.",
+      "type": "object",
+      "required": [
+        "description",
+        "identifier",
+        "permissions"
+      ],
+      "properties": {
+        "identifier": {
+          "description": "A unique identifier for the permission.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does.",
+          "type": "string"
+        },
+        "permissions": {
+          "description": "All permissions this set contains.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PermissionKind"
+          }
+        }
+      }
+    },
+    "Permission": {
+      "description": "Descriptions of explicit privileges of commands.\n\nIt can enable commands to be accessible in the frontend of the application.\n\nIf the scope is defined it can be used to fine grain control the access of individual or multiple commands.",
+      "type": "object",
+      "required": [
+        "identifier"
+      ],
+      "properties": {
+        "version": {
+          "description": "The version of the permission.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 1.0
+        },
+        "identifier": {
+          "description": "A unique identifier for the permission.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Human-readable description of what the permission does. Tauri internal convention is to use `<h4>` headings in markdown content for Tauri documentation generation purposes.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "commands": {
+          "description": "Allowed or denied commands when using this permission.",
+          "default": {
+            "allow": [],
+            "deny": []
+          },
+          "allOf": [
+            {
+              "$ref": "#/definitions/Commands"
+            }
+          ]
+        },
+        "scope": {
+          "description": "Allowed or denied scoped when using this permission.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Scopes"
+            }
+          ]
+        },
+        "platforms": {
+          "description": "Target platforms this permission applies. By default all platforms are affected by this permission.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Target"
+          }
+        }
+      }
+    },
+    "Commands": {
+      "description": "Allowed and denied commands inside a permission.\n\nIf two commands clash inside of `allow` and `deny`, it should be denied by default.",
+      "type": "object",
+      "properties": {
+        "allow": {
+          "description": "Allowed command.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deny": {
+          "description": "Denied command, which takes priority.",
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Scopes": {
+      "description": "An argument for fine grained behavior control of Tauri commands.\n\nIt can be of any serde serializable type and is used to allow or prevent certain actions inside a Tauri command. The configured scope is passed to the command and will be enforced by the command implementation.\n\n## Example\n\n```json { \"allow\": [{ \"path\": \"$HOME/**\" }], \"deny\": [{ \"path\": \"$HOME/secret.txt\" }] } ```",
+      "type": "object",
+      "properties": {
+        "allow": {
+          "description": "Data that defines what is allowed by the scope.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        "deny": {
+          "description": "Data that defines what is denied by the scope. This should be prioritized by validation logic.",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        }
+      }
+    },
+    "Value": {
+      "description": "All supported ACL values.",
+      "anyOf": [
+        {
+          "description": "Represents a null JSON value.",
+          "type": "null"
+        },
+        {
+          "description": "Represents a [`bool`].",
+          "type": "boolean"
+        },
+        {
+          "description": "Represents a valid ACL [`Number`].",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Number"
+            }
+          ]
+        },
+        {
+          "description": "Represents a [`String`].",
+          "type": "string"
+        },
+        {
+          "description": "Represents a list of other [`Value`]s.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Value"
+          }
+        },
+        {
+          "description": "Represents a map of [`String`] keys to [`Value`]s.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/Value"
+          }
+        }
+      ]
+    },
+    "Number": {
+      "description": "A valid ACL number.",
+      "anyOf": [
+        {
+          "description": "Represents an [`i64`].",
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "description": "Represents a [`f64`].",
+          "type": "number",
+          "format": "double"
+        }
+      ]
+    },
+    "Target": {
+      "description": "Platform target.",
+      "oneOf": [
+        {
+          "description": "MacOS.",
+          "type": "string",
+          "enum": [
+            "macOS"
+          ]
+        },
+        {
+          "description": "Windows.",
+          "type": "string",
+          "enum": [
+            "windows"
+          ]
+        },
+        {
+          "description": "Linux.",
+          "type": "string",
+          "enum": [
+            "linux"
+          ]
+        },
+        {
+          "description": "Android.",
+          "type": "string",
+          "enum": [
+            "android"
+          ]
+        },
+        {
+          "description": "iOS.",
+          "type": "string",
+          "enum": [
+            "iOS"
+          ]
+        }
+      ]
+    },
+    "PermissionKind": {
+      "type": "string",
+      "oneOf": [
+        {
+          "description": "Enables the add_project_source command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-add-project-source",
+          "markdownDescription": "Enables the add_project_source command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the add_project_source command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-add-project-source",
+          "markdownDescription": "Denies the add_project_source command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the archive_ask_thread command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-archive-ask-thread",
+          "markdownDescription": "Enables the archive_ask_thread command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the archive_ask_thread command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-archive-ask-thread",
+          "markdownDescription": "Denies the archive_ask_thread command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the assign_session_to_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-assign-session-to-space",
+          "markdownDescription": "Enables the assign_session_to_space command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the assign_session_to_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-assign-session-to-space",
+          "markdownDescription": "Denies the assign_session_to_space command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the assign_tag_to_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-assign-tag-to-session",
+          "markdownDescription": "Enables the assign_tag_to_session command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the assign_tag_to_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-assign-tag-to-session",
+          "markdownDescription": "Denies the assign_tag_to_session command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the claim_next_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-claim-next-project-knowledge-job",
+          "markdownDescription": "Enables the claim_next_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the claim_next_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-claim-next-project-knowledge-job",
+          "markdownDescription": "Denies the claim_next_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the clear_session_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-clear-session-space",
+          "markdownDescription": "Enables the clear_session_space command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the clear_session_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-clear-session-space",
+          "markdownDescription": "Denies the clear_session_space command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the complete_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-complete-project-knowledge-job",
+          "markdownDescription": "Enables the complete_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the complete_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-complete-project-knowledge-job",
+          "markdownDescription": "Denies the complete_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the create_ask_thread command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-ask-thread",
+          "markdownDescription": "Enables the create_ask_thread command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_ask_thread command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-ask-thread",
+          "markdownDescription": "Denies the create_ask_thread command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the create_chat_group command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-chat-group",
+          "markdownDescription": "Enables the create_chat_group command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_chat_group command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-chat-group",
+          "markdownDescription": "Denies the create_chat_group command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the create_onboarding_demo_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-onboarding-demo-session",
+          "markdownDescription": "Enables the create_onboarding_demo_session command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_onboarding_demo_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-onboarding-demo-session",
+          "markdownDescription": "Denies the create_onboarding_demo_session command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the create_onboarding_note command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-onboarding-note",
+          "markdownDescription": "Enables the create_onboarding_note command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_onboarding_note command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-onboarding-note",
+          "markdownDescription": "Denies the create_onboarding_note command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the create_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-space",
+          "markdownDescription": "Enables the create_space command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-space",
+          "markdownDescription": "Denies the create_space command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_chat_messages command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-chat-messages",
+          "markdownDescription": "Enables the delete_chat_messages command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_chat_messages command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-chat-messages",
+          "markdownDescription": "Denies the delete_chat_messages command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_human command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-human",
+          "markdownDescription": "Enables the delete_human command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_human command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-human",
+          "markdownDescription": "Denies the delete_human command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_organization command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-organization",
+          "markdownDescription": "Enables the delete_organization command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_organization command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-organization",
+          "markdownDescription": "Denies the delete_organization command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_project_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-project-file",
+          "markdownDescription": "Enables the delete_project_file command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_project_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-project-file",
+          "markdownDescription": "Denies the delete_project_file command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-session",
+          "markdownDescription": "Enables the delete_session command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-session",
+          "markdownDescription": "Denies the delete_session command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-space",
+          "markdownDescription": "Enables the delete_space command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-space",
+          "markdownDescription": "Denies the delete_space command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_tag command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-tag",
+          "markdownDescription": "Enables the delete_tag command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_tag command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-tag",
+          "markdownDescription": "Denies the delete_tag command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the delete_template command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete-template",
+          "markdownDescription": "Enables the delete_template command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete_template command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete-template",
+          "markdownDescription": "Denies the delete_template command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the enqueue_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-enqueue-project-knowledge-job",
+          "markdownDescription": "Enables the enqueue_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the enqueue_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-enqueue-project-knowledge-job",
+          "markdownDescription": "Denies the enqueue_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the fail_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-fail-project-knowledge-job",
+          "markdownDescription": "Enables the fail_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the fail_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-fail-project-knowledge-job",
+          "markdownDescription": "Denies the fail_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_ask_thread command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-ask-thread",
+          "markdownDescription": "Enables the get_ask_thread command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_ask_thread command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-ask-thread",
+          "markdownDescription": "Denies the get_ask_thread command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_calendar command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-calendar",
+          "markdownDescription": "Enables the get_calendar command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_calendar command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-calendar",
+          "markdownDescription": "Denies the get_calendar command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_config command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-config",
+          "markdownDescription": "Enables the get_config command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_config command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-config",
+          "markdownDescription": "Denies the get_config command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_event command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-event",
+          "markdownDescription": "Enables the get_event command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_event command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-event",
+          "markdownDescription": "Denies the get_event command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_favorite_templates command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-favorite-templates",
+          "markdownDescription": "Enables the get_favorite_templates command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_favorite_templates command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-favorite-templates",
+          "markdownDescription": "Denies the get_favorite_templates command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_human command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-human",
+          "markdownDescription": "Enables the get_human command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_human command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-human",
+          "markdownDescription": "Denies the get_human command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_latest_project_brief command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-latest-project-brief",
+          "markdownDescription": "Enables the get_latest_project_brief command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_latest_project_brief command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-latest-project-brief",
+          "markdownDescription": "Denies the get_latest_project_brief command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_organization command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-organization",
+          "markdownDescription": "Enables the get_organization command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_organization command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-organization",
+          "markdownDescription": "Denies the get_organization command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_organization_by_user_id command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-organization-by-user-id",
+          "markdownDescription": "Enables the get_organization_by_user_id command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_organization_by_user_id command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-organization-by-user-id",
+          "markdownDescription": "Denies the get_organization_by_user_id command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_project_knowledge_synthesis command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-project-knowledge-synthesis",
+          "markdownDescription": "Enables the get_project_knowledge_synthesis command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_project_knowledge_synthesis command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-project-knowledge-synthesis",
+          "markdownDescription": "Denies the get_project_knowledge_synthesis command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-session",
+          "markdownDescription": "Enables the get_session command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-session",
+          "markdownDescription": "Denies the get_session command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-space",
+          "markdownDescription": "Enables the get_space command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-space",
+          "markdownDescription": "Denies the get_space command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_words command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-words",
+          "markdownDescription": "Enables the get_words command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_words command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-words",
+          "markdownDescription": "Denies the get_words command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_words_onboarding command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-words-onboarding",
+          "markdownDescription": "Enables the get_words_onboarding command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_words_onboarding command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-words-onboarding",
+          "markdownDescription": "Denies the get_words_onboarding command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the initialize_user_onboarding command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-initialize-user-onboarding",
+          "markdownDescription": "Enables the initialize_user_onboarding command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the initialize_user_onboarding command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-initialize-user-onboarding",
+          "markdownDescription": "Denies the initialize_user_onboarding command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the is_template_favorited command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-is-template-favorited",
+          "markdownDescription": "Enables the is_template_favorited command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the is_template_favorited command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-is-template-favorited",
+          "markdownDescription": "Denies the is_template_favorited command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_all_tags command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-all-tags",
+          "markdownDescription": "Enables the list_all_tags command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_all_tags command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-all-tags",
+          "markdownDescription": "Denies the list_all_tags command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_ask_context_snapshots command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-ask-context-snapshots",
+          "markdownDescription": "Enables the list_ask_context_snapshots command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_ask_context_snapshots command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-ask-context-snapshots",
+          "markdownDescription": "Denies the list_ask_context_snapshots command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_ask_messages command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-ask-messages",
+          "markdownDescription": "Enables the list_ask_messages command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_ask_messages command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-ask-messages",
+          "markdownDescription": "Denies the list_ask_messages command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_ask_threads command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-ask-threads",
+          "markdownDescription": "Enables the list_ask_threads command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_ask_threads command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-ask-threads",
+          "markdownDescription": "Denies the list_ask_threads command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_calendars command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-calendars",
+          "markdownDescription": "Enables the list_calendars command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_calendars command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-calendars",
+          "markdownDescription": "Denies the list_calendars command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_chat_groups command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-chat-groups",
+          "markdownDescription": "Enables the list_chat_groups command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_chat_groups command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-chat-groups",
+          "markdownDescription": "Denies the list_chat_groups command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_chat_messages command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-chat-messages",
+          "markdownDescription": "Enables the list_chat_messages command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_chat_messages command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-chat-messages",
+          "markdownDescription": "Denies the list_chat_messages command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_events command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-events",
+          "markdownDescription": "Enables the list_events command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_events command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-events",
+          "markdownDescription": "Denies the list_events command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_humans command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-humans",
+          "markdownDescription": "Enables the list_humans command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_humans command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-humans",
+          "markdownDescription": "Denies the list_humans command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_included_sessions_by_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-included-sessions-by-space",
+          "markdownDescription": "Enables the list_included_sessions_by_space command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_included_sessions_by_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-included-sessions-by-space",
+          "markdownDescription": "Denies the list_included_sessions_by_space command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_organization_members command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-organization-members",
+          "markdownDescription": "Enables the list_organization_members command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_organization_members command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-organization-members",
+          "markdownDescription": "Denies the list_organization_members command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_organizations command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-organizations",
+          "markdownDescription": "Enables the list_organizations command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_organizations command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-organizations",
+          "markdownDescription": "Denies the list_organizations command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_project_brief_sources command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-project-brief-sources",
+          "markdownDescription": "Enables the list_project_brief_sources command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_project_brief_sources command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-project-brief-sources",
+          "markdownDescription": "Denies the list_project_brief_sources command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_project_file_extractions command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-project-file-extractions",
+          "markdownDescription": "Enables the list_project_file_extractions command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_project_file_extractions command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-project-file-extractions",
+          "markdownDescription": "Denies the list_project_file_extractions command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_project_files command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-project-files",
+          "markdownDescription": "Enables the list_project_files command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_project_files command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-project-files",
+          "markdownDescription": "Denies the list_project_files command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_project_knowledge_jobs command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-project-knowledge-jobs",
+          "markdownDescription": "Enables the list_project_knowledge_jobs command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_project_knowledge_jobs command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-project-knowledge-jobs",
+          "markdownDescription": "Denies the list_project_knowledge_jobs command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_project_source_chunks command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-project-source-chunks",
+          "markdownDescription": "Enables the list_project_source_chunks command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_project_source_chunks command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-project-source-chunks",
+          "markdownDescription": "Denies the list_project_source_chunks command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_project_source_digests command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-project-source-digests",
+          "markdownDescription": "Enables the list_project_source_digests command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_project_source_digests command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-project-source-digests",
+          "markdownDescription": "Denies the list_project_source_digests command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_project_sources command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-project-sources",
+          "markdownDescription": "Enables the list_project_sources command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_project_sources command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-project-sources",
+          "markdownDescription": "Denies the list_project_sources command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_projects_by_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-projects-by-session",
+          "markdownDescription": "Enables the list_projects_by_session command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_projects_by_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-projects-by-session",
+          "markdownDescription": "Denies the list_projects_by_session command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_session_tags command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-session-tags",
+          "markdownDescription": "Enables the list_session_tags command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_session_tags command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-session-tags",
+          "markdownDescription": "Denies the list_session_tags command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_sessions command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-sessions",
+          "markdownDescription": "Enables the list_sessions command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_sessions command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-sessions",
+          "markdownDescription": "Denies the list_sessions command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_sessions_by_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-sessions-by-space",
+          "markdownDescription": "Enables the list_sessions_by_space command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_sessions_by_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-sessions-by-space",
+          "markdownDescription": "Denies the list_sessions_by_space command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_spaces command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-spaces",
+          "markdownDescription": "Enables the list_spaces command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_spaces command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-spaces",
+          "markdownDescription": "Denies the list_spaces command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the list_templates command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-templates",
+          "markdownDescription": "Enables the list_templates command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_templates command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-templates",
+          "markdownDescription": "Denies the list_templates command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the load_demo_transcript command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-load-demo-transcript",
+          "markdownDescription": "Enables the load_demo_transcript command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the load_demo_transcript command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-load-demo-transcript",
+          "markdownDescription": "Denies the load_demo_transcript command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the onboarding_session_id command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-onboarding-session-id",
+          "markdownDescription": "Enables the onboarding_session_id command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the onboarding_session_id command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-onboarding-session-id",
+          "markdownDescription": "Denies the onboarding_session_id command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the reclaim_stale_project_knowledge_jobs command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-reclaim-stale-project-knowledge-jobs",
+          "markdownDescription": "Enables the reclaim_stale_project_knowledge_jobs command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the reclaim_stale_project_knowledge_jobs command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-reclaim-stale-project-knowledge-jobs",
+          "markdownDescription": "Denies the reclaim_stale_project_knowledge_jobs command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the release_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-release-project-knowledge-job",
+          "markdownDescription": "Enables the release_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the release_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-release-project-knowledge-job",
+          "markdownDescription": "Denies the release_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the remove_project_source command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-remove-project-source",
+          "markdownDescription": "Enables the remove_project_source command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the remove_project_source command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-remove-project-source",
+          "markdownDescription": "Denies the remove_project_source command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the replace_project_brief_sources command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-replace-project-brief-sources",
+          "markdownDescription": "Enables the replace_project_brief_sources command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the replace_project_brief_sources command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-replace-project-brief-sources",
+          "markdownDescription": "Denies the replace_project_brief_sources command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the replace_project_source_chunks command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-replace-project-source-chunks",
+          "markdownDescription": "Enables the replace_project_source_chunks command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the replace_project_source_chunks command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-replace-project-source-chunks",
+          "markdownDescription": "Denies the replace_project_source_chunks command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the retry_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-retry-project-knowledge-job",
+          "markdownDescription": "Enables the retry_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the retry_project_knowledge_job command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-retry-project-knowledge-job",
+          "markdownDescription": "Denies the retry_project_knowledge_job command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the session_add_participant command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-session-add-participant",
+          "markdownDescription": "Enables the session_add_participant command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the session_add_participant command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-session-add-participant",
+          "markdownDescription": "Denies the session_add_participant command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the session_get_event command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-session-get-event",
+          "markdownDescription": "Enables the session_get_event command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the session_get_event command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-session-get-event",
+          "markdownDescription": "Denies the session_get_event command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the session_list_participants command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-session-list-participants",
+          "markdownDescription": "Enables the session_list_participants command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the session_list_participants command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-session-list-participants",
+          "markdownDescription": "Denies the session_list_participants command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the session_remove_participant command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-session-remove-participant",
+          "markdownDescription": "Enables the session_remove_participant command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the session_remove_participant command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-session-remove-participant",
+          "markdownDescription": "Denies the session_remove_participant command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the set_config command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-config",
+          "markdownDescription": "Enables the set_config command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_config command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-config",
+          "markdownDescription": "Denies the set_config command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the set_project_source_status command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-project-source-status",
+          "markdownDescription": "Enables the set_project_source_status command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_project_source_status command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-project-source-status",
+          "markdownDescription": "Denies the set_project_source_status command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the set_session_event command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-session-event",
+          "markdownDescription": "Enables the set_session_event command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_session_event command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-session-event",
+          "markdownDescription": "Denies the set_session_event command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the simulate_live_transcription command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-simulate-live-transcription",
+          "markdownDescription": "Enables the simulate_live_transcription command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the simulate_live_transcription command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-simulate-live-transcription",
+          "markdownDescription": "Denies the simulate_live_transcription command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the thank_you_session_id command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-thank-you-session-id",
+          "markdownDescription": "Enables the thank_you_session_id command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the thank_you_session_id command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-thank-you-session-id",
+          "markdownDescription": "Denies the thank_you_session_id command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the toggle_calendar_selected command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-toggle-calendar-selected",
+          "markdownDescription": "Enables the toggle_calendar_selected command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the toggle_calendar_selected command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-toggle-calendar-selected",
+          "markdownDescription": "Denies the toggle_calendar_selected command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the toggle_template_favorite command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-toggle-template-favorite",
+          "markdownDescription": "Enables the toggle_template_favorite command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the toggle_template_favorite command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-toggle-template-favorite",
+          "markdownDescription": "Denies the toggle_template_favorite command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the unassign_tag_from_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-unassign-tag-from-session",
+          "markdownDescription": "Enables the unassign_tag_from_session command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the unassign_tag_from_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-unassign-tag-from-session",
+          "markdownDescription": "Denies the unassign_tag_from_session command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the update_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-update-space",
+          "markdownDescription": "Enables the update_space command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the update_space command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-update-space",
+          "markdownDescription": "Denies the update_space command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_ask_context_snapshot command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-ask-context-snapshot",
+          "markdownDescription": "Enables the upsert_ask_context_snapshot command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_ask_context_snapshot command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-ask-context-snapshot",
+          "markdownDescription": "Denies the upsert_ask_context_snapshot command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_ask_message command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-ask-message",
+          "markdownDescription": "Enables the upsert_ask_message command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_ask_message command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-ask-message",
+          "markdownDescription": "Denies the upsert_ask_message command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_calendar command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-calendar",
+          "markdownDescription": "Enables the upsert_calendar command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_calendar command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-calendar",
+          "markdownDescription": "Denies the upsert_calendar command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_chat_message command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-chat-message",
+          "markdownDescription": "Enables the upsert_chat_message command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_chat_message command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-chat-message",
+          "markdownDescription": "Denies the upsert_chat_message command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_human command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-human",
+          "markdownDescription": "Enables the upsert_human command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_human command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-human",
+          "markdownDescription": "Denies the upsert_human command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_organization command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-organization",
+          "markdownDescription": "Enables the upsert_organization command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_organization command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-organization",
+          "markdownDescription": "Denies the upsert_organization command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_project_brief command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-project-brief",
+          "markdownDescription": "Enables the upsert_project_brief command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_project_brief command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-project-brief",
+          "markdownDescription": "Denies the upsert_project_brief command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_project_brief_refresh command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-project-brief-refresh",
+          "markdownDescription": "Enables the upsert_project_brief_refresh command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_project_brief_refresh command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-project-brief-refresh",
+          "markdownDescription": "Denies the upsert_project_brief_refresh command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_project_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-project-file",
+          "markdownDescription": "Enables the upsert_project_file command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_project_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-project-file",
+          "markdownDescription": "Denies the upsert_project_file command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_project_file_extraction command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-project-file-extraction",
+          "markdownDescription": "Enables the upsert_project_file_extraction command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_project_file_extraction command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-project-file-extraction",
+          "markdownDescription": "Denies the upsert_project_file_extraction command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_project_knowledge_synthesis command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-project-knowledge-synthesis",
+          "markdownDescription": "Enables the upsert_project_knowledge_synthesis command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_project_knowledge_synthesis command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-project-knowledge-synthesis",
+          "markdownDescription": "Denies the upsert_project_knowledge_synthesis command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_project_source_digest command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-project-source-digest",
+          "markdownDescription": "Enables the upsert_project_source_digest command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_project_source_digest command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-project-source-digest",
+          "markdownDescription": "Denies the upsert_project_source_digest command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-session",
+          "markdownDescription": "Enables the upsert_session command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-session",
+          "markdownDescription": "Denies the upsert_session command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_tag command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-tag",
+          "markdownDescription": "Enables the upsert_tag command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_tag command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-tag",
+          "markdownDescription": "Denies the upsert_tag command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the upsert_template command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-upsert-template",
+          "markdownDescription": "Enables the upsert_template command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the upsert_template command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-upsert-template",
+          "markdownDescription": "Denies the upsert_template command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the visit_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-visit-session",
+          "markdownDescription": "Enables the visit_session command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the visit_session command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-visit-session",
+          "markdownDescription": "Denies the visit_session command without any pre-configured scope."
+        },
+        {
+          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-onboarding-session-id`\n- `allow-thank-you-session-id`\n- `allow-upsert-session`\n- `allow-list-sessions`\n- `allow-get-session`\n- `allow-visit-session`\n- `allow-delete-session`\n- `allow-set-session-event`\n- `allow-session-add-participant`\n- `allow-session-remove-participant`\n- `allow-session-list-participants`\n- `allow-session-get-event`\n- `allow-get-words`\n- `allow-get-words-onboarding`\n- `allow-get-calendar`\n- `allow-list-calendars`\n- `allow-upsert-calendar`\n- `allow-toggle-calendar-selected`\n- `allow-list-templates`\n- `allow-upsert-template`\n- `allow-delete-template`\n- `allow-get-favorite-templates`\n- `allow-toggle-template-favorite`\n- `allow-is-template-favorited`\n- `allow-get-event`\n- `allow-list-events`\n- `allow-get-config`\n- `allow-set-config`\n- `allow-get-human`\n- `allow-delete-human`\n- `allow-upsert-human`\n- `allow-list-humans`\n- `allow-get-organization`\n- `allow-get-organization-by-user-id`\n- `allow-list-organizations`\n- `allow-list-organization-members`\n- `allow-upsert-organization`\n- `allow-delete-organization`\n- `allow-list-chat-groups`\n- `allow-list-chat-messages`\n- `allow-create-chat-group`\n- `allow-upsert-chat-message`\n- `allow-delete-chat-messages`\n- `allow-create-ask-thread`\n- `allow-get-ask-thread`\n- `allow-list-ask-threads`\n- `allow-archive-ask-thread`\n- `allow-upsert-ask-message`\n- `allow-list-ask-messages`\n- `allow-upsert-ask-context-snapshot`\n- `allow-list-ask-context-snapshots`\n- `allow-upsert-project-file`\n- `allow-list-project-files`\n- `allow-delete-project-file`\n- `allow-upsert-project-file-extraction`\n- `allow-list-project-file-extractions`\n- `allow-enqueue-project-knowledge-job`\n- `allow-list-project-knowledge-jobs`\n- `allow-claim-next-project-knowledge-job`\n- `allow-complete-project-knowledge-job`\n- `allow-retry-project-knowledge-job`\n- `allow-release-project-knowledge-job`\n- `allow-fail-project-knowledge-job`\n- `allow-reclaim-stale-project-knowledge-jobs`\n- `allow-upsert-project-knowledge-synthesis`\n- `allow-get-project-knowledge-synthesis`\n- `allow-list-project-sources`\n- `allow-set-project-source-status`\n- `allow-add-project-source`\n- `allow-remove-project-source`\n- `allow-replace-project-source-chunks`\n- `allow-list-project-source-chunks`\n- `allow-upsert-project-source-digest`\n- `allow-list-project-source-digests`\n- `allow-list-included-sessions-by-space`\n- `allow-list-projects-by-session`\n- `allow-upsert-project-brief`\n- `allow-get-latest-project-brief`\n- `allow-replace-project-brief-sources`\n- `allow-list-project-brief-sources`\n- `allow-upsert-project-brief-refresh`\n- `allow-list-spaces`\n- `allow-get-space`\n- `allow-create-space`\n- `allow-update-space`\n- `allow-delete-space`\n- `allow-assign-session-to-space`\n- `allow-clear-session-space`\n- `allow-list-sessions-by-space`\n- `allow-upsert-tag`\n- `allow-delete-tag`\n- `allow-list-all-tags`\n- `allow-list-session-tags`\n- `allow-assign-tag-to-session`\n- `allow-unassign-tag-from-session`",
+          "type": "string",
+          "const": "default",
+          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-onboarding-session-id`\n- `allow-thank-you-session-id`\n- `allow-upsert-session`\n- `allow-list-sessions`\n- `allow-get-session`\n- `allow-visit-session`\n- `allow-delete-session`\n- `allow-set-session-event`\n- `allow-session-add-participant`\n- `allow-session-remove-participant`\n- `allow-session-list-participants`\n- `allow-session-get-event`\n- `allow-get-words`\n- `allow-get-words-onboarding`\n- `allow-get-calendar`\n- `allow-list-calendars`\n- `allow-upsert-calendar`\n- `allow-toggle-calendar-selected`\n- `allow-list-templates`\n- `allow-upsert-template`\n- `allow-delete-template`\n- `allow-get-favorite-templates`\n- `allow-toggle-template-favorite`\n- `allow-is-template-favorited`\n- `allow-get-event`\n- `allow-list-events`\n- `allow-get-config`\n- `allow-set-config`\n- `allow-get-human`\n- `allow-delete-human`\n- `allow-upsert-human`\n- `allow-list-humans`\n- `allow-get-organization`\n- `allow-get-organization-by-user-id`\n- `allow-list-organizations`\n- `allow-list-organization-members`\n- `allow-upsert-organization`\n- `allow-delete-organization`\n- `allow-list-chat-groups`\n- `allow-list-chat-messages`\n- `allow-create-chat-group`\n- `allow-upsert-chat-message`\n- `allow-delete-chat-messages`\n- `allow-create-ask-thread`\n- `allow-get-ask-thread`\n- `allow-list-ask-threads`\n- `allow-archive-ask-thread`\n- `allow-upsert-ask-message`\n- `allow-list-ask-messages`\n- `allow-upsert-ask-context-snapshot`\n- `allow-list-ask-context-snapshots`\n- `allow-upsert-project-file`\n- `allow-list-project-files`\n- `allow-delete-project-file`\n- `allow-upsert-project-file-extraction`\n- `allow-list-project-file-extractions`\n- `allow-enqueue-project-knowledge-job`\n- `allow-list-project-knowledge-jobs`\n- `allow-claim-next-project-knowledge-job`\n- `allow-complete-project-knowledge-job`\n- `allow-retry-project-knowledge-job`\n- `allow-release-project-knowledge-job`\n- `allow-fail-project-knowledge-job`\n- `allow-reclaim-stale-project-knowledge-jobs`\n- `allow-upsert-project-knowledge-synthesis`\n- `allow-get-project-knowledge-synthesis`\n- `allow-list-project-sources`\n- `allow-set-project-source-status`\n- `allow-add-project-source`\n- `allow-remove-project-source`\n- `allow-replace-project-source-chunks`\n- `allow-list-project-source-chunks`\n- `allow-upsert-project-source-digest`\n- `allow-list-project-source-digests`\n- `allow-list-included-sessions-by-space`\n- `allow-list-projects-by-session`\n- `allow-upsert-project-brief`\n- `allow-get-latest-project-brief`\n- `allow-replace-project-brief-sources`\n- `allow-list-project-brief-sources`\n- `allow-upsert-project-brief-refresh`\n- `allow-list-spaces`\n- `allow-get-space`\n- `allow-create-space`\n- `allow-update-space`\n- `allow-delete-space`\n- `allow-assign-session-to-space`\n- `allow-clear-session-space`\n- `allow-list-sessions-by-space`\n- `allow-upsert-tag`\n- `allow-delete-tag`\n- `allow-list-all-tags`\n- `allow-list-session-tags`\n- `allow-assign-tag-to-session`\n- `allow-unassign-tag-from-session`"
+        }
+      ]
+    }
+  }
+}

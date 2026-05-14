@@ -1,0 +1,46 @@
+<participants>
+{% for participant in participants %}
+- {{ participant.full_name }}
+{% endfor %}
+</participants>
+
+<raw_note>
+{{ editor }}
+</raw_note>
+
+<transcript>
+{{ words | timeline }}
+</transcript>
+
+{% if type == "TyprLocal" %}
+Create a strategic summary that flows naturally and explains what happened in the meeting
+
+Follow the format and guidelines from your system instructions.
+
+IMPORTANT: Output only markdown. Do NOT include any XML tags like <raw_note>, <transcript>, or <participants> in your output.
+
+Note: If raw_note contains relevant information, integrate it. Do not create sections for topics marked as "not mentioned".
+{% elif type == "OpenAI" or type == "Groq" %}
+Analyze this meeting transcript and create a strategic summary that flows naturally:
+
+1. Group related discussions under meaningful business themes
+2. For each theme, write bullets that naturally explain what happened and why it matters
+3. Include the business context, decisions made, and what happens next
+4. Write in conversational flow avoiding rigid labels
+5. Use direct, action-oriented language, active voice
+6. Make it feel like you're explaining to a colleague who missed the meeting
+7. Keep the output proportional to complexity: short meetings should be brief; standard meetings usually need 3-6 sections; long or dense meetings may use up to 8 sections only when needed
+8. Prefer fewer, denser bullets over many thin bullets, and omit low-signal discussion, repetition, greetings, and small talk
+
+GOAL: Someone who didn't attend should understand the full picture and know exactly what they need to do.
+
+IMPORTANT: Output only markdown. Do NOT include any XML tags like <raw_note>, <transcript>, or <participants> in your output.
+
+Note: If raw_note says something was "not mentioned", do not create sections for those topics.
+{% else %}
+Create a concise but decision-complete summary combining the transcript and raw notes above. Follow your system instructions for format, proportional length, and style.
+
+IMPORTANT: Output only markdown. Do NOT include any XML tags like <raw_note>, <transcript>, or <participants> in your output.
+
+Note: If raw_note says something was "not mentioned", do not create sections for those topics.
+{% endif %}

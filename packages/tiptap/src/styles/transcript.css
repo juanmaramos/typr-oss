@@ -1,0 +1,60 @@
+.search-result {
+  background-color: hsl(var(--warning) / 0.4);
+  border-radius: 2px;
+  padding: 1px 0;
+}
+
+.search-result-current {
+  background-color: hsl(var(--success) / 0.5) !important;
+  border-radius: 2px;
+  padding: 1px 0;
+}
+
+.transcript-speaker {
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+
+.transcript-speaker + .transcript-speaker {
+  margin-top: 28px;
+}
+
+.transcript-speaker-label {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.transcript-speaker-content {
+  display: inline;
+  font-size: 14px;
+  line-height: 1.5rem;
+  white-space: normal;
+}
+
+.tiptap-transcript {
+  font-size: 14px;
+  line-height: 1.5rem;
+  white-space: normal;
+  word-wrap: break-word;
+  color: hsl(var(--foreground) / 0.9);
+  text-align: left;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.tiptap-transcript * {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.ProseMirror {
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.ProseMirror-selectednode {
+  outline: 2px solid hsl(var(--primary));
+}

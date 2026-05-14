@@ -1,0 +1,79 @@
+.tiptap-normal {
+  /* task list */
+  ul[data-type="taskList"] {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+
+    &.is-empty::before {
+      margin-left: 24px;
+    }
+
+    li {
+      align-items: flex-start;
+      display: flex;
+      margin-bottom: 0.25rem;
+
+      > label {
+        flex: 0 0 auto;
+        margin-right: 6px;
+        user-select: none;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      > div {
+        flex: 1 1 auto;
+        margin-top: 0;
+      }
+    }
+
+    input[type="checkbox"] {
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid hsl(var(--foreground));
+      margin: 0;
+      transition: all 0.2s ease;
+      position: relative;
+      margin-top: 3px;
+
+      &:checked {
+        background-color: hsl(var(--primary));
+        border-color: hsl(var(--primary));
+      }
+
+      &:checked::after {
+        content: "";
+        position: absolute;
+        left: 4.5px;
+        top: 1px;
+        width: 5px;
+        height: 10px;
+        border: solid hsl(var(--primary-foreground));
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px hsl(var(--primary) / 0.3);
+      }
+
+      &:hover:not(:checked) {
+        border-color: hsl(var(--muted-foreground));
+      }
+    }
+
+    ul[data-type="taskList"] {
+      margin: 0;
+
+      li {
+        margin-top: 0.25rem;
+      }
+    }
+  }
+}

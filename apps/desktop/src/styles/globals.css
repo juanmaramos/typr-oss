@@ -1,0 +1,323 @@
+/* All @import statements must come first */
+@import "remixicon/fonts/remixicon.css";
+@import "@typr/fonts/css"; /* Import fonts before UI package */
+@import "@typr/ui/globals.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animation keyframes for loaders */
+@keyframes typing {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-2px);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce-dots {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.6);
+  }
+}
+
+@keyframes wave-bars {
+  0%, 100% {
+    transform: scaleY(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scaleY(1.5);
+    opacity: 1;
+  }
+}
+
+/* Apple/Linear-style spring slide-in animation */
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px);
+    max-width: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+    max-width: 100px;
+  }
+}
+
+.ai-edit-aura {
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 115% 100% at 50% 50%,
+    hsl(var(--sidebar-primary) / 0.35) 0%,
+    hsl(var(--info) / 0.26) 45%,
+    hsl(var(--sidebar-primary) / 0.18) 75%,
+    transparent 100%
+  );
+  filter: blur(10px);
+  opacity: 0.65;
+  transition: opacity 300ms ease;
+}
+
+.chat-control-label-enter {
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes loading-dots {
+  0%, 60%, 100% {
+    opacity: 0.3;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Wave animation utility class */
+.animate-wave-bars {
+  animation: wave-bars 1.2s ease-in-out infinite;
+}
+
+.ri-openrouter-fill {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: none;
+  background-color: currentColor;
+  line-height: 1;
+  vertical-align: -0.125em;
+  -webkit-mask-image: url("/icons/openrouter.svg");
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-image: url("/icons/openrouter.svg");
+  mask-mode: alpha;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.ri-openrouter-fill::before {
+  content: "";
+}
+
+/* https://www.joshwcomeau.com/css/custom-css-reset/ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+p {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+#root,
+#__next {
+  isolation: isolate;
+}
+
+/* https://github.com/gitbutlerapp/gitbutler/blob/master/apps/desktop/src/styles/styles.css */
+
+html,
+body {
+  height: 100vh;
+  width: 100vw;
+  overflow-y: hidden;
+
+  user-select: none;
+  overscroll-behavior: none;
+}
+
+:where(:not(.scrollbar-native))::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+:where(:not(.scrollbar-native))::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+:where(:not(.scrollbar-native))::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+
+:where(:not(.scrollbar-native))::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.3);
+}
+
+/* Utility classes are handled by @typr/ui package */
+
+@layer base {
+  :root {
+    /* Variables now imported from @typr/fonts package */
+  }
+
+  * {
+    @apply select-none;
+  }
+
+  input, textarea, [contenteditable="true"] {
+    @apply select-text;
+  }
+
+  /* Ensure chat messages and other text content can be selected */
+  .select-text, .user-select-text {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+  }
+
+  /* Ensure all child elements of selectable containers are also selectable */
+  .select-text *, .user-select-text * {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+  }
+
+  /* Ensure fonts are applied properly following Tauri pattern */
+  body {
+    font-family: var(--font-sans);
+  }
+
+  /* 
+    Local overrides should be kept to a minimum to ensure consistency.
+    See packages/ui/src/styles/globals.css for the source of truth.
+  */
+}
+
+/* Animations */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle 1s ease-in-out infinite;
+}
+
+/* Text shimmer animation for loader-like effects */
+@keyframes shimmer-text {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes about-sun-glint {
+  0% {
+    opacity: 0.8;
+    transform: rotate(0deg) scale(1);
+  }
+  35% {
+    opacity: 1;
+    transform: rotate(10deg) scale(1.12);
+  }
+  100% {
+    opacity: 0.8;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Font variables and base styles are handled by @typr/ui package */
