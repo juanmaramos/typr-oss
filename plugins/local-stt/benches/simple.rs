@@ -29,7 +29,7 @@ fn bench_english_1() -> CustomBenchmarkResult {
 
     rt.block_on(async {
         let server_state = tauri_plugin_local_stt::ServerStateBuilder::default()
-            .model_cache_dir(dirs::data_dir().unwrap().join("com.typr.dev/stt"))
+            .model_cache_dir(dirs::data_dir().unwrap().join("com.typr.oss.dev/stt"))
             .model_type(tauri_plugin_local_stt::SupportedModel::QuantizedTinyEn)
             .build();
 

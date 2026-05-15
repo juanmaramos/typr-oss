@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
+use std::path::PathBuf;
 use typr_db_core::DatabaseBuilder;
 use typr_db_user::{Session, UserDatabase};
-use std::path::PathBuf;
 
 const SESSION_SELECT_COLUMNS: &str = "SELECT DISTINCT s.id, s.created_at, s.visited_at, s.user_id, s.calendar_event_id, s.title, s.raw_memo_html, s.enhanced_memo_html, s.conversations, s.words, s.record_start, s.record_end, s.pre_meeting_memo_html, s.source_type, s.source_metadata, s.space_id, s.auto_enhanced_memo_html, s.needs_enhance FROM sessions s";
 
@@ -19,7 +19,7 @@ pub struct SessionSearchFilters {
 ///
 /// Looks for database in this order:
 /// 1. TYPR_DB_PATH environment variable
-/// 2. Platform-specific data directory (~/Library/Application Support/com.typr.stable/db.sqlite on macOS)
+/// 2. Platform-specific data directory (~/Library/Application Support/com.typr.oss/db.sqlite on macOS)
 pub async fn open_local_db() -> Result<UserDatabase> {
     let db_path = get_db_path()?;
 
@@ -44,15 +44,15 @@ fn get_db_path() -> Result<PathBuf> {
     let data_dir = if cfg!(target_os = "macos") {
         dirs::home_dir()
             .context("Could not find home directory")?
-            .join("Library/Application Support/com.typr.stable")
+            .join("Library/Application Support/com.typr.oss")
     } else if cfg!(target_os = "windows") {
         dirs::data_local_dir()
             .context("Could not find AppData directory")?
-            .join("com.typr.stable")
+            .join("com.typr.oss")
     } else {
         dirs::data_local_dir()
             .context("Could not find data directory")?
-            .join("com.typr.stable")
+            .join("com.typr.oss")
     };
 
     Ok(data_dir.join("db.sqlite"))

@@ -1,9 +1,9 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "version": "0.1.11",
-  "productName": "Typr Dev",
-  "mainBinaryName": "Typr Dev",
-  "identifier": "com.typr.dev",
+  "version": "0.1.12",
+  "productName": "Typr OSS Dev",
+  "mainBinaryName": "Typr OSS Dev",
+  "identifier": "com.typr.oss.dev",
   "build": {
     "beforeDevCommand": "pnpm -F desktop dev",
     "devUrl": "http://localhost:1420",
@@ -69,7 +69,7 @@
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": ["typr"]
+        "schemes": ["typross-dev"]
       }
     },
     "updater": {

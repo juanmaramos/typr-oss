@@ -137,7 +137,7 @@ mod test {
 
     fn create_app<R: tauri::Runtime>(builder: tauri::Builder<R>) -> tauri::App<R> {
         let mut ctx = tauri::test::mock_context(tauri::test::noop_assets());
-        ctx.config_mut().identifier = "com.typr.dev".to_string();
+        ctx.config_mut().identifier = "com.typr.oss.dev".to_string();
 
         builder
             .plugin(tauri_plugin_store::Builder::default().build())

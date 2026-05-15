@@ -383,7 +383,7 @@ mod tests {
     fn get_model() -> Llama {
         let model_path = dirs::data_dir()
             .unwrap()
-            .join("com.typr.dev")
+            .join("com.typr.oss.dev")
             .join("ttt/typr-llm.gguf");
 
         Llama::new(model_path).unwrap()

@@ -178,7 +178,7 @@ pub async fn main() {
 
                 let app_clone = app.clone();
 
-                // typr://typr.com + <path>
+                // <configured-scheme>://typr.com + <path>
                 app.deep_link().on_open_url(move |event| {
                     let url = if let Some(url) = event.urls().first() {
                         url.to_string()

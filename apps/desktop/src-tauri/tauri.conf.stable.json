@@ -1,9 +1,14 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Typr",
-  "mainBinaryName": "Typr",
-  "identifier": "com.typr.stable",
+  "productName": "Typr OSS",
+  "mainBinaryName": "Typr OSS",
+  "identifier": "com.typr.oss",
   "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["typross"]
+      }
+    },
     "updater": {
       "active": true,
       "endpoints": [

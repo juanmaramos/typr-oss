@@ -23,4 +23,4 @@ This repository is intended to be a clean public source tree derived from the co
 ## Namespace Cleanup
 
 Package, crate, import, and internal type namespaces have been moved from the historical `hypr` prefix to `typr`.
-OSS bundle identifiers and local data directories use the `com.typr.*` namespace.
+OSS bundle identifiers and local data directories use the `com.typr.oss*` namespace.

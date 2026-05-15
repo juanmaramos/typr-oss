@@ -20,6 +20,22 @@ Run `scripts/prepare_oss_release_secrets.sh --help` to generate local copy/paste
 
 Do not commit certificates, API keys, updater private keys, or notarization credentials.
 
+## Local Smoke Build
+
+Before publishing, build the stable OSS app identity locally without updater artifacts:
+
+```bash
+./scripts/build_mcp_sidecar.sh aarch64-apple-darwin
+pnpm -F @typr/desktop tauri build --target aarch64-apple-darwin --config ./src-tauri/tauri.conf.stable.json --config '{"bundle":{"createUpdaterArtifacts":false},"plugins":{"updater":{"active":false}}}' --bundles app --no-sign
+```
+
+Then inspect the generated app metadata:
+
+```bash
+/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' 'apps/desktop/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/Typr OSS.app/Contents/Info.plist'
+/usr/libexec/PlistBuddy -c 'Print :CFBundleURLTypes' 'apps/desktop/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/Typr OSS.app/Contents/Info.plist'
+```
+
 ## Release Steps
 
 1. Confirm `apps/desktop/src-tauri/tauri.conf.json` has the intended version.
@@ -27,16 +43,16 @@ Do not commit certificates, API keys, updater private keys, or notarization cred
 3. Run `gitleaks detect --source . --redact --no-banner` locally, or confirm the `Secret Scan` workflow is green.
 4. Run the `Validate Release Secrets` workflow manually and fix any reported secret or credential issues.
 5. Publish the release with one of these equivalent paths:
-   - Push a tag matching the app version, for example `v0.1.11`.
+   - Push a tag matching the app version, for example `v0.1.12`.
    - Run `OSS Release` manually with `publish=true`.
 6. Let the `OSS Release` workflow publish the GitHub Release assets and `latest.json`.
 7. Download the release asset on a clean macOS machine and verify Gatekeeper opens it without warning.
 8. Update the Homebrew tap after the release assets exist:
 
    ```bash
-   scripts/render_homebrew_cask.sh <version> <aarch64-dmg-sha256> <x64-dmg-sha256> > Casks/typr.rb
+   scripts/render_homebrew_cask.sh <version> <aarch64-dmg-sha256> <x64-dmg-sha256> > Casks/typr-oss.rb
    ```
 
-   Commit that file to `juanmaramos/homebrew-typr`, then run `brew audit --cask --strict typr` and a local install smoke test.
+   Commit that file to `juanmaramos/homebrew-typr`, then run `brew audit --cask --strict typr-oss` and a local install smoke test.
 
 Manual `workflow_dispatch` runs default to a draft prerelease tag named `oss-test-v<version>-<run>` so the signing and notarization path can be tested without changing the public latest release. Set `publish=true` only when you want the run to publish the official `v<version>` release.

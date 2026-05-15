@@ -156,7 +156,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_calculate_file_checksum() {
-        let base = dirs::data_dir().unwrap().join("com.typr.dev");
+        let base = dirs::data_dir().unwrap().join("com.typr.oss.dev");
 
         let files = vec![
             base.join("ggml-tiny.en-q8_0.bin"),
@@ -178,7 +178,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_file_size() {
-        let base = dirs::data_dir().unwrap().join("com.typr.dev");
+        let base = dirs::data_dir().unwrap().join("com.typr.oss.dev");
 
         let files = vec![
             base.join("ggml-tiny.en-q8_0.bin"),

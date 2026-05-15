@@ -5,7 +5,7 @@
 ///
 /// Example:
 ///   cargo run -p llama --example test_inference -- \
-///     ~/Library/Application\ Support/com.typr.dev/models/gemma-4-E4B-it-Q4_K_M.gguf \
+///     ~/Library/Application\ Support/com.typr.oss.dev/models/gemma-4-E4B-it-Q4_K_M.gguf \
 ///     "say hi in 3 words"
 use futures_util::StreamExt;
 use llama::{LlamaChatMessage, LlamaRequest};

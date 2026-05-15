@@ -10,6 +10,7 @@ pub struct Job(DateTime<Utc>);
 pub struct WorkerState {
     pub db: typr_db_user::UserDatabase,
     pub user_id: String,
+    pub deep_link_scheme: String,
 }
 
 impl From<DateTime<Utc>> for Job {
@@ -42,8 +43,8 @@ pub async fn perform_event_notification(_job: Job, ctx: Data<WorkerState>) -> Re
             title: "Meeting starting in 5 minutes".to_string(),
             message: event.name.clone(),
             url: Some(format!(
-                "typr://typr.com/notification?event_id={}",
-                event.id
+                "{}://typr.com/notification?event_id={}",
+                ctx.deep_link_scheme, event.id
             )),
             timeout: Some(std::time::Duration::from_secs(10)),
         });

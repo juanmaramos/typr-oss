@@ -124,7 +124,7 @@ export function UserSetupView({ onContinue, existingData }: UserSetupViewProps) 
             <RadioGroupItem value="en" id={englishId} />
             <div>
               <Label htmlFor={englishId} className="font-normal cursor-pointer">
-                English
+                <Trans>English</Trans>
               </Label>
             </div>
           </div>
@@ -132,7 +132,7 @@ export function UserSetupView({ onContinue, existingData }: UserSetupViewProps) 
             <RadioGroupItem value="es" id={spanishId} />
             <div>
               <Label htmlFor={spanishId} className="font-normal cursor-pointer">
-                Español
+                <Trans>Español</Trans>
               </Label>
             </div>
           </div>

@@ -467,7 +467,7 @@ mod tests {
     async fn test_whisper_with_llama() {
         let llama_path = dirs::data_dir()
             .unwrap()
-            .join("com.typr.dev")
+            .join("com.typr.oss.dev")
             .join("typr-llm.gguf");
 
         let llama = typr_llama::Llama::new(llama_path).unwrap();

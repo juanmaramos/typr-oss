@@ -6,7 +6,7 @@ if [[ "$#" -ne 3 ]]; then
 Usage: scripts/render_homebrew_cask.sh <version> <aarch64-dmg-sha256> <x64-dmg-sha256>
 
 Example:
-  scripts/render_homebrew_cask.sh 0.1.11 <arm_sha256> <intel_sha256> > Casks/typr.rb
+  scripts/render_homebrew_cask.sh 0.1.12 <arm_sha256> <intel_sha256> > Casks/typr-oss.rb
 EOF
   exit 64
 fi
@@ -16,14 +16,14 @@ arm_sha="$2"
 intel_sha="$3"
 
 cat <<EOF
-cask "typr" do
+cask "typr-oss" do
   arch arm: "aarch64", intel: "x64"
 
   version "$version"
   sha256 arm:   "$arm_sha",
          intel: "$intel_sha"
 
-  url "https://github.com/juanmaramos/typr-oss/releases/download/v#{version}/Typr_#{version}_#{arch}.dmg"
+  url "https://github.com/juanmaramos/typr-oss/releases/download/v#{version}/Typr%20OSS_#{version}_#{arch}.dmg"
   name "Typr OSS"
   desc "AI notepad for meetings, notes, and follow-up work"
   homepage "https://github.com/juanmaramos/typr-oss"
@@ -33,14 +33,14 @@ cask "typr" do
     strategy :github_latest
   end
 
-  app "Typr.app"
+  app "Typr OSS.app"
 
   zap trash: [
-    "~/Library/Application Support/com.typr.stable",
-    "~/Library/Caches/com.typr.stable",
-    "~/Library/Logs/com.typr.stable",
-    "~/Library/Preferences/com.typr.stable.plist",
-    "~/Library/Saved Application State/com.typr.stable.savedState",
+    "~/Library/Application Support/com.typr.oss",
+    "~/Library/Caches/com.typr.oss",
+    "~/Library/Logs/com.typr.oss",
+    "~/Library/Preferences/com.typr.oss.plist",
+    "~/Library/Saved Application State/com.typr.oss.savedState",
   ]
 end
 EOF

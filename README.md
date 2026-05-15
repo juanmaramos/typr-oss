@@ -78,7 +78,7 @@ Download signed macOS builds and the Windows installer from [GitHub Releases](ht
 macOS users can also install with Homebrew:
 
 ```bash
-brew install --cask juanmaramos/typr/typr
+brew install --cask juanmaramos/typr/typr-oss
 ```
 
 ## Quick Start

@@ -226,7 +226,7 @@ mod tests {
     fn test_gguf_chat_format() {
         let test_path = dirs::data_dir()
             .unwrap()
-            .join("com.typr.stable")
+            .join("com.typr.oss")
             .join("typr-llm.gguf");
 
         assert!(test_path.exists());

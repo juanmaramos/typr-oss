@@ -102,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_parse_register_query() {
-        let url = "typr://typr.com/register?base_url=http://localhost:3000&api_key=123";
+        let url = "typross://typr.com/register?base_url=http://localhost:3000&api_key=123";
 
         let dests = parse(url.to_string());
         assert_eq!(dests.len(), 1);
@@ -117,7 +117,7 @@ mod tests {
 
     #[test]
     fn test_parse_license_query() {
-        let url = "typr://typr.com/license";
+        let url = "typross://typr.com/license";
 
         let dests = parse(url.to_string());
         assert_eq!(dests.len(), 1);

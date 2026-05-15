@@ -96,8 +96,15 @@ impl<R: tauri::Runtime, T: tauri::Manager<R> + tauri::Listener<R>> NotificationP
         let state = self.state::<crate::SharedState>();
         let mut s = state.lock().unwrap();
 
+        let deep_link_scheme = first_deep_link_scheme(self).unwrap_or_else(|| "typr".to_string());
+
         s.worker_handle = Some(tokio::runtime::Handle::current().spawn(async move {
-            let _ = crate::worker::monitor(crate::worker::WorkerState { db, user_id }).await;
+            let _ = crate::worker::monitor(crate::worker::WorkerState {
+                db,
+                user_id,
+                deep_link_scheme,
+            })
+            .await;
         }));
 
         Ok(())
@@ -229,6 +236,18 @@ impl<R: tauri::Runtime, T: tauri::Manager<R> + tauri::Listener<R>> NotificationP
         .await
         .map_err(|_| Error::PermissionTimeout)?
     }
+}
+
+fn first_deep_link_scheme<R: tauri::Runtime, T: tauri::Manager<R>>(app: &T) -> Option<String> {
+    let deep_link = app.config().plugins.0.get("deep-link")?;
+    let schemes = deep_link
+        .get("desktop")
+        .and_then(|desktop| desktop.get("schemes"))?;
+
+    schemes
+        .as_array()?
+        .iter()
+        .find_map(|scheme| scheme.as_str().map(ToOwned::to_owned))
 }
 
 #[derive(Debug, Deserialize)]

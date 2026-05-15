@@ -170,7 +170,7 @@ jobs:
       - name: Verify macOS signature and notarization
         if: ${{ matrix.platform == 'macos' }}
         run: |
-          APP_PATH="./apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/macos/Typr.app"
+          APP_PATH="./apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/macos/Typr OSS.app"
           codesign --verify --deep --strict --verbose=2 "$APP_PATH"
           spctl --assess --type execute --verbose "$APP_PATH"
         shell: bash
