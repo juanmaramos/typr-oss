@@ -3,14 +3,14 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { customProvider, extractReasoningMiddleware, type TextStreamPart, type ToolSet, wrapLanguageModel } from "ai";
 
 import { commands as connectorCommands } from "@typr/plugin-connector";
-import { fetch as customFetch } from "@typr/utils";
 import {
-  normalizeAiTaskDefaults,
-  resolveAiTaskModelId,
   type AiTaskDefaults,
   type AiTextTask,
+  normalizeAiTaskDefaults,
+  resolveAiTaskModelId,
 } from "./ai-task-defaults";
 import { AUTO_CLOUD_MODEL_ID, AUTO_CLOUD_MODEL_PRIORITY, getOsTypeSafe, resolveCloudModelId } from "./cloud-models";
+import { fetch as customFetch } from "./fetch";
 
 async function hasConfiguredApiKey(getter: () => Promise<string>): Promise<boolean> {
   try {
