@@ -1,5 +1,10 @@
 # AI Rules
 
+## RELEASES
+
+- Keep release names, release bodies, tags, and workflow-visible metadata tool-agnostic. Do not append or brand releases with the coding agent name.
+- When a release needs provenance, describe the GitHub Actions run and actor neutrally, for example: `OSS Release #11: Manually run by juanmaramos` and the branch name, such as `codex/oss-app-identity-0.1.12`.
+
 ## FRONTEND
 
 ### Guidelines for React
