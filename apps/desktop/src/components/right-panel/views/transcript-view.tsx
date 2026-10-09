@@ -24,6 +24,7 @@ import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { AnimatedIconDisplay, BUTTON_VARIANTS, CONTENT_VARIANTS } from "@/components/ui/animated-icon-display";
 import { Loader } from "@/components/ui/loader";
 import { debugLogFor } from "@/components/utils/debug-logger";
+import { safeUnlisten } from "@/utils/safe-unlisten";
 import { useRecordingTimer } from "@/hooks/useRecordingTimer";
 import { cn } from "@/lib/utils";
 import { sessionQueryOptions } from "@/lib/session-query";
@@ -170,9 +171,14 @@ export function TranscriptView({
       return;
     }
 
-    const unlisteners: (() => void)[] = [];
+    let disposed = false;
+    let unlisten: (() => void) | null = null;
 
     listen("session-event", (event: any) => {
+      if (disposed) {
+        return;
+      }
+
       const payload = event.payload;
 
       if (payload.type === "transcriptProcessing" && payload.session_id === sessionId) {
@@ -193,10 +199,20 @@ export function TranscriptView({
           id: "speaker-processing",
         });
       }
-    }).then((unlisten) => unlisteners.push(unlisten));
+    }).then((fn) => {
+      if (disposed) {
+        safeUnlisten(fn, "TranscriptView.session-event.listener.late-dispose");
+        return;
+      }
+
+      unlisten = fn;
+    }).catch((error) => {
+      console.error("[events] Failed to register transcript listener", error);
+    });
 
     return () => {
-      unlisteners.forEach((fn) => fn());
+      disposed = true;
+      safeUnlisten(unlisten, "TranscriptView.session-event.listener");
     };
   }, [sessionId, queryClient, t]);
 

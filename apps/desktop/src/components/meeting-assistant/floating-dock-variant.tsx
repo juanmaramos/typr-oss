@@ -501,7 +501,7 @@ export function FloatingDockVariant() {
 
   const chatHistorySummary = useQuery({
     queryKey: ["dock-chat-history-summary", sessionId],
-    enabled: !!sessionId,
+    enabled: surface === "floating" && !!sessionId,
     queryFn: async () => {
       const groups = await dbCommands.listChatGroups(sessionId);
       const groupsWithMessages = await Promise.all(
@@ -519,7 +519,7 @@ export function FloatingDockVariant() {
 
   const activeGroupHasMessages = useQuery({
     queryKey: ["dock-active-group-messages", activeFloatingChatGroupId],
-    enabled: !!activeFloatingChatGroupId,
+    enabled: surface === "floating" && !!activeFloatingChatGroupId,
     queryFn: async () => {
       const messages = await dbCommands.listChatMessages(activeFloatingChatGroupId!);
       return messages.some((msg) => msg.role === "User");
