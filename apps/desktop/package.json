@@ -10,7 +10,7 @@
     "tauri": "tauri",
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile --typescript",
-    "test": "vitest run src/components/right-panel/hooks/transcript-state.test.ts src/components/right-panel/views/transcript-persistence.test.ts src/lib/project-knowledge.test.ts src/lib/project-briefs.test.ts src/lib/ask.test.ts src/lib/note-title.test.ts",
+    "test": "vitest run src/components/right-panel/hooks/transcript-state.test.ts src/components/right-panel/views/transcript-persistence.test.ts src/lib/session-query.test.tsx src/lib/project-knowledge.test.ts src/lib/project-briefs.test.ts src/lib/ask.test.ts src/lib/note-title.test.ts",
     "typecheck": "tsc --noEmit",
     "tauri:dev": "pnpm tauri dev",
     "tauri:build": "pnpm tauri build",
