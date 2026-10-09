@@ -11,6 +11,7 @@ import { useMatch } from "@tanstack/react-router";
 import { Component, ErrorInfo, type ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { captureTelemetryException } from "@/utils/telemetry";
 import { useShowRightSidebar } from "./hooks/useShowRightSidebar";
+import { useTranscriptSessionEvents } from "./hooks/useTranscriptSessionEvents";
 import { ChatView, TranscriptView } from "./views";
 
 const RIGHT_PANEL_MIN_WIDTH_PX = 335;
@@ -90,6 +91,9 @@ export default function RightPanel({ panelGroupWidth }: RightPanelProps) {
   const shouldRenderNoteContent = isMainWindow && hasNoteRoute && currentView !== "project-brief";
   const shouldRenderProjectBrief = isMainWindow && hasProjectRoute && currentView === "project-brief";
   const shouldRenderContent = shouldRenderNoteContent || shouldRenderProjectBrief;
+  const activeNoteSessionId = isMainWindow ? noteMatch?.params.id ?? null : null;
+
+  useTranscriptSessionEvents(activeNoteSessionId);
 
   const openMinSize = useMemo(() => {
     if (!panelGroupWidth) {
