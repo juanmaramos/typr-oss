@@ -1,6 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { useChatState } from "@/stores/useChatState";
+import {
+  abortChatGeneration,
+  finishChatGeneration,
+  hasActiveChatGeneration,
+  startChatGeneration,
+} from "./chat-generation";
 import { useSelectionContext } from "@/stores/useSelectionContext";
 import { safeAnalyticsEvent } from "@/utils/analytics-safe";
 import { showInlineDiffPreview } from "@/utils/inline-diff-preview";
@@ -23,6 +29,7 @@ import { useSessions } from "@typr/utils/contexts";
 import { SHOW_WEB_SEARCH_IN_CHAT_INPUT } from "../constants/features";
 
 import type { ActiveEntityInfo, Message, MessagePart } from "../types/chat-types";
+import type { ChatSessionContextData } from "./useChatQueries";
 
 interface UseChatLogicProps {
   sessionId: string | null;
@@ -32,8 +39,8 @@ interface UseChatLogicProps {
   hasChatStarted: boolean;
   setInputValue: (value: string) => void;
   setHasChatStarted: (started: boolean) => void;
-  getChatGroupId: () => Promise<string>;
-  sessionData: any;
+  getChatGroupId: (signal?: AbortSignal) => Promise<string>;
+  fetchSessionData: (sessionId: string) => Promise<ChatSessionContextData | null>;
   chatInputRef: React.RefObject<HTMLTextAreaElement>;
   totalSessionMessages: number;
   editMode?: "chat" | "edit"; // Explicit mode selection
@@ -99,7 +106,7 @@ export function useChatLogic({
   setInputValue,
   setHasChatStarted,
   getChatGroupId,
-  sessionData,
+  fetchSessionData,
   chatInputRef,
   totalSessionMessages,
   editMode = "chat", // Default to chat mode
@@ -149,9 +156,6 @@ export function useChatLogic({
       setResearchMode(false);
     }
   }, [editMode, researchMode, setResearchMode]);
-
-  // AbortController for cancelling in-flight inference
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Add debouncing to prevent double submissions
   const lastSubmitTime = useRef(0);
@@ -227,7 +231,7 @@ export function useChatLogic({
   };
 
   const handleImproveWriting = async (selectedText: string, range: { from: number; to: number }) => {
-    if (!sessionId || useChatState.getState().isGenerating(sessionId)) {
+    if (!sessionId || useChatState.getState().isGenerating(sessionId) || hasActiveChatGeneration(sessionId)) {
       return;
     }
 
@@ -349,7 +353,7 @@ export function useChatLogic({
       // Guard against race condition: if editor HTML is empty but we expect content, refetch from database
       if (currentEditorHTML.trim() === "<p></p>" || currentEditorHTML.trim() === "") {
         console.warn("⚠️ [DocumentEdit] Editor returned empty HTML, checking database...");
-        const refetchResult = await sessionData.refetch();
+        const refetchResult = await fetchSessionData(sessionId);
 
         // CRITICAL: Respect which note the user is currently viewing
         // Get the session store to check showRaw state
@@ -364,8 +368,8 @@ export function useChatLogic({
 
         // Use the note that matches the current view
         const dbDocument = isViewingRaw
-          ? (refetchResult.data?.rawContent || "")
-          : (refetchResult.data?.enhancedContent || "");
+          ? (refetchResult?.rawContent || "")
+          : (refetchResult?.enhancedContent || "");
 
         console.log(`🔍 [DocumentEdit] User is viewing ${isViewingRaw ? "raw" : "enhanced"} note`);
 
@@ -439,8 +443,8 @@ export function useChatLogic({
 
       // Enhanced templates with HTML for better AI understanding
       // Get lightweight context (title only) for better AI understanding
-      const refetchForContext = await sessionData.refetch();
-      const sessionTitle = refetchForContext.data?.title || "";
+      const refetchForContext = await fetchSessionData(sessionId);
+      const sessionTitle = refetchForContext?.title || "";
 
       const [systemMessage, userMessage] = await Promise.all([
         templateCommands.render("document_edit.system", {
@@ -582,8 +586,6 @@ export function useChatLogic({
         }]);
 
         setGenerating(sessionId, false);
-        setIsProcessing(false);
-        isProcessingRef.current = false;
         return;
       }
 
@@ -741,15 +743,11 @@ export function useChatLogic({
 
       // Clear generating state
       setGenerating(sessionId, false);
-      setIsProcessing(false);
-      isProcessingRef.current = false;
     } catch (error) {
       console.error("🎯 [DocumentEdit] Failed to improve document:", error);
 
       // CRITICAL: Clear generating state on error too
       setGenerating(sessionId, false);
-      setIsProcessing(false);
-      isProcessingRef.current = false;
     }
   };
 
@@ -1041,10 +1039,13 @@ Leave everything else in the document completely unchanged.`;
     }
   };
 
-  const prepareMessageHistory = async (messages: Message[], currentUserMessage?: string) => {
+  const prepareMessageHistory = async (
+    messages: Message[],
+    currentUserMessage: string | undefined,
+    capturedSessionId: string,
+  ) => {
     // Force fresh session data to avoid stale context
-    const refetchResult = await sessionData.refetch();
-    let freshSessionData = refetchResult.data;
+    const freshSessionData = await fetchSessionData(capturedSessionId);
 
     if (!freshSessionData) {
       throw new Error("Failed to load session data");
@@ -1052,9 +1053,9 @@ Leave everything else in the document completely unchanged.`;
 
     const { type } = await connectorCommands.getLlmConnection();
 
-    const participants = sessionId ? await dbCommands.sessionListParticipants(sessionId) : [];
+    const participants = await dbCommands.sessionListParticipants(capturedSessionId);
 
-    const calendarEvent = sessionId ? await dbCommands.sessionGetEvent(sessionId) : null;
+    const calendarEvent = await dbCommands.sessionGetEvent(capturedSessionId);
 
     // Get current user profile for AI context
     const currentUser = userId ? await dbCommands.getHuman(userId) : null;
@@ -1115,9 +1116,6 @@ Leave everything else in the document completely unchanged.`;
     return conversationHistory;
   };
 
-  const [isProcessing, setIsProcessing] = useState(false);
-  const isProcessingRef = useRef(false);
-
   const beginSubmission = (content: string, analyticsEvent: string, source: string, bypassDebounce = false) => {
     const trimmedContent = content.trim();
 
@@ -1134,13 +1132,14 @@ Leave everything else in the document completely unchanged.`;
       };
     }
 
-    if (isProcessing || isGenerating || isProcessingRef.current) {
+    const sessionIsGenerating = !!sessionId && (
+      useChatState.getState().isGenerating(sessionId) || hasActiveChatGeneration(sessionId)
+    );
+    if (sessionIsGenerating) {
       logChatSubmit("submit_blocked_busy", {
         source,
         sessionId,
-        isGenerating,
-        isProcessing,
-        isProcessingRef: isProcessingRef.current,
+        isGenerating: sessionIsGenerating,
       });
       return {
         accepted: false,
@@ -1160,6 +1159,17 @@ Leave everything else in the document completely unchanged.`;
       };
     }
 
+    const controller = startChatGeneration(sessionId);
+    if (!controller) {
+      logChatSubmit("submit_blocked_busy", { source, sessionId });
+      return {
+        accepted: false,
+        capturedSessionId: null,
+        trimmedContent,
+        controller: null,
+      };
+    }
+
     if (!bypassDebounce) {
       const now = Date.now();
       if (now - lastSubmitTime.current < SUBMIT_DEBOUNCE_MS) {
@@ -1168,17 +1178,17 @@ Leave everything else in the document completely unchanged.`;
           sessionId,
           elapsedMs: now - lastSubmitTime.current,
         });
+        finishChatGeneration(sessionId, controller);
         return {
           accepted: false,
           capturedSessionId: null,
           trimmedContent,
+          controller: null,
         };
       }
       lastSubmitTime.current = now;
     }
 
-    isProcessingRef.current = true;
-    setIsProcessing(true);
     setGenerating(sessionId, true);
     if (surface === "floating") {
       logChatSubmit("expand_floating_on_submit", {
@@ -1202,6 +1212,7 @@ Leave everything else in the document completely unchanged.`;
       accepted: true,
       capturedSessionId: sessionId,
       trimmedContent,
+      controller,
     };
   };
 
@@ -1209,8 +1220,9 @@ Leave everything else in the document completely unchanged.`;
     capturedSessionId: string,
     content: string,
     analyticsEvent: string,
+    generationController: AbortController,
   ): Promise<boolean> => {
-    if (!content.trim()) {
+    if (generationController.signal.aborted || !content.trim()) {
       logChatSubmit("process_blocked_empty", {
         sessionId: capturedSessionId,
         analyticsEvent,
@@ -1223,9 +1235,7 @@ Leave everything else in the document completely unchanged.`;
       analyticsEvent,
       contentLength: content.trim().length,
       editMode,
-      isGenerating,
-      isProcessing,
-      isProcessingRef: isProcessingRef.current,
+      isGenerating: useChatState.getState().isGenerating(capturedSessionId),
       totalSessionMessages,
     });
 
@@ -1301,11 +1311,18 @@ Leave everything else in the document completely unchanged.`;
       }
     }
 
+    if (generationController.signal.aborted) {
+      return false;
+    }
+
     if (!hasChatStarted && activeEntity) {
       setHasChatStarted(true);
     }
 
-    const groupId = await getChatGroupId();
+    const groupId = await getChatGroupId(generationController.signal);
+    if (generationController.signal.aborted) {
+      return false;
+    }
     console.log("[processUserMessage] Using chat group", { groupId, sessionId: capturedSessionId });
     logChatSubmit("group_ready", {
       capturedSessionId,
@@ -1326,7 +1343,9 @@ Leave everything else in the document completely unchanged.`;
       console.log("🎯 [AskMode] Including selection as context in message");
 
       // Clear selection and editor highlight after including it in message
-      clearSelection();
+      if (useSelectionContext.getState().sessionId === selectionSessionId) {
+        clearSelection();
+      }
 
       // Also clear the AI selection highlight from editor
       const editorRef = window.__TYPR_EDITORS__?.[capturedSessionId];
@@ -1355,10 +1374,16 @@ Leave everything else in the document completely unchanged.`;
       content: userMessage.content.trim(),
       parts: userMessage.parts ? JSON.stringify(userMessage.parts) : null,
     });
+    if (generationController.signal.aborted) {
+      return false;
+    }
 
     // Check for Edit mode document editing BEFORE try block
-    const refetchForDoc = await sessionData.refetch();
-    const currentDocument = refetchForDoc.data?.enhancedContent || refetchForDoc.data?.rawContent || "";
+    const refetchForDoc = await fetchSessionData(capturedSessionId);
+    if (generationController.signal.aborted) {
+      return false;
+    }
+    const currentDocument = refetchForDoc?.enhancedContent || refetchForDoc?.rawContent || "";
 
     console.log("🎯 [ProcessMessage] Mode check:", {
       editMode,
@@ -1378,8 +1403,6 @@ Leave everything else in the document completely unchanged.`;
 
       // Clean up state after successful edit
       setGenerating(capturedSessionId, false);
-      setIsProcessing(false);
-      isProcessingRef.current = false;
       return true; // Exit early for document editing
     }
 
@@ -1402,7 +1425,7 @@ Leave everything else in the document completely unchanged.`;
       // Do not add a message with "Generating..." content, we'll use the typing indicator instead
       // and only show actual content when it starts streaming
 
-      const messageHistory = await prepareMessageHistory(messages, content);
+      const messageHistory = await prepareMessageHistory(messages, content, capturedSessionId);
 
       // Track browser search sources for citation linking
       const searchSources: Array<{ url: string; title?: string }> = [];
@@ -1432,14 +1455,15 @@ Leave everything else in the document completely unchanged.`;
         isResearchMode ? "WITH browser_search tool" : "without tools",
       );
 
+      // The accepted operation keeps its controller when this view unmounts.
+      if (generationController.signal.aborted) {
+        return false;
+      }
+
       // Enable browser search header for this request
       const shouldEnableSearch = isResearchMode || false;
       console.log("[processUserMessage] 🌐 Setting browser search header:", shouldEnableSearch);
       setEnableBrowserSearch(shouldEnableSearch);
-
-      // Create abort controller for this request
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
 
       const { fullStream } = streamText({
         model,
@@ -1448,8 +1472,12 @@ Leave everything else in the document completely unchanged.`;
         maxSteps: 1,
         maxTokens: maxChatTokens,
         maxRetries: 3,
-        abortSignal: abortController.signal,
+        abortSignal: generationController.signal,
         onStepFinish: ({ text, toolCalls, toolResults, finishReason }) => {
+          if (generationController.signal.aborted) {
+            return;
+          }
+
           console.log("🔧 [AI SDK] Step finished:", {
             hasText: !!text,
             toolCallCount: toolCalls?.length || 0,
@@ -1629,6 +1657,10 @@ Leave everything else in the document completely unchanged.`;
       };
 
       const upsertAssistantMessage = (reasoningComplete: boolean) => {
+        if (generationController.signal.aborted) {
+          return;
+        }
+
         const reasoningParts = buildReasoningParts(reasoningComplete, !aiResponse.trim());
         const sources = searchSources.length > 0 ? searchSources : undefined;
 
@@ -1716,6 +1748,10 @@ Leave everything else in the document completely unchanged.`;
         scheduleUpdate();
       }
 
+      if (generationController.signal.aborted) {
+        throw new DOMException("The operation was aborted", "AbortError");
+      }
+
       if (promptStartedReasoningBuffer) {
         reasoningResponse += promptStartedReasoningBuffer;
         promptStartedReasoningBuffer = "";
@@ -1769,6 +1805,7 @@ Leave everything else in the document completely unchanged.`;
           messages: messageHistory,
           maxTokens: maxChatTokens,
           maxRetries: 1,
+          abortSignal: generationController.signal,
         });
 
         let fallbackResponse = "";
@@ -1786,6 +1823,10 @@ Leave everything else in the document completely unchanged.`;
             "The AI model returned an empty response. This might be due to rate limiting or model unavailability. Please try again.",
           );
         }
+      }
+
+      if (generationController.signal.aborted) {
+        throw new DOMException("The operation was aborted", "AbortError");
       }
 
       // Final synchronous update with complete response
@@ -1811,19 +1852,12 @@ Leave everything else in the document completely unchanged.`;
         responseLength: aiResponse.trim().length,
       });
       // Use captured sessionId for generating state
-      setGenerating(capturedSessionId, false);
-      setIsProcessing(false);
-      isProcessingRef.current = false;
-      abortControllerRef.current = null;
       return true;
     } catch (error) {
       // Handle user-initiated abort gracefully
-      if (error instanceof Error && error.name === "AbortError") {
+      if (generationController.signal.aborted || (error instanceof Error && error.name === "AbortError")) {
         console.log("[processUserMessage] Inference cancelled by user");
-        setGenerating(capturedSessionId, false);
-        setIsProcessing(false);
-        isProcessingRef.current = false;
-        abortControllerRef.current = null;
+        setEnableBrowserSearch(false);
         return false;
       }
 
@@ -1832,12 +1866,6 @@ Leave everything else in the document completely unchanged.`;
         capturedSessionId,
         error: error instanceof Error ? error.message : String(error),
       });
-
-      // Use captured sessionId for generating state
-      setGenerating(capturedSessionId, false);
-      setIsProcessing(false);
-      isProcessingRef.current = false;
-      abortControllerRef.current = null;
 
       const errorMessageId = crypto.randomUUID();
       const errorDetails = error instanceof Error ? error.message : String(error);
@@ -1873,27 +1901,49 @@ Leave everything else in the document completely unchanged.`;
     }
   };
 
+  const launchSubmission = (
+    capturedSessionId: string,
+    content: string,
+    analyticsEvent: string,
+    controller: AbortController,
+  ) => {
+    void processUserMessage(capturedSessionId, content, analyticsEvent, controller)
+      .catch((error) => {
+        if (!controller.signal.aborted && !(error instanceof Error && error.name === "AbortError")) {
+          console.error("[CHAT] Failed before stream processing:", error);
+        }
+      })
+      .finally(() => {
+        if (!finishChatGeneration(capturedSessionId, controller)) {
+          return;
+        }
+
+        const chatState = useChatState.getState();
+        if (chatState.isGenerating(capturedSessionId)) {
+          chatState.setGenerating(capturedSessionId, false);
+        }
+      });
+  };
+
   const handleSubmit = async () => {
     logChatSubmit("submit_requested", {
       source: "chat-input",
       sessionId,
       inputLength: inputValue.trim().length,
-      isGenerating,
-      isProcessing,
-      isProcessingRef: isProcessingRef.current,
+      isGenerating: sessionId ? useChatState.getState().isGenerating(sessionId) : false,
     });
 
-    const { accepted, capturedSessionId, trimmedContent } = beginSubmission(
+    const { accepted, capturedSessionId, trimmedContent, controller } = beginSubmission(
       inputValue,
       "chat_message_sent",
       "chat-input",
     );
 
-    if (!accepted || !capturedSessionId) {
+    if (!accepted || !capturedSessionId || !controller) {
       return false;
     }
 
-    void processUserMessage(capturedSessionId, trimmedContent, "chat_message_sent");
+    launchSubmission(capturedSessionId, trimmedContent, "chat_message_sent", controller);
     return true;
   };
 
@@ -1904,36 +1954,36 @@ Leave everything else in the document completely unchanged.`;
       sessionId,
       valueLength: value.trim().length,
       bypassDebounce: !!options?.bypassDebounce,
-      isGenerating,
-      isProcessing,
-      isProcessingRef: isProcessingRef.current,
+      isGenerating: sessionId ? useChatState.getState().isGenerating(sessionId) : false,
     });
 
-    const { accepted, capturedSessionId, trimmedContent } = beginSubmission(
+    const { accepted, capturedSessionId, trimmedContent, controller } = beginSubmission(
       value,
       "chat_message_sent",
       source,
       !!options?.bypassDebounce,
     );
 
-    if (!accepted || !capturedSessionId) {
+    if (!accepted || !capturedSessionId || !controller) {
       return false;
     }
 
-    void processUserMessage(capturedSessionId, trimmedContent, "chat_message_sent");
+    launchSubmission(capturedSessionId, trimmedContent, "chat_message_sent", controller);
     return true;
   };
 
   const handleQuickAction = async (prompt: string) => {
-    const { accepted, capturedSessionId, trimmedContent } = beginSubmission(
+    const { accepted, capturedSessionId, trimmedContent, controller } = beginSubmission(
       prompt,
       "chat_quickaction_sent",
       "quick-action",
       true,
     );
 
-    if (accepted && capturedSessionId) {
-      void processUserMessage(capturedSessionId, trimmedContent, "chat_quickaction_sent");
+    if (accepted && capturedSessionId && controller) {
+      launchSubmission(capturedSessionId, trimmedContent, "chat_quickaction_sent", controller);
+    } else if (trimmedContent) {
+      setInputValue(trimmedContent);
     }
 
     if (chatInputRef.current) {
@@ -1946,15 +1996,14 @@ Leave everything else in the document completely unchanged.`;
   };
 
   const handleStop = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
+    if (sessionId) {
+      abortChatGeneration(sessionId);
     }
   };
 
   return {
     messages,
-    isGenerating: isGenerating || isProcessing,
+    isGenerating,
     handleSubmit,
     handleSubmitWithValue,
     handleQuickAction,

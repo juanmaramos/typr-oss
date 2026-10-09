@@ -2,6 +2,7 @@ import { useRouter } from "@tanstack/react-router";
 import { createContext, useCallback, useContext } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
+import { abortChatGeneration } from "@/components/right-panel/hooks/chat-generation";
 import { useChatState } from "@/stores/useChatState";
 import { useRightPanel } from "./layout";
 
@@ -36,6 +37,7 @@ export function NewChatProvider({ children }: { children: React.ReactNode }) {
     const sessionId = sessionMatch[2];
     console.log("[NewChat] Creating new chat via context", { sessionId });
 
+    abortChatGeneration(sessionId);
     requestNewChat(sessionId);
     useChatState.getState().clearSession(sessionId);
 

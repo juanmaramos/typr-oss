@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { IconArrowsDiagonalMinimize2 } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { ResponsiveIconButton } from "@typr/ui";
 import { cn } from "@typr/ui/lib/utils";
@@ -18,6 +18,7 @@ import { ChatSearchHeader } from "../components/search";
 
 import { useEditModeModelSwitch } from "@/hooks/useEditModeModelSwitch.tsx";
 import { useChatState } from "@/stores/useChatState";
+import { abortChatGeneration } from "../hooks/chat-generation";
 import { useActiveEntity } from "../hooks/useActiveEntity";
 import { useChatLogic } from "../hooks/useChatLogic";
 import { useChatQueries } from "../hooks/useChatQueries";
@@ -123,6 +124,26 @@ export function ChatView({
     setShowHistory,
     setHasChatStarted,
   });
+  const currentSessionIdRef = useRef(sessionId);
+  useLayoutEffect(() => {
+    const sessionChanged = currentSessionIdRef.current !== sessionId;
+    currentSessionIdRef.current = sessionId;
+    if (sessionChanged) {
+      setIsNewChatRequested(false);
+    }
+  }, [sessionId, setIsNewChatRequested]);
+
+  const setHasChatStartedForSession = useCallback((started: boolean) => {
+    if (currentSessionIdRef.current === sessionId) {
+      setHasChatStarted(started);
+    }
+  }, [sessionId, setHasChatStarted]);
+
+  const setIsNewChatRequestedForSession = useCallback((requested: boolean) => {
+    if (currentSessionIdRef.current === sessionId) {
+      setIsNewChatRequested(requested);
+    }
+  }, [sessionId, setIsNewChatRequested]);
 
   useEffect(() => {
     if (!sessionId) {
@@ -133,15 +154,17 @@ export function ChatView({
   }, [getChatDraft, sessionId]);
 
   const setPersistedInputValue = useCallback((value: string) => {
-    setInputValue(value);
-    if (!sessionId) {
-      return;
+    if (sessionId) {
+      if (value) {
+        setChatDraft(sessionId, value);
+      } else {
+        clearChatDraft(sessionId);
+      }
     }
-    if (value) {
-      setChatDraft(sessionId, value);
-      return;
+
+    if (currentSessionIdRef.current === sessionId) {
+      setInputValue(value);
     }
-    clearChatDraft(sessionId);
   }, [clearChatDraft, sessionId, setChatDraft]);
 
   // Get editMode from store (per-session, defaults to "chat" / Ask mode)
@@ -183,14 +206,14 @@ export function ChatView({
   // Auto-switch to cloud model when entering Edit mode
   useEditModeModelSwitch(effectiveEditMode);
 
-  const { chatGroupsQuery, sessionData, getChatGroupId, chatHistory, totalSessionMessagesQuery } = useChatQueries({
+  const { chatGroupsQuery, sessionData, fetchSessionData, getChatGroupId, chatHistory, totalSessionMessagesQuery } = useChatQueries({
     sessionId,
     userId,
     currentChatGroupId,
     setCurrentChatGroupId,
-    setHasChatStarted,
+    setHasChatStarted: setHasChatStartedForSession,
     isNewChatRequested,
-    setIsNewChatRequested,
+    setIsNewChatRequested: setIsNewChatRequestedForSession,
     isNewChatPending: isNewChatPendingForSession,
     completeNewChat,
     isActiveSurface: isActiveChatSurface,
@@ -218,9 +241,9 @@ export function ChatView({
     inputValue,
     hasChatStarted,
     setInputValue: setPersistedInputValue,
-    setHasChatStarted,
+    setHasChatStarted: setHasChatStartedForSession,
     getChatGroupId,
-    sessionData,
+    fetchSessionData,
     chatInputRef,
     totalSessionMessages: totalSessionMessagesQuery.data || 0,
     editMode: effectiveEditMode, // Pass explicit mode
@@ -293,6 +316,7 @@ export function ChatView({
       sessionId,
       oldChatGroupId: currentChatGroupId,
     });
+    abortChatGeneration(sessionId);
     setIsNewChatRequested(true);
     clearChatState(sessionId);
     const { clearSession } = useChatState.getState();
@@ -407,10 +431,13 @@ export function ChatView({
 
     if (trimmedPrompt) {
       if (layout === "floating") {
-        handleSubmitWithValue(trimmedPrompt, {
+        const accepted = handleSubmitWithValue(trimmedPrompt, {
           bypassDebounce: true,
           source: "floating-queued-prompt",
         });
+        if (!accepted) {
+          setPersistedInputValue(trimmedPrompt);
+        }
       } else {
         // Draft transferred from floating → sidebar: populate input without submitting
         setPersistedInputValue(trimmedPrompt);
