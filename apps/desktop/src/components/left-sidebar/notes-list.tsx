@@ -8,7 +8,7 @@ import { endOfMonth, startOfMonth, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChevronDownIcon, TrashIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 
@@ -16,6 +16,8 @@ import { MarqueeTitle } from "@/components/left-sidebar/marquee-title";
 import { Loader } from "@/components/ui/loader";
 import { debugLog } from "@/components/utils/debug-logger";
 import { useTypr } from "@/contexts";
+import { endNoteProjectDrag, startNoteProjectDrag } from "@/lib/note-project-drag";
+import { listProjects, projectQueryKeys } from "@/lib/projects";
 import { useEnhancePendingState } from "@/hooks/enhance-pending";
 import { useMultiSelectKeyboard } from "@/hooks/useMultiSelectKeyboard";
 import { useMultiSelectNotes } from "@/stores/useMultiSelectNotes";
@@ -72,6 +74,13 @@ export default function NotesList({
 
   const queryClient = useQueryClient();
   const { userId } = useTypr();
+  const projectsQuery = useQuery({
+    queryKey: [projectQueryKeys.all],
+    queryFn: listProjects,
+    select: projects => projects.length > 0,
+    refetchOnMount: false,
+  });
+  const canDragNoteToProject = projectsQuery.data ?? false;
   const sessions = useInfiniteQuery({
     queryKey: ["sessions"],
     queryFn: async ({ pageParam: { monthOffset } }) => {
@@ -260,6 +269,7 @@ export default function NotesList({
                       <NoteItem
                         activeSessionId={activeSessionId || ""}
                         currentSessionId={session.id}
+                        canDragToProject={canDragNoteToProject}
                       />
                     </motion.div>
                   ))}
@@ -287,12 +297,14 @@ export default function NotesList({
   );
 }
 
-function NoteItem({
+export function NoteItem({
   activeSessionId,
   currentSessionId,
+  canDragToProject,
 }: {
   activeSessionId: string;
   currentSessionId: string;
+  canDragToProject: boolean;
 }) {
   const { t } = useLingui();
   const navigate = useNavigate();
@@ -315,6 +327,17 @@ function NoteItem({
 
   const isEnhancePending = useEnhancePendingState(currentSessionId);
   const shouldShowEnhancePending = !isActive && isEnhancePending;
+
+  const handleDragStart = useCallback((event: DragEvent<HTMLDivElement>) => {
+    if (!canDragToProject || isMultiSelectMode || !startNoteProjectDrag(event.dataTransfer, currentSessionId)) {
+      event.preventDefault();
+    }
+  }, [canDragToProject, currentSessionId, isMultiSelectMode]);
+  const handleDragEnd = useCallback(() => {
+    endNoteProjectDrag(currentSessionId);
+  }, [currentSessionId]);
+
+  useEffect(() => () => endNoteProjectDrag(currentSessionId), [currentSessionId]);
 
   const currentSessionEvent = useQuery({
     queryKey: ["event", currentSessionId],
@@ -398,7 +421,12 @@ function NoteItem({
         )}
       </div>
 
-      <div className="flex min-w-0 flex-1 items-center">
+      <div
+        className="flex min-w-0 flex-1 items-center"
+        draggable={canDragToProject && !isMultiSelectMode}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <MarqueeTitle
           text={currentSession.title || t`New note`}
           className="min-w-0 flex-1 text-[13px] font-normal text-sidebar-foreground"

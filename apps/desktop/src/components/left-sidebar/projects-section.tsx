@@ -1,14 +1,18 @@
 import { CreateProjectDialog } from "@/components/projects/create-project-dialog";
 import { ProjectIcon } from "@/components/projects/project-icon";
+import { useAddNotesToProject } from "@/hooks/useAddNotesToProject";
+import { isActiveNoteProjectDrag, NOTE_PROJECT_DRAG_END_EVENT, readDroppedNoteId } from "@/lib/note-project-drag";
 import { getRecentProjects, listProjects, listSessionsByProject, projectQueryKeys } from "@/lib/projects";
 import { Button } from "@typr/ui/components/ui/button";
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
 import { cn } from "@typr/ui/lib/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { DragEvent } from "react";
+import type { ProjectSource } from "@typr/plugin-db";
 
 const SIDEBAR_PROJECT_PREVIEW_LIMIT = 3;
 
@@ -19,8 +23,18 @@ export function ProjectsSection() {
   const shouldReduceMotion = useReducedMotion();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [draggedOverProjectId, setDraggedOverProjectId] = useState<string | null>(null);
+  const pendingDropKeys = useRef(new Set<string>());
+  const queryClient = useQueryClient();
+  const addNotesToProject = useAddNotesToProject("sidebar_drag_drop");
   const activeProjectMatch = location.pathname.match(/^\/app\/projects\/(.+)$/);
   const activeProjectId = activeProjectMatch?.[1] ?? null;
+
+  useEffect(() => {
+    const clearDraggedOverProject = () => setDraggedOverProjectId(null);
+    window.addEventListener(NOTE_PROJECT_DRAG_END_EVENT, clearDraggedOverProject);
+    return () => window.removeEventListener(NOTE_PROJECT_DRAG_END_EVENT, clearDraggedOverProject);
+  }, []);
 
   const projectsQuery = useQuery({
     queryKey: [projectQueryKeys.all],
@@ -96,6 +110,54 @@ export function ProjectsSection() {
           <AnimatePresence initial={false}>
             {visibleProjects.map(project => {
               const isActive = activeProjectId === project.id;
+              const isDragTarget = draggedOverProjectId === project.id;
+              const handleDragEnter = (event: DragEvent<HTMLButtonElement>) => {
+                if (!isActiveNoteProjectDrag(event.dataTransfer)) {
+                  return;
+                }
+                event.preventDefault();
+                setDraggedOverProjectId(current => current === project.id ? current : project.id);
+              };
+              const handleDragLeave = (event: DragEvent<HTMLButtonElement>) => {
+                if (!isActiveNoteProjectDrag(event.dataTransfer)) {
+                  return;
+                }
+                if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
+                  return;
+                }
+                setDraggedOverProjectId(current => current === project.id ? null : current);
+              };
+              const handleDragOver = (event: DragEvent<HTMLButtonElement>) => {
+                if (!isActiveNoteProjectDrag(event.dataTransfer)) {
+                  return;
+                }
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "link";
+              };
+              const handleDrop = (event: DragEvent<HTMLButtonElement>) => {
+                const noteId = readDroppedNoteId(event.dataTransfer);
+                if (!noteId) {
+                  setDraggedOverProjectId(current => current === project.id ? null : current);
+                  return;
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                setDraggedOverProjectId(current => current === project.id ? null : current);
+
+                const sources = queryClient.getQueryData<ProjectSource[]>([projectQueryKeys.sources, project.id]);
+                if (sources?.some(source => source.session_id === noteId && source.status === "Included")) {
+                  return;
+                }
+
+                const pendingKey = JSON.stringify([project.id, noteId]);
+                if (pendingDropKeys.current.has(pendingKey)) {
+                  return;
+                }
+                pendingDropKeys.current.add(pendingKey);
+                void addNotesToProject.mutateAsync({ projectId: project.id, noteIds: [noteId] })
+                  .catch(() => undefined)
+                  .finally(() => pendingDropKeys.current.delete(pendingKey));
+              };
 
               return (
                 <motion.button
@@ -107,11 +169,16 @@ export function ProjectsSection() {
                   transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
                   type="button"
                   onClick={() => navigate({ to: "/app/projects/$projectId", params: { projectId: project.id } })}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
                   className={cn(
                     "relative flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] transition-colors duration-200",
                     isActive
                       ? "bg-sidebar-accent text-sidebar-accent-foreground before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:rounded-l-md before:bg-primary"
                       : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    isDragTarget && "bg-sidebar-accent text-sidebar-accent-foreground ring-1 ring-sidebar-ring",
                   )}
                 >
                   <ProjectIcon
