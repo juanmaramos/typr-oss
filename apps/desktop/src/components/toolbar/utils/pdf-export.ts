@@ -1,6 +1,6 @@
 import { appDataDir } from "@tauri-apps/api/path";
 import { writeFile } from "@tauri-apps/plugin-fs";
-import { jsPDF } from "jspdf";
+import type { jsPDF } from "jspdf";
 
 import { commands as dbCommands, type Event, type Human, type Session } from "@typr/plugin-db";
 
@@ -156,7 +156,10 @@ const fetchSessionMetadata = async (sessionId: string): Promise<{ participants: 
 };
 
 export const exportToPDF = async (session: SessionData): Promise<string> => {
-  const { participants, event } = await fetchSessionMetadata(session.id);
+  const [{ jsPDF }, { participants, event }] = await Promise.all([
+    import("jspdf"),
+    fetchSessionMetadata(session.id),
+  ]);
 
   // Generate filename
   const filename = session?.title
