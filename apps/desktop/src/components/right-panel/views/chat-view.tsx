@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { IconArrowsDiagonalMinimize2 } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { ResponsiveIconButton } from "@typr/ui";
 import { cn } from "@typr/ui/lib/utils";
@@ -124,6 +124,22 @@ export function ChatView({
     setShowHistory,
     setHasChatStarted,
   });
+  const currentSessionIdRef = useRef(sessionId);
+  useLayoutEffect(() => {
+    currentSessionIdRef.current = sessionId;
+  }, [sessionId]);
+
+  const setHasChatStartedForSession = useCallback((started: boolean) => {
+    if (currentSessionIdRef.current === sessionId) {
+      setHasChatStarted(started);
+    }
+  }, [sessionId, setHasChatStarted]);
+
+  const setIsNewChatRequestedForSession = useCallback((requested: boolean) => {
+    if (currentSessionIdRef.current === sessionId) {
+      setIsNewChatRequested(requested);
+    }
+  }, [sessionId, setIsNewChatRequested]);
 
   useEffect(() => {
     if (!sessionId) {
@@ -134,15 +150,17 @@ export function ChatView({
   }, [getChatDraft, sessionId]);
 
   const setPersistedInputValue = useCallback((value: string) => {
-    setInputValue(value);
-    if (!sessionId) {
-      return;
+    if (sessionId) {
+      if (value) {
+        setChatDraft(sessionId, value);
+      } else {
+        clearChatDraft(sessionId);
+      }
     }
-    if (value) {
-      setChatDraft(sessionId, value);
-      return;
+
+    if (currentSessionIdRef.current === sessionId) {
+      setInputValue(value);
     }
-    clearChatDraft(sessionId);
   }, [clearChatDraft, sessionId, setChatDraft]);
 
   // Get editMode from store (per-session, defaults to "chat" / Ask mode)
@@ -189,9 +207,9 @@ export function ChatView({
     userId,
     currentChatGroupId,
     setCurrentChatGroupId,
-    setHasChatStarted,
+    setHasChatStarted: setHasChatStartedForSession,
     isNewChatRequested,
-    setIsNewChatRequested,
+    setIsNewChatRequested: setIsNewChatRequestedForSession,
     isNewChatPending: isNewChatPendingForSession,
     completeNewChat,
     isActiveSurface: isActiveChatSurface,
@@ -219,7 +237,7 @@ export function ChatView({
     inputValue,
     hasChatStarted,
     setInputValue: setPersistedInputValue,
-    setHasChatStarted,
+    setHasChatStarted: setHasChatStartedForSession,
     getChatGroupId,
     sessionData,
     chatInputRef,
