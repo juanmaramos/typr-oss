@@ -65,6 +65,7 @@ vi.mock("@tanstack/react-router", () => ({
   },
 }));
 vi.mock("@typr/plugin-db", () => ({ commands: testState.db }));
+vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn(async () => () => {}) }));
 vi.mock("@typr/utils/contexts", () => ({
   useSession: (sessionId: string, selector: (state: unknown) => unknown) =>
     selector({ session: { id: sessionId, title: `Title ${sessionId}`, words: [] } }),
