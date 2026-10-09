@@ -6,9 +6,17 @@ import type { ActiveEntityInfo } from "../types/chat-types";
 
 interface UseActiveEntityProps {
   setInputValue: (value: string) => void;
+  setShowHistory: (show: boolean) => void;
+  setHasChatStarted: (started: boolean) => void;
+  setCurrentChatGroupId?: (id: string | null) => void;
 }
 
-export function useActiveEntity({ setInputValue }: UseActiveEntityProps) {
+export function useActiveEntity({
+  setInputValue,
+  setShowHistory,
+  setHasChatStarted,
+  setCurrentChatGroupId,
+}: UseActiveEntityProps) {
   const noteMatch = useMatch({ from: "/app/note/$id", shouldThrow: false });
   const humanMatch = useMatch({ from: "/app/human/$id", shouldThrow: false });
   const organizationMatch = useMatch({ from: "/app/organization/$id", shouldThrow: false });
@@ -34,13 +42,14 @@ export function useActiveEntity({ setInputValue }: UseActiveEntityProps) {
 
   const sessionId = activeEntity?.type === "note" ? activeEntity.id : null;
 
-  // Track previous entity to reset only the local input when its session changes.
-  // Other chat UI and group state is session-scoped and must survive view remounts.
+  // Track previous entity to run side effects only on actual entity changes.
+  // undefined means "not yet initialized" so we always run on first mount.
   const prevEntityRef = useRef<ActiveEntityInfo | null | undefined>(undefined);
 
   useEffect(() => {
     const prev = prevEntityRef.current;
-    const isDifferentEntity = prev === undefined
+    const isFirstMount = prev === undefined;
+    const isDifferentEntity = isFirstMount
       || prev?.id !== activeEntity?.id
       || prev?.type !== activeEntity?.type;
 
@@ -53,7 +62,10 @@ export function useActiveEntity({ setInputValue }: UseActiveEntityProps) {
     debugLogFor("DEBUG_CHAT", "ChatDebug", "active entity changed", { from: prev, to: activeEntity });
 
     setInputValue("");
-  }, [activeEntity, setInputValue]);
+    setShowHistory(false);
+    setHasChatStarted(false);
+    setCurrentChatGroupId?.(null);
+  }, [activeEntity, setInputValue, setShowHistory, setHasChatStarted, setCurrentChatGroupId]);
 
   return { activeEntity, sessionId };
 }

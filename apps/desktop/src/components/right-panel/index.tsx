@@ -10,9 +10,7 @@ import { Trans } from "@lingui/react/macro";
 import { useMatch } from "@tanstack/react-router";
 import { Component, ErrorInfo, type ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { captureTelemetryException } from "@/utils/telemetry";
-import { useAssistantEditorRequests } from "./hooks/useAssistantEditorRequests";
 import { useShowRightSidebar } from "./hooks/useShowRightSidebar";
-import { useTranscriptSessionEvents } from "./hooks/useTranscriptSessionEvents";
 import { ChatView, TranscriptView } from "./views";
 
 const RIGHT_PANEL_MIN_WIDTH_PX = 335;
@@ -79,7 +77,7 @@ interface RightPanelProps {
 }
 
 export default function RightPanel({ panelGroupWidth }: RightPanelProps) {
-  const { currentView, switchView, surface } = useRightPanel();
+  const { currentView, switchView } = useRightPanel();
   const show = useShowRightSidebar();
   const noteMatch = useMatch({ from: "/app/note/$id", shouldThrow: false });
   const projectMatch = useMatch({ from: "/app/projects/$projectId", shouldThrow: false });
@@ -92,11 +90,6 @@ export default function RightPanel({ panelGroupWidth }: RightPanelProps) {
   const shouldRenderNoteContent = isMainWindow && hasNoteRoute && currentView !== "project-brief";
   const shouldRenderProjectBrief = isMainWindow && hasProjectRoute && currentView === "project-brief";
   const shouldRenderContent = shouldRenderNoteContent || shouldRenderProjectBrief;
-  const activeNoteSessionId = isMainWindow ? noteMatch?.params.id ?? null : null;
-  const shouldRenderSidebarNoteContent = shouldRenderNoteContent && show && surface === "sidebar";
-
-  useAssistantEditorRequests(activeNoteSessionId);
-  useTranscriptSessionEvents(activeNoteSessionId);
 
   const openMinSize = useMemo(() => {
     if (!panelGroupWidth) {
@@ -172,7 +165,7 @@ export default function RightPanel({ panelGroupWidth }: RightPanelProps) {
           : "pointer-events-none opacity-0 border-l-transparent",
       )}
     >
-      {shouldRenderSidebarNoteContent && (
+      {shouldRenderNoteContent && (
         <>
           <div className="h-11 shrink-0 bg-background" />
           <Tabs
@@ -181,7 +174,7 @@ export default function RightPanel({ panelGroupWidth }: RightPanelProps) {
             className="flex flex-1 flex-col overflow-hidden"
           >
             <div className={cn("flex-1 overflow-hidden", currentView !== "chat" && "hidden")}>
-              <ChatView layout="sidebar" />
+              <ChatView />
             </div>
 
             <div className={cn("flex-1 overflow-hidden", currentView !== "transcript" && "hidden")}>

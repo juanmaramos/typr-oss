@@ -56,8 +56,6 @@ interface LayoutContextType {
     getChatGroup: (sessionId: string) => string | null;
     setChatGroup: (sessionId: string, groupId: string | null) => void;
     clearChatGroup: (sessionId: string) => void;
-    getPendingCreatedChatGroupId: (sessionId: string) => string | null;
-    setPendingCreatedChatGroupId: (sessionId: string, groupId: string | null) => void;
     newChatRequest: NewChatRequest | null;
     requestNewChat: (sessionId: string) => number;
     consumeNewChatRequest: (requestId: number) => void;
@@ -122,9 +120,6 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
   const [view, setView] = useState<RightPanelView>("chat");
   const [floatingState, setFloatingState] = useState<FloatingPanelState>("collapsed");
   const [activeChatGroupIdBySession, setActiveChatGroupIdBySession] = useState<
-    Record<string, string | null>
-  >({});
-  const [pendingCreatedChatGroupIdBySession, setPendingCreatedChatGroupIdBySession] = useState<
     Record<string, string | null>
   >({});
   const [pendingFloatingPromptBySession, setPendingFloatingPromptBySession] = useState<Record<string, string | null>>(
@@ -288,24 +283,6 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const getPendingCreatedChatGroupId = useCallback((sessionId: string) => {
-    return pendingCreatedChatGroupIdBySession[sessionId] ?? null;
-  }, [pendingCreatedChatGroupIdBySession]);
-
-  const setPendingCreatedChatGroupId = useCallback((sessionId: string, groupId: string | null) => {
-    setPendingCreatedChatGroupIdBySession((prev) => {
-      if (!groupId) {
-        if (!(sessionId in prev)) {
-          return prev;
-        }
-        const next = { ...prev };
-        delete next[sessionId];
-        return next;
-      }
-      return { ...prev, [sessionId]: groupId };
-    });
-  }, []);
-
   const getPendingFloatingPrompt = useCallback((sessionId: string) => {
     return pendingFloatingPromptBySession[sessionId] ?? null;
   }, [pendingFloatingPromptBySession]);
@@ -366,14 +343,6 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
     setPendingFloatingPromptBySession((prev) => {
-      if (!(sessionId in prev)) {
-        return prev;
-      }
-      const next = { ...prev };
-      delete next[sessionId];
-      return next;
-    });
-    setPendingCreatedChatGroupIdBySession((prev) => {
       if (!(sessionId in prev)) {
         return prev;
       }
@@ -602,8 +571,6 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
       getChatGroup,
       setChatGroup,
       clearChatGroup,
-      getPendingCreatedChatGroupId,
-      setPendingCreatedChatGroupId,
       newChatRequest,
       requestNewChat,
       consumeNewChatRequest,
@@ -644,8 +611,6 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
     getChatGroup,
     setChatGroup,
     clearChatGroup,
-    getPendingCreatedChatGroupId,
-    setPendingCreatedChatGroupId,
     newChatRequest,
     requestNewChat,
     consumeNewChatRequest,
@@ -705,8 +670,6 @@ const fallbackRightPanel: LayoutContextType["rightPanel"] = {
   getChatGroup: noopReturnNull,
   setChatGroup: noopStringFn as LayoutContextType["rightPanel"]["setChatGroup"],
   clearChatGroup: noopStringFn,
-  getPendingCreatedChatGroupId: noopReturnNull,
-  setPendingCreatedChatGroupId: noopStringFn as LayoutContextType["rightPanel"]["setPendingCreatedChatGroupId"],
   newChatRequest: null,
   requestNewChat: (_s: string) => 0,
   consumeNewChatRequest: (_n: number) => {},

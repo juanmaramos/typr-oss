@@ -207,9 +207,24 @@ describe("Stop after moving the live chat view", () => {
     expect(signalA.aborted).toBe(false);
 
     await act(async () => { root.render(<Harness sessionId="session-b" />); });
-    act(() => { actions?.handleStop(); });
-
+    await act(async () => {
+      actions?.handleSubmitWithValue("hello", { source: "test", bypassDebounce: true });
+      for (let attempt = 0; attempt < 30 && mocks.streamText.mock.calls.length < 2; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    });
+    const signalB = mocks.streamText.mock.calls[1][0].abortSignal as AbortSignal;
     expect(signalA.aborted).toBe(false);
+    expect(signalB.aborted).toBe(false);
+
+    await act(async () => {
+      actions?.handleStop();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(signalB.aborted).toBe(true);
+    expect(signalA.aborted).toBe(false);
+    expect(useChatState.getState().isGenerating("session-a")).toBe(true);
+    expect(useChatState.getState().isGenerating("session-b")).toBe(false);
 
     await act(async () => { root.render(<Harness sessionId="session-a" />); });
     await act(async () => {
@@ -275,6 +290,47 @@ describe("Stop after moving the live chat view", () => {
     });
 
     expect(signal.aborted).toBe(true);
+    expect(useChatState.getState().isGenerating("session-1")).toBe(false);
+  });
+
+  it("releases the session claim after preflight rejects and allows a fresh submission", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    mocks.getChatGroupId.mockReset()
+      .mockRejectedValueOnce(new Error("group lookup failed"))
+      .mockResolvedValue("group-1");
+
+    await act(async () => { root.render(<Harness sessionId="session-1" />); });
+
+    let firstAccepted: boolean | undefined;
+    act(() => {
+      firstAccepted = actions?.handleSubmitWithValue("first", { source: "test", bypassDebounce: true });
+    });
+    expect(firstAccepted).toBe(true);
+    expect(hasActiveChatGeneration("session-1")).toBe(true);
+
+    await act(async () => {
+      for (let attempt = 0; attempt < 30 && hasActiveChatGeneration("session-1"); attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    });
+
+    expect(hasActiveChatGeneration("session-1")).toBe(false);
+    expect(useChatState.getState().isGenerating("session-1")).toBe(false);
+    expect(mocks.streamText).not.toHaveBeenCalled();
+
+    let retryAccepted: boolean | undefined;
+    await act(async () => {
+      retryAccepted = actions?.handleSubmitWithValue("retry", { source: "test", bypassDebounce: true });
+      await mocks.streamStarted.promise;
+    });
+    expect(retryAccepted).toBe(true);
+    expect(mocks.getChatGroupId).toHaveBeenCalledTimes(2);
+    expect(mocks.streamText).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      actions?.handleStop();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
     expect(useChatState.getState().isGenerating("session-1")).toBe(false);
   });
 

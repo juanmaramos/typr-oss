@@ -26,10 +26,6 @@ interface SearchHeaderProps {
   onClose: () => void;
   hasReplace?: boolean;
   placeholder?: string;
-  searchTerm?: string;
-  onSearchTermChange?: (value: string) => void;
-  replaceTerm?: string;
-  onReplaceTermChange?: (value: string) => void;
 }
 
 export function SearchHeader({
@@ -37,10 +33,6 @@ export function SearchHeader({
   onClose,
   hasReplace = false,
   placeholder,
-  searchTerm: controlledSearchTerm,
-  onSearchTermChange,
-  replaceTerm: controlledReplaceTerm,
-  onReplaceTermChange,
 }: SearchHeaderProps) {
   const { t } = useLingui();
   // Add ref for the search header container
@@ -61,10 +53,6 @@ export function SearchHeader({
     target,
     onClose,
     hasReplace,
-    searchTerm: controlledSearchTerm,
-    onSearchTermChange,
-    replaceTerm: controlledReplaceTerm,
-    onReplaceTermChange,
   });
 
   // Click outside handler

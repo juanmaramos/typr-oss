@@ -1895,6 +1895,30 @@ Leave everything else in the document completely unchanged.`;
     }
   };
 
+  const launchSubmission = (
+    capturedSessionId: string,
+    content: string,
+    analyticsEvent: string,
+    controller: AbortController,
+  ) => {
+    void processUserMessage(capturedSessionId, content, analyticsEvent, controller)
+      .catch((error) => {
+        if (!controller.signal.aborted && !(error instanceof Error && error.name === "AbortError")) {
+          console.error("[CHAT] Failed before stream processing:", error);
+        }
+      })
+      .finally(() => {
+        if (!finishChatGeneration(capturedSessionId, controller)) {
+          return;
+        }
+
+        const chatState = useChatState.getState();
+        if (chatState.isGenerating(capturedSessionId)) {
+          chatState.setGenerating(capturedSessionId, false);
+        }
+      });
+  };
+
   const handleSubmit = async () => {
     logChatSubmit("submit_requested", {
       source: "chat-input",
@@ -1913,13 +1937,7 @@ Leave everything else in the document completely unchanged.`;
       return false;
     }
 
-    void processUserMessage(capturedSessionId, trimmedContent, "chat_message_sent", controller)
-      .catch((error) => console.error("[CHAT] Failed before stream processing:", error))
-      .finally(() => {
-        if (finishChatGeneration(capturedSessionId, controller)) {
-          useChatState.getState().setGenerating(capturedSessionId, false);
-        }
-      });
+    launchSubmission(capturedSessionId, trimmedContent, "chat_message_sent", controller);
     return true;
   };
 
@@ -1944,13 +1962,7 @@ Leave everything else in the document completely unchanged.`;
       return false;
     }
 
-    void processUserMessage(capturedSessionId, trimmedContent, "chat_message_sent", controller)
-      .catch((error) => console.error("[CHAT] Failed before stream processing:", error))
-      .finally(() => {
-        if (finishChatGeneration(capturedSessionId, controller)) {
-          useChatState.getState().setGenerating(capturedSessionId, false);
-        }
-      });
+    launchSubmission(capturedSessionId, trimmedContent, "chat_message_sent", controller);
     return true;
   };
 
@@ -1963,13 +1975,7 @@ Leave everything else in the document completely unchanged.`;
     );
 
     if (accepted && capturedSessionId && controller) {
-      void processUserMessage(capturedSessionId, trimmedContent, "chat_quickaction_sent", controller)
-        .catch((error) => console.error("[CHAT] Failed before stream processing:", error))
-        .finally(() => {
-          if (finishChatGeneration(capturedSessionId, controller)) {
-            useChatState.getState().setGenerating(capturedSessionId, false);
-          }
-        });
+      launchSubmission(capturedSessionId, trimmedContent, "chat_quickaction_sent", controller);
     }
 
     if (chatInputRef.current) {

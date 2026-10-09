@@ -2,34 +2,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 // Define the type of search target
 export type SearchTarget =
-  | { type: "editor"; editorRef: React.RefObject<any>; ready?: boolean } // For TipTap editor (transcript)
+  | { type: "editor"; editorRef: React.RefObject<any> } // For TipTap editor (transcript)
   | { type: "dom"; selector: string }; // For DOM elements (chat)
 
 interface UseSearchProps {
   target: SearchTarget;
   onClose: () => void;
   hasReplace?: boolean;
-  searchTerm?: string;
-  onSearchTermChange?: (value: string) => void;
-  replaceTerm?: string;
-  onReplaceTermChange?: (value: string) => void;
 }
 
-export function useSearch({
-  target,
-  onClose,
-  hasReplace = false,
-  searchTerm: controlledSearchTerm,
-  onSearchTermChange,
-  replaceTerm: controlledReplaceTerm,
-  onReplaceTermChange,
-}: UseSearchProps) {
-  const [localSearchTerm, setLocalSearchTerm] = useState("");
-  const [localReplaceTerm, setLocalReplaceTerm] = useState("");
-  const searchTerm = controlledSearchTerm ?? localSearchTerm;
-  const replaceTerm = controlledReplaceTerm ?? localReplaceTerm;
-  const setSearchTerm = onSearchTermChange ?? setLocalSearchTerm;
-  const setReplaceTerm = onReplaceTermChange ?? setLocalReplaceTerm;
+export function useSearch({ target, onClose, hasReplace = false }: UseSearchProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [replaceTerm, setReplaceTerm] = useState("");
   const [resultCount, setResultCount] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [results, setResults] = useState<number[]>([]);
@@ -74,7 +58,7 @@ export function useSearch({
     if (target.type === "editor") {
       // Editor-based search (TipTap)
       const editorRef = target.editorRef;
-      if (!searchTerm.trim() || target.ready === false || !editorRef.current) {
+      if (!searchTerm.trim() || !editorRef.current) {
         clearResults();
         return;
       }
@@ -107,7 +91,7 @@ export function useSearch({
 
   // Handle replace term changes (for editor only)
   useEffect(() => {
-    if (target.type === "editor" && target.ready !== false && target.editorRef.current) {
+    if (target.type === "editor" && target.editorRef.current) {
       target.editorRef.current.editor.commands.setReplaceTerm(replaceTerm);
     }
   }, [replaceTerm, target]);
@@ -334,7 +318,7 @@ export function useSearch({
   }, [target, searchTerm]);
 
   const handleClose = useCallback(() => {
-    if (target.type === "editor" && target.ready !== false && target.editorRef.current) {
+    if (target.type === "editor" && target.editorRef.current) {
       target.editorRef.current.editor.commands.setSearchTerm("");
     }
     clearResults();

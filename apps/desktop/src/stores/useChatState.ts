@@ -8,36 +8,7 @@ interface SessionChatState {
   messages: Message[];
   isGenerating: boolean;
   editMode: "chat" | "edit";
-  viewState: ChatViewState;
 }
-
-export interface ChatViewState {
-  showHistory: boolean;
-  historySearchValue: string;
-  hasChatStarted: boolean;
-  isSearchActive: boolean;
-  searchTerm: string;
-  researchMode: boolean;
-  pendingEditorAction: PendingEditorAction | null;
-}
-
-export interface PendingEditorAction {
-  requestId: string;
-  sessionId: string;
-  type: "improve-writing" | "edit-in-chat";
-  selectedText?: string;
-  range?: { from: number; to: number };
-}
-
-export const DEFAULT_CHAT_VIEW_STATE: ChatViewState = {
-  showHistory: false,
-  historySearchValue: "",
-  hasChatStarted: false,
-  isSearchActive: false,
-  searchTerm: "",
-  researchMode: false,
-  pendingEditorAction: null,
-};
 
 interface ChatState {
   // Track state per session to support multiple sessions
@@ -55,10 +26,6 @@ interface ChatState {
   getEditMode: (sessionId: string) => "chat" | "edit";
   setEditMode: (sessionId: string, mode: "chat" | "edit") => void;
 
-  // Chat panel UI state
-  getViewState: (sessionId: string) => ChatViewState;
-  setViewState: (sessionId: string, updates: Partial<ChatViewState>) => void;
-
   // Clear session state
   clearSession: (sessionId: string) => void;
 }
@@ -68,7 +35,6 @@ const getDefaultSessionState = (): SessionChatState => ({
   messages: [],
   isGenerating: false,
   editMode: "chat", // Default to Ask mode
-  viewState: DEFAULT_CHAT_VIEW_STATE,
 });
 
 export const useChatState = create<ChatState>((set, get) => ({
@@ -129,28 +95,6 @@ export const useChatState = create<ChatState>((set, get) => ({
           [sessionId]: {
             ...currentSession,
             editMode: mode,
-          },
-        },
-      };
-    });
-  },
-
-  getViewState: (sessionId: string) => {
-    return get().sessions[sessionId]?.viewState ?? DEFAULT_CHAT_VIEW_STATE;
-  },
-
-  setViewState: (sessionId: string, updates: Partial<ChatViewState>) => {
-    set((state) => {
-      const currentSession = state.sessions[sessionId] || getDefaultSessionState();
-      return {
-        sessions: {
-          ...state.sessions,
-          [sessionId]: {
-            ...currentSession,
-            viewState: {
-              ...currentSession.viewState,
-              ...updates,
-            },
           },
         },
       };
