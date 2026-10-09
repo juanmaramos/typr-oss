@@ -27,6 +27,7 @@ import { debugLogFor } from "@/components/utils/debug-logger";
 import { safeUnlisten } from "@/utils/safe-unlisten";
 import { useRecordingTimer } from "@/hooks/useRecordingTimer";
 import { cn } from "@/lib/utils";
+import { sessionQueryOptions } from "@/lib/session-query";
 import { Button } from "@typr/ui/components/ui/button";
 import { Spinner } from "@typr/ui/components/ui/spinner";
 import { useOngoingSession } from "@typr/utils/contexts";
@@ -121,9 +122,7 @@ export function TranscriptView({
   currentSessionIdRef.current = sessionId;
 
   const sessionQuery = useQuery({
-    queryKey: ["session", sessionId],
-    queryFn: () => dbCommands.getSession({ id: sessionId! }),
-    enabled: !!sessionId,
+    ...sessionQueryOptions(sessionId),
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -192,9 +191,6 @@ export function TranscriptView({
           id: "speaker-processing",
         });
 
-        queryClient.invalidateQueries({
-          queryKey: ["session", "words", sessionId],
-        });
         queryClient.invalidateQueries({
           queryKey: ["session", sessionId],
         });
@@ -308,9 +304,7 @@ export function TranscriptView({
           } words=${words.length}`,
         );
         dbCommands.upsertSession({ ...session, words }).then(() => {
-          queryClient.invalidateQueries({
-            queryKey: ["session", "words", sessionId],
-          });
+          queryClient.invalidateQueries({ queryKey: ["session", sessionId] });
         });
       }
     });

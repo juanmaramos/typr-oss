@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { debugLogFor } from "@/components/utils/debug-logger";
+import { sessionWordsQueryOptions } from "@/lib/session-query";
 import { safeUnlisten } from "@/utils/safe-unlisten";
-import { commands as dbCommands } from "@typr/plugin-db";
 import { events as listenerEvents, type Word } from "@typr/plugin-listener";
 import { useOngoingSession } from "@typr/utils/contexts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -44,20 +44,7 @@ export function useTranscript(sessionId: string | null, caller?: string) {
 
   const prevEventCountRef = useRef({ committed: 0 });
 
-  const existingWords = useQuery({
-    enabled: !!sessionId,
-    queryKey: ["session", "words", sessionId],
-    queryFn: async () => {
-      // Get words directly from session instead of separate words table
-      try {
-        const session = await dbCommands.getSession({ id: sessionId! });
-        return session?.words || [];
-      } catch (error) {
-        console.error("Failed to fetch session:", error);
-        return [];
-      }
-    },
-  });
+  const existingWords = useQuery(sessionWordsQueryOptions(sessionId));
 
   useEffect(() => {
     if (!sessionId) {
@@ -108,7 +95,6 @@ export function useTranscript(sessionId: string | null, caller?: string) {
       } // Handle Session End
       else if (payload.type === "inactive" && sessionId) {
         debugLogFor("DEBUG_TRANSCRIPT", "TranscriptDebug", "session ended; invalidating cache", { sessionId });
-        queryClient.invalidateQueries({ queryKey: ["session", "words", sessionId] });
         queryClient.invalidateQueries({ queryKey: ["session", sessionId] });
       }
     }).then((fn) => {
