@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { setupI18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
-import { act } from "react";
+import { act, StrictMode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -10,6 +10,13 @@ const mocks = vi.hoisted(() => ({
   renderTemplate: vi.fn(),
   upsertChatMessage: vi.fn(),
   inputFocus: vi.fn(),
+  panel: {
+    currentView: "chat" as string,
+    surface: "floating" as string,
+    floatingState: "expanded" as string,
+    switchView: vi.fn(),
+    openFloating: vi.fn(),
+  },
 }));
 
 const i18n = setupI18n({ locale: "en", messages: { en: {} } });
@@ -24,13 +31,18 @@ vi.mock("@/contexts", () => ({
   useRightPanel: () => ({
     isExpanded: false,
     chatInputRef: { current: { focus: mocks.inputFocus } },
-    currentView: "chat",
-    surface: "floating",
-    floatingState: "expanded",
-    switchView: vi.fn(),
-    openFloating: vi.fn(),
+    currentView: mocks.panel.currentView,
+    surface: mocks.panel.surface,
+    floatingState: mocks.panel.floatingState,
+    switchView: (view: string) => {
+      mocks.panel.switchView(view);
+      mocks.panel.currentView = view;
+    },
+    openFloating: mocks.panel.openFloating,
     getChatGroup: () => "group-1",
     setChatGroup: vi.fn(),
+    getPendingCreatedChatGroupId: vi.fn(() => null),
+    setPendingCreatedChatGroupId: vi.fn(),
     getPendingFloatingPrompt: () => null,
     consumeFloatingPrompt: vi.fn(),
     getChatDraft: () => "",
@@ -93,20 +105,27 @@ vi.mock("@/utils/analytics-safe", () => ({ safeAnalyticsEvent: vi.fn() }));
 
 import { useChatState } from "@/stores/useChatState";
 import type { TiptapEditor } from "@typr/tiptap/editor";
+import { useAssistantEditorRequests } from "../hooks/useAssistantEditorRequests";
 import { ChatView } from "./chat-view";
 
 let root: Root;
 let container: HTMLDivElement;
 
-function views() {
+function RightPanelOwnerFixture() {
+  useAssistantEditorRequests("session-1");
+  const shouldMountChat = mocks.panel.surface === "floating"
+    ? mocks.panel.floatingState === "expanded" && mocks.panel.currentView === "chat"
+    : mocks.panel.currentView === "chat";
+
   return (
     <I18nProvider i18n={i18n}>
-      <>
-        <ChatView layout="sidebar" />
-        <ChatView layout="floating" />
-      </>
+      {shouldMountChat && <ChatView layout={mocks.panel.surface === "floating" ? "floating" : "sidebar"} />}
     </I18nProvider>
   );
+}
+
+function views() {
+  return <RightPanelOwnerFixture />;
 }
 
 async function sendImproveWritingEvent() {
@@ -142,6 +161,11 @@ describe("same-session improve-writing requests", () => {
     mocks.generateText.mockReset().mockResolvedValue({ text: "<p>improved words</p>" });
     mocks.renderTemplate.mockReset().mockImplementation(async (template: string) => template);
     mocks.upsertChatMessage.mockReset().mockResolvedValue(undefined);
+    mocks.panel.currentView = "chat";
+    mocks.panel.surface = "floating";
+    mocks.panel.floatingState = "expanded";
+    mocks.panel.switchView.mockReset();
+    mocks.panel.openFloating.mockReset();
   });
 
   afterEach(() => {
@@ -151,7 +175,7 @@ describe("same-session improve-writing requests", () => {
     vi.unstubAllGlobals();
   });
 
-  it("starts one AI edit and saves one user/result pair when both surfaces receive the event", async () => {
+  it("starts one AI edit and saves one user/result pair through the persistent request owner", async () => {
     await act(async () => { root.render(views()); });
     await sendImproveWritingEvent();
 
@@ -183,5 +207,29 @@ describe("same-session improve-writing requests", () => {
     expect(mocks.generateText).toHaveBeenCalledTimes(2);
     expect(useChatState.getState().getMessages("session-1")).toHaveLength(4);
     expect(mocks.upsertChatMessage).toHaveBeenCalledTimes(4);
+  });
+
+  it("queues a closed sidebar request and consumes it once when ChatView mounts", async () => {
+    mocks.panel.currentView = "transcript";
+    mocks.panel.surface = "sidebar";
+    mocks.panel.floatingState = "collapsed";
+
+    await act(async () => { root.render(<StrictMode><RightPanelOwnerFixture /></StrictMode>); });
+    expect(container.querySelector("textarea")).toBeNull();
+
+    await sendImproveWritingEvent();
+    expect(mocks.panel.switchView).toHaveBeenCalledTimes(1);
+    expect(mocks.panel.currentView).toBe("chat");
+    expect(useChatState.getState().getViewState("session-1").pendingEditorAction).toMatchObject({
+      type: "improve-writing",
+      selectedText: "words",
+      range: { from: 1, to: 6 },
+    });
+
+    await act(async () => { root.render(<StrictMode><RightPanelOwnerFixture /></StrictMode>); });
+    await act(async () => { await Promise.resolve(); });
+
+    expect(mocks.generateText).toHaveBeenCalledTimes(1);
+    expect(useChatState.getState().getViewState("session-1").pendingEditorAction).toBeNull();
   });
 });

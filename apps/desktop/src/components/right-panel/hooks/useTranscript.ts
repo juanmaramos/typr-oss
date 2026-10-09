@@ -12,6 +12,8 @@ import {
   getSessionScopedWords,
 } from "./transcript-state";
 
+const TRANSCRIPT_QUERY_GC_TIME = 60_000;
+
 const shortSessionId = (id: string | null | undefined) => id?.slice(-8) ?? "none";
 
 export function useTranscript(sessionId: string | null, caller?: string) {
@@ -47,6 +49,7 @@ export function useTranscript(sessionId: string | null, caller?: string) {
   const existingWords = useQuery({
     enabled: !!sessionId,
     queryKey: ["session", "words", sessionId],
+    gcTime: TRANSCRIPT_QUERY_GC_TIME,
     queryFn: async () => {
       // Get words directly from session instead of separate words table
       try {

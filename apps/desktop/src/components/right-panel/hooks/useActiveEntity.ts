@@ -6,17 +6,9 @@ import type { ActiveEntityInfo } from "../types/chat-types";
 
 interface UseActiveEntityProps {
   setInputValue: (value: string) => void;
-  setShowHistory: (show: boolean) => void;
-  setHasChatStarted: (started: boolean) => void;
-  setCurrentChatGroupId?: (id: string | null) => void;
 }
 
-export function useActiveEntity({
-  setInputValue,
-  setShowHistory,
-  setHasChatStarted,
-  setCurrentChatGroupId,
-}: UseActiveEntityProps) {
+export function useActiveEntity({ setInputValue }: UseActiveEntityProps) {
   const noteMatch = useMatch({ from: "/app/note/$id", shouldThrow: false });
   const humanMatch = useMatch({ from: "/app/human/$id", shouldThrow: false });
   const organizationMatch = useMatch({ from: "/app/organization/$id", shouldThrow: false });
@@ -42,14 +34,13 @@ export function useActiveEntity({
 
   const sessionId = activeEntity?.type === "note" ? activeEntity.id : null;
 
-  // Track previous entity to run side effects only on actual entity changes.
-  // undefined means "not yet initialized" so we always run on first mount.
+  // Track previous entity to reset only the local input when its session changes.
+  // Other chat UI and group state is session-scoped and must survive view remounts.
   const prevEntityRef = useRef<ActiveEntityInfo | null | undefined>(undefined);
 
   useEffect(() => {
     const prev = prevEntityRef.current;
-    const isFirstMount = prev === undefined;
-    const isDifferentEntity = isFirstMount
+    const isDifferentEntity = prev === undefined
       || prev?.id !== activeEntity?.id
       || prev?.type !== activeEntity?.type;
 
@@ -62,10 +53,7 @@ export function useActiveEntity({
     debugLogFor("DEBUG_CHAT", "ChatDebug", "active entity changed", { from: prev, to: activeEntity });
 
     setInputValue("");
-    setShowHistory(false);
-    setHasChatStarted(false);
-    setCurrentChatGroupId?.(null);
-  }, [activeEntity, setInputValue, setShowHistory, setHasChatStarted, setCurrentChatGroupId]);
+  }, [activeEntity, setInputValue]);
 
   return { activeEntity, sessionId };
 }

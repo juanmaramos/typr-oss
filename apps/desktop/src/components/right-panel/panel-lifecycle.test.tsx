@@ -65,6 +65,8 @@ vi.mock("@tanstack/react-router", () => ({
   },
 }));
 vi.mock("@typr/plugin-db", () => ({ commands: testState.db }));
+vi.mock("@tauri-apps/api/event", () => ({ listen: vi.fn(async () => vi.fn()) }));
+vi.mock("sonner", () => ({ toast: { loading: vi.fn(), success: vi.fn(), error: vi.fn() } }));
 vi.mock("@typr/utils/contexts", () => ({
   useSession: (sessionId: string, selector: (state: unknown) => unknown) =>
     selector({ session: { id: sessionId, title: `Title ${sessionId}`, words: [] } }),
@@ -272,13 +274,20 @@ describe("right panel and floating assistant lifecycle", () => {
     container = undefined;
   });
 
-  it("measures retained sidebar tabs and floating shell remounts across the route and surface matrix", async () => {
+  it("owns one heavy view per type, retains sidebar tabs, and clears views on collapse or route leave", async () => {
     await render();
     await waitForQueries();
 
-    expect(active("chat")).toBe(1);
-    expect(active("transcript")).toBe(1);
+    const expectNoDuplicateViews = () => {
+      expect(active("chat")).toBeLessThanOrEqual(1);
+      expect(active("transcript")).toBeLessThanOrEqual(1);
+    };
+
+    // A collapsed floating surface owns no heavy assistant view.
+    expect(active("chat")).toBe(0);
+    expect(active("transcript")).toBe(0);
     expect(active("leftSidebar")).toBe(1);
+    expectNoDuplicateViews();
 
     testState.leftSidebar.isExpanded = false;
     await render();
@@ -288,46 +297,68 @@ describe("right panel and floating assistant lifecycle", () => {
     await render();
     expect(active("leftSidebar")).toBe(1);
 
-    Object.assign(testState.panel, { floatingState: "expanded", currentView: "chat" });
+    // The sidebar keeps both tabs mounted while switching between them.
+    Object.assign(testState.panel, { surface: "sidebar", isExpanded: true, floatingState: "collapsed", currentView: "chat" });
     await render();
-    expect(active("chat")).toBe(2);
+    expect(active("chat")).toBe(1);
     expect(active("transcript")).toBe(1);
+    expect(testState.counts.chat).toEqual({ mounts: 1, unmounts: 0 });
+    expect(testState.counts.transcript).toEqual({ mounts: 1, unmounts: 0 });
 
     testState.panel.currentView = "transcript";
     await render();
     expect(active("chat")).toBe(1);
-    expect(active("transcript")).toBe(2);
+    expect(active("transcript")).toBe(1);
+    expect(testState.counts.chat).toEqual({ mounts: 1, unmounts: 0 });
+    expect(testState.counts.transcript).toEqual({ mounts: 1, unmounts: 0 });
+    expectNoDuplicateViews();
+
+    // Surface handoff unmounts the sidebar pair before the floating shell mounts
+    // only its selected view.
+    Object.assign(testState.panel, { surface: "floating", isExpanded: false, floatingState: "expanded", currentView: "chat" });
+    await render();
+    expect(active("chat")).toBe(1);
+    expect(active("transcript")).toBe(0);
     expect(testState.counts.chat).toEqual({ mounts: 2, unmounts: 1 });
+    expect(testState.counts.transcript).toEqual({ mounts: 1, unmounts: 1 });
+    expectNoDuplicateViews();
 
-    Object.assign(testState.panel, { surface: "sidebar", isExpanded: true, floatingState: "collapsed" });
+    testState.panel.currentView = "transcript";
     await render();
-    expect(active("chat")).toBe(1);
+    expect(active("chat")).toBe(0);
     expect(active("transcript")).toBe(1);
+    expect(testState.counts.chat).toEqual({ mounts: 2, unmounts: 2 });
     expect(testState.counts.transcript).toEqual({ mounts: 2, unmounts: 1 });
+    expectNoDuplicateViews();
 
-    testState.panel.isExpanded = false;
+    // Collapsing floating unmounts the selected view as well.
+    testState.panel.floatingState = "collapsed";
+    await render();
+    expect(active("chat")).toBe(0);
+    expect(active("transcript")).toBe(0);
+    expectNoDuplicateViews();
+
+    // Returning to an open sidebar restores both tabs. Navigating between notes
+    // keeps their owners mounted, while leaving the note route cleans them up.
+    Object.assign(testState.panel, { surface: "sidebar", isExpanded: true, currentView: "transcript" });
     await render();
     expect(active("chat")).toBe(1);
     expect(active("transcript")).toBe(1);
+    expectNoDuplicateViews();
 
     testState.route.noteSessionId = "note-b";
     await render();
     expect(active("chat")).toBe(1);
     expect(active("transcript")).toBe(1);
-
-    Object.assign(testState.panel, { surface: "floating", isExpanded: false, floatingState: "collapsed" });
-    await render();
-    Object.assign(testState.panel, { floatingState: "expanded", currentView: "chat" });
-    await render();
-    expect(active("chat")).toBe(2);
-    expect(testState.counts.chat).toEqual({ mounts: 3, unmounts: 1 });
+    expectNoDuplicateViews();
 
     testState.route.noteSessionId = null;
     await render();
     expect(active("chat")).toBe(0);
     expect(active("transcript")).toBe(0);
     expect(testState.counts.chat).toEqual({ mounts: 3, unmounts: 3 });
-    expect(testState.counts.transcript).toEqual({ mounts: 2, unmounts: 2 });
+    expect(testState.counts.transcript).toEqual({ mounts: 3, unmounts: 3 });
+    expectNoDuplicateViews();
   });
 
   it.each(["dock", "rail"] as const)("enables %s history reads only on the floating surface and keeps their cache", async (variant) => {

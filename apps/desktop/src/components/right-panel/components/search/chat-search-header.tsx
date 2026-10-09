@@ -20,9 +20,16 @@ import { useChatSearchTipTap } from "./use-chat-search-tiptap";
 interface ChatSearchHeaderProps {
   onClose: () => void;
   messages: any[];
+  searchTerm: string;
+  onSearchTermChange: (value: string) => void;
 }
 
-export function ChatSearchHeader({ onClose, messages }: ChatSearchHeaderProps) {
+export function ChatSearchHeader({
+  onClose,
+  messages,
+  searchTerm: controlledSearchTerm,
+  onSearchTermChange,
+}: ChatSearchHeaderProps) {
   const { t } = useLingui();
   const searchHeaderRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +47,7 @@ export function ChatSearchHeader({ onClose, messages }: ChatSearchHeaderProps) {
     handleNext,
     handlePrevious,
     handleClose,
-  } = useChatSearchTipTap(content, onClose);
+  } = useChatSearchTipTap(content, onClose, controlledSearchTerm, onSearchTermChange);
 
   // Click outside handler
   useEffect(() => {

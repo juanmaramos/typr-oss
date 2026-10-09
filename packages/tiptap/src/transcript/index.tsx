@@ -127,8 +127,8 @@ const TranscriptEditor = forwardRef<TranscriptEditorRef, TranscriptEditorProps>(
     }, [editor]);
 
     useEffect(() => {
-      if (ref && typeof ref === "object" && editor) {
-        ref.current = {
+      if (ref && editor) {
+        const exposedRef: TranscriptEditorRef = {
           editor,
           setWords,
           getWords: () => {
@@ -196,8 +196,20 @@ const TranscriptEditor = forwardRef<TranscriptEditorRef, TranscriptEditorProps>(
             return lines.join("\n\n");
           },
         };
+
+        if (typeof ref === "function") {
+          ref(exposedRef);
+          return () => ref(null);
+        }
+
+        ref.current = exposedRef;
+        return () => {
+          if (ref.current === exposedRef) {
+            ref.current = null;
+          }
+        };
       }
-    }, [editor]);
+    }, [editor, ref, setWords]);
 
     useEffect(() => {
       if (editor) {

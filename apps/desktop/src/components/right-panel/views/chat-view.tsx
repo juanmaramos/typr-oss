@@ -17,7 +17,8 @@ import { ChatSearchHeader } from "../components/search";
 // No longer needed as these are used within the ChatHeader component
 
 import { useEditModeModelSwitch } from "@/hooks/useEditModeModelSwitch.tsx";
-import { useChatState } from "@/stores/useChatState";
+import { DEFAULT_CHAT_VIEW_STATE, useChatState, type ChatViewState } from "@/stores/useChatState";
+import { abortChatGeneration } from "../hooks/chat-generation";
 import { useActiveEntity } from "../hooks/useActiveEntity";
 import { useChatLogic } from "../hooks/useChatLogic";
 import { useChatQueries } from "../hooks/useChatQueries";
@@ -85,6 +86,8 @@ export function ChatView({
     switchView,
     getChatGroup,
     setChatGroup,
+    getPendingCreatedChatGroupId,
+    setPendingCreatedChatGroupId,
     getPendingFloatingPrompt,
     consumeFloatingPrompt,
     getChatDraft,
@@ -110,19 +113,39 @@ export function ChatView({
   // Responsive design breakpoints
 
   const [inputValue, setInputValue] = useState("");
-  const [showHistory, setShowHistory] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [hasChatStarted, setHasChatStarted] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const [researchMode, setResearchMode] = useState(false);
   const handledNewChatRequestIdRef = useRef<number | null>(null);
 
   const { activeEntity, sessionId } = useActiveEntity({
     setInputValue,
-    setShowHistory,
-    setHasChatStarted,
   });
+
+  const viewState = useChatState((state) => sessionId
+    ? state.sessions[sessionId]?.viewState ?? DEFAULT_CHAT_VIEW_STATE
+    : DEFAULT_CHAT_VIEW_STATE);
+  const { showHistory, hasChatStarted, isSearchActive, researchMode } = viewState;
+  const searchValue = viewState.historySearchValue;
+  const setViewState = useChatState((state) => state.setViewState);
+  const updateViewState = useCallback((updates: Partial<ChatViewState>) => {
+    if (sessionId) {
+      setViewState(sessionId, updates);
+    }
+  }, [sessionId, setViewState]);
+  const setShowHistory = useCallback((showHistory: boolean) => {
+    updateViewState({ showHistory });
+  }, [updateViewState]);
+  const setHasChatStarted = useCallback((hasChatStarted: boolean) => {
+    updateViewState({ hasChatStarted });
+  }, [updateViewState]);
+  const setIsSearchActive = useCallback((isSearchActive: boolean) => {
+    updateViewState({ isSearchActive });
+  }, [updateViewState]);
+  const setResearchMode = useCallback((researchMode: boolean) => {
+    updateViewState({ researchMode });
+  }, [updateViewState]);
+  const setHistorySearchValue = useCallback((historySearchValue: string) => {
+    updateViewState({ historySearchValue });
+  }, [updateViewState]);
 
   useEffect(() => {
     if (!sessionId) {
@@ -193,6 +216,8 @@ export function ChatView({
     setIsNewChatRequested,
     isNewChatPending: isNewChatPendingForSession,
     completeNewChat,
+    pendingCreatedChatGroupId: sessionId ? getPendingCreatedChatGroupId(sessionId) : null,
+    setPendingCreatedChatGroupId,
     isActiveSurface: isActiveChatSurface,
     allowAutoSelectLatest: isActiveChatSurface
       && !isNewChatRequested
@@ -232,53 +257,28 @@ export function ChatView({
 
   const hasMessages = messages.length > 0;
 
+  useEffect(() => {
+    const pendingAction = viewState.pendingEditorAction;
+    if (!sessionId || !pendingAction || pendingAction.sessionId !== sessionId) {
+      return;
+    }
+
+    const liveAction = useChatState.getState().getViewState(sessionId).pendingEditorAction;
+    if (liveAction?.requestId !== pendingAction.requestId) {
+      return;
+    }
+
+    setViewState(sessionId, { pendingEditorAction: null });
+    if (pendingAction.type === "improve-writing" && pendingAction.selectedText && pendingAction.range) {
+      void handleImproveWriting(pendingAction.selectedText, pendingAction.range);
+    } else if (pendingAction.type === "edit-in-chat") {
+      chatInputRef.current?.focus();
+    }
+  }, [chatInputRef, handleImproveWriting, sessionId, setViewState, viewState.pendingEditorAction]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPersistedInputValue(e.target.value);
   };
-
-  // Listen for improve writing requests from editor
-  useEffect(() => {
-    const handleImproveWritingRequest = (event: CustomEvent) => {
-      const { selectedText, range, sessionId: eventSessionId, action } = event.detail;
-
-      // Only handle if it's for the current session
-      if (eventSessionId === sessionId) {
-        if (action === "improve" || action === "improveWriting") {
-          // Direct improvement - bypass chat input
-          handleImproveWriting(selectedText, range);
-        } else if (action === "editInChat") {
-          // Edit in Chat - just set selection context, let user type their message
-          // The selection context is already set by the selection store
-          // Just focus the input so user can type
-          if (chatInputRef.current) {
-            chatInputRef.current.focus();
-          }
-        }
-      }
-    };
-
-    const handleEditInChatRequest = (event: CustomEvent) => {
-      const { sessionId: eventSessionId } = event.detail;
-
-      // Only handle if it's for the current session
-      if (eventSessionId === sessionId) {
-        // Edit in Chat (⌘L) - focus input and prepare for editing
-        if (chatInputRef.current) {
-          chatInputRef.current.focus();
-        }
-        // Selection context is already set by the SelectionActions component
-      }
-    };
-
-    // Listen for both improve writing and edit in chat events
-    window.addEventListener("improveWritingRequested", handleImproveWritingRequest as EventListener);
-    window.addEventListener("editInChatRequested", handleEditInChatRequest as EventListener);
-
-    return () => {
-      window.removeEventListener("improveWritingRequested", handleImproveWritingRequest as EventListener);
-      window.removeEventListener("editInChatRequested", handleEditInChatRequest as EventListener);
-    };
-  }, [handleImproveWriting, sessionId, chatInputRef]);
 
   const handleFocusInput = () => {
     focusInput(chatInputRef);
@@ -293,15 +293,15 @@ export function ChatView({
       sessionId,
       oldChatGroupId: currentChatGroupId,
     });
+    const chatState = useChatState.getState();
+    const retainedResearchMode = chatState.getViewState(sessionId).researchMode;
+    abortChatGeneration(sessionId);
     setIsNewChatRequested(true);
     clearChatState(sessionId);
-    const { clearSession } = useChatState.getState();
-    clearSession(sessionId);
+    chatState.clearSession(sessionId);
+    chatState.setViewState(sessionId, { researchMode: retainedResearchMode });
     setHasChatStarted(false);
     setPersistedInputValue("");
-    setSearchValue("");
-    setShowHistory(false);
-    setIsSearchActive(false);
     setCopied(false);
     setCurrentChatGroupId(null);
     debugLogFor("DEBUG_CHAT", "ChatDebug", "new chat ready; current chat group is null");
@@ -342,7 +342,7 @@ export function ChatView({
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
+    setHistorySearchValue(e.target.value);
   };
 
   const handleSelectChat = (chatId: string) => {
@@ -455,6 +455,8 @@ export function ChatView({
             <ChatSearchHeader
               onClose={() => setIsSearchActive(false)}
               messages={messages}
+              searchTerm={viewState.searchTerm}
+              onSearchTermChange={(searchTerm) => updateViewState({ searchTerm })}
             />
           )}
 

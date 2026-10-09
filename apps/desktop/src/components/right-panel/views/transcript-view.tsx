@@ -1,13 +1,12 @@
 import { useAudioUpload } from "@/contexts/audio-upload";
 import { useAudioUploadStore } from "@/stores/audio-upload";
+import { DEFAULT_TRANSCRIPT_VIEW_STATE, useTranscriptViewState } from "@/stores/useTranscriptViewState";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMatch } from "@tanstack/react-router";
-import { listen } from "@tauri-apps/api/event";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 
 import { TranscriptActionBar } from "../../transcript/actions/TranscriptActionBar";
 import type { TranscriptState } from "../../transcript/hooks/useTranscriptState";
@@ -24,7 +23,6 @@ import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { AnimatedIconDisplay, BUTTON_VARIANTS, CONTENT_VARIANTS } from "@/components/ui/animated-icon-display";
 import { Loader } from "@/components/ui/loader";
 import { debugLogFor } from "@/components/utils/debug-logger";
-import { safeUnlisten } from "@/utils/safe-unlisten";
 import { useRecordingTimer } from "@/hooks/useRecordingTimer";
 import { cn } from "@/lib/utils";
 import { Button } from "@typr/ui/components/ui/button";
@@ -110,20 +108,49 @@ export function TranscriptView({
   onMoveToSidebar?: () => void;
 } = {}) {
   const { t } = useLingui();
-  const [isSearchActive, setIsSearchActive] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<TranscriptEditorRef | null>(null);
+  const [editorInstance, setEditorInstanceState] = useState<TranscriptEditorRef | null>(null);
+  const setEditorInstance = useCallback((editor: TranscriptEditorRef | null) => {
+    editorRef.current = editor;
+    setEditorInstanceState(editor);
+  }, []);
   const currentSessionIdRef = useRef<string | null>(null);
   const queryClient = useQueryClient();
 
   const noteMatch = useMatch({ from: "/app/note/$id", shouldThrow: false });
   const sessionId = noteMatch?.params.id ?? null;
+  const transcriptViewState = useTranscriptViewState((state) => sessionId
+    ? state.sessions[sessionId] ?? DEFAULT_TRANSCRIPT_VIEW_STATE
+    : DEFAULT_TRANSCRIPT_VIEW_STATE);
+  const setTranscriptViewState = useTranscriptViewState((state) => state.setViewState);
+  const isSearchActive = transcriptViewState.isSearchActive;
+  const setIsSearchActive = useCallback((isSearchActive: boolean) => {
+    if (sessionId) {
+      setTranscriptViewState(sessionId, { isSearchActive });
+    }
+  }, [sessionId, setTranscriptViewState]);
+  const setSearchTerm = useCallback((searchTerm: string) => {
+    if (sessionId) {
+      setTranscriptViewState(sessionId, { searchTerm });
+    }
+  }, [sessionId, setTranscriptViewState]);
+  const setReplaceTerm = useCallback((replaceTerm: string) => {
+    if (sessionId) {
+      setTranscriptViewState(sessionId, { replaceTerm });
+    }
+  }, [sessionId, setTranscriptViewState]);
+  const searchTarget = useMemo(
+    () => ({ type: "editor" as const, editorRef, ready: !!editorInstance }),
+    [editorInstance],
+  );
   currentSessionIdRef.current = sessionId;
 
   const sessionQuery = useQuery({
     queryKey: ["session", sessionId],
     queryFn: () => dbCommands.getSession({ id: sessionId! }),
     enabled: !!sessionId,
+    gcTime: 60_000,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
@@ -166,59 +193,6 @@ export function TranscriptView({
     hasTranscript,
     sessionId,
   ]);
-
-  useEffect(() => {
-    if (!sessionId) {
-      return;
-    }
-
-    let disposed = false;
-    let unlisten: (() => void) | null = null;
-
-    listen("session-event", (event: any) => {
-      if (disposed) {
-        return;
-      }
-
-      const payload = event.payload;
-
-      if (payload.type === "transcriptProcessing" && payload.session_id === sessionId) {
-        toast.loading(t`Enhancing transcript with speaker labels...`, {
-          id: "speaker-processing",
-          duration: Infinity,
-        });
-      } else if (payload.type === "transcriptUpdated" && payload.session_id === sessionId) {
-        toast.success(t`Speaker labels added`, {
-          id: "speaker-processing",
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ["session", "words", sessionId],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ["session", sessionId],
-        });
-      } else if (payload.type === "transcriptError" && payload.session_id === sessionId) {
-        toast.error(t`Failed to add speaker labels`, {
-          id: "speaker-processing",
-        });
-      }
-    }).then((fn) => {
-      if (disposed) {
-        safeUnlisten(fn, "TranscriptView.session-event.listener.late-dispose");
-        return;
-      }
-
-      unlisten = fn;
-    }).catch((error) => {
-      console.error("[events] Failed to register transcript listener", error);
-    });
-
-    return () => {
-      disposed = true;
-      safeUnlisten(unlisten, "TranscriptView.session-event.listener");
-    };
-  }, [sessionId, queryClient, t]);
 
   useEffect(() => {
     // Sync editor content when words change within the same session
@@ -384,13 +358,14 @@ export function TranscriptView({
     <div className="w-full h-full flex flex-col" ref={containerRef}>
       {isSearchActive && (
         <SearchHeader
-          target={{
-            type: "editor",
-            editorRef: editorRef,
-          }}
+          target={searchTarget}
           onClose={() => setIsSearchActive(false)}
           placeholder={t`Find`}
           hasReplace={true}
+          searchTerm={transcriptViewState.searchTerm}
+          onSearchTermChange={setSearchTerm}
+          replaceTerm={transcriptViewState.replaceTerm}
+          onReplaceTermChange={setReplaceTerm}
         />
       )}
 
@@ -437,7 +412,7 @@ export function TranscriptView({
 
                 <TranscriptEditor
                   key={sessionId}
-                  ref={editorRef}
+                  ref={setEditorInstance}
                   initialWords={words}
                   editable={ongoingSession.isInactive}
                   onUpdate={handleUpdate}

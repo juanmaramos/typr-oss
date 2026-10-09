@@ -6,6 +6,8 @@ import { useChatState } from "@/stores/useChatState";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { parseMarkdownBlocks } from "../utils/markdown-parser";
 
+const CHAT_QUERY_GC_TIME = 60_000;
+
 interface UseChatQueriesProps {
   sessionId: string | null;
   userId: string | null;
@@ -16,6 +18,8 @@ interface UseChatQueriesProps {
   setIsNewChatRequested: (requested: boolean) => void;
   isNewChatPending: boolean;
   completeNewChat: (sessionId: string) => void;
+  pendingCreatedChatGroupId: string | null;
+  setPendingCreatedChatGroupId: (sessionId: string, groupId: string | null) => void;
   isActiveSurface: boolean;
   allowAutoSelectLatest: boolean;
   selectionSource: "sidebar" | "floating";
@@ -31,6 +35,8 @@ export function useChatQueries({
   setIsNewChatRequested,
   isNewChatPending,
   completeNewChat,
+  pendingCreatedChatGroupId,
+  setPendingCreatedChatGroupId,
   isActiveSurface,
   allowAutoSelectLatest,
   selectionSource,
@@ -41,10 +47,10 @@ export function useChatQueries({
 
   // Track previous generating state
   const prevIsGenerating = useRef(false);
-  const pendingCreatedGroupIdRef = useRef<string | null>(null);
   const chatGroupsQuery = useQuery({
     enabled: !!sessionId && !!userId,
     queryKey: ["chat-groups", sessionId],
+    gcTime: CHAT_QUERY_GC_TIME,
     queryFn: async () => {
       if (!sessionId || !userId) {
         return [];
@@ -74,20 +80,19 @@ export function useChatQueries({
   });
 
   useEffect(() => {
-    if (pendingCreatedGroupIdRef.current) {
-      const pendingCreatedGroupId = pendingCreatedGroupIdRef.current;
-      const pendingGroupExists = !!chatGroupsQuery.data?.some((group) => group.id === pendingCreatedGroupId);
+    if (pendingCreatedChatGroupId && sessionId) {
+      const pendingGroupExists = !!chatGroupsQuery.data?.some((group) => group.id === pendingCreatedChatGroupId);
 
       if (!pendingGroupExists) {
         debugLogFor("DEBUG_CHAT", "ChatDebug", "suppressing auto-select until created group exists", {
-          pendingCreatedGroupId,
+          pendingCreatedChatGroupId,
           sessionId,
           selectionSource,
         });
         return;
       }
 
-      pendingCreatedGroupIdRef.current = null;
+      setPendingCreatedChatGroupId(sessionId, null);
     }
 
     if (currentChatGroupId) {
@@ -144,16 +149,19 @@ export function useChatQueries({
     chatGroupsQuery.data,
     currentChatGroupId,
     isNewChatRequested,
+    pendingCreatedChatGroupId,
     selectionSource,
     sessionId,
     setCurrentChatGroupId,
     setHasChatStarted,
+    setPendingCreatedChatGroupId,
     setMessages,
   ]);
 
   const chatMessagesQuery = useQuery({
     enabled: !!currentChatGroupId,
     queryKey: ["chat-messages", currentChatGroupId],
+    gcTime: CHAT_QUERY_GC_TIME,
     queryFn: async () => {
       if (!currentChatGroupId) {
         return [];
@@ -203,6 +211,13 @@ export function useChatQueries({
     const justFinishedGenerating = prevIsGenerating.current === true && isGenerating === false;
     prevIsGenerating.current = isGenerating;
 
+    // A remounted observer can expose cached messages while its stale query is
+    // refetching. Wait for that fetch before syncing so old cache data cannot
+    // replace a completed response already held in Zustand.
+    if (chatMessagesQuery.isFetching || chatMessagesQuery.isError) {
+      return;
+    }
+
     if (chatMessagesQuery.data) {
       debugLogFor("DEBUG_CHAT", "ChatDebug", "message sync effect running", {
         sessionId,
@@ -220,7 +235,7 @@ export function useChatQueries({
         const selectedGroup = chatGroupsQuery.data?.find(
           (group) => group.id === currentChatGroupId,
         );
-        const isPendingCreatedGroup = pendingCreatedGroupIdRef.current === currentChatGroupId;
+        const isPendingCreatedGroup = pendingCreatedChatGroupId === currentChatGroupId;
 
         if (!selectedGroup && isPendingCreatedGroup) {
           debugLogFor("DEBUG_CHAT", "ChatDebug", "allowing message sync for pending created group", {
@@ -275,6 +290,8 @@ export function useChatQueries({
     }
   }, [
     chatMessagesQuery.data,
+    chatMessagesQuery.isError,
+    chatMessagesQuery.isFetching,
     isGenerating,
     setMessages,
     setHasChatStarted,
@@ -287,6 +304,7 @@ export function useChatQueries({
   const sessionData = useQuery({
     enabled: !!sessionId,
     queryKey: ["session", "chat-context", sessionId],
+    gcTime: CHAT_QUERY_GC_TIME,
     queryFn: async () => {
       if (!sessionId) {
         return null;
@@ -307,7 +325,14 @@ export function useChatQueries({
     },
   });
 
-  const getChatGroupId = async (): Promise<string> => {
+  const getChatGroupId = async (signal?: AbortSignal): Promise<string> => {
+    const throwIfAborted = () => {
+      if (signal?.aborted) {
+        throw new DOMException("The operation was aborted", "AbortError");
+      }
+    };
+
+    throwIfAborted();
     if (!sessionId || !userId) {
       throw new Error("No session or user");
     }
@@ -323,6 +348,7 @@ export function useChatQueries({
       isNewChatPending,
       ignoredCurrentChatGroupId: currentChatGroupId,
     });
+    throwIfAborted();
     const chatGroup = await dbCommands.createChatGroup({
       id: crypto.randomUUID(),
       session_id: sessionId,
@@ -331,8 +357,9 @@ export function useChatQueries({
       created_at: new Date().toISOString(),
     });
 
+    throwIfAborted();
     debugLogFor("DEBUG_CHAT", "ChatDebug", "new chat group created", { newGroupId: chatGroup.id, sessionId });
-    pendingCreatedGroupIdRef.current = chatGroup.id;
+    setPendingCreatedChatGroupId(sessionId, chatGroup.id);
     setCurrentChatGroupId(chatGroup.id);
     // Clear the new chat flag now that we've created the group
     setIsNewChatRequested(false);
@@ -364,6 +391,7 @@ export function useChatQueries({
   const totalSessionMessagesQuery = useQuery({
     enabled: !!sessionId && !!chatGroupsQuery.data,
     queryKey: ["total-session-messages", sessionId],
+    gcTime: CHAT_QUERY_GC_TIME,
     queryFn: async () => {
       if (!sessionId || !chatGroupsQuery.data) {
         return 0;

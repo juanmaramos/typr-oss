@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
-export function useChatSearchTipTap(content: string, onClose: () => void) {
-  const [searchTerm, setSearchTerm] = useState("");
+export function useChatSearchTipTap(
+  content: string,
+  onClose: () => void,
+  searchTerm: string,
+  setSearchTerm: (value: string) => void,
+) {
   const [resultCount, setResultCount] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [_results, setResults] = useState<number[]>([]);

@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import { useChatState } from "@/stores/useChatState";
+import { abortChatGeneration } from "@/components/right-panel/hooks/chat-generation";
 import { useRightPanel } from "./layout";
 
 interface NewChatContextType {
@@ -36,8 +37,12 @@ export function NewChatProvider({ children }: { children: React.ReactNode }) {
     const sessionId = sessionMatch[2];
     console.log("[NewChat] Creating new chat via context", { sessionId });
 
+    const chatState = useChatState.getState();
+    const researchMode = chatState.getViewState(sessionId).researchMode;
+    abortChatGeneration(sessionId);
     requestNewChat(sessionId);
-    useChatState.getState().clearSession(sessionId);
+    chatState.clearSession(sessionId);
+    chatState.setViewState(sessionId, { researchMode });
 
     if (surface === "floating") {
       showFloatingDock("chat");
