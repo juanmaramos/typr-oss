@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef } from "react";
 
 import { debugLogFor, debugWarnFor } from "@/components/utils/debug-logger";
 import { useChatState } from "@/stores/useChatState";
 import { commands as dbCommands } from "@typr/plugin-db";
+import type { Word } from "@typr/plugin-db";
 import { parseMarkdownBlocks } from "../utils/markdown-parser";
 
 interface UseChatQueriesProps {
@@ -21,6 +22,14 @@ interface UseChatQueriesProps {
   selectionSource: "sidebar" | "floating";
 }
 
+export type ChatSessionContextData = {
+  title: string;
+  rawContent: string;
+  enhancedContent: string | null;
+  preMeetingContent: string | null;
+  words: Word[];
+};
+
 export function useChatQueries({
   sessionId,
   userId,
@@ -37,11 +46,12 @@ export function useChatQueries({
 }: UseChatQueriesProps) {
   // Get state from Zustand store
   const { isGenerating: isGeneratingFn, setMessages } = useChatState();
+  const queryClient = useQueryClient();
   const isGenerating = sessionId ? isGeneratingFn(sessionId) : false;
 
   // Track previous generating state
   const prevIsGenerating = useRef(false);
-  const pendingCreatedGroupIdRef = useRef<string | null>(null);
+
   const chatGroupsQuery = useQuery({
     enabled: !!sessionId && !!userId,
     queryKey: ["chat-groups", sessionId],
@@ -74,22 +84,6 @@ export function useChatQueries({
   });
 
   useEffect(() => {
-    if (pendingCreatedGroupIdRef.current) {
-      const pendingCreatedGroupId = pendingCreatedGroupIdRef.current;
-      const pendingGroupExists = !!chatGroupsQuery.data?.some((group) => group.id === pendingCreatedGroupId);
-
-      if (!pendingGroupExists) {
-        debugLogFor("DEBUG_CHAT", "ChatDebug", "suppressing auto-select until created group exists", {
-          pendingCreatedGroupId,
-          sessionId,
-          selectionSource,
-        });
-        return;
-      }
-
-      pendingCreatedGroupIdRef.current = null;
-    }
-
     if (currentChatGroupId) {
       const selectedGroup = chatGroupsQuery.data?.find((group) => group.id === currentChatGroupId);
       const selectedGroupExists = !!selectedGroup;
@@ -214,20 +208,12 @@ export function useChatQueries({
       });
 
       // Verify that the messages belong to a group for this session.
-      // A newly created group can briefly lead the groups query, so allow that
-      // in-flight transition instead of hiding the just-submitted thread.
       if (currentChatGroupId) {
         const selectedGroup = chatGroupsQuery.data?.find(
           (group) => group.id === currentChatGroupId,
         );
-        const isPendingCreatedGroup = pendingCreatedGroupIdRef.current === currentChatGroupId;
 
-        if (!selectedGroup && isPendingCreatedGroup) {
-          debugLogFor("DEBUG_CHAT", "ChatDebug", "allowing message sync for pending created group", {
-            sessionId,
-            currentChatGroupId,
-          });
-        } else if (!selectedGroup) {
+        if (!selectedGroup) {
           debugWarnFor("DEBUG_CHAT", "ChatDebug", "skipping message sync until selected chat group is verified", {
             sessionId,
             currentChatGroupId,
@@ -284,29 +270,31 @@ export function useChatQueries({
     isActiveSurface,
   ]);
 
-  const sessionData = useQuery({
+  const loadSessionData = async (capturedSessionId: string): Promise<ChatSessionContextData | null> => {
+    const session = await dbCommands.getSession({ id: capturedSessionId });
+    if (!session) {
+      return null;
+    }
+
+    return {
+      title: session.title || "",
+      rawContent: session.raw_memo_html || "",
+      enhancedContent: session.enhanced_memo_html,
+      preMeetingContent: session.pre_meeting_memo_html,
+      words: session.words || [],
+    };
+  };
+
+  const sessionDataQuery = useQuery({
     enabled: !!sessionId,
     queryKey: ["session", "chat-context", sessionId],
-    queryFn: async () => {
-      if (!sessionId) {
-        return null;
-      }
-
-      const session = await dbCommands.getSession({ id: sessionId });
-      if (!session) {
-        return null;
-      }
-
-      return {
-        title: session.title || "",
-        rawContent: session.raw_memo_html || "",
-        enhancedContent: session.enhanced_memo_html,
-        preMeetingContent: session.pre_meeting_memo_html,
-        words: session.words || [],
-      };
-    },
+    queryFn: () => sessionId ? loadSessionData(sessionId) : null,
   });
-
+  const fetchSessionData = (capturedSessionId: string) => queryClient.fetchQuery({
+    queryKey: ["session", "chat-context", capturedSessionId],
+    queryFn: () => loadSessionData(capturedSessionId),
+    staleTime: 0,
+  });
   const getChatGroupId = async (signal?: AbortSignal): Promise<string> => {
     const throwIfAborted = () => {
       if (signal?.aborted) {
@@ -340,12 +328,28 @@ export function useChatQueries({
 
     throwIfAborted();
     debugLogFor("DEBUG_CHAT", "ChatDebug", "new chat group created", { newGroupId: chatGroup.id, sessionId });
-    pendingCreatedGroupIdRef.current = chatGroup.id;
+    const chatGroupsQueryKey = ["chat-groups", sessionId] as const;
+    await queryClient.cancelQueries({ queryKey: chatGroupsQueryKey, exact: true });
+    throwIfAborted();
+
+    type ChatGroupWithMessage = NonNullable<typeof chatGroupsQuery.data>[number];
+    const existingGroups = queryClient.getQueryData<ChatGroupWithMessage[]>(chatGroupsQueryKey);
+    if (existingGroups) {
+      const createdGroupSummary: ChatGroupWithMessage = {
+        ...chatGroup,
+        firstMessage: "",
+        mostRecentMessageTimestamp: new Date(chatGroup.created_at).getTime(),
+      };
+      queryClient.setQueryData<ChatGroupWithMessage[]>(chatGroupsQueryKey, [
+        ...existingGroups.filter((group) => group.id !== chatGroup.id),
+        createdGroupSummary,
+      ]);
+    }
     setCurrentChatGroupId(chatGroup.id);
     // Clear the new chat flag now that we've created the group
     setIsNewChatRequested(false);
     completeNewChat(sessionId);
-    chatGroupsQuery.refetch();
+    void queryClient.invalidateQueries({ queryKey: chatGroupsQueryKey, exact: true });
     return chatGroup.id;
   };
 
@@ -389,7 +393,8 @@ export function useChatQueries({
   return {
     chatGroupsQuery,
     chatMessagesQuery,
-    sessionData,
+    sessionData: sessionDataQuery,
+    fetchSessionData,
     getChatGroupId,
     chatHistory,
     totalSessionMessagesQuery,

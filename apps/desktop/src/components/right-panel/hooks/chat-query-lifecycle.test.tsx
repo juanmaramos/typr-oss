@@ -14,6 +14,12 @@ const fixture = vi.hoisted(() => ({
   setCurrentChatGroupId: vi.fn(),
   setIsNewChatRequested: vi.fn(),
   completeNewChat: vi.fn(),
+  activeSessionId: "session-a",
+  activeGroupId: "group-a" as string | null,
+  groupIdsBySession: { "session-a": "group-a" } as Record<string, string | null>,
+  newChatRequested: true,
+  newChatPending: true,
+  allowAutoSelectLatest: false,
 }));
 
 vi.mock("@typr/plugin-db", () => ({ commands: fixture.db }));
@@ -67,6 +73,36 @@ function ChatQueryOwner() {
   return null;
 }
 
+function SwitchingChatQueryOwner() {
+  const sessionId = fixture.activeSessionId;
+  latestQueries = useChatQueries({
+    sessionId,
+    userId: "user-a",
+    currentChatGroupId: fixture.groupIdsBySession[sessionId] ?? null,
+    setCurrentChatGroupId: (id) => {
+      fixture.groupIdsBySession[sessionId] = id;
+      if (fixture.activeSessionId === sessionId) {
+        fixture.activeGroupId = id;
+      }
+      fixture.setCurrentChatGroupId(id);
+    },
+    setHasChatStarted: noop,
+    isNewChatRequested: fixture.newChatRequested,
+    setIsNewChatRequested: (requested) => {
+      if (fixture.activeSessionId === sessionId) {
+        fixture.newChatRequested = requested;
+        fixture.setIsNewChatRequested(requested);
+      }
+    },
+    isNewChatPending: fixture.newChatPending,
+    completeNewChat: fixture.completeNewChat,
+    isActiveSurface: true,
+    allowAutoSelectLatest: fixture.allowAutoSelectLatest,
+    selectionSource: "sidebar",
+  });
+  return null;
+}
+
 function TestProviders({ children }: { children: ReactNode }) {
   return createElement(QueryClientProvider, { client: queryClient }, children);
 }
@@ -96,6 +132,12 @@ describe("chat group creation cancellation", () => {
     fixture.setCurrentChatGroupId.mockReset();
     fixture.setIsNewChatRequested.mockReset();
     fixture.completeNewChat.mockReset();
+    fixture.activeSessionId = sessionId;
+    fixture.activeGroupId = existingGroupId;
+    fixture.groupIdsBySession = { [sessionId]: existingGroupId };
+    fixture.newChatRequested = true;
+    fixture.newChatPending = true;
+    fixture.allowAutoSelectLatest = false;
     latestQueries = undefined;
     queryClient = new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } });
     container = document.createElement("div");
@@ -159,5 +201,135 @@ describe("chat group creation cancellation", () => {
     expect(fixture.setIsNewChatRequested).toHaveBeenCalledWith(false);
     expect(fixture.completeNewChat).toHaveBeenCalledWith(sessionId);
     await vi.waitFor(() => expect(fixture.db.listChatGroups).toHaveBeenCalledTimes(2));
+  });
+
+  it("keeps late group creation and note-context reads scoped to the originating session", async () => {
+    queryClient.clear();
+    queryClient = new QueryClient({ defaultOptions: { queries: { gcTime: 60_000, retry: false } } });
+    const oldGroupsForA = deferred<ChatGroup[]>();
+    const originalGroupA: ChatGroup = {
+      id: "old-group-a",
+      session_id: "session-a",
+      user_id: "user-a",
+      created_at: "2025-01-01T00:00:00.000Z",
+      name: null,
+    };
+    const createdGroupA: ChatGroup = {
+      id: "group-from-a",
+      session_id: "session-a",
+      user_id: "user-a",
+      created_at: new Date().toISOString(),
+      name: null,
+    };
+    const groupB: ChatGroup = {
+      id: "group-b",
+      session_id: "session-b",
+      user_id: "user-a",
+      created_at: new Date().toISOString(),
+      name: null,
+    };
+    let aGroupLoads = 0;
+    fixture.db.listChatGroups.mockImplementation(async (requestedSessionId: string) => {
+      if (requestedSessionId === "session-a") {
+        aGroupLoads += 1;
+        if (aGroupLoads === 2) {
+          return oldGroupsForA.promise;
+        }
+        return [originalGroupA, createdGroupA].slice(0, aGroupLoads === 1 ? 1 : 2);
+      }
+      return requestedSessionId === "session-b" ? [groupB] : [];
+    });
+    fixture.db.listChatMessages.mockImplementation(async (groupId: string) => groupId === "group-b"
+      ? [{
+        id: "message-b",
+        group_id: "group-b",
+        role: "User",
+        content: "B message",
+        created_at: new Date().toISOString(),
+        parts: null,
+      }]
+      : []);
+    fixture.db.getSession.mockImplementation(async ({ id }: { id: string }) => ({
+      id,
+      title: `Session ${id}`,
+      raw_memo_html: `Body ${id}`,
+      enhanced_memo_html: null,
+      pre_meeting_memo_html: null,
+      words: [],
+    }));
+
+    await act(async () => {
+      root.render(createElement(TestProviders, null, createElement(SwitchingChatQueryOwner)));
+    });
+    await waitForInitialQueries();
+
+    fixture.groupIdsBySession["session-a"] = "old-group-a";
+    await act(async () => {
+      void queryClient.refetchQueries({ queryKey: ["chat-groups", "session-a"], type: "active" });
+    });
+    await vi.waitFor(() => expect(fixture.db.listChatGroups).toHaveBeenCalledTimes(2));
+
+    const queriesForA = latestQueries!;
+    const fetchSessionDataForA = queriesForA.fetchSessionData;
+    const createGroup = deferred<ChatGroup>();
+    fixture.db.createChatGroup.mockImplementationOnce(() => createGroup.promise);
+    const createOperation = queriesForA.getChatGroupId(new AbortController().signal);
+    await vi.waitFor(() => expect(fixture.db.createChatGroup).toHaveBeenCalledTimes(1));
+
+    fixture.activeSessionId = "session-b";
+    fixture.activeGroupId = null;
+    fixture.newChatRequested = false;
+    fixture.newChatPending = false;
+    fixture.allowAutoSelectLatest = true;
+    await act(async () => {
+      root.render(createElement(TestProviders, null, createElement(SwitchingChatQueryOwner)));
+    });
+    await vi.waitFor(() => {
+      expect(fixture.db.listChatGroups.mock.calls.filter(([requestedSessionId]) => requestedSessionId === "session-b"))
+        .toHaveLength(1);
+    });
+
+    await act(async () => {
+      createGroup.resolve(createdGroupA);
+      await expect(createOperation).resolves.toBe("group-from-a");
+    });
+    expect(queryClient.getQueryData<ChatGroup[]>(["chat-groups", "session-a"])).toEqual([
+      expect.objectContaining({ id: "old-group-a" }),
+      expect.objectContaining({
+        id: "group-from-a",
+        firstMessage: "",
+        mostRecentMessageTimestamp: new Date(createdGroupA.created_at).getTime(),
+      }),
+    ]);
+
+    const contextForA = await fetchSessionDataForA("session-a");
+    expect(contextForA?.title).toBe("Session session-a");
+    expect(fixture.db.getSession).toHaveBeenLastCalledWith({ id: "session-a" });
+    await vi.waitFor(() => expect(fixture.setCurrentChatGroupId).toHaveBeenCalledWith("group-b"));
+    expect(fixture.db.listChatGroups.mock.calls.filter(([requestedSessionId]) => requestedSessionId === "session-b"))
+      .toHaveLength(1);
+
+    await act(async () => { oldGroupsForA.resolve([originalGroupA]); });
+    expect(queryClient.getQueryData<ChatGroup[]>(["chat-groups", "session-a"])).toEqual([
+      expect.objectContaining({ id: "old-group-a" }),
+      expect.objectContaining({ id: "group-from-a" }),
+    ]);
+
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: ["chat-groups", "session-b"] });
+    });
+    expect(fixture.db.listChatGroups.mock.calls.filter(([requestedSessionId]) => requestedSessionId === "session-b"))
+      .toHaveLength(2);
+    expect(fixture.setCurrentChatGroupId.mock.calls.map(([groupId]) => groupId)).toContain("group-b");
+
+    fixture.activeSessionId = "session-a";
+    fixture.activeGroupId = fixture.groupIdsBySession["session-a"] ?? null;
+    await act(async () => {
+      root.render(createElement(TestProviders, null, createElement(SwitchingChatQueryOwner)));
+    });
+    await vi.waitFor(() => expect(fixture.db.listChatGroups.mock.calls.filter(([requestedSessionId]) => requestedSessionId === "session-a"))
+      .toHaveLength(3));
+    await vi.waitFor(() => expect(fixture.groupIdsBySession["session-a"]).toBe("group-from-a"));
+    expect(fixture.activeGroupId).toBe("group-from-a");
   });
 });

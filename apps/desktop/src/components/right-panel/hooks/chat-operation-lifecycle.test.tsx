@@ -6,6 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   streamText: vi.fn(),
   getChatGroupId: vi.fn(),
+  fetchSessionData: vi.fn(),
+  renderTemplate: vi.fn(),
   setInputValue: vi.fn(),
   panel: { surface: "floating" as "floating" | "sidebar" },
   streamStarted: (() => { let resolve!: () => void; const promise = new Promise<void>((r) => { resolve = r; }); return { promise, resolve }; })(),
@@ -25,7 +27,7 @@ vi.mock("@typr/plugin-db", () => ({ commands: {
 } }));
 vi.mock("@typr/plugin-local-llm", () => ({ commands: { getCurrentModel: vi.fn(async () => "model") } }));
 vi.mock("@typr/plugin-misc", () => ({ commands: {} }));
-vi.mock("@typr/plugin-template", () => ({ commands: { render: vi.fn(async () => "system") } }));
+vi.mock("@typr/plugin-template", () => ({ commands: { render: mocks.renderTemplate } }));
 vi.mock("@typr/utils", () => ({
   AUTO_CLOUD_MODEL_ID: "auto",
   AUTO_CLOUD_MODEL_PRIORITY: [],
@@ -61,7 +63,7 @@ function Harness({ sessionId }: { sessionId: string }) {
     setInputValue: mocks.setInputValue,
     setHasChatStarted: vi.fn(),
     getChatGroupId: mocks.getChatGroupId,
-    sessionData: { refetch: async () => ({ data: { title: "Note", words: [] } }) },
+    fetchSessionData: mocks.fetchSessionData,
     chatInputRef: { current: null },
     totalSessionMessages: 0,
   });
@@ -79,6 +81,13 @@ describe("Stop after moving the live chat view", () => {
     mocks.panel.surface = "floating";
     mocks.streamStarted = (() => { let resolve!: () => void; const promise = new Promise<void>((r) => { resolve = r; }); return { promise, resolve }; })();
     mocks.getChatGroupId.mockReset().mockResolvedValue("group-1");
+    mocks.fetchSessionData.mockReset().mockImplementation(async (sessionId: string) => ({
+      title: `Note ${sessionId}`,
+      words: [],
+    }));
+    mocks.renderTemplate.mockReset().mockImplementation(async (_template: string, variables?: { title?: string }) => {
+      return variables?.title ? `system:${variables.title}` : "system";
+    });
     mocks.setInputValue.mockReset();
     mocks.streamText.mockReset().mockImplementation(({ abortSignal }: { abortSignal: AbortSignal }) => {
       mocks.streamStarted.resolve();
@@ -235,6 +244,52 @@ describe("Stop after moving the live chat view", () => {
     });
     expect(signalA.aborted).toBe(true);
     expect(useChatState.getState().isGenerating("session-a")).toBe(false);
+  });
+
+  it("uses the originating note context after navigation during Ask preflight", async () => {
+    let releaseGroupId!: (groupId: string) => void;
+    const groupIdPromise = new Promise<string>((resolve) => { releaseGroupId = resolve; });
+    releasePendingGroupId = releaseGroupId;
+    mocks.getChatGroupId.mockReset().mockImplementationOnce(() => groupIdPromise);
+    mocks.fetchSessionData.mockImplementation(async (sessionId: string) => ({
+      title: `Title ${sessionId}`,
+      rawContent: `Body ${sessionId}`,
+      enhancedContent: null,
+      preMeetingContent: null,
+      words: [],
+    }));
+
+    await act(async () => { root.render(<Harness sessionId="session-a" />); });
+    let accepted: boolean | undefined;
+    await act(async () => {
+      accepted = actions?.handleSubmitWithValue("summarize this note", { source: "test", bypassDebounce: true });
+      for (let attempt = 0; attempt < 20 && mocks.getChatGroupId.mock.calls.length === 0; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    });
+    expect(accepted).toBe(true);
+
+    await act(async () => { root.render(<Harness sessionId="session-b" />); });
+    await act(async () => {
+      releaseGroupId("group-a");
+      await mocks.streamStarted.promise;
+    });
+
+    expect(mocks.fetchSessionData.mock.calls.map(([sessionId]) => sessionId)).toEqual([
+      "session-a",
+      "session-a",
+    ]);
+    const messages = mocks.streamText.mock.calls[0][0].messages as Array<{ role: string; content: string }>;
+    expect(messages[0].content).toContain("Title session-a");
+    expect(messages[0].content).not.toContain("Title session-b");
+
+    await act(async () => {
+      abortChatGeneration("session-a");
+      for (let attempt = 0; attempt < 30 && hasActiveChatGeneration("session-a"); attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    });
+    expect(hasActiveChatGeneration("session-a")).toBe(false);
   });
 
   it("keeps a preflight submission claimed when New Chat clears session generating state", async () => {

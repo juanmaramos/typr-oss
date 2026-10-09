@@ -21,6 +21,10 @@ const mocks = vi.hoisted(() => {
     consumeFloatingPrompt: vi.fn(),
     getChatGroupId: vi.fn(),
     activeSessionId: "session-1",
+    newChatRequest: null as null | { sessionId: string; requestId: number },
+    isNewChatRequestedInQuery: false,
+    selectionSessionId: "session-1" as string | null,
+    clearSelection: vi.fn(() => { mocks.selectionSessionId = null; }),
     chatInputValue: "",
     chatInputSubmit: null as null | (() => unknown),
     chatInputChange: null as null | ((event: { target: { value: string } }) => void),
@@ -60,9 +64,13 @@ vi.mock("@/contexts", () => ({
     setChatDraft: mocks.setChatDraft,
     clearChatDraft: mocks.clearChatDraft,
     clearChatState: vi.fn(),
-    newChatRequest: null,
+    newChatRequest: mocks.newChatRequest,
     requestNewChat: vi.fn(),
-    consumeNewChatRequest: vi.fn(),
+    consumeNewChatRequest: (requestId: number) => {
+      if (mocks.newChatRequest?.requestId === requestId) {
+        mocks.newChatRequest = null;
+      }
+    },
     isNewChatPending: () => false,
     completeNewChat: vi.fn(),
   }),
@@ -90,20 +98,29 @@ vi.mock("../components/chat", async () => {
 vi.mock("../components/search", () => ({ ChatSearchHeader: () => null }));
 vi.mock("@/hooks/useEditModeModelSwitch.tsx", () => ({ useEditModeModelSwitch: vi.fn() }));
 
-vi.mock("../hooks/useChatQueries", () => ({ useChatQueries: () => ({
+vi.mock("../hooks/useChatQueries", () => ({ useChatQueries: (options: { isNewChatRequested: boolean }) => {
+  mocks.isNewChatRequestedInQuery = options.isNewChatRequested;
+  return ({
   chatGroupsQuery: { data: [] },
   sessionData: { data: { title: "Test" }, refetch: async () => ({ data: { title: "Test", words: [] } }) },
+  fetchSessionData: async () => ({ title: "Test", words: [] }),
   getChatGroupId: mocks.getChatGroupId,
   chatHistory: [],
   totalSessionMessagesQuery: { data: 0 },
-}) }));
+  });
+} }));
 vi.mock("../utils/chat-utils", () => ({ focusInput: vi.fn(), formatDate: vi.fn() }));
-vi.mock("@/stores/useSelectionContext", () => ({ useSelectionContext: () => ({
-  selectedText: "words",
-  selectionRange: { from: 1, to: 6 },
-  sessionId: mocks.activeSessionId,
-  clearSelection: vi.fn(),
-}) }));
+vi.mock("@/stores/useSelectionContext", () => ({
+  useSelectionContext: Object.assign(
+    () => ({
+      selectedText: "words",
+      selectionRange: { from: 1, to: 6 },
+      sessionId: mocks.selectionSessionId,
+      clearSelection: mocks.clearSelection,
+    }),
+    { getState: () => ({ sessionId: mocks.selectionSessionId }) },
+  ),
+}));
 vi.mock("@typr/utils/contexts", () => ({ useSessions: (selector: (state: object) => unknown) => selector({ sessions: {} }) }));
 vi.mock("@typr/utils", () => ({
   AUTO_CLOUD_MODEL_ID: "auto",
@@ -208,6 +225,10 @@ describe("same-session improve-writing requests", () => {
     mocks.getChatDraft.mockClear();
     mocks.consumeFloatingPrompt.mockReset();
     mocks.activeSessionId = "session-1";
+    mocks.newChatRequest = null;
+    mocks.isNewChatRequestedInQuery = false;
+    mocks.selectionSessionId = "session-1";
+    mocks.clearSelection.mockClear();
     mocks.chatInputValue = "";
     mocks.chatInputSubmit = null;
     mocks.chatInputChange = null;
@@ -325,6 +346,8 @@ describe("same-session improve-writing requests", () => {
 
   it("keeps the current note draft when a previous note's Ask preflight completes", async () => {
     mocks.activeSessionId = "session-a";
+    mocks.selectionSessionId = "session-a";
+    mocks.newChatRequest = { sessionId: "session-a", requestId: 1 };
     let resolveGroup!: (groupId: string) => void;
     const groupPromise = new Promise<string>((resolve) => { resolveGroup = resolve; });
     releaseRouteGroupId = resolveGroup;
@@ -337,6 +360,7 @@ describe("same-session improve-writing requests", () => {
         </I18nProvider>,
       );
     });
+    expect(mocks.isNewChatRequestedInQuery).toBe(true);
     act(() => {
       mocks.chatInputChange?.({ target: { value: "question for A" } });
     });
@@ -352,6 +376,7 @@ describe("same-session improve-writing requests", () => {
     expect(mocks.getChatGroupId).toHaveBeenCalledTimes(1);
 
     mocks.activeSessionId = "session-b";
+    mocks.selectionSessionId = "session-b";
     await act(async () => {
       root.render(
         <I18nProvider i18n={i18n}>
@@ -359,6 +384,7 @@ describe("same-session improve-writing requests", () => {
         </I18nProvider>,
       );
     });
+    expect(mocks.isNewChatRequestedInQuery).toBe(false);
     act(() => {
       mocks.chatInputChange?.({ target: { value: "draft for B" } });
     });
@@ -376,6 +402,7 @@ describe("same-session improve-writing requests", () => {
     expect(mocks.chatDrafts["session-b"]).toBe("draft for B");
     expect(mocks.chatInputValue).toBe("draft for B");
     expect(container.querySelector<HTMLTextAreaElement>('[data-testid="chat-input"]')?.value).toBe("draft for B");
+    expect(mocks.selectionSessionId).toBe("session-b");
 
     await act(async () => {
       abortChatGeneration("session-a");

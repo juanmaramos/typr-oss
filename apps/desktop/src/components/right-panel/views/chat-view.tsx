@@ -126,8 +126,12 @@ export function ChatView({
   });
   const currentSessionIdRef = useRef(sessionId);
   useLayoutEffect(() => {
+    const sessionChanged = currentSessionIdRef.current !== sessionId;
     currentSessionIdRef.current = sessionId;
-  }, [sessionId]);
+    if (sessionChanged) {
+      setIsNewChatRequested(false);
+    }
+  }, [sessionId, setIsNewChatRequested]);
 
   const setHasChatStartedForSession = useCallback((started: boolean) => {
     if (currentSessionIdRef.current === sessionId) {
@@ -202,7 +206,7 @@ export function ChatView({
   // Auto-switch to cloud model when entering Edit mode
   useEditModeModelSwitch(effectiveEditMode);
 
-  const { chatGroupsQuery, sessionData, getChatGroupId, chatHistory, totalSessionMessagesQuery } = useChatQueries({
+  const { chatGroupsQuery, sessionData, fetchSessionData, getChatGroupId, chatHistory, totalSessionMessagesQuery } = useChatQueries({
     sessionId,
     userId,
     currentChatGroupId,
@@ -239,7 +243,7 @@ export function ChatView({
     setInputValue: setPersistedInputValue,
     setHasChatStarted: setHasChatStartedForSession,
     getChatGroupId,
-    sessionData,
+    fetchSessionData,
     chatInputRef,
     totalSessionMessages: totalSessionMessagesQuery.data || 0,
     editMode: effectiveEditMode, // Pass explicit mode

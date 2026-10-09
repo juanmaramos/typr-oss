@@ -29,6 +29,7 @@ import { useSessions } from "@typr/utils/contexts";
 import { SHOW_WEB_SEARCH_IN_CHAT_INPUT } from "../constants/features";
 
 import type { ActiveEntityInfo, Message, MessagePart } from "../types/chat-types";
+import type { ChatSessionContextData } from "./useChatQueries";
 
 interface UseChatLogicProps {
   sessionId: string | null;
@@ -39,7 +40,7 @@ interface UseChatLogicProps {
   setInputValue: (value: string) => void;
   setHasChatStarted: (started: boolean) => void;
   getChatGroupId: (signal?: AbortSignal) => Promise<string>;
-  sessionData: any;
+  fetchSessionData: (sessionId: string) => Promise<ChatSessionContextData | null>;
   chatInputRef: React.RefObject<HTMLTextAreaElement>;
   totalSessionMessages: number;
   editMode?: "chat" | "edit"; // Explicit mode selection
@@ -105,7 +106,7 @@ export function useChatLogic({
   setInputValue,
   setHasChatStarted,
   getChatGroupId,
-  sessionData,
+  fetchSessionData,
   chatInputRef,
   totalSessionMessages,
   editMode = "chat", // Default to chat mode
@@ -352,7 +353,7 @@ export function useChatLogic({
       // Guard against race condition: if editor HTML is empty but we expect content, refetch from database
       if (currentEditorHTML.trim() === "<p></p>" || currentEditorHTML.trim() === "") {
         console.warn("⚠️ [DocumentEdit] Editor returned empty HTML, checking database...");
-        const refetchResult = await sessionData.refetch();
+        const refetchResult = await fetchSessionData(sessionId);
 
         // CRITICAL: Respect which note the user is currently viewing
         // Get the session store to check showRaw state
@@ -367,8 +368,8 @@ export function useChatLogic({
 
         // Use the note that matches the current view
         const dbDocument = isViewingRaw
-          ? (refetchResult.data?.rawContent || "")
-          : (refetchResult.data?.enhancedContent || "");
+          ? (refetchResult?.rawContent || "")
+          : (refetchResult?.enhancedContent || "");
 
         console.log(`🔍 [DocumentEdit] User is viewing ${isViewingRaw ? "raw" : "enhanced"} note`);
 
@@ -442,8 +443,8 @@ export function useChatLogic({
 
       // Enhanced templates with HTML for better AI understanding
       // Get lightweight context (title only) for better AI understanding
-      const refetchForContext = await sessionData.refetch();
-      const sessionTitle = refetchForContext.data?.title || "";
+      const refetchForContext = await fetchSessionData(sessionId);
+      const sessionTitle = refetchForContext?.title || "";
 
       const [systemMessage, userMessage] = await Promise.all([
         templateCommands.render("document_edit.system", {
@@ -1038,10 +1039,13 @@ Leave everything else in the document completely unchanged.`;
     }
   };
 
-  const prepareMessageHistory = async (messages: Message[], currentUserMessage?: string) => {
+  const prepareMessageHistory = async (
+    messages: Message[],
+    currentUserMessage: string | undefined,
+    capturedSessionId: string,
+  ) => {
     // Force fresh session data to avoid stale context
-    const refetchResult = await sessionData.refetch();
-    let freshSessionData = refetchResult.data;
+    const freshSessionData = await fetchSessionData(capturedSessionId);
 
     if (!freshSessionData) {
       throw new Error("Failed to load session data");
@@ -1049,9 +1053,9 @@ Leave everything else in the document completely unchanged.`;
 
     const { type } = await connectorCommands.getLlmConnection();
 
-    const participants = sessionId ? await dbCommands.sessionListParticipants(sessionId) : [];
+    const participants = await dbCommands.sessionListParticipants(capturedSessionId);
 
-    const calendarEvent = sessionId ? await dbCommands.sessionGetEvent(sessionId) : null;
+    const calendarEvent = await dbCommands.sessionGetEvent(capturedSessionId);
 
     // Get current user profile for AI context
     const currentUser = userId ? await dbCommands.getHuman(userId) : null;
@@ -1339,7 +1343,9 @@ Leave everything else in the document completely unchanged.`;
       console.log("🎯 [AskMode] Including selection as context in message");
 
       // Clear selection and editor highlight after including it in message
-      clearSelection();
+      if (useSelectionContext.getState().sessionId === selectionSessionId) {
+        clearSelection();
+      }
 
       // Also clear the AI selection highlight from editor
       const editorRef = window.__TYPR_EDITORS__?.[capturedSessionId];
@@ -1373,11 +1379,11 @@ Leave everything else in the document completely unchanged.`;
     }
 
     // Check for Edit mode document editing BEFORE try block
-    const refetchForDoc = await sessionData.refetch();
+    const refetchForDoc = await fetchSessionData(capturedSessionId);
     if (generationController.signal.aborted) {
       return false;
     }
-    const currentDocument = refetchForDoc.data?.enhancedContent || refetchForDoc.data?.rawContent || "";
+    const currentDocument = refetchForDoc?.enhancedContent || refetchForDoc?.rawContent || "";
 
     console.log("🎯 [ProcessMessage] Mode check:", {
       editMode,
@@ -1419,7 +1425,7 @@ Leave everything else in the document completely unchanged.`;
       // Do not add a message with "Generating..." content, we'll use the typing indicator instead
       // and only show actual content when it starts streaming
 
-      const messageHistory = await prepareMessageHistory(messages, content);
+      const messageHistory = await prepareMessageHistory(messages, content, capturedSessionId);
 
       // Track browser search sources for citation linking
       const searchSources: Array<{ url: string; title?: string }> = [];
