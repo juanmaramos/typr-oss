@@ -1,26 +1,15 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 import { ProjectIcon } from "@/components/projects/project-icon";
-import { useTypr } from "@/contexts";
 import { useBulkDelete } from "@/hooks/useBulkDelete";
-import { projectBriefQueryKeys } from "@/lib/project-briefs";
-import { markAndEnqueueProjectBriefRefresh, projectKnowledgeJobQueryKeys } from "@/lib/project-knowledge-jobs";
-import {
-  assignSessionToProject,
-  getProjectActionErrorMessage,
-  isProjectQueryKey,
-  listProjects,
-  projectQueryKeys,
-} from "@/lib/projects";
+import { useAddNotesToProject } from "@/hooks/useAddNotesToProject";
+import { listProjects, projectQueryKeys } from "@/lib/projects";
 import { useMultiSelectNotes } from "@/stores/useMultiSelectNotes";
-import { trackEvent } from "@/utils/analytics-events";
 import { NumberBadge } from "@typr/ui/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
-import { toast } from "@typr/ui/components/ui/toast";
-import { useSessions } from "@typr/utils/contexts";
 
 export function BulkActionBar() {
   const {
@@ -65,9 +54,6 @@ export function BulkActionBar() {
 
 function MoveToProjectButton() {
   const { t } = useLingui();
-  const queryClient = useQueryClient();
-  const sessionsStore = useSessions((s) => s.sessions);
-  const { userId } = useTypr();
   const {
     selectedNoteIds,
     clearSelection,
@@ -79,44 +65,7 @@ function MoveToProjectButton() {
     queryFn: listProjects,
   });
 
-  const addToProjectMutation = useMutation({
-    mutationFn: async ({ projectId, noteIds }: { projectId: string; noteIds: string[] }) => {
-      await Promise.all(noteIds.map(noteId => assignSessionToProject(noteId, projectId)));
-      return noteIds;
-    },
-    onSuccess: async (noteIds, variables) => {
-      trackEvent("project_notes_added", userId, {
-        project_id: variables.projectId,
-        note_count: noteIds.length,
-        source: "bulk_action",
-      });
-      await markAndEnqueueProjectBriefRefresh(variables.projectId);
-      await Promise.all([
-        queryClient.invalidateQueries({
-          predicate: query => isProjectQueryKey(query.queryKey[0]),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: [projectKnowledgeJobQueryKeys.byProject, variables.projectId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: [projectBriefQueryKeys.latest, variables.projectId],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: [projectBriefQueryKeys.freshness, variables.projectId],
-        }),
-        ...noteIds.map(noteId => sessionsStore[noteId]?.getState().refresh()).filter(Boolean),
-      ]);
-      clearSelection();
-      setOpen(false);
-    },
-    onError: (error) => {
-      toast({
-        id: "bulk-move-project-error",
-        title: <Trans>Couldn’t add notes</Trans>,
-        content: getProjectActionErrorMessage(error),
-      });
-    },
-  });
+  const addToProjectMutation = useAddNotesToProject("bulk_action");
 
   const projects = projectsQuery.data ?? [];
 
@@ -154,10 +103,18 @@ function MoveToProjectButton() {
             type="button"
             disabled={addToProjectMutation.isPending}
             onClick={() => {
-              addToProjectMutation.mutate({
-                projectId: project.id,
-                noteIds: Array.from(selectedNoteIds),
-              });
+              addToProjectMutation.mutate(
+                {
+                  projectId: project.id,
+                  noteIds: Array.from(selectedNoteIds),
+                },
+                {
+                  onSuccess: () => {
+                    clearSelection();
+                    setOpen(false);
+                  },
+                },
+              );
             }}
             className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-foreground transition-colors hover:bg-surface-400 disabled:pointer-events-none disabled:opacity-50"
           >

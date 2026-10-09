@@ -69,7 +69,7 @@ interface ProjectSourceStatusChanged extends ProjectRef {
 
 interface ProjectNotesAdded extends ProjectRef {
   note_count: number;
-  source: "project_picker" | "note_header" | "bulk_action";
+  source: "project_picker" | "note_header" | "bulk_action" | "sidebar_drag_drop";
 }
 
 interface ProjectFilesAdded extends ProjectRef {

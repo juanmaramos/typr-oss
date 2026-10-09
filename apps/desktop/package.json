@@ -10,7 +10,7 @@
     "tauri": "tauri",
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile --typescript",
-    "test": "vitest run src/components/right-panel/hooks/transcript-state.test.ts src/components/right-panel/hooks/chat-query-lifecycle.test.tsx src/components/right-panel/hooks/chat-operation-lifecycle.test.tsx src/components/right-panel/views/transcript-persistence.test.ts src/components/right-panel/panel-lifecycle.test.tsx src/components/right-panel/views/transcript-listener-lifecycle.test.tsx src/components/right-panel/views/chat-improve-writing-lifecycle.test.tsx src/contexts/layout-focus.test.tsx src/lib/session-query.test.tsx src/lib/project-knowledge.test.ts src/lib/project-briefs.test.ts src/lib/ask.test.ts src/lib/note-title.test.ts src/components/toolbar/utils/pdf-export.test.ts",
+    "test": "vitest run src/components/right-panel/hooks/transcript-state.test.ts src/components/right-panel/hooks/chat-query-lifecycle.test.tsx src/components/right-panel/hooks/chat-operation-lifecycle.test.tsx src/components/right-panel/views/transcript-persistence.test.ts src/components/right-panel/panel-lifecycle.test.tsx src/components/right-panel/views/transcript-listener-lifecycle.test.tsx src/components/right-panel/views/chat-improve-writing-lifecycle.test.tsx src/contexts/layout-focus.test.tsx src/lib/session-query.test.tsx src/lib/project-knowledge.test.ts src/lib/project-briefs.test.ts src/lib/ask.test.ts src/components/left-sidebar/note-project-drag.test.tsx src/lib/note-title.test.ts src/components/toolbar/utils/pdf-export.test.ts",
     "typecheck": "tsc --noEmit",
     "perf:assert-pdf-export-lazy": "node scripts/assert-pdf-export-lazy.mjs",
     "tauri:dev": "pnpm tauri dev",
