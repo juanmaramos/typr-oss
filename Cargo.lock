@@ -3089,7 +3089,7 @@ checksum = "dea2df4cf52843e0452895c455a1a2cfbb842a1e7329671acf418fdc53ed4c59"
 [[package]]
 name = "esaxx-rs"
 version = "0.1.10"
-source = "git+https://github.com/thewh1teagle/esaxx-rs.git?branch=feat%2Fdynamic-msvc-link#3c8ac57d245ab328f7c71953b7c116a8d1d5498f"
+source = "git+https://github.com/Narsil/esaxx-rs.git?rev=3c8ac57d245ab328f7c71953b7c116a8d1d5498f#3c8ac57d245ab328f7c71953b7c116a8d1d5498f"
 dependencies = [
  "cc",
 ]
