@@ -4,10 +4,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMatch } from "@tanstack/react-router";
-import { listen } from "@tauri-apps/api/event";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
 
 import { TranscriptActionBar } from "../../transcript/actions/TranscriptActionBar";
 import type { TranscriptState } from "../../transcript/hooks/useTranscriptState";
@@ -24,7 +22,6 @@ import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { AnimatedIconDisplay, BUTTON_VARIANTS, CONTENT_VARIANTS } from "@/components/ui/animated-icon-display";
 import { Loader } from "@/components/ui/loader";
 import { debugLogFor } from "@/components/utils/debug-logger";
-import { safeUnlisten } from "@/utils/safe-unlisten";
 import { useRecordingTimer } from "@/hooks/useRecordingTimer";
 import { cn } from "@/lib/utils";
 import { sessionQueryOptions } from "@/lib/session-query";
@@ -165,56 +162,6 @@ export function TranscriptView({
     hasTranscript,
     sessionId,
   ]);
-
-  useEffect(() => {
-    if (!sessionId) {
-      return;
-    }
-
-    let disposed = false;
-    let unlisten: (() => void) | null = null;
-
-    listen("session-event", (event: any) => {
-      if (disposed) {
-        return;
-      }
-
-      const payload = event.payload;
-
-      if (payload.type === "transcriptProcessing" && payload.session_id === sessionId) {
-        toast.loading(t`Enhancing transcript with speaker labels...`, {
-          id: "speaker-processing",
-          duration: Infinity,
-        });
-      } else if (payload.type === "transcriptUpdated" && payload.session_id === sessionId) {
-        toast.success(t`Speaker labels added`, {
-          id: "speaker-processing",
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ["session", sessionId],
-        });
-      } else if (payload.type === "transcriptError" && payload.session_id === sessionId) {
-        toast.error(t`Failed to add speaker labels`, {
-          id: "speaker-processing",
-        });
-      }
-    }).then((fn) => {
-      if (disposed) {
-        safeUnlisten(fn, "TranscriptView.session-event.listener.late-dispose");
-        return;
-      }
-
-      unlisten = fn;
-    }).catch((error) => {
-      console.error("[events] Failed to register transcript listener", error);
-    });
-
-    return () => {
-      disposed = true;
-      safeUnlisten(unlisten, "TranscriptView.session-event.listener");
-    };
-  }, [sessionId, queryClient, t]);
 
   useEffect(() => {
     // Sync editor content when words change within the same session
