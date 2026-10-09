@@ -10,6 +10,7 @@ import { useTypr, useLeftSidebar, useRightPanel } from "@/contexts";
 import { useEnhancePendingState } from "@/hooks/enhance-pending";
 import { markNewNoteTrace, timeNewNoteStep } from "@/utils/new-note-debug";
 import { safeUnlisten } from "@/utils/safe-unlisten";
+import { sessionQueryKey } from "@/lib/session-query";
 import { commands as dbCommands, type Session } from "@typr/plugin-db";
 import {
   commands as windowsCommands,
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/app/note/$id")({
     markNewNoteTrace("route:/app/note/$id:start", { sessionId: id });
 
     return queryClient.fetchQuery({
-      queryKey: ["session", id],
+      queryKey: sessionQueryKey(id),
       queryFn: async (): Promise<any> => {
         let session: Session | null = null;
 
