@@ -77,6 +77,8 @@ const LayoutContext = createContext<LayoutContextType | null>(null);
 // ─── Auto-collapse constants ─────────────────────────────────────────────────
 
 const AUTO_COLLAPSE_WIDTH = 1460;
+// Retry for at most 500ms after the regular focus delay while the chat input mounts.
+const MAX_CHAT_INPUT_FOCUS_RETRIES = 10;
 
 // ─── Provider ────────────────────────────────────────────────────────────────
 
@@ -129,24 +131,50 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
   const preferredSurface = useRef<"sidebar" | "floating">("floating");
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
+  const chatInputFocusTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const newChatRequestIdRef = useRef(0);
 
   const currentView = view;
   const isRightExpanded = surface === "sidebar";
   const isFloatingOpen = floatingState === "expanded";
 
-  const focusChatInput = useCallback((delayMs = 150) => {
-    setTimeout(() => {
-      const attemptFocus = () => {
-        if (chatInputRef.current) {
-          chatInputRef.current.focus();
-          return;
-        }
-        setTimeout(attemptFocus, 50);
-      };
-      attemptFocus();
-    }, delayMs);
+  const cancelChatInputFocus = useCallback(() => {
+    if (chatInputFocusTimeoutRef.current !== null) {
+      clearTimeout(chatInputFocusTimeoutRef.current);
+      chatInputFocusTimeoutRef.current = null;
+    }
   }, []);
+
+  const focusChatInput = useCallback((delayMs = 150) => {
+    cancelChatInputFocus();
+    let retryCount = 0;
+
+    const attemptFocus = () => {
+      chatInputFocusTimeoutRef.current = null;
+      if (chatInputRef.current) {
+        chatInputRef.current.focus();
+        return;
+      }
+      if (retryCount < MAX_CHAT_INPUT_FOCUS_RETRIES) {
+        retryCount += 1;
+        chatInputFocusTimeoutRef.current = setTimeout(attemptFocus, 50);
+      }
+    };
+
+    chatInputFocusTimeoutRef.current = setTimeout(attemptFocus, delayMs);
+  }, [cancelChatInputFocus]);
+
+  useEffect(() => () => cancelChatInputFocus(), [cancelChatInputFocus]);
+
+  useEffect(() => {
+    if (view !== "chat" || (surface === "floating" && !isFloatingOpen)) {
+      cancelChatInputFocus();
+    }
+  }, [cancelChatInputFocus, isFloatingOpen, surface, view]);
+
+  useEffect(() => {
+    cancelChatInputFocus();
+  }, [cancelChatInputFocus, location]);
 
   const showSidebar = useCallback((v: RightPanelView = view) => {
     debugLogFor("DEBUG_LAYOUT", "LayoutDebug", "panel → sidebar", { view: v });
@@ -156,15 +184,18 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
     setFloatingState("collapsed");
     if (v === "chat") {
       focusChatInput(350);
+    } else {
+      cancelChatInputFocus();
     }
-  }, [view, focusChatInput]);
+  }, [view, cancelChatInputFocus, focusChatInput]);
 
   const showFloatingDock = useCallback((v: RightPanelView = view) => {
     debugLogFor("DEBUG_LAYOUT", "LayoutDebug", "panel → floating:collapsed", { view: v });
+    cancelChatInputFocus();
     setView(v);
     setSurface("floating");
     setFloatingState("collapsed");
-  }, [view]);
+  }, [view, cancelChatInputFocus]);
 
   const setRightExpanded = useCallback((nextExpanded: boolean) => {
     if (nextExpanded) {
@@ -200,25 +231,31 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
     setSurface("floating");
     if (v === "chat" && focus) {
       focusChatInput();
+    } else {
+      cancelChatInputFocus();
     }
-  }, [focusChatInput]);
+  }, [cancelChatInputFocus, focusChatInput]);
 
   const collapseFloating = useCallback(() => {
     debugLogFor("DEBUG_LAYOUT", "LayoutDebug", "panel → floating:collapsed");
+    cancelChatInputFocus();
     setFloatingState("collapsed");
-  }, []);
+  }, [cancelChatInputFocus]);
 
   const closeFloating = useCallback(() => {
     debugLogFor("DEBUG_LAYOUT", "LayoutDebug", "panel → floating:collapsed");
+    cancelChatInputFocus();
     setFloatingState("collapsed");
-  }, []);
+  }, [cancelChatInputFocus]);
 
   const switchView = useCallback((v: RightPanelView) => {
     setView(v);
     if (v === "chat" && (surface === "sidebar" || floatingState === "expanded")) {
       focusChatInput(surface === "sidebar" ? 350 : 150);
+    } else {
+      cancelChatInputFocus();
     }
-  }, [floatingState, focusChatInput, surface]);
+  }, [cancelChatInputFocus, floatingState, focusChatInput, surface]);
 
   const isViewVisible = useCallback((v: RightPanelView) => {
     if (surface === "sidebar") {
@@ -360,6 +397,8 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
           setView(targetView);
           if (targetView === "chat") {
             focusChatInput();
+          } else {
+            cancelChatInputFocus();
           }
           return;
         }
@@ -387,6 +426,7 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
       openFloating,
       showFloatingDock,
       showSidebar,
+      cancelChatInputFocus,
       focusChatInput,
     ],
   );

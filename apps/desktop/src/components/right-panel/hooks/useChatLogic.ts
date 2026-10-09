@@ -227,7 +227,7 @@ export function useChatLogic({
   };
 
   const handleImproveWriting = async (selectedText: string, range: { from: number; to: number }) => {
-    if (!sessionId) {
+    if (!sessionId || useChatState.getState().isGenerating(sessionId)) {
       return;
     }
 
