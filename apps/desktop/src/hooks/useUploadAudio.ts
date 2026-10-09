@@ -104,7 +104,6 @@ export function useUploadAudio() {
         await dbCommands.upsertSession(updatedSession);
         insertSession(updatedSession);
         await queryClient.invalidateQueries({ queryKey: ["session", targetSessionId] });
-        await queryClient.invalidateQueries({ queryKey: ["session", "words", targetSessionId] });
         await queryClient.invalidateQueries({ queryKey: ["audio-upload-count", userId] });
         await queryClient.invalidateQueries({ queryKey: ["sessions"] });
         console.log("[useUploadAudio:saveWords] DONE — queries invalidated for:", targetSessionId);
