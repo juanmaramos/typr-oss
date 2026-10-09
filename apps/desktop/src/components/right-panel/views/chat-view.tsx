@@ -409,10 +409,13 @@ export function ChatView({
 
     if (trimmedPrompt) {
       if (layout === "floating") {
-        handleSubmitWithValue(trimmedPrompt, {
+        const accepted = handleSubmitWithValue(trimmedPrompt, {
           bypassDebounce: true,
           source: "floating-queued-prompt",
         });
+        if (!accepted) {
+          setPersistedInputValue(trimmedPrompt);
+        }
       } else {
         // Draft transferred from floating → sidebar: populate input without submitting
         setPersistedInputValue(trimmedPrompt);

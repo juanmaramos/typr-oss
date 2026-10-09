@@ -1976,6 +1976,8 @@ Leave everything else in the document completely unchanged.`;
 
     if (accepted && capturedSessionId && controller) {
       launchSubmission(capturedSessionId, trimmedContent, "chat_quickaction_sent", controller);
+    } else if (trimmedContent) {
+      setInputValue(trimmedContent);
     }
 
     if (chatInputRef.current) {

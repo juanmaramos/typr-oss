@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   streamText: vi.fn(),
   getChatGroupId: vi.fn(),
+  setInputValue: vi.fn(),
   panel: { surface: "floating" as "floating" | "sidebar" },
   streamStarted: (() => { let resolve!: () => void; const promise = new Promise<void>((r) => { resolve = r; }); return { promise, resolve }; })(),
 }));
@@ -57,7 +58,7 @@ function Harness({ sessionId }: { sessionId: string }) {
     activeEntity: { id: sessionId, type: "note" },
     inputValue: "hello",
     hasChatStarted: false,
-    setInputValue: vi.fn(),
+    setInputValue: mocks.setInputValue,
     setHasChatStarted: vi.fn(),
     getChatGroupId: mocks.getChatGroupId,
     sessionData: { refetch: async () => ({ data: { title: "Note", words: [] } }) },
@@ -78,6 +79,7 @@ describe("Stop after moving the live chat view", () => {
     mocks.panel.surface = "floating";
     mocks.streamStarted = (() => { let resolve!: () => void; const promise = new Promise<void>((r) => { resolve = r; }); return { promise, resolve }; })();
     mocks.getChatGroupId.mockReset().mockResolvedValue("group-1");
+    mocks.setInputValue.mockReset();
     mocks.streamText.mockReset().mockImplementation(({ abortSignal }: { abortSignal: AbortSignal }) => {
       mocks.streamStarted.resolve();
       const fullStream = (async function* () {
@@ -258,6 +260,12 @@ describe("Stop after moving the live chat view", () => {
       useChatState.getState().clearSession("session-1");
     });
     await act(async () => { root.render(<Harness sessionId="session-1" />); });
+
+    await act(async () => {
+      await actions?.handleQuickAction("quick prompt");
+    });
+    expect(mocks.setInputValue).toHaveBeenCalledWith("quick prompt");
+    expect(mocks.getChatGroupId).toHaveBeenCalledTimes(1);
 
     let secondAccepted: unknown;
     act(() => {

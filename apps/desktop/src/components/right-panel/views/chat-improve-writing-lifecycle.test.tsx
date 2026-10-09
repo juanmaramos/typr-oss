@@ -10,6 +10,13 @@ const mocks = vi.hoisted(() => ({
   renderTemplate: vi.fn(),
   upsertChatMessage: vi.fn(),
   inputFocus: vi.fn(),
+  pendingFloatingPrompt: null as string | null,
+  chatDraft: "",
+  setChatDraft: vi.fn(),
+  consumeFloatingPrompt: vi.fn(),
+  getChatGroupId: vi.fn(),
+  chatInputValue: "",
+  chatInputSubmit: null as null | (() => unknown),
 }));
 
 const i18n = setupI18n({ locale: "en", messages: { en: {} } });
@@ -31,11 +38,19 @@ vi.mock("@/contexts", () => ({
     openFloating: vi.fn(),
     getChatGroup: () => "group-1",
     setChatGroup: vi.fn(),
-    getPendingFloatingPrompt: () => null,
-    consumeFloatingPrompt: vi.fn(),
-    getChatDraft: () => "",
-    setChatDraft: vi.fn(),
-    clearChatDraft: vi.fn(),
+    getPendingFloatingPrompt: () => mocks.pendingFloatingPrompt,
+    consumeFloatingPrompt: (sessionId: string) => {
+      mocks.consumeFloatingPrompt(sessionId);
+      mocks.pendingFloatingPrompt = null;
+    },
+    getChatDraft: () => mocks.chatDraft,
+    setChatDraft: (sessionId: string, draft: string) => {
+      mocks.setChatDraft(sessionId, draft);
+      mocks.chatDraft = draft;
+    },
+    clearChatDraft: (sessionId: string) => {
+      mocks.chatDraft = "";
+    },
     clearChatState: vi.fn(),
     newChatRequest: null,
     requestNewChat: vi.fn(),
@@ -46,19 +61,26 @@ vi.mock("@/contexts", () => ({
 }));
 vi.mock("@/hooks/useTranscriptionActive", () => ({ useTranscriptionActive: () => ({ isRecordingActive: false }) }));
 vi.mock("@/hooks/use-agent-writing-feature", () => ({ useAgentWritingFeature: () => false }));
-vi.mock("../components/chat", () => ({
-  ChatHistoryView: () => null,
-  ChatInput: () => null,
-  ChatMessagesView: () => null,
-  EmptyChatState: () => null,
-}));
+vi.mock("../components/chat", async () => {
+  const React = await import("react");
+  return {
+    ChatHistoryView: () => null,
+    ChatInput: ({ inputValue, onSubmit }: { inputValue: string; onSubmit: () => unknown }) => {
+      mocks.chatInputValue = inputValue;
+      mocks.chatInputSubmit = onSubmit;
+      return React.createElement("textarea", { "data-testid": "chat-input", value: inputValue, readOnly: true });
+    },
+    ChatMessagesView: () => null,
+    EmptyChatState: () => null,
+  };
+});
 vi.mock("../components/search", () => ({ ChatSearchHeader: () => null }));
 vi.mock("@/hooks/useEditModeModelSwitch.tsx", () => ({ useEditModeModelSwitch: vi.fn() }));
 vi.mock("../hooks/useActiveEntity", () => ({ useActiveEntity: () => ({ activeEntity: { id: "session-1", type: "note" }, sessionId: "session-1" }) }));
 vi.mock("../hooks/useChatQueries", () => ({ useChatQueries: () => ({
   chatGroupsQuery: { data: [] },
   sessionData: { data: { title: "Test" } },
-  getChatGroupId: vi.fn(async () => "group-1"),
+  getChatGroupId: mocks.getChatGroupId,
   chatHistory: [],
   totalSessionMessagesQuery: { data: 0 },
 }) }));
@@ -92,11 +114,14 @@ vi.mock("@/utils/inline-diff-preview", () => ({ showInlineDiffPreview: vi.fn() }
 vi.mock("@/utils/analytics-safe", () => ({ safeAnalyticsEvent: vi.fn() }));
 
 import { useChatState } from "@/stores/useChatState";
+import { abortChatGeneration, finishChatGeneration, hasActiveChatGeneration, startChatGeneration } from "../hooks/chat-generation";
 import type { TiptapEditor } from "@typr/tiptap/editor";
 import { ChatView } from "./chat-view";
 
 let root: Root;
 let container: HTMLDivElement;
+let queuedPromptController: AbortController | null = null;
+let releaseQueuedGroupId: ((groupId: string) => void) | null = null;
 
 function views() {
   return (
@@ -142,10 +167,25 @@ describe("same-session improve-writing requests", () => {
     mocks.generateText.mockReset().mockResolvedValue({ text: "<p>improved words</p>" });
     mocks.renderTemplate.mockReset().mockImplementation(async (template: string) => template);
     mocks.upsertChatMessage.mockReset().mockResolvedValue(undefined);
+    mocks.getChatGroupId.mockReset().mockResolvedValue("group-1");
+    mocks.pendingFloatingPrompt = null;
+    mocks.chatDraft = "";
+    mocks.setChatDraft.mockReset();
+    mocks.consumeFloatingPrompt.mockReset();
+    mocks.chatInputValue = "";
+    mocks.chatInputSubmit = null;
+    queuedPromptController = null;
+    releaseQueuedGroupId = null;
   });
 
   afterEach(() => {
     act(() => root.unmount());
+    if (queuedPromptController) {
+      abortChatGeneration("session-1");
+      releaseQueuedGroupId?.("group-1");
+      finishChatGeneration("session-1", queuedPromptController);
+      queuedPromptController = null;
+    }
     useChatState.getState().clearSession("session-1");
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
@@ -171,6 +211,63 @@ describe("same-session improve-writing requests", () => {
 
     expect(mocks.generateText).not.toHaveBeenCalled();
     expect(useChatState.getState().getMessages("session-1")).toHaveLength(0);
+  });
+
+  it("keeps a queued floating prompt as a draft while a New Chat claim is still active", async () => {
+    const controller = startChatGeneration("session-1");
+    queuedPromptController = controller;
+    expect(controller).not.toBeNull();
+    useChatState.getState().setGenerating("session-1", true);
+    abortChatGeneration("session-1");
+    useChatState.getState().clearSession("session-1");
+    mocks.pendingFloatingPrompt = "  queued prompt  ";
+
+    await act(async () => {
+      root.render(
+        <I18nProvider i18n={i18n}>
+          <ChatView layout="floating" />
+        </I18nProvider>,
+      );
+    });
+
+    expect(mocks.consumeFloatingPrompt).toHaveBeenCalledWith("session-1");
+    expect(mocks.setChatDraft).toHaveBeenCalledWith("session-1", "queued prompt");
+    expect(mocks.chatInputValue).toBe("queued prompt");
+    expect(container.querySelector<HTMLTextAreaElement>('[data-testid="chat-input"]')?.value).toBe("queued prompt");
+    expect(mocks.generateText).not.toHaveBeenCalled();
+    expect(mocks.getChatGroupId).not.toHaveBeenCalled();
+    expect(hasActiveChatGeneration("session-1")).toBe(true);
+
+    let releaseGroupId!: (groupId: string) => void;
+    const groupIdPromise = new Promise<string>((resolve) => { releaseGroupId = resolve; });
+    releaseQueuedGroupId = releaseGroupId;
+    mocks.getChatGroupId.mockReset().mockReturnValueOnce(groupIdPromise);
+    act(() => {
+      finishChatGeneration("session-1", controller!);
+    });
+
+    let retryAccepted: unknown;
+    await act(async () => {
+      retryAccepted = await mocks.chatInputSubmit?.();
+      for (let attempt = 0; attempt < 20 && mocks.getChatGroupId.mock.calls.length === 0; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    });
+    expect(retryAccepted).toBe(true);
+    expect(mocks.getChatGroupId).toHaveBeenCalledTimes(1);
+    expect(mocks.chatInputValue).toBe("queued prompt");
+    expect(hasActiveChatGeneration("session-1")).toBe(true);
+    expect(useChatState.getState().isGenerating("session-1")).toBe(true);
+
+    await act(async () => {
+      abortChatGeneration("session-1");
+      releaseGroupId("group-1");
+      await groupIdPromise;
+      for (let attempt = 0; attempt < 20 && hasActiveChatGeneration("session-1"); attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    });
+    expect(hasActiveChatGeneration("session-1")).toBe(false);
   });
 
   it("accepts a later edit after the earlier one completes", async () => {
