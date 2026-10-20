@@ -22,7 +22,7 @@ export const Kbd = ({
   return (
     <span
       className={cn(
-        "inline-flex select-none items-center gap-1 rounded align-middle font-medium font-mono text-[10px] leading-loose",
+        "inline-flex select-none items-center gap-1 rounded align-middle font-medium font-mono text-ui-tiny leading-loose",
         kbdVariants[variant],
         className,
       )}

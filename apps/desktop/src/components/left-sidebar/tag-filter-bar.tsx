@@ -81,11 +81,11 @@ export function TagFilterBar({ selectedTags, onTagsChange, visibleNotesCount }: 
     <div className="px-3 pb-2">
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 items-baseline gap-1.5 select-none">
-          <span className="text-[12px] font-semibold text-foreground/80">
+          <span className="text-ui-label font-semibold text-foreground/80">
             <Trans>Notes</Trans>
           </span>
           {countLabel !== null && (
-            <span className="text-[11px] font-medium text-muted-foreground/70">
+            <span className="text-ui-caption font-medium text-muted-foreground/70">
               {countLabel}
             </span>
           )}
@@ -106,7 +106,7 @@ export function TagFilterBar({ selectedTags, onTagsChange, visibleNotesCount }: 
                 <div className="relative">
                   <i className="ri-filter-3-line text-[15px]" />
                   {selectedTags.length > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 inline-flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-foreground px-0.5 text-[9px] font-semibold text-background">
+                    <span className="absolute -top-1.5 -right-1.5 inline-flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-foreground px-0.5 text-ui-fine font-semibold text-background">
                       {selectedTags.length}
                     </span>
                   )}
@@ -149,7 +149,7 @@ export function TagFilterBar({ selectedTags, onTagsChange, visibleNotesCount }: 
                   </CommandGroup>
                 </CommandList>
                 <div className="flex items-center justify-between border-t border px-2.5 py-2">
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-ui-caption text-muted-foreground">
                     {selectedTags.length > 0
                       ? t`${selectedTags.length} selected`
                       : t`No filters active`}
@@ -157,7 +157,7 @@ export function TagFilterBar({ selectedTags, onTagsChange, visibleNotesCount }: 
                   {selectedTags.length > 0 && (
                     <Button
                       variant="ghost"
-                      className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+                      className="h-6 px-1.5 text-ui-caption text-muted-foreground hover:text-foreground"
                       onClick={clearFilters}
                     >
                       <Trans>Clear</Trans>
@@ -177,7 +177,7 @@ export function TagFilterBar({ selectedTags, onTagsChange, visibleNotesCount }: 
               key={tag.id}
               type="button"
               onClick={() => toggleTag(tag.id)}
-              className="inline-flex h-6 items-center gap-1 rounded-md bg-muted px-2 text-[11px] font-medium text-foreground/80 transition-colors hover:bg-surface-400/80"
+              className="inline-flex h-6 items-center gap-1 rounded-md bg-muted px-2 text-ui-caption font-medium text-foreground/80 transition-colors hover:bg-surface-400/80"
             >
               <span className="max-w-[130px] truncate">{tag.name}</span>
               <i className="ri-close-line text-[12px] text-muted-foreground" />

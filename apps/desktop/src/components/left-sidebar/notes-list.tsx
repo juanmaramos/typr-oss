@@ -244,7 +244,7 @@ export default function NotesList({
           >
             <Collapsible.Root open={isOpen} onOpenChange={() => toggleGroup(key)}>
               <Collapsible.Trigger className="group mb-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 transition-colors hover:bg-sidebar-accent">
-                <h2 className="text-[13px] font-medium text-muted-foreground/85">
+                <h2 className="text-ui font-medium text-muted-foreground/85">
                   {key}
                 </h2>
                 <ChevronDownIcon
@@ -429,7 +429,7 @@ export function NoteItem({
       >
         <MarqueeTitle
           text={currentSession.title || t`New note`}
-          className="min-w-0 flex-1 text-[13px] font-normal text-sidebar-foreground"
+          className="min-w-0 flex-1 text-ui font-normal text-sidebar-foreground"
           hovered={cardHovered}
         />
       </div>
@@ -448,7 +448,7 @@ export function NoteItem({
         >
           <span
             className={cn(
-              "absolute inset-y-0 right-1 flex items-center whitespace-nowrap text-right text-[11px] text-muted-foreground transition-opacity duration-150",
+              "absolute inset-y-0 right-1 flex items-center whitespace-nowrap text-right text-ui-caption text-muted-foreground transition-opacity duration-150",
               cardHovered || actionMenuOpen ? "opacity-0" : "opacity-100",
             )}
           >

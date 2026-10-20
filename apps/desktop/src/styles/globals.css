@@ -141,7 +141,7 @@
 }
 
 body {
-  line-height: 1.5;
+  @apply leading-normal;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -247,7 +247,7 @@ body {
 
   /* Ensure fonts are applied properly following Tauri pattern */
   body {
-    font-family: var(--font-sans);
+    @apply font-sans;
   }
 
   /* 

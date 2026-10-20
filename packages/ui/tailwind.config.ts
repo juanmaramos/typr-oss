@@ -1,6 +1,8 @@
 import path from "path";
 import type { Config } from "tailwindcss";
 
+import { typography } from "./src/lib/typography";
+
 // https://magicui.design/docs/components/shimmer-button
 const shimmerButton = {
   animation: {
@@ -271,19 +273,7 @@ const config = {
         ...shadcn.keyframes,
         ...spinner.keyframes,
       },
-      fontFamily: {
-        sans: ["var(--font-sans)"],
-        serif: ["var(--font-serif)"],
-        mono: ["var(--font-mono)"],
-        heading: ["var(--font-heading)"],
-        body: ["var(--font-body)"],
-      },
-      fontWeight: {
-        normal: "400",
-        medium: "400",
-        semibold: "500",
-        bold: "600",
-      },
+      ...typography,
       colors: shadcn.colors,
       borderRadius: shadcn.borderRadius,
       boxShadow: shadcn.boxShadow,

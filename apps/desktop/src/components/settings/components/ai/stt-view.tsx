@@ -228,14 +228,14 @@ export function STTView({
                         <div>
                           {isCloud
                             ? (
-                              <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
+                              <span className="inline-flex items-center gap-1.5 text-ui-caption text-success">
                                 <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
                                 <Trans>Ready</Trans>
                               </span>
                             )
                             : modelState?.isDownloaded && selectedSTTModel === model.key
                             ? (
-                              <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
+                              <span className="inline-flex items-center gap-1.5 text-ui-caption text-success">
                                 <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
                                 <Trans>Current</Trans>
                               </span>
@@ -256,7 +256,7 @@ export function STTView({
                             )
                             : modelState?.isDownloading
                             ? (
-                              <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                              <span className="inline-flex items-center gap-1.5 text-ui-caption text-muted-foreground">
                                 <i className="ri-loader-4-line animate-spin text-sm" />
                                 <Trans>Downloading…</Trans>
                               </span>
@@ -280,7 +280,7 @@ export function STTView({
                         {/* Performance dots */}
                         <div className="flex flex-col gap-1 items-end">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[9px] text-muted-foreground uppercase tracking-wide">
+                            <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
                               <Trans>Accuracy</Trans>
                             </span>
                             <div className="flex gap-0.5">
@@ -296,7 +296,7 @@ export function STTView({
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[9px] text-muted-foreground uppercase tracking-wide">
+                            <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
                               <Trans>Speed</Trans>
                             </span>
                             <div className="flex gap-0.5">
@@ -380,7 +380,7 @@ export function STTView({
                                             ? <Trans>High accuracy (≤10% error)</Trans>
                                             : <Trans>Good accuracy (10-25% error)</Trans>}
                                         </span>
-                                        <span className="text-[11px] text-muted-foreground block mb-1">
+                                        <span className="text-ui-caption text-muted-foreground block mb-1">
                                           {key === "multilingualSupport"
                                             ? (
                                               <Trans>
@@ -399,7 +399,7 @@ export function STTView({
                                   </div>
                                 ))}
                                 <div className="pt-2 mt-2 border-t border-border/50">
-                                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                  <p className="text-ui-caption text-muted-foreground leading-relaxed">
                                     <Trans>
                                       Plus 50+ additional languages with moderate to fair accuracy. Total 99 languages
                                       supported.
@@ -436,7 +436,7 @@ export function STTView({
                                       ? <Trans>Fair</Trans>
                                       : <Trans>Limited</Trans>}
                                   </span>
-                                  <span className="text-[10px] text-muted-foreground">
+                                  <span className="text-ui-tiny text-muted-foreground">
                                     ({data.range})
                                   </span>
                                 </div>
@@ -495,13 +495,13 @@ export function STTView({
                       <div>
                         {!hasAssemblyAiApiKey
                           ? (
-                            <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary">
+                            <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-ui-caption font-medium text-primary">
                               <Trans>API key required</Trans>
                             </span>
                           )
                           : isAssemblyAiSelected
                           ? (
-                            <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
+                            <span className="inline-flex items-center gap-1.5 text-ui-caption text-success">
                               <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
                               <Trans>Current</Trans>
                             </span>
@@ -524,7 +524,7 @@ export function STTView({
                       {/* Performance dots */}
                       <div className="flex flex-col gap-1 items-end">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] text-muted-foreground uppercase tracking-wide">
+                          <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
                             <Trans>Accuracy</Trans>
                           </span>
                           <div className="flex gap-0.5">
@@ -540,7 +540,7 @@ export function STTView({
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] text-muted-foreground uppercase tracking-wide">
+                          <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
                             <Trans>Speed</Trans>
                           </span>
                           <div className="flex gap-0.5">
@@ -657,7 +657,7 @@ export function STTView({
                                           ? <Trans>High accuracy (≤10% error)</Trans>
                                           : <Trans>Good accuracy (10-25% error)</Trans>}
                                       </span>
-                                      <span className="text-[11px] text-muted-foreground block mb-1">
+                                      <span className="text-ui-caption text-muted-foreground block mb-1">
                                         {key === "multilingualSupport"
                                           ? (
                                             <Trans>
@@ -676,7 +676,7 @@ export function STTView({
                                 </div>
                               ))}
                               <div className="pt-2 mt-2 border-t border-border/50">
-                                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                <p className="text-ui-caption text-muted-foreground leading-relaxed">
                                   <Trans>
                                     Plus 50+ additional languages with moderate to fair accuracy. Total 99 languages
                                     supported.

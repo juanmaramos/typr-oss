@@ -166,7 +166,7 @@ export default function TranscriptionBar({
               variant="secondary"
               className={cn(
                 buttonGroupItemVariants({ orientation: "horizontal" }),
-                "gap-2 text-[13px] font-medium",
+                "gap-2 text-ui font-medium",
               )}
               onClick={handleStartSession}
               disabled={isSttLoading

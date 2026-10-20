@@ -514,10 +514,10 @@ export function ChatView({
                     )
                     : (
                       <div className="min-w-0 flex-1 pr-4">
-                        <div className="truncate text-[16px] font-semibold leading-tight text-foreground">
+                        <div className="truncate text-sm font-semibold leading-tight text-foreground">
                           {title || sessionData.data?.title || t`Current note`}
                         </div>
-                        <div className="pt-0.5 text-[12px] leading-tight text-muted-foreground">
+                        <div className="pt-0.5 text-ui-label leading-tight text-muted-foreground">
                           {t`Ask in context of this meeting`}
                         </div>
                       </div>

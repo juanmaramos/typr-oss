@@ -26,7 +26,7 @@ export function InlineCitation({ source }: { source: CitationSource }) {
         <Button
           variant="ghost"
           size="icon"
-          className="ml-0.5 size-5 rounded bg-primary/10 p-0 text-[10px] font-medium text-primary hover:bg-primary/20 hover:text-primary"
+          className="ml-0.5 size-5 rounded bg-primary/10 p-0 text-ui-tiny font-medium text-primary hover:bg-primary/20 hover:text-primary"
           aria-label={t`View source ${source.number}`}
           type="button"
         >

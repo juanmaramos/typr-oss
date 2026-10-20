@@ -74,7 +74,7 @@ function RailButton({
       <TooltipContent side="right" className="text-xs">
         <div className="flex items-center gap-1.5">
           <span>{label}</span>
-          {showSearchShortcut && <ShortcutById shortcutId="open-search" variant="ghost" className="text-[10px]" />}
+          {showSearchShortcut && <ShortcutById shortcutId="open-search" variant="ghost" className="text-ui-tiny" />}
         </div>
       </TooltipContent>
     </Tooltip>

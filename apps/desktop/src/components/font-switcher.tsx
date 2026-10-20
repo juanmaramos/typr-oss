@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { typography } from "@typr/ui/lib/typography";
+
 const FONT_OPTIONS = [
   {
     name: "Plus Jakarta Sans",
@@ -34,8 +36,8 @@ export function FontSwitcher() {
         document.head.appendChild(style);
       }
       style.textContent = `
-        .font-medium { font-weight: 400 !important; }
-        .font-semibold { font-weight: 500 !important; }
+        .font-medium { font-weight: ${typography.fontWeight.medium} !important; }
+        .font-semibold { font-weight: ${typography.fontWeight.semibold} !important; }
       `;
     } else if (style) {
       style.remove();
@@ -49,6 +51,7 @@ export function FontSwitcher() {
     return (
       <button
         onClick={() => setCollapsed(false)}
+        className="font-system text-ui-label"
         style={{
           position: "fixed",
           bottom: 12,
@@ -59,8 +62,6 @@ export function FontSwitcher() {
           border: "1px solid #3f3f46",
           borderRadius: 8,
           padding: "6px 12px",
-          fontSize: 12,
-          fontFamily: "system-ui",
           cursor: "pointer",
           boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
         }}
@@ -73,6 +74,7 @@ export function FontSwitcher() {
 
   return (
     <div
+      className="font-system text-ui"
       style={{
         position: "fixed",
         bottom: 12,
@@ -84,21 +86,19 @@ export function FontSwitcher() {
         borderRadius: 12,
         padding: 16,
         width: 300,
-        fontFamily: "system-ui",
-        fontSize: 13,
         boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontWeight: 600, fontSize: 14 }}>Sans Font Switcher</span>
+        <span className="font-bold text-ui-control">Sans Font Switcher</span>
         <button
           onClick={() => setCollapsed(true)}
+          className="text-ui-heading"
           style={{
             background: "none",
             border: "none",
             color: "#a1a1aa",
             cursor: "pointer",
-            fontSize: 16,
             padding: 0,
           }}
         >
@@ -108,6 +108,7 @@ export function FontSwitcher() {
 
       <button
         onClick={() => setLightWeights((v) => !v)}
+        className="text-ui-label"
         style={{
           width: "100%",
           padding: "6px 10px",
@@ -117,7 +118,6 @@ export function FontSwitcher() {
           background: lightWeights ? "#1e1b4b" : "transparent",
           color: "#fafafa",
           cursor: "pointer",
-          fontSize: 12,
           textAlign: "left",
         }}
       >
@@ -144,10 +144,10 @@ export function FontSwitcher() {
               width: "100%",
             }}
           >
-            <span style={{ fontFamily: font.family, fontSize: 14, fontWeight: 500 }}>
+            <span className="text-ui-control font-semibold" style={{ fontFamily: font.family }}>
               {font.name}
               {i === 0 && (
-                <span style={{ color: "#6366f1", fontSize: 11, marginLeft: 6, fontFamily: "system-ui" }}>
+                <span className="font-system text-ui-caption" style={{ color: "#6366f1", marginLeft: 6 }}>
                   current
                 </span>
               )}

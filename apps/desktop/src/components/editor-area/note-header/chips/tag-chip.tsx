@@ -47,7 +47,7 @@ export function TagChip({ sessionId }: TagChipProps) {
             ? <span className="max-w-[120px] truncate">{firstTag}</span>
             : <span className="text-muted-foreground">{t`Add tags`}</span>}
           {additionalTags > 0 && (
-            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-secondary px-1.5 text-[10px] font-medium text-foreground/80">
+            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-secondary px-1.5 text-ui-tiny font-medium text-foreground/80">
               +{additionalTags}
             </span>
           )}
@@ -146,7 +146,7 @@ function TagChipEditor({ sessionId }: { sessionId: string }) {
       emptyIndicator={<p className="px-2 py-1 text-center text-xs text-muted-foreground">{t`No tags found.`}</p>}
       createLabel={(value) => t`Create "${value}"`}
       className="w-full min-h-9 rounded-md border border bg-background text-xs text-foreground/80 focus-within:border focus-within:ring-0 focus-within:shadow-none"
-      badgeClassName="h-6 rounded-md border-0 bg-muted px-2 pr-6 text-[11px] leading-none font-medium text-foreground/80 [&>button]:size-6 [&>button_svg]:size-3"
+      badgeClassName="h-6 rounded-md border-0 bg-muted px-2 pr-6 text-ui-caption leading-none font-medium text-foreground/80 [&>button]:size-6 [&>button_svg]:size-3"
       commandProps={{
         className: "rounded-md border-0 bg-transparent",
         label: t`Select tags`,

@@ -168,7 +168,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
             <span>
               <Trans>Options</Trans>
             </span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
+            <Badge variant="secondary" className="px-1.5 py-0 text-ui-tiny">
               <Trans>OSS</Trans>
             </Badge>
           </DropdownMenuLabel>
@@ -204,7 +204,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <div className="px-2 py-1.5 text-[11px] text-muted-foreground">
+          <div className="px-2 py-1.5 text-ui-caption text-muted-foreground">
             <span>{appInfo.data ? `${appInfo.data.name} ${appInfo.data.version}` : "Typr"}</span>
           </div>
         </DropdownMenuContent>

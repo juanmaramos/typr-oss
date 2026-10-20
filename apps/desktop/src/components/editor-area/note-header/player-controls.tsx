@@ -71,7 +71,7 @@ export function PlayerControls({ sessionId, onPause, onResume, onStop }: PlayerC
           size="compact"
           color="blue-dark"
         />
-        <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+        <span className="font-mono text-ui-caption text-muted-foreground tabular-nums">
           {formatTime(elapsedMinutes)}
         </span>
       </div>

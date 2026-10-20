@@ -13,7 +13,7 @@ export function SpaceEmptyState({ onAddNotes }: SpaceEmptyStateProps) {
         <div className="absolute right-3 top-1 h-14 w-10 -rotate-[8deg] rounded-2xl border border bg-background shadow-md" />
       </div>
 
-      <h2 className="text-[24px] font-semibold tracking-tight text-foreground">
+      <h2 className="text-ui-section font-semibold tracking-tight text-foreground">
         <Trans>No notes here yet</Trans>
       </h2>
       <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">

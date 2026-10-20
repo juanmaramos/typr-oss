@@ -208,7 +208,7 @@ function DockRecipes({ onQuickAction }: { onQuickAction: (prompt: string) => voi
           variant="ghost"
           size="sm"
           onClick={() => onQuickAction(action.prompt)}
-          className="h-9 rounded-full border-0 bg-surface-300 px-3.5 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-surface-300 hover:text-primary"
+          className="h-9 rounded-full border-0 bg-surface-300 px-3.5 text-ui font-medium text-muted-foreground transition-colors hover:bg-surface-300 hover:text-primary"
         >
           <span className="truncate">{action.label}</span>
         </Button>

@@ -247,7 +247,7 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                         )}
                       />
                       <span
-                        className={cn("font-medium truncate", compact ? "max-w-16 text-[11px]" : "max-w-24 text-xs")}
+                        className={cn("font-medium truncate", compact ? "max-w-16 text-ui-caption" : "max-w-24 text-xs")}
                       >
                         Auto
                       </span>
@@ -263,7 +263,7 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                         )}
                       />
                       <span
-                        className={cn("font-medium truncate", compact ? "max-w-16 text-[11px]" : "max-w-24 text-xs")}
+                        className={cn("font-medium truncate", compact ? "max-w-16 text-ui-caption" : "max-w-24 text-xs")}
                       >
                         {displayModel.name}
                       </span>
@@ -419,7 +419,7 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                             ))}
 
                             {section.models.length === 0 && (
-                              <p className="px-2.5 py-2 text-[11px] text-muted-foreground">
+                              <p className="px-2.5 py-2 text-ui-caption text-muted-foreground">
                                 <Trans>No models found</Trans>
                               </p>
                             )}
@@ -497,7 +497,7 @@ function ModelSectionHeader({
         )}
       />
       <span>{children}</span>
-      <span className="ml-auto shrink-0 text-[10px] tabular-nums">
+      <span className="ml-auto shrink-0 text-ui-tiny tabular-nums">
         {count}
       </span>
     </button>
@@ -540,11 +540,11 @@ function CloudProviderHeader({
         {getCloudProviderLabel(provider)}
       </span>
       {selectedModel && isCollapsed && (
-        <span className="min-w-0 truncate text-[11px]">
+        <span className="min-w-0 truncate text-ui-caption">
           {selectedModel.name}
         </span>
       )}
-      <span className="ml-auto shrink-0 text-[10px] tabular-nums">
+      <span className="ml-auto shrink-0 text-ui-tiny tabular-nums">
         {totalCount}
       </span>
       {selectedModel && isCollapsed && <i className="ri-check-line shrink-0 text-base text-primary" />}
@@ -576,7 +576,7 @@ function AutomaticOption({ description, isSelected, onSelect }: AutomaticOptionP
       </div>
       <div className="flex flex-col flex-1 ml-2.5 min-w-0">
         <span className="font-medium text-xs leading-tight">Auto</span>
-        <span className="text-muted-foreground text-[11px] leading-tight">
+        <span className="text-muted-foreground text-ui-caption leading-tight">
           {description}
         </span>
       </div>
@@ -626,18 +626,18 @@ function ModelItem(
             {model.name}
           </span>
           {model.size && model.size !== "0 MB" && (
-            <span className="text-[11px] text-muted-foreground font-medium">
+            <span className="text-ui-caption text-muted-foreground font-medium">
               {model.size}
             </span>
           )}
         </div>
         {model.description && !isUnavailableCloud && (
-          <span className="text-muted-foreground text-[11px] leading-tight">
+          <span className="text-muted-foreground text-ui-caption leading-tight">
             {model.description}
           </span>
         )}
         {isUnavailableCloud && (
-          <span className="text-muted-foreground text-[11px] leading-tight">
+          <span className="text-muted-foreground text-ui-caption leading-tight">
             <Trans>Connect API key</Trans>
           </span>
         )}
@@ -683,12 +683,12 @@ function ModelItemWithDownload({ model, onDownload }: ModelItemWithDownloadProps
             {model.name}
           </span>
           {model.size && model.size !== "0 MB" && (
-            <span className="text-[11px] text-muted-foreground font-medium">
+            <span className="text-ui-caption text-muted-foreground font-medium">
               {model.size}
             </span>
           )}
         </div>
-        <span className="text-muted-foreground text-[11px] leading-tight">
+        <span className="text-muted-foreground text-ui-caption leading-tight">
           {model.isDownloading ? "Downloading..." : model.description}
         </span>
       </div>

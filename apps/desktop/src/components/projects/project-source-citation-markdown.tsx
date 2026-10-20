@@ -129,7 +129,7 @@ function ProjectSourceCitation({
           type="button"
           variant="outline"
           size="sm"
-          className="mx-0.5 h-5 max-w-[12rem] translate-y-[2px] gap-1 border-border bg-muted px-1.5 text-[11px] font-medium leading-none text-foreground hover:border-foreground/20 hover:bg-muted/80"
+          className="mx-0.5 h-5 max-w-[12rem] translate-y-[2px] gap-1 border-border bg-muted px-1.5 text-ui-caption font-medium leading-none text-foreground hover:border-foreground/20 hover:bg-muted/80"
           aria-label={t`View source ${label}`}
         >
           <i

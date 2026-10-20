@@ -47,7 +47,7 @@ export function ScopedPromptComposer({
         </div>
         <Badge
           variant="outline"
-          className="rounded-full border-[hsl(var(--sidebar-primary))]/15 bg-[hsl(var(--sidebar-accent))]/25 px-2.5 py-1 text-[11px] font-medium text-[hsl(var(--sidebar-primary))]"
+          className="rounded-full border-[hsl(var(--sidebar-primary))]/15 bg-[hsl(var(--sidebar-accent))]/25 px-2.5 py-1 text-ui-caption font-medium text-[hsl(var(--sidebar-primary))]"
         >
           <i className="ri-folder-3-line mr-1 text-[12px]" />
           {scopeLabel}
@@ -60,7 +60,7 @@ export function ScopedPromptComposer({
         value={value}
         onChange={(event) => setValue(event.target.value)}
         placeholder={resolvedPlaceholder}
-        className="mt-2 min-h-[44px] w-full resize-none border-0 bg-transparent px-0 py-1 text-[15px] leading-7 text-foreground outline-none placeholder:text-muted-foreground/70"
+        className="mt-2 min-h-[44px] w-full resize-none border-0 bg-transparent px-0 py-1 text-ui-body leading-7 text-foreground outline-none placeholder:text-muted-foreground/70"
       />
 
       <div className="mt-1 flex items-center justify-between gap-3 border-t border/50 pt-3">
