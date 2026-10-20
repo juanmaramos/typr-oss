@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer } from "@tiptap/react";
 import { Node as ProseNode } from "prosemirror-model";
 
 import { SPEAKER_ID_ATTR, SPEAKER_INDEX_ATTR, SPEAKER_LABEL_ATTR } from "./utils";
-import { createSpeakerView, SpeakerViewInnerComponent } from "./views";
+import { SpeakerView } from "./views";
 
 export const SPEAKER_NODE_NAME = "speaker";
 
@@ -323,62 +323,60 @@ const implementCommands = {
     },
 };
 
-export const SpeakerNode = (c: SpeakerViewInnerComponent) => {
-  return Node.create({
-    name: SPEAKER_NODE_NAME,
-    group: "block",
-    content: "inline*",
-    addAttributes() {
-      return {
-        [SPEAKER_INDEX_ATTR]: {
-          default: null,
-          parseHTML: element => {
-            const v = element.getAttribute(`data-${SPEAKER_INDEX_ATTR}`);
-            return v !== null ? Number(v) : null;
-          },
-          renderHTML: attributes => ({ [`data-${SPEAKER_INDEX_ATTR}`]: attributes[SPEAKER_INDEX_ATTR] }),
+export const SpeakerNode = Node.create({
+  name: SPEAKER_NODE_NAME,
+  group: "block",
+  content: "inline*",
+  addAttributes() {
+    return {
+      [SPEAKER_INDEX_ATTR]: {
+        default: null,
+        parseHTML: element => {
+          const v = element.getAttribute(`data-${SPEAKER_INDEX_ATTR}`);
+          return v !== null ? Number(v) : null;
         },
-        [SPEAKER_ID_ATTR]: {
-          default: null,
-          parseHTML: element => element.getAttribute(`data-${SPEAKER_ID_ATTR}`),
-          renderHTML: attributes => ({ [`data-${SPEAKER_ID_ATTR}`]: attributes[SPEAKER_ID_ATTR] }),
+        renderHTML: attributes => ({ [`data-${SPEAKER_INDEX_ATTR}`]: attributes[SPEAKER_INDEX_ATTR] }),
+      },
+      [SPEAKER_ID_ATTR]: {
+        default: null,
+        parseHTML: element => element.getAttribute(`data-${SPEAKER_ID_ATTR}`),
+        renderHTML: attributes => ({ [`data-${SPEAKER_ID_ATTR}`]: attributes[SPEAKER_ID_ATTR] }),
+      },
+      [SPEAKER_LABEL_ATTR]: {
+        default: null,
+        parseHTML: element => element.getAttribute(`data-${SPEAKER_LABEL_ATTR}`),
+        renderHTML: attributes => ({ [`data-${SPEAKER_LABEL_ATTR}`]: attributes[SPEAKER_LABEL_ATTR] }),
+      },
+    };
+  },
+  parseHTML() {
+    return [{
+      tag: "div.transcript-speaker",
+      attrs: {
+        [`data-${SPEAKER_INDEX_ATTR}`]: 0,
+        [`data-${SPEAKER_ID_ATTR}`]: "",
+        [`data-${SPEAKER_LABEL_ATTR}`]: "",
+      },
+    }];
+  },
+  renderHTML({ HTMLAttributes, node }) {
+    return [
+      "div",
+      mergeAttributes(
+        {
+          class: "transcript-speaker",
+          [`data-${SPEAKER_INDEX_ATTR}`]: node.attrs[SPEAKER_INDEX_ATTR],
+          [`data-${SPEAKER_ID_ATTR}`]: node.attrs[SPEAKER_ID_ATTR],
+          [`data-${SPEAKER_LABEL_ATTR}`]: node.attrs[SPEAKER_LABEL_ATTR],
         },
-        [SPEAKER_LABEL_ATTR]: {
-          default: null,
-          parseHTML: element => element.getAttribute(`data-${SPEAKER_LABEL_ATTR}`),
-          renderHTML: attributes => ({ [`data-${SPEAKER_LABEL_ATTR}`]: attributes[SPEAKER_LABEL_ATTR] }),
-        },
-      };
-    },
-    parseHTML() {
-      return [{
-        tag: "div.transcript-speaker",
-        attrs: {
-          [`data-${SPEAKER_INDEX_ATTR}`]: 0,
-          [`data-${SPEAKER_ID_ATTR}`]: "",
-          [`data-${SPEAKER_LABEL_ATTR}`]: "",
-        },
-      }];
-    },
-    renderHTML({ HTMLAttributes, node }) {
-      return [
-        "div",
-        mergeAttributes(
-          {
-            class: "transcript-speaker",
-            [`data-${SPEAKER_INDEX_ATTR}`]: node.attrs[SPEAKER_INDEX_ATTR],
-            [`data-${SPEAKER_ID_ATTR}`]: node.attrs[SPEAKER_ID_ATTR],
-            [`data-${SPEAKER_LABEL_ATTR}`]: node.attrs[SPEAKER_LABEL_ATTR],
-          },
-          HTMLAttributes,
-        ),
-      ];
-    },
-    addNodeView() {
-      return ReactNodeViewRenderer(createSpeakerView(c) as any);
-    },
-    addCommands() {
-      return implementCommands as any; // casting because util object is compatible
-    },
-  });
-};
+        HTMLAttributes,
+      ),
+    ];
+  },
+  addNodeView() {
+    return ReactNodeViewRenderer(SpeakerView);
+  },
+  addCommands() {
+    return implementCommands as any; // casting because util object is compatible
+  },
+});

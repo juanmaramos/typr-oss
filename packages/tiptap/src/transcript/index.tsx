@@ -1,5 +1,6 @@
 import "../styles/transcript.css";
 
+import { useLingui } from "@lingui/react";
 import { SearchAndReplace } from "@sereneinserenade/tiptap-search-and-replace";
 import { type Editor as TiptapEditor } from "@tiptap/core";
 import BubbleMenu from "@tiptap/extension-bubble-menu";
@@ -11,11 +12,11 @@ import { forwardRef, useCallback, useEffect, useRef } from "react";
 
 import { SpeakerSplit } from "./extensions";
 import { SpeakerNode } from "./nodes";
+import { TranscriptPreview, type TranscriptPreviews, transcriptPreviewsKey } from "./previews";
 import { fromEditorToWords, fromWordsToEditor, getSpeakerLabel, type SpeakerAttributes, type Word } from "./utils";
-import type { SpeakerViewInnerComponent, SpeakerViewInnerProps } from "./views";
 
 export { SPEAKER_ID_ATTR, SPEAKER_INDEX_ATTR, SPEAKER_LABEL_ATTR } from "./utils";
-export { getSpeakerLabel, SpeakerViewInnerProps };
+export { getSpeakerLabel };
 
 export function shouldEmitTranscriptUpdate({
   isFocused,
@@ -30,8 +31,8 @@ export function shouldEmitTranscriptUpdate({
 interface TranscriptEditorProps {
   editable?: boolean;
   initialWords: Word[] | null;
+  previews?: TranscriptPreviews;
   onUpdate?: (words: Word[]) => void;
-  c: SpeakerViewInnerComponent;
 }
 
 export interface TranscriptEditorRef {
@@ -43,10 +44,23 @@ export interface TranscriptEditorRef {
   toText: () => string;
 }
 
+function shouldFollowTranscriptTail(container: HTMLElement | null, editor: TiptapEditor) {
+  if (!container || editor.isFocused) {
+    return false;
+  }
+  const selection = window.getSelection();
+  const hasTextSelection = !!selection && !selection.isCollapsed && (
+    !!selection.anchorNode && container.contains(selection.anchorNode)
+    || !!selection.focusNode && container.contains(selection.focusNode)
+  );
+  return !hasTextSelection && container.scrollHeight - container.scrollTop - container.clientHeight <= 64;
+}
+
 // SearchAndReplace commands are declared in shared/extensions.ts
 
 const TranscriptEditor = forwardRef<TranscriptEditorRef, TranscriptEditorProps>(
-  ({ editable = true, c, onUpdate, initialWords }, ref) => {
+  ({ editable = true, onUpdate, initialWords, previews }, ref) => {
+    const { i18n } = useLingui();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isProgrammaticUpdate = useRef(false);
     const hasUserChanges = useRef(false);
@@ -55,8 +69,9 @@ const TranscriptEditor = forwardRef<TranscriptEditorRef, TranscriptEditorProps>(
       Document.configure({ content: "speaker+" }),
       History,
       Text,
-      SpeakerNode(c),
+      SpeakerNode,
       SpeakerSplit,
+      TranscriptPreview,
       SearchAndReplace.configure({
         searchResultClass: "search-result",
         disableRegex: true,
@@ -108,11 +123,16 @@ const TranscriptEditor = forwardRef<TranscriptEditorRef, TranscriptEditorProps>(
       const { from, to } = editor.state.selection;
       const wasEditorFocused = editor.isFocused;
       const scrollTop = scrollContainerRef.current?.scrollTop || 0;
+      const followTail = !editor.isEditable && shouldFollowTranscriptTail(scrollContainerRef.current, editor);
 
       isProgrammaticUpdate.current = true;
       const content = fromWordsToEditor(words);
       editor.commands.setContent(content, false);
       isProgrammaticUpdate.current = false;
+
+      if (followTail && scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      }
 
       // Only restore cursor position if we were actually editing
       if (wasEditorFocused && from > 0 && to > 0 && from < editor.state.doc.content.size) {
@@ -198,6 +218,20 @@ const TranscriptEditor = forwardRef<TranscriptEditorRef, TranscriptEditorProps>(
         };
       }
     }, [editor]);
+
+    useEffect(() => {
+      if (!editor) {
+        return;
+      }
+      const container = scrollContainerRef.current;
+      const followTail = shouldFollowTranscriptTail(container, editor);
+      editor.view.dispatch(
+        editor.state.tr.setMeta(transcriptPreviewsKey, editable ? {} : previews ?? {}).setMeta("addToHistory", false),
+      );
+      if (followTail && container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }, [editor, previews, editable, i18n.locale]);
 
     useEffect(() => {
       if (editor) {

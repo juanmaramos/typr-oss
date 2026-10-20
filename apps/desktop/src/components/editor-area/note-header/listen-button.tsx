@@ -1,4 +1,3 @@
-import { localTranscriptionModelQueryOptions } from "@/lib/model-selection";
 import { localizeDefaultTemplate } from "@/utils/default-templates";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -12,12 +11,13 @@ import { useEnhancePendingState } from "@/hooks/enhance-pending";
 import { useMicrophoneDevice } from "@/components/transcript/hooks/useMicrophoneDevice";
 import { Icon } from "@/components/ui/icon";
 import { TemplateIcon } from "@/components/ui/template-icon";
-import { useModelState } from "@/hooks/useModelState";
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
+import { useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
+import { openSettingsWindow } from "@/utils/open-settings-window";
 import { getTemplateDisplayName } from "@/utils/template-presentation";
 import { TemplateService } from "@/utils/template-service";
 import { commands as configCommands } from "@typr/plugin-config";
 import { commands as listenerCommands } from "@typr/plugin-listener";
-import { commands as localSttCommands } from "@typr/plugin-local-stt";
 import { Button } from "@typr/ui/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@typr/ui/components/ui/select";
@@ -36,31 +36,8 @@ export default function ListenButton({ sessionId }: { sessionId: string }) {
   const isOnboarding = sessionId === onboardingSessionId;
   const { surface, showSidebar, openFloating } = useRightPanel();
 
-  // ✅ FIXED: Replace polling with event-driven model state
-  const { isDownloaded } = useModelState();
-
-  // Get current model status
-  const currentModelQuery = useQuery(localTranscriptionModelQueryOptions());
-
-  const modelDownloaded = {
-    data: currentModelQuery.data ? isDownloaded(currentModelQuery.data.toString()) : false,
-    isLoading: currentModelQuery.isLoading,
-  };
-
-  // Check if any STT model exists (for onboarding)
-  const supportedModelsQuery = useQuery({
-    queryKey: ["supported-stt-models"],
-    queryFn: () => localSttCommands.listSupportedModels(),
-    staleTime: 60 * 1000, // Static data - cache for 1 minute
-    enabled: isOnboarding,
-  });
-
-  const anySttModelExists = {
-    data: isOnboarding && supportedModelsQuery.data
-      ? supportedModelsQuery.data.some(model => isDownloaded(model.toString()))
-      : false,
-    isLoading: supportedModelsQuery.isLoading,
-  };
+  const { availability, retry } = useTranscriptionAvailability();
+  const statusLabel = useModelAvailabilityLabel();
 
   const ongoingSessionStatus = useOngoingSession((s) => s.status);
   const ongoingSessionId = useOngoingSession((s) => s.sessionId);
@@ -89,7 +66,7 @@ export default function ListenButton({ sessionId }: { sessionId: string }) {
   const meetingEnded = isEnhancePending || nonEmptySession;
 
   const handleStartSession = () => {
-    if (ongoingSessionStatus === "inactive") {
+    if (ongoingSessionStatus === "inactive" && availability.canStart) {
       ongoingSessionStore.start(sessionId);
 
       // Consent notification disabled - handled by TranscriptionBar (this component is hidden)
@@ -131,7 +108,7 @@ export default function ListenButton({ sessionId }: { sessionId: string }) {
   if (ongoingSessionStatus === "running_paused" && sessionId === ongoingSessionId) {
     return (
       <Button
-        disabled={!modelDownloaded.data}
+        disabled={!availability.canStart}
         onClick={handleResumeSession}
         size="sm"
         variant="destructive"
@@ -147,21 +124,34 @@ export default function ListenButton({ sessionId }: { sessionId: string }) {
 
   if (ongoingSessionStatus === "inactive") {
     const buttonProps = {
-      disabled: isOnboarding
-        ? !anySttModelExists.data || (meetingEnded && isEnhancePending)
-        : !modelDownloaded.data || (meetingEnded && isEnhancePending),
+      disabled: !availability.canStart || (meetingEnded && isEnhancePending),
       onClick: handleStartSession,
     };
-
-    if (!meetingEnded) {
-      return isOnboarding
-        ? <WhenInactiveAndMeetingNotEndedOnboarding {...buttonProps} />
-        : <WhenInactiveAndMeetingNotEnded {...buttonProps} />;
-    } else {
-      return isOnboarding
+    const startButton = meetingEnded
+      ? isOnboarding
         ? <WhenInactiveAndMeetingEndedOnboarding {...buttonProps} />
-        : <WhenInactiveAndMeetingEnded {...buttonProps} />;
-    }
+        : <WhenInactiveAndMeetingEnded {...buttonProps} />
+      : isOnboarding
+      ? <WhenInactiveAndMeetingNotEndedOnboarding {...buttonProps} />
+      : <WhenInactiveAndMeetingNotEnded {...buttonProps} />;
+    return (
+      <div className="flex items-center gap-2">
+        {startButton}
+        <span className="sr-only" role="status">{statusLabel(availability)}</span>
+        {availability.canRetry && (
+          <Button variant="ghost" size="sm" onClick={() => void retry()}>
+            <Trans>Retry</Trans>
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => openSettingsWindow("/app/settings?tab=ai&section=transcription")}
+        >
+          <Trans>Open Settings</Trans>
+        </Button>
+      </div>
+    );
   }
 
   if (ongoingSessionStatus === "running_active") {

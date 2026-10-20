@@ -1,8 +1,8 @@
 use std::future::Future;
 
 use crate::{
-    Connection, ConnectionLLM, ConnectionSTT, SessionModelOverride, SessionModelOverrideState,
-    StoreKey, SttSelection,
+    Connection, ConnectionLLM, ConnectionSTT, ResolvedSttConnection, ResolvedSttModel,
+    SessionModelOverride, SessionModelOverrideState, StoreKey, SttSelection,
 };
 use tauri_plugin_store2::StorePluginExt;
 
@@ -66,7 +66,8 @@ pub trait ConnectorPluginExt<R: tauri::Runtime> {
     fn connect_stt_selection(
         &self,
         selection: SttSelection,
-    ) -> impl Future<Output = Result<ConnectionSTT, crate::Error>>;
+        languages: &[typr_language::Language],
+    ) -> impl Future<Output = Result<ResolvedSttConnection, crate::Error>>;
     fn set_stt_model_session(
         &self,
         session_id: String,
@@ -295,21 +296,58 @@ impl<R: tauri::Runtime, T: tauri::Manager<R> + tauri::Emitter<R>> ConnectorPlugi
     async fn connect_stt_selection(
         &self,
         selection: SttSelection,
-    ) -> Result<ConnectionSTT, crate::Error> {
+        languages: &[typr_language::Language],
+    ) -> Result<ResolvedSttConnection, crate::Error> {
         match selection {
-            SttSelection::AssemblyAi { api_key } => Ok(ConnectionSTT::CloudProvider(Connection {
-                api_base: "https://api.assemblyai.com".to_string(),
-                api_key: Some(api_key.ok_or_else(|| {
-                    crate::Error::UnknownError("missing AssemblyAI API key".to_string())
-                })?),
-            })),
+            SttSelection::AssemblyAi { api_key } => Ok(ResolvedSttConnection {
+                model: ResolvedSttModel::AssemblyAi,
+                connection: ConnectionSTT::CloudProvider(Connection {
+                    api_base: "https://api.assemblyai.com".to_string(),
+                    api_key: Some(api_key.ok_or_else(|| {
+                        crate::Error::UnknownError("missing AssemblyAI API key".to_string())
+                    })?),
+                }),
+            }),
             SttSelection::Local(model) => {
                 use tauri_plugin_local_stt::LocalSttPluginExt;
-                let api_base = self.start_server_for_model(model).await?;
-                Ok(ConnectionSTT::TyprLocal(Connection {
-                    api_base,
-                    api_key: None,
-                }))
+                let startup = if model.supports_languages(languages) {
+                    self.start_server_for_model(model.clone()).await
+                } else {
+                    Err(tauri_plugin_local_stt::Error::NotSupported(
+                        "Selected languages require Whisper".into(),
+                    ))
+                };
+                let (api_base, effective_model) = match startup {
+                    Ok(api_base) => (api_base, model),
+                    Err(error)
+                        if model.backend()
+                            == tauri_plugin_local_stt::SttBackend::NemotronStreaming =>
+                    {
+                        tracing::warn!("nemotron_startup_failed_using_whisper: {}", error);
+                        let mut fallback = None;
+                        for candidate in tauri_plugin_local_stt::STREAMING_WHISPER_FALLBACKS {
+                            if self.is_model_downloaded(candidate).await? {
+                                fallback = Some(candidate.clone());
+                                break;
+                            }
+                        }
+                        let fallback = fallback.ok_or(error)?;
+                        // This is a connection-only recovery choice. Never rewrite the
+                        // user's durable model selection or another session's override.
+                        (
+                            self.start_server_for_model(fallback.clone()).await?,
+                            fallback,
+                        )
+                    }
+                    Err(error) => return Err(error.into()),
+                };
+                Ok(ResolvedSttConnection {
+                    connection: ConnectionSTT::TyprLocal(Connection {
+                        api_base,
+                        api_key: None,
+                    }),
+                    model: ResolvedSttModel::Local(effective_model),
+                })
             }
         }
     }
@@ -317,7 +355,9 @@ impl<R: tauri::Runtime, T: tauri::Manager<R> + tauri::Emitter<R>> ConnectorPlugi
     async fn get_stt_connection(&self) -> Result<ConnectionSTT, crate::Error> {
         // Non-session callers (including uploads) always resolve the durable default.
         let selection = self.get_stt_selection(None).await?;
-        self.connect_stt_selection(selection).await
+        self.connect_stt_selection(selection, &[])
+            .await
+            .map(|resolved| resolved.connection)
     }
     fn get_admin_connection(&self) -> Result<Option<Connection>, crate::Error> {
         let api_base = self.connector_store().get(StoreKey::AdminApiBase)?;

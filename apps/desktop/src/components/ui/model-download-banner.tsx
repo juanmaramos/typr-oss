@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { BrainIcon } from "lucide-react";
 
-import { useLocalModels } from "@/hooks/useModels";
+import { useAIAvailability } from "@/hooks/useAIAvailability";
 import { Spinner } from "@typr/ui/components/ui/spinner";
 
 interface ModelDownloadBannerProps {
@@ -10,10 +10,8 @@ interface ModelDownloadBannerProps {
 
 export function ModelDownloadBanner({ className }: ModelDownloadBannerProps) {
   const { t } = useLingui();
-  const { models } = useLocalModels();
-
-  // Check if any model is currently downloading
-  const isAnyModelDownloading = models.some(model => model.isDownloading);
+  const { availability } = useAIAvailability();
+  const isAnyModelDownloading = availability.status === "downloading";
 
   if (!isAnyModelDownloading) {
     return null;
@@ -30,10 +28,10 @@ export function ModelDownloadBanner({ className }: ModelDownloadBannerProps) {
 
           {/* Content */}
           <div className="flex-1">
-            <div className="font-medium text-info dark:text-info/80 text-sm">
+            <div className="font-medium text-foreground text-sm">
               {t`Setting up AI assistant`}
             </div>
-            <div className="text-info dark:text-info/80 text-xs mt-0.5">
+            <div className="text-foreground text-xs mt-0.5">
               {t`You'll be able to chat when the download completes`}
             </div>
           </div>

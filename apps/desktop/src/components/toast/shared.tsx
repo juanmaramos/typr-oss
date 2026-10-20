@@ -1,3 +1,4 @@
+import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
 import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { Trans } from "@lingui/react/macro";
 import { QueryClient, useQuery } from "@tanstack/react-query";
@@ -5,10 +6,10 @@ import { Channel } from "@tauri-apps/api/core";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { getSttModelLabel, sttModelMetadata } from "@/components/transcript/constants/languageData";
 import { DEFAULT_ONBOARDING_LLM_MODEL } from "@/components/welcome-modal/model-setup";
 import { useModelState } from "@/hooks/useModelState";
 import { openSettingsWindow } from "@/utils/open-settings-window";
-import { sttModelMetadata } from "@/components/transcript/constants/languageData";
 import { commands as localLlmCommands, SupportedModel as SupportedModelLLM } from "@typr/plugin-local-llm";
 import { commands as localSttCommands, SupportedModel } from "@typr/plugin-local-stt";
 import { Button } from "@typr/ui/components/ui/button";
@@ -45,16 +46,18 @@ function ModelDownloadStateToastContent({
 function ModelDownloadDescription({
   detail,
   iconClass,
+  icon,
   modelName,
 }: {
   detail: ReactNode;
-  iconClass: string;
+  iconClass?: string;
+  icon?: ReactNode;
   modelName: ReactNode;
 }) {
   return (
     <div className="flex min-w-0 items-start gap-2">
       <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-muted-foreground">
-        <i className={`${iconClass} text-base`} />
+        {icon ?? <i className={`${iconClass} text-base`} />}
       </div>
       <div className="min-w-0">
         <div className="truncate font-medium text-foreground">{modelName}</div>
@@ -140,9 +143,8 @@ function SttModelDownloadToastContent({
   const progress = modelState?.isDownloaded ? 100 : modelState?.progress || 0;
   const error = modelState?.error;
   const metadata = sttModelMetadata[model];
-  const modelName = metadata?.name ?? model;
+  const modelName = getSttModelLabel(model);
   const modelSize = metadata?.size;
-  const iconClass = metadata?.iconClass ?? "ri-speech-to-text-line";
 
   useEffect(() => {
     if (!modelState?.isDownloaded || completedRef.current) {
@@ -187,7 +189,7 @@ function SttModelDownloadToastContent({
       status="loading"
       description={
         <ModelDownloadDescription
-          iconClass={iconClass}
+          icon={<STTProviderIcon model={model} />}
           modelName={modelName}
           detail={modelSize
             ? <Trans>Voice transcription · {modelSize}</Trans>

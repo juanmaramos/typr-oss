@@ -3,13 +3,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { debugLogFor } from "@/components/utils/debug-logger";
 import { sessionWordsQueryOptions } from "@/lib/session-query";
 import { safeUnlisten } from "@/utils/safe-unlisten";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { events as listenerEvents, type Word } from "@typr/plugin-listener";
 import { useOngoingSession } from "@typr/utils/contexts";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   type CommittedWordsState,
+  getSessionScopedPreviews,
   getSessionScopedWords,
+  type PreviewWordsState,
 } from "./transcript-state";
 
 const shortSessionId = (id: string | null | undefined) => id?.slice(-8) ?? "none";
@@ -35,6 +37,13 @@ export function useTranscript(sessionId: string | null, caller?: string) {
     sessionId,
     words: [],
   });
+  const [previewState, setPreviewState] = useState<PreviewWordsState>({ sessionId, wordsByChannel: {} });
+  const previews = isLive ? getSessionScopedPreviews(previewState, sessionId) : {};
+
+  useEffect(() => {
+    setPreviewState({ sessionId, wordsByChannel: {} });
+  }, [sessionId, ongoingSessionState.status, ongoingSessionState.sessionId]);
+
   const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
 
   // These derived values are intentionally session-gated during render. React
@@ -71,12 +80,28 @@ export function useTranscript(sessionId: string | null, caller?: string) {
     let unlisten: (() => void) | null = null;
 
     listenerEvents.sessionEvent.listen(({ payload }) => {
+      if (disposed) {
+        return;
+      }
       // Handle events only for the active session
       if (
         ongoingSessionState.sessionId !== sessionId
         || ongoingSessionState.status !== "running_active"
       ) {
         return;
+      }
+
+      if (payload.type === "preview") {
+        if (payload.session_id !== sessionId) {
+          return;
+        }
+        setPreviewState(previous => ({
+          sessionId,
+          wordsByChannel: {
+            ...getSessionScopedPreviews(previous, sessionId),
+            [payload.channel]: payload.words,
+          },
+        }));
       }
 
       // Handle Final Commit (Saved to DB)
@@ -94,6 +119,7 @@ export function useTranscript(sessionId: string | null, caller?: string) {
         setCommittedState({ sessionId, words: newCommitted });
       } // Handle Session End
       else if (payload.type === "inactive" && sessionId) {
+        setPreviewState({ sessionId, wordsByChannel: {} });
         debugLogFor("DEBUG_TRANSCRIPT", "TranscriptDebug", "session ended; invalidating cache", { sessionId });
         queryClient.invalidateQueries({ queryKey: ["session", sessionId] });
       }
@@ -120,6 +146,7 @@ export function useTranscript(sessionId: string | null, caller?: string) {
 
   return {
     words: committedWords,
+    previews,
     isLive,
     selectedLanguage,
     handleLanguageChange,

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "bundle": {
+    "resources": {
+      "../public/assets/*.woff2": "assets/",
+      "../public/assets/inter/*.woff2": "assets/inter/",
+      "../../../target/nemotron/runtime/": "stt/nemotron/"
+    }
+  },
+  "build": {
+    "beforeDevCommand": "pnpm -F @typr/desktop dev",
+    "beforeBuildCommand": "pnpm -F @typr/desktop build"
+  }
+}

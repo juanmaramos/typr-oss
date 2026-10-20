@@ -1,9 +1,10 @@
+import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
 import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { showModelDownloadStateToast } from "@/components/toast/shared";
-import { sttModelMetadata } from "@/components/transcript/constants/languageData";
+import { getSttModelLabel, sttModelMetadata } from "@/components/transcript/constants/languageData";
 import { useModelState } from "@/hooks/useModelState";
 import { commands } from "@/types";
 import { commands as localLlmCommands, type SupportedModel as SupportedLlmModel } from "@typr/plugin-local-llm";
@@ -152,7 +153,15 @@ export const DownloadProgressView = ({
         id: ONBOARDING_STT_TOAST_ID,
         status: "error",
         title: <Trans>Transcription setup failed</Trans>,
-        description: sttDescription,
+        description: (
+          <span className="flex items-start gap-2">
+            <STTProviderIcon model={selectedSttModel} />
+            <span>
+              <span className="block">{getSttModelLabel(selectedSttModel)}</span>
+              {sttDescription}
+            </span>
+          </span>
+        ),
         action: {
           label: <Trans>Retry</Trans>,
           onClick: retryDownloads,
@@ -165,7 +174,15 @@ export const DownloadProgressView = ({
         id: ONBOARDING_STT_TOAST_ID,
         status: "loading",
         title: <Trans>Preparing transcription</Trans>,
-        description: sttDescription,
+        description: (
+          <span className="flex items-start gap-2">
+            <STTProviderIcon model={selectedSttModel} />
+            <span>
+              <span className="block">{getSttModelLabel(selectedSttModel)}</span>
+              {sttDescription}
+            </span>
+          </span>
+        ),
         progress: sttProgress,
       });
     }

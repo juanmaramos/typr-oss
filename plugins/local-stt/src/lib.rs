@@ -8,7 +8,7 @@ mod ext;
 mod manager;
 mod model;
 mod store;
-mod whisper_manager;
+mod streaming;
 
 pub mod server;
 
@@ -18,7 +18,6 @@ pub use ext::*;
 pub use model::*;
 pub use server::*;
 pub use store::*;
-pub use whisper_manager::*;
 
 pub type SharedState = std::sync::Arc<tokio::sync::Mutex<State>>;
 
@@ -44,6 +43,7 @@ fn make_specta_builder<R: tauri::Runtime>() -> tauri_specta::Builder<R> {
             commands::download_model::<Wry>,
             commands::download_model_background::<Wry>,
             commands::list_supported_models,
+            commands::list_model_capabilities::<Wry>,
             commands::get_current_model::<Wry>,
             commands::set_current_model::<Wry>,
             commands::start_server::<Wry>,

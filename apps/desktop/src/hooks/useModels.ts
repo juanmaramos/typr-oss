@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
 import { localChatModelQueryOptions } from "@/lib/model-selection";
-import { useModelPreferences } from "./useModelPreferences";
 import { type SupportedModel } from "@typr/plugin-local-llm";
 import { AUTO_MODEL_ID, useCloudModelSelection } from "./useCloudModelSelection";
 import { useGroqModels } from "./useGroqModels";
+import { useModelPreferences } from "./useModelPreferences";
 import { useModelRegistry } from "./useModelRegistry";
 import { useOpenAIModels } from "./useOpenAIModels";
 import { useOpenRouterModels } from "./useOpenRouterModels";
@@ -30,7 +30,8 @@ export function useLocalModels() {
       name: model.name,
       provider: ModelProvider.LOCAL,
       type: ModelType.LOCAL,
-      isAvailable: true,
+      isAvailable: model.availability.canSelect,
+      availability: model.availability,
       isDownloaded: model.isDownloaded,
       isDownloading: model.isDownloading,
       // If cloud model is selected, no local model should show as selected
@@ -96,6 +97,9 @@ export function useCustomModels() {
 export function useModelSelection() {
   const { selectLocalChat, selectCloudChat } = useModelPreferences();
   const selectModel = useCallback(async (model: ModelOption) => {
+    if (model.availability && !model.availability.canSelect) {
+      throw new Error("model_not_ready");
+    }
     if (model.type === ModelType.LOCAL) {
       await selectLocalChat(model.id.replace(/^local-/, "") as SupportedModel);
     } else if (model.type === ModelType.CLOUD) {
@@ -152,23 +156,8 @@ export function useAllModels() {
     });
   }, [localModels, customModels]);
 
-  // Currently selected model - prioritize cloud models when selected
-  const selectedModel = useMemo(() => {
-    // First check if there's a selected cloud model
-    const selectedCloudModel = allModels.find(model => model.type === ModelType.CLOUD && model.isSelected);
-    if (selectedCloudModel?.isAvailable) {
-      return selectedCloudModel;
-    }
-
-    // Otherwise, use selected local model
-    const selectedLocalModel = allModels.find(model => model.type === ModelType.LOCAL && model.isSelected);
-    if (selectedLocalModel?.isDownloaded) {
-      return selectedLocalModel;
-    }
-
-    // Fallback to first downloaded local model
-    return allModels.find(model => model.type === ModelType.LOCAL && model.isDownloaded) || null;
-  }, [allModels]);
+  // Show the saved selection even when it needs setup; display must not silently pick a different model.
+  const selectedModel = useMemo(() => allModels.find(model => model.isSelected) ?? null, [allModels]);
 
   // Downloaded models only
   const downloadedModels = useMemo(() => allModels.filter(model => model.isDownloaded), [allModels]);

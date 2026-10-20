@@ -17,13 +17,13 @@ specta-typescript = { workspace = true }
 tauri-plugin-auth = { workspace = true }
 tauri-plugin-local-llm = { workspace = true }
 tauri-plugin-local-stt = { workspace = true }
+typr-language = { workspace = true }
 
 tauri = { workspace = true, features = ["test"] }
 tauri-plugin-flags = { workspace = true }
 tauri-plugin-store2 = { workspace = true }
 tauri-specta = { workspace = true, features = ["derive", "typescript"] }
 
-typr-listener-interface = { workspace = true }
 reqwest = { workspace = true, features = ["json"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -32,4 +32,5 @@ strum = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["fs", "time"] }
 tracing = { workspace = true }
+typr-listener-interface = { workspace = true }
 url = { workspace = true }

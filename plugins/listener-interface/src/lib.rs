@@ -41,6 +41,17 @@ common_derives! {
     pub struct ListenOutputChunk {
         pub meta: Option<serde_json::Value>,
         pub words: Vec<Word>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub update: Option<TranscriptUpdate>,
+    }
+}
+
+common_derives! {
+    #[serde(tag = "type", rename_all = "snake_case")]
+    pub enum TranscriptUpdate {
+        Preview { channel: String },
+        Final { channel: String },
+        Failed { code: String },
     }
 }
 
