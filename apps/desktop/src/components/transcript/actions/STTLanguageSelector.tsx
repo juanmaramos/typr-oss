@@ -196,7 +196,11 @@ export function STTLanguageSelector({
       <PopoverTrigger asChild>
         {SelectorButton}
       </PopoverTrigger>
-      <PopoverContent className="w-80 border-0 shadow-lg" align="center" sideOffset={4}>
+      <PopoverContent
+        className="w-80 max-w-[var(--radix-popover-content-available-width)] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto overscroll-contain border-0 shadow-lg"
+        align="center"
+        sideOffset={4}
+      >
         <div className="space-y-3">
           {/* On-device Models Section - Only show header if local models exist */}
           {availableOptions.some(o => o.isLocal) && (
