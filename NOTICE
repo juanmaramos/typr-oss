@@ -23,3 +23,38 @@ Selected bundled binary assets:
   https://huggingface.co/onnx-community/pyannote-segmentation-3.0
 - WeSpeaker VoxCeleb CAM++ speaker embedding model, Apache License 2.0:
   https://huggingface.co/Wespeaker/wespeaker-voxceleb-campplus
+
+Call-control accessibility adapter provenance
+
+The bounded call-control label matching and checked CoreFoundation attribute conversion
+in crates/detect/src/call/mod.rs and crates/detect/src/call/macos.rs adapt small portions
+of Fastrepl Anarlog's crates/detect/src/meeting_ax/node.rs and
+crates/detect/src/meeting_ax.rs at revision
+0e769907818559177205ce91789c2f5be3927704 (modified for read-only call evidence;
+no chat extraction or UI mutation code included).
+https://github.com/fastrepl/anarlog/tree/0e769907818559177205ce91789c2f5be3927704
+
+Those upstream paths are MIT licensed, outside the separately licensed enterprise
+boundary documented in upstream LICENSING.md. Their license follows:
+
+MIT License
+
+Copyright (c) 2023-present Fastrepl, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

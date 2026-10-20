@@ -113,6 +113,13 @@ const displayPosition = (node) => {
       ) {
         return true;
       }
+      // Native DOM tag names stay technical even when the element is named label/content.
+      if (
+        callee.type === "MemberExpression" && callee.object.name === "document"
+        && callee.property.name === "createElement" && current.arguments[0] === node
+      ) {
+        return false;
+      }
       // Technical selector strings and date-format tokens are not rendered copy.
       if (
         callee.type === "MemberExpression"

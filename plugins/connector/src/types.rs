@@ -79,6 +79,37 @@ impl SttSelection {
     }
 }
 
+/// The model actually serving a connection, independent of saved preferences.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ResolvedSttModel {
+    Local(tauri_plugin_local_stt::SupportedModel),
+    AssemblyAi,
+}
+
+impl ResolvedSttModel {
+    pub fn model_id(&self) -> String {
+        match self {
+            Self::Local(model) => model.to_string(),
+            Self::AssemblyAi => "assemblyai-universal".into(),
+        }
+    }
+
+    pub fn is_streaming(&self) -> bool {
+        matches!(self, Self::Local(model) if model.is_streaming())
+    }
+}
+
+pub struct ResolvedSttConnection {
+    pub connection: ConnectionSTT,
+    pub model: ResolvedSttModel,
+}
+
+impl From<ResolvedSttConnection> for Connection {
+    fn from(value: ResolvedSttConnection) -> Self {
+        value.connection.into()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SessionModelOverride {
     pub session_id: String,

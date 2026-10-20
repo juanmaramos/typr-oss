@@ -1,0 +1,29 @@
+name: Native STT
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  worker:
+    name: Native STT worker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup toolchain install 1.93.0 --profile minimal
+      - name: Check framing, lifecycle, and actual worker process boundaries
+        run: cargo +1.93.0 test --locked -p typr-nemotron-runtime
+
+  integration:
+    name: Native STT integration
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup toolchain install 1.93.0 --profile minimal
+      - name: Check routing, fallback, previews, and shutdown
+        run: cargo +1.93.0 test --locked -p tauri-plugin-local-stt -p tauri-plugin-connector -p tauri-plugin-listener --lib

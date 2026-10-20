@@ -6,7 +6,7 @@ use tauri::Manager;
 use tauri_specta::Event;
 
 use futures_util::StreamExt;
-use tokio::task::JoinSet;
+use tokio::task::{JoinHandle, JoinSet};
 
 use typr_audio::AsyncSource;
 
@@ -237,6 +237,7 @@ fn schedule_stream_reconnect(
 
 async fn evaluate_session_watchdog<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
+    session_id: &str,
     watchdog: &mut crate::policy::SessionWatchdog,
     policy: crate::policy::SessionLifecyclePolicy,
     session_started_at: Instant,
@@ -279,10 +280,18 @@ async fn evaluate_session_watchdog<R: tauri::Runtime>(
                 silence_elapsed.as_millis(),
                 stream_count
             );
-            if let Some(state) = app.try_state::<crate::SharedState>() {
-                let mut guard = state.lock().await;
-                guard.fsm.handle(&StateEvent::Stop).await;
-            }
+            // Stop awaits this monitor, so dispatch independently and keep consuming
+            // final transcript chunks during the flush.
+            let app = app.clone();
+            let session_id = session_id.to_owned();
+            tauri::async_runtime::spawn(async move {
+                if let Some(state) = app.try_state::<crate::SharedState>() {
+                    let mut guard = state.lock().await;
+                    if guard.fsm.session_id.as_deref() == Some(session_id.as_str()) {
+                        guard.fsm.handle(&StateEvent::Stop).await;
+                    }
+                }
+            });
             true
         }
     }
@@ -609,6 +618,8 @@ impl AudioChannels {
 pub struct Session {
     app: tauri::AppHandle,
     session_id: Option<String>,
+    recording_started: bool,
+    recording_completion: crate::completion::RecordingCompletion,
     mic_device_name: Option<String>,
     mic_selection_mode: MicSelectionMode,
     mic_muted_tx: Option<tokio::sync::watch::Sender<bool>>,
@@ -618,9 +629,16 @@ pub struct Session {
     silence_stream_tx: Option<std::sync::mpsc::Sender<()>>,
     session_state_tx: Option<tokio::sync::watch::Sender<State>>,
     tasks: Option<JoinSet<()>>,
+    transcript_task: Option<JoinHandle<bool>>,
+    transcript_input_closed: Option<std::sync::Arc<std::sync::atomic::AtomicBool>>,
     device_monitor_handle: Option<typr_audio::DeviceMonitorHandle>,
     process_mic_tx: Option<flume::Sender<Vec<f32>>>,
     process_speaker_tx: Option<flume::Sender<Vec<f32>>>,
+    streaming_finishing: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    audio_ingress_stop_tx: Option<tokio::sync::watch::Sender<bool>>,
+    audio_ingress_stopped_rx: Option<tokio::sync::oneshot::Receiver<()>>,
+    audio_timeline: Option<(String, crate::streaming_lifecycle::AudioTimeline)>,
+    is_streaming_stt: bool,
     is_local_stt: bool,        // Track if using local STT for silence injection
     stt_model: Option<String>, // Effective selection captured for this session startup
     lifecycle_policy: crate::policy::SessionLifecyclePolicy,
@@ -641,6 +659,8 @@ impl Session {
         Self {
             app,
             session_id: None,
+            recording_started: false,
+            recording_completion: crate::completion::RecordingCompletion::default(),
             mic_device_name: Some(mic_device_name),
             mic_selection_mode: MicSelectionMode::Auto,
             mic_muted_tx: None,
@@ -649,10 +669,17 @@ impl Session {
             speaker_muted_rx: None,
             silence_stream_tx: None,
             tasks: None,
+            transcript_task: None,
+            transcript_input_closed: None,
             session_state_tx: None,
             device_monitor_handle: None,
             process_mic_tx: None,
             process_speaker_tx: None,
+            streaming_finishing: std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            audio_ingress_stop_tx: None,
+            audio_ingress_stopped_rx: None,
+            audio_timeline: None,
+            is_streaming_stt: false,
             is_local_stt: false,
             stt_model: None,
             lifecycle_policy: crate::policy::SessionLifecyclePolicy::default(),
@@ -845,14 +872,14 @@ impl Session {
     async fn mark_pipeline_failed(
         app: &tauri::AppHandle,
         status: &std::sync::Arc<tokio::sync::Mutex<PipelineStatus>>,
+        session_id: &str,
         reason: impl Into<String>,
-    ) {
+    ) -> bool {
         let status = {
             let mut status = status.lock().await;
-            status.phase = PipelineStatusPhase::Failed;
-            status.reason = Some(reason.into());
-            status.reconnect_attempt = None;
-            status.reconnect_max_attempts = None;
+            if !status.fail_for_session(session_id, reason.into()) {
+                return false;
+            }
             status.clone()
         };
 
@@ -862,6 +889,7 @@ impl Session {
         if let Err(err) = (PipelineStatusChanged { status }).emit(app) {
             tracing::warn!("[PIPELINE_STATUS] Failed to emit failed status: {:?}", err);
         }
+        true
     }
 
     async fn wait_for_stream_connection(&mut self, timeout: Duration) -> bool {
@@ -1095,6 +1123,40 @@ impl Session {
             .await?
             .ok_or(crate::Error::NoneSession)?;
 
+        let timeline = match &self.audio_timeline {
+            Some((timeline_session, timeline)) if timeline_session == &session_id => {
+                timeline.clone()
+            }
+            _ => {
+                // Existing recordings append PCM. Read only the WAV header to
+                // initialize a restarted note's durable audio position.
+                let audio_path = self
+                    .app
+                    .path()
+                    .app_data_dir()
+                    .map_err(|error| crate::Error::Custom(error.to_string()))?
+                    .join(&session_id)
+                    .join("audio.wav");
+                let recorded_samples = hound::WavReader::open(audio_path)
+                    .ok()
+                    .filter(|audio| audio.spec() == WAV_SPEC)
+                    .map(|audio| u64::from(audio.duration()));
+                let initial_samples = recorded_samples.unwrap_or_else(|| {
+                    session
+                        .words
+                        .iter()
+                        .filter_map(|word| word.end_ms)
+                        .max()
+                        .unwrap_or(0)
+                        .saturating_mul(16)
+                });
+                let timeline = crate::streaming_lifecycle::AudioTimeline::new(initial_samples);
+                self.audio_timeline = Some((session_id.clone(), timeline.clone()));
+                timeline
+            }
+        };
+        let stream_origin_ms = timeline.origin_ms();
+
         let (mic_muted_tx, mic_muted_rx_main) = tokio::sync::watch::channel(false);
         let (speaker_muted_tx, speaker_muted_rx_main) = tokio::sync::watch::channel(false);
         let (session_state_tx, session_state_rx) =
@@ -1187,7 +1249,6 @@ impl Session {
         self.stt_model = None;
         let selection = self.app.get_stt_selection(Some(&session_id)).await?;
         let selected_model = Some(selection.model_id());
-        self.stt_model = selected_model.clone();
 
         let provider = SttProvider::from_model(selected_model.as_deref());
         let is_local = provider.is_local();
@@ -1218,8 +1279,8 @@ impl Session {
         tracing::info!(
             "⏳ [CONNECTION] Attempting to connect to transcription service (10s timeout)..."
         );
-        let connection_timeout = Duration::from_secs(10);
-        let (listen_client, listen_provider) =
+        let connection_timeout = Duration::from_secs(if is_local { 120 } else { 10 });
+        let (listen_client, listen_provider, resolved_model) =
             match tokio::time::timeout(connection_timeout, async {
                 let user_id = self.app.db_user_id().await.ok().flatten();
                 setup_listen_client(
@@ -1263,8 +1324,20 @@ impl Session {
                     );
                     return Err(err);
                 }
-                Ok(Ok((builder, provider))) => (builder.build_dual(), provider),
+                Ok(Ok((builder, provider, model))) => (builder.build_dual(), provider, model),
             };
+
+        let effective_model = resolved_model.model_id();
+        self.is_streaming_stt = resolved_model.is_streaming();
+        self.stt_model = Some(effective_model.clone());
+        if selected_model.as_deref() != Some(effective_model.as_str()) {
+            let _ = (SessionEvent::ModelFallback {
+                session_id: session_id.clone(),
+                requested_model: selected_model.clone().unwrap_or_default(),
+                effective_model,
+            })
+            .emit(&self.app);
+        }
 
         tracing::info!("🔌 [PHASE 1] Service connection established");
 
@@ -1414,6 +1487,10 @@ impl Session {
         ));
 
         let app_dir = self.app.path().app_data_dir().unwrap();
+        let (audio_stop_tx, mut audio_stop_rx) = tokio::sync::watch::channel(false);
+        let (audio_stopped_tx, audio_stopped_rx) = tokio::sync::oneshot::channel();
+        self.audio_ingress_stop_tx = Some(audio_stop_tx);
+        self.audio_ingress_stopped_rx = Some(audio_stopped_rx);
 
         tasks.spawn({
             let app = self.app.clone();
@@ -1426,6 +1503,7 @@ impl Session {
             let process_mic_tx = channels.process_mic_tx.clone();
             let process_speaker_tx = channels.process_speaker_tx.clone();
             async move {
+                let _stopped = crate::streaming_lifecycle::CompletionSignal(Some(audio_stopped_tx));
                 let mut aec = typr_aec::AEC::new().unwrap();
                 let mut last_broadcast = Instant::now();
 
@@ -1440,6 +1518,8 @@ impl Session {
                 loop {
                     // Non-blocking: process whichever channel has data ready
                     let (mic_chunk_raw, speaker_chunk): (Vec<f32>, Vec<f32>) = tokio::select! {
+                        biased;
+                        _ = audio_stop_rx.changed() => break,
                         mic_result = mic_rx.recv_async() => {
                             match mic_result {
                                 Ok(mic) => {
@@ -1772,6 +1852,19 @@ impl Session {
             })) as std::pin::Pin<Box<dyn futures_util::Stream<Item = bytes::Bytes> + Send>>
         };
 
+        let mic_timeline = timeline.clone();
+        let mic_audio_stream = Box::pin(mic_audio_stream.map(move |bytes| {
+            mic_timeline.submitted(0, bytes.len());
+            bytes
+        }));
+        let speaker_audio_stream = Box::pin(speaker_audio_stream.map(move |bytes| {
+            timeline.submitted(1, bytes.len());
+            bytes
+        }));
+
+        self.streaming_finishing = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let intentional_finish = self.streaming_finishing.clone();
+
         let (stream_connected_tx, stream_connected_rx) = tokio::sync::watch::channel(false);
         self.stream_connected_rx = Some(stream_connected_rx);
 
@@ -1781,7 +1874,7 @@ impl Session {
         tracing::info!(
             "🔌 [CONNECTION] Initiating WebSocket connection to transcription service..."
         );
-        let listen_stream_task = tokio::spawn(async move {
+        let connect_listen_stream = async move {
             let result = listen_client
                 .from_realtime_audio(mic_audio_stream, speaker_audio_stream)
                 .await;
@@ -1793,14 +1886,17 @@ impl Session {
             }
 
             result
-        });
+        };
 
         // Log that pipeline is starting (WebSocket connecting in background)
         tracing::info!("🚀 [PHASE 3] Audio pipeline starting (connecting to service...)");
 
         let selected_model_for_stream_error = selected_model.clone();
 
-        tasks.spawn({
+        let transcript_input_closed =
+            std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        self.transcript_input_closed = Some(transcript_input_closed.clone());
+        self.transcript_task = Some(tokio::spawn({
             let app = self.app.clone();
             let policy = self.lifecycle_policy;
             let selected_model_for_stream_error = selected_model_for_stream_error.clone();
@@ -1808,36 +1904,35 @@ impl Session {
 
             async move {
                 // Wait for WebSocket connection to complete
-                tracing::info!("🔌 [PHASE 3] Waiting for WebSocket connection to transcription service...");
-                let listen_stream = match listen_stream_task.await {
-                    Ok(Ok(stream)) => {
+                tracing::info!(
+                    "🔌 [PHASE 3] Waiting for WebSocket connection to transcription service..."
+                );
+                let listen_stream = match connect_listen_stream.await {
+                    Ok(stream) => {
                         tracing::info!("✅ [PHASE 3] Audio pipeline started successfully - WebSocket connected");
                         let _ = stream_connected_tx.send(true);
                         Self::mark_pipeline_active(&app, &pipeline_status).await;
                         stream
                     }
-                    Ok(Err(e)) => {
+                    Err(e) => {
                         tracing::error!("❌ [PHASE 3] Failed to establish listen stream: {:?}", e);
                         tracing::error!("💡 Check: 1) API keys configured 2) Network connectivity 3) Firewall not blocking");
-                        Self::mark_pipeline_failed(&app, &pipeline_status, "websocket_connect_failed").await;
-                        emit_cloud_failure_event(
+                        if Self::mark_pipeline_failed(
                             &app,
-                            selected_model_for_stream_error.as_deref(),
+                            &pipeline_status,
+                            &session.id,
                             "websocket_connect_failed",
-                            &e.to_string(),
-                        );
-                        return;
-                    }
-                    Err(e) => {
-                        tracing::error!("❌ [PHASE 3] Task join error (task panicked or was cancelled): {:?}", e);
-                        Self::mark_pipeline_failed(&app, &pipeline_status, "websocket_task_join_failed").await;
-                        emit_cloud_failure_event(
-                            &app,
-                            selected_model_for_stream_error.as_deref(),
-                            "websocket_task_join_failed",
-                            &e.to_string(),
-                        );
-                        return;
+                        )
+                        .await
+                        {
+                            emit_cloud_failure_event(
+                                &app,
+                                selected_model_for_stream_error.as_deref(),
+                                "websocket_connect_failed",
+                                &e.to_string(),
+                            );
+                        }
+                        return false;
                     }
                 };
 
@@ -1848,6 +1943,7 @@ impl Session {
                 let mut stream_count: u64 = 0;
                 let mut watchdog = crate::policy::SessionWatchdog::default();
                 let mut auto_stop_triggered = false;
+                let mut transcript_succeeded = true;
                 let mut watchdog_tick = tokio::time::interval(Duration::from_secs(1));
                 watchdog_tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
 
@@ -1859,6 +1955,41 @@ impl Session {
                             let Some(result) = maybe_result else {
                                 break;
                             };
+                            let mut result = match result {
+                                Ok(result) => result,
+                                Err(error) => {
+                                    transcript_succeeded = false;
+                                    tracing::error!(%error, "transcription transport failed; summary remains unqueued");
+                                    continue;
+                                }
+                            };
+
+                            crate::streaming_lifecycle::offset_streaming_chunk(&mut result, stream_origin_ms);
+
+                            // Streaming hypotheses are display-only; they never reach update_session.
+                            if let Some(update) = result.update.as_ref() {
+                                match update {
+                                    typr_listener_interface::TranscriptUpdate::Preview { channel } => {
+                                        if !result.words.is_empty() { last_transcript_activity_at = std::time::Instant::now(); }
+                                        let _ = (SessionEvent::Preview { session_id: session.id.clone(), channel: channel.clone(), words: result.words }).emit(&app);
+                                        continue;
+                                    }
+                                    typr_listener_interface::TranscriptUpdate::Final { channel } => {
+                                        let _ = (SessionEvent::Preview { session_id: session.id.clone(), channel: channel.clone(), words: vec![] }).emit(&app);
+                                    }
+                                    typr_listener_interface::TranscriptUpdate::Failed { code } => {
+                                        Self::mark_pipeline_failed(&app, &pipeline_status, &session.id, code).await;
+                                        for channel in ["mixed", "mic", "speaker"] {
+                                            let _ = (SessionEvent::Preview { session_id: session.id.clone(), channel: channel.into(), words: vec![] }).emit(&app);
+                                        }
+                                        let _ = (SessionEvent::TranscriptError { session_id: session.id.clone(), status: code.clone(), message: code.clone() }).emit(&app);
+                                        // Replaying after committed finals would duplicate or lose words.
+                                        // Never assume recording is enabled: preserve committed text and
+                                        // stop this stream explicitly so the user can select Whisper.
+                                        return false;
+                                    }
+                                }
+                            }
 
                             stream_count += 1;
                             let meta = result.meta.clone();
@@ -1869,8 +2000,9 @@ impl Session {
                                 State::RunningActive {}
                             );
 
-                            if evaluate_session_watchdog(
+                            if !auto_stop_triggered && evaluate_session_watchdog(
                                 &app,
+                                &session.id,
                                 &mut watchdog,
                                 policy,
                                 session_started_at,
@@ -1882,7 +2014,6 @@ impl Session {
                             .await
                             {
                                 auto_stop_triggered = true;
-                                break;
                             }
 
                             // Monitor for unusually long silence periods that might indicate device issues
@@ -2002,6 +2133,7 @@ impl Session {
                                     }
                                 }
                                 Err(e) => {
+                                    transcript_succeeded = false;
                                     tracing::error!("[SESSION_UPDATE_FAILED] {:?} - continuing stream", e);
                                 }
                             }
@@ -2014,8 +2146,9 @@ impl Session {
                                 State::RunningActive {}
                             );
 
-                            if evaluate_session_watchdog(
+                            if !auto_stop_triggered && evaluate_session_watchdog(
                                 &app,
+                                &session.id,
                                 &mut watchdog,
                                 policy,
                                 session_started_at,
@@ -2027,7 +2160,6 @@ impl Session {
                             .await
                             {
                                 auto_stop_triggered = true;
-                                break;
                             }
 
                             // Heartbeat every 30 seconds to show stream is alive, even during silence.
@@ -2051,17 +2183,25 @@ impl Session {
                         .as_millis()
                 );
 
+                if intentional_finish.load(std::sync::atomic::Ordering::Acquire) {
+                    return transcript_succeeded
+                        && transcript_input_closed.load(std::sync::atomic::Ordering::SeqCst);
+                }
                 if auto_stop_triggered {
                     tracing::info!(
                         "[STREAM_END] Auto-stop already handled lifecycle transition; skipping reconnection logic"
                     );
-                    return;
+                    return transcript_succeeded
+                        && transcript_input_closed.load(std::sync::atomic::Ordering::SeqCst);
                 }
 
                 // Handle reconnection based on stream stability.
-                // The recovery path aborts and drains the session JoinSet, so reconnect must be
-                // coordinated outside the current stream-monitor task to avoid self-cancellation.
-                if matches!(*session_state_rx_for_stream_monitor.borrow(), State::RunningActive {}) {
+                // Recovery aborts the current monitor, so coordinate reconnect outside
+                // this task to avoid self-cancellation.
+                if matches!(
+                    *session_state_rx_for_stream_monitor.borrow(),
+                    State::RunningActive {}
+                ) {
                     let session_id_for_reconnect = session.id.clone();
                     let model_for_reconnect = selected_model_for_stream_error.clone();
 
@@ -2088,8 +2228,11 @@ impl Session {
                         );
                     }
                 }
+
+                transcript_succeeded
+                    && transcript_input_closed.load(std::sync::atomic::Ordering::SeqCst)
             }
-        });
+        }));
 
         self.tasks = Some(tasks);
 
@@ -2152,23 +2295,54 @@ impl Session {
         tracing::info!("[FLUSH] Silence injection complete");
     }
 
+    async fn drain_streaming(&mut self) -> bool {
+        self.streaming_finishing
+            .store(true, std::sync::atomic::Ordering::Release);
+        let drained = crate::completion::drain_streaming_transcript(
+            self.audio_ingress_stop_tx.take(),
+            self.audio_ingress_stopped_rx.take(),
+            self.transcript_input_closed.take(),
+            (self.process_mic_tx.take(), self.process_speaker_tx.take()),
+            self.transcript_task.take(),
+            Duration::from_secs(60),
+        )
+        .await;
+        self.recording_completion.record_drain(drained);
+        drained
+    }
+
+    fn clear_previews(&self) {
+        if let Some(session_id) = &self.session_id {
+            for channel in ["mixed", "mic", "speaker"] {
+                let _ = (SessionEvent::Preview {
+                    session_id: session_id.clone(),
+                    channel: channel.into(),
+                    words: vec![],
+                })
+                .emit(&self.app);
+            }
+        }
+    }
+
     #[tracing::instrument(skip_all)]
-    async fn teardown_resources(&mut self, flush_transcript: bool) {
-        // Inject silence before teardown to flush VAD
-        if flush_transcript && (self.process_mic_tx.is_some() || self.process_speaker_tx.is_some())
+    async fn teardown_resources(&mut self, flush_transcript: bool) -> bool {
+        // Stop watchers/reconnects before awaiting provider output. The state-machine
+        // transition callback may run after this entry action.
+        if let Some(tx) = &self.session_state_tx {
+            let _ = tx.send(State::Inactive {});
+        }
+
+        let streaming_drained = if flush_transcript && self.is_streaming_stt {
+            Some(self.drain_streaming().await)
+        } else {
+            None
+        };
+        if flush_transcript
+            && !self.is_streaming_stt
+            && (self.process_mic_tx.is_some() || self.process_speaker_tx.is_some())
         {
             self.inject_silence_for_flush().await;
         }
-
-        self.process_mic_tx = None;
-        self.process_speaker_tx = None;
-        self.stream_connected_rx = None;
-
-        if let Some(session_id) = &self.session_id {
-            tracing::info!("Session {} teardown complete", session_id);
-        }
-
-        self.session_id = None;
 
         if let Some(tx) = self.silence_stream_tx.take() {
             let _ = tx.send(());
@@ -2180,10 +2354,39 @@ impl Session {
         }
 
         if let Some(mut tasks) = self.tasks.take() {
-            tracing::info!("[TEARDOWN] Aborting {} background tasks", tasks.len());
+            tracing::info!("[TEARDOWN] Stopping {} audio/background tasks", tasks.len());
             tasks.abort_all();
             while tasks.join_next().await.is_some() {}
         }
+
+        // Closing all audio senders lets providers send their shutdown message and
+        // drain their final output. The separate monitor awaits each transcript write.
+        if let Some(input_closed) = self.transcript_input_closed.take() {
+            input_closed.store(true, std::sync::atomic::Ordering::SeqCst);
+        }
+        self.process_mic_tx = None;
+        self.process_speaker_tx = None;
+        self.stream_connected_rx = None;
+        self.audio_ingress_stop_tx = None;
+        self.audio_ingress_stopped_rx = None;
+        let transcript_drained = match self.transcript_task.take() {
+            Some(task) if flush_transcript && streaming_drained.is_none() => {
+                crate::completion::drain_transcript(task, Duration::from_secs(15)).await
+            }
+            Some(task) => {
+                task.abort();
+                let _ = task.await;
+                false
+            }
+            None => streaming_drained.unwrap_or(false),
+        };
+        self.clear_previews();
+
+        if let Some(session_id) = &self.session_id {
+            tracing::info!(%session_id, transcript_drained, "session teardown complete");
+        }
+        self.session_id = None;
+        self.recording_completion.record_drain(transcript_drained)
     }
 
     pub fn is_mic_muted(&self) -> bool {
@@ -2293,12 +2496,25 @@ impl Session {
                 MAX_RETRIES + 1
             );
 
+            // Finish the old native stream before rebuilding within the same session.
+            if self.is_streaming_stt {
+                self.drain_streaming().await;
+            }
+            // Stop the old transcript consumer before replacing its audio channels.
+            // Cancellation cannot prove that final provider output and writes drained.
+            if let Some(task) = self.transcript_task.take() {
+                task.abort();
+                let drained = task.await.unwrap_or(false);
+                self.recording_completion.record_drain(drained);
+            }
+
             // Step 1: Only abort audio processing tasks, keep session metadata
             if let Some(mut tasks) = self.tasks.take() {
                 tracing::info!("[DEVICE_RECOVERY] Stopping audio tasks...");
                 tasks.abort_all();
                 while let Some(_) = tasks.join_next().await {}
             }
+            self.clear_previews();
 
             // Step 1.5: Clear AssemblyAI turn state to allow new WebSocket connection to start fresh
             // The new connection will start at turn_order=0, so we need to reset our tracking
@@ -2362,14 +2578,20 @@ async fn setup_listen_client<R: tauri::Runtime>(
     is_onboarding: bool,
     redemption_time_ms: u32,
     user_id: Option<String>,
-) -> Result<(crate::client::ListenClientBuilder, SttProvider), crate::Error> {
-    let selected_model = Some(selection.model_id());
+) -> Result<
+    (
+        crate::client::ListenClientBuilder,
+        SttProvider,
+        tauri_plugin_connector::ResolvedSttModel,
+    ),
+    crate::Error,
+> {
+    use tauri_plugin_connector::{Connection, ConnectorPluginExt};
+    let resolved = app.connect_stt_selection(selection, &languages).await?;
+    let model = resolved.model;
+    let selected_model = Some(model.model_id());
     let provider = SttProvider::from_model(selected_model.as_deref());
-    let conn = {
-        use tauri_plugin_connector::{Connection, ConnectorPluginExt};
-        let conn: Connection = app.connect_stt_selection(selection).await?.into();
-        conn
-    };
+    let conn: Connection = resolved.connection.into();
     let api_base = conn.api_base;
 
     let api_key = if provider.is_cloud() {
@@ -2424,6 +2646,7 @@ async fn setup_listen_client<R: tauri::Runtime>(
                 ..Default::default()
             }),
         provider,
+        model,
     ))
 }
 
@@ -2599,7 +2822,7 @@ mod tests {
         // Exercise the production snapshot-to-connection/params assembly. A saved
         // model read reintroduced inside setup_listen_client must route this to the
         // wrong URL and fail the assertions below.
-        let (builder, provider) = super::setup_listen_client(
+        let (builder, provider, resolved_model) = super::setup_listen_client(
             app.handle(),
             local_selection,
             vec![],
@@ -2611,6 +2834,8 @@ mod tests {
         .await
         .unwrap();
         assert_eq!(provider, crate::SttProvider::Local);
+        assert_eq!(resolved_model.model_id(), "QuantizedTinyEn");
+        assert!(!resolved_model.is_streaming());
         let uri = builder.build_uri(typr_listener_interface::AudioMode::Dual);
         let uri = url::Url::parse(&uri).unwrap();
         assert_eq!(uri.scheme(), "ws");
@@ -2640,7 +2865,7 @@ mod tests {
             .set(StoreKey::AssemblyaiApiKey, "updated-test-key")
             .unwrap();
         let cloud_connection: Connection = app
-            .connect_stt_selection(other_selection)
+            .connect_stt_selection(other_selection, &[])
             .await
             .unwrap()
             .into();
@@ -2663,6 +2888,78 @@ mod tests {
         app.stop_server().await.unwrap();
         std::fs::remove_file(model_path).unwrap();
         std::fs::remove_dir(models_dir).unwrap();
+    }
+
+    #[tokio::test]
+    async fn nemotron_startup_fallback_reports_whisper_runtime_without_changing_preferences() {
+        use tauri::Manager;
+        use tauri_plugin_connector::{ConnectorPluginExt, StoreKey, SttSelection};
+        use tauri_plugin_local_stt::{LocalSttPluginExt, SupportedModel};
+        let mut context = tauri::test::mock_context(tauri::test::noop_assets());
+        context.config_mut().identifier =
+            format!("com.typr.oss.nemotron-fallback-{}", uuid::Uuid::new_v4());
+        let app = tauri::test::mock_builder()
+            .plugin(tauri_plugin_store::Builder::default().build())
+            .plugin(tauri_plugin_connector::init())
+            .manage(tauri_plugin_local_stt::SharedState::default())
+            .build(context)
+            .unwrap();
+        app.set_current_model(SupportedModel::Nemotron3p5Streaming)
+            .unwrap();
+        app.connector_store()
+            .set(StoreKey::SttModel, "Nemotron3p5Streaming")
+            .unwrap();
+        let directory = app.models_dir();
+        std::fs::create_dir_all(&directory).unwrap();
+        let fallback = SupportedModel::QuantizedLargeTurbo;
+        let path = directory.join(fallback.file_name());
+        std::fs::File::create(&path)
+            .unwrap()
+            .set_len(fallback.model_size())
+            .unwrap();
+        // Nemotron is intentionally absent; no SDK/model fixture is fabricated.
+        let (builder, _, model) = super::setup_listen_client(
+            app.handle(),
+            SttSelection::Local(SupportedModel::Nemotron3p5Streaming),
+            vec![typr_language::ISO639::Es.into()],
+            vec![],
+            false,
+            200,
+            None,
+        )
+        .await
+        .unwrap();
+        assert_eq!(model.model_id(), "QuantizedLargeTurbo");
+        assert!(
+            !model.is_streaming(),
+            "fallback must use Whisper's VAD stop/flush policy"
+        );
+        let uri =
+            url::Url::parse(&builder.build_uri(typr_listener_interface::AudioMode::Dual)).unwrap();
+        assert!(uri
+            .query_pairs()
+            .any(|(key, value)| key == "model" && value == "QuantizedLargeTurbo"));
+        assert_eq!(
+            app.get_current_model().unwrap(),
+            SupportedModel::Nemotron3p5Streaming
+        );
+        assert_eq!(
+            app.connector_store()
+                .get::<String>(StoreKey::SttModel)
+                .unwrap()
+                .as_deref(),
+            Some("Nemotron3p5Streaming")
+        );
+        assert_eq!(
+            app.state::<tauri_plugin_local_stt::SharedState>()
+                .lock()
+                .await
+                .server_model,
+            Some(fallback)
+        );
+        app.stop_server().await.unwrap();
+        std::fs::remove_file(path).unwrap();
+        std::fs::remove_dir(directory).unwrap();
     }
 
     fn word(text: &str, start: u64, end: u64) -> typr_listener_interface::Word {
@@ -2779,19 +3076,7 @@ async fn update_session<R: tauri::Runtime>(
     use tauri_plugin_db::DatabasePluginExt;
 
     let session_id = session_id.into();
-
-    // TODO: not ideal. We might want to only do "update" everywhere instead of upserts.
-    // We do this because it is highly likely that the session fetched in the listener is stale (session can be updated on the React side).
-    let mut session = app
-        .db_get_session(&session_id)
-        .await?
-        .ok_or(crate::Error::NoneSession)?;
-
-    // Standard behavior: append new words to session
-    session.words.extend(words);
-    app.db_upsert_session(session.clone()).await.unwrap();
-
-    Ok(session.words)
+    Ok(app.db_append_session_words(&session_id, words).await?)
 }
 
 pub enum StateEvent {
@@ -2930,11 +3215,24 @@ impl Session {
     async fn inactive(&mut self, event: &StateEvent) -> Response<State> {
         match event {
             StateEvent::Start(id) => {
+                self.recording_completion = crate::completion::RecordingCompletion::default();
                 self.session_id = Some(id.clone());
                 self.set_pipeline_phase(PipelineStatusPhase::Starting, None, None, None)
                     .await;
 
-                match self.setup_resources(id).await {
+                let startup = async {
+                    use tauri_plugin_db::DatabasePluginExt;
+                    let config =
+                        tauri_plugin_config::commands::get_general_config(self.app.clone())
+                            .map_err(|error| crate::Error::Custom(error.to_string()))?;
+                    self.app
+                        .db_begin_recording(id, config.selected_template_id)
+                        .await?;
+                    self.setup_resources(id).await
+                }
+                .await;
+
+                match startup {
                     Ok(_) => Transition(State::running_active()),
                     Err(e) => {
                         tracing::error!("error: {:?}", e);
@@ -2972,17 +3270,8 @@ impl Session {
             let _ = self.app.window_hide(TyprWindow::TranscriptionStatus);
         }
 
-        // Trigger async diarization BEFORE teardown to ensure file save task completes
-        if let Some(session_id) = &self.session_id {
-            use tauri_plugin_db::DatabasePluginExt;
-
-            if let Ok(Some(mut session)) = self.app.db_get_session(session_id).await {
-                session.record_end = Some(chrono::Utc::now());
-                let _ = self.app.db_upsert_session(session).await;
-            }
-
-            tracing::info!("[SESSION_END] Using dual stream mode - no async diarization needed");
-        }
+        let completed_session_id = self.session_id.clone().filter(|_| self.recording_started);
+        self.recording_started = false;
 
         // Only a terminal stop clears recovery. Device/stream rebuilds keep the
         // matching session override and resolve it again during setup.
@@ -2991,8 +3280,21 @@ impl Session {
             self.app.clear_stt_model_session(session_id).await;
         }
         // Teardown immediately - no async diarization with dual stream mode
-        self.teardown_resources(true).await;
+        let transcript_drained = self.teardown_resources(true).await;
         self.stt_model = None;
+
+        // Teardown flushes and drains transcript tasks before publishing work to
+        // the route-independent summary worker. Failed starts never queue a summary.
+        if let Some(session_id) = completed_session_id {
+            use tauri_plugin_db::DatabasePluginExt;
+            if let Err(error) = self
+                .app
+                .db_complete_recording(&session_id, transcript_drained)
+                .await
+            {
+                tracing::error!(%session_id, %error, "recording completion persistence failed");
+            }
+        }
     }
 
     #[action]
@@ -3011,13 +3313,11 @@ impl Session {
         if let Some(session_id) = &self.session_id {
             use tauri_plugin_db::DatabasePluginExt;
 
-            if let Ok(Some(mut session)) = self.app.db_get_session(session_id).await {
-                if session.record_start.is_none() {
-                    session.record_start = Some(chrono::Utc::now());
-                }
-                let _ = self.app.db_upsert_session(session).await;
+            if let Err(error) = self.app.db_mark_recording_started(session_id).await {
+                tracing::error!(%session_id, %error, "recording start persistence failed");
             }
         }
+        self.recording_started = true;
     }
 
     fn on_transition(&mut self, source: &State, target: &State) {

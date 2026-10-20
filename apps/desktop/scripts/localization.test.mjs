@@ -94,6 +94,19 @@ test("macros, descriptors, technical attributes, tool prompts and product names 
   );
 });
 
+test("native DOM tag names are technical even in display-named variables", async () => {
+  assert.deepEqual(
+    await lint(`
+    const label = document.createElement("span");
+    const content = document.createElement("div");
+  `),
+    [],
+  );
+  assert.ok((await lint("const label = helper(\"Missing translation\")")).some(
+    (message) => message.ruleId === "typr-i18n/ui-strings",
+  ));
+});
+
 test("extraction fails closed for removed catalogs, missing shared roots and excluded source trees", () => {
   const directories = ["apps/desktop/src", "packages/ui/src", "packages/utils/src", "packages/tiptap/src"];
   const catalog = {

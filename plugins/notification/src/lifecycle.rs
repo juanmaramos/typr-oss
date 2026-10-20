@@ -102,9 +102,14 @@ impl Controller {
         self.decide(now)
     }
 
-    pub(crate) fn mark_auto_session_started(&mut self, now: Instant) {
+    #[cfg(test)]
+    fn mark_auto_session_started(&mut self, now: Instant) {
         self.auto_session_active = true;
         self.last_audio_signal_at = Some(now);
+    }
+
+    pub(crate) fn mark_user_session_started(&mut self) {
+        self.auto_session_active = false;
     }
 
     pub(crate) fn mark_auto_session_start_failed(&mut self, now: Instant) {
@@ -209,6 +214,43 @@ mod tests {
         }
     }
 
+    #[test]
+    fn user_started_session_is_not_managed_by_inactivity_heuristics() {
+        let mut controller = Controller::with_policy(test_policy());
+        let now = Instant::now();
+        controller.on_input(Input::MeetingSignal, now);
+        controller.on_input(Input::AudioSignal, now);
+        // Take Notes is explicit user intent, even if a previous presence signal
+        // optimistically requested an auto-start that the orchestrator suppresses.
+        controller.mark_user_session_started();
+        assert_eq!(
+            controller.on_input(Input::SessionStateChanged(SessionState::RunningActive), now),
+            None
+        );
+        assert_eq!(
+            controller.on_input(Input::Tick, now + Duration::from_secs(60)),
+            None
+        );
+        assert_eq!(
+            controller.on_input(
+                Input::SessionStateChanged(SessionState::RunningPaused),
+                now + Duration::from_secs(61)
+            ),
+            None
+        );
+        assert_eq!(
+            controller.on_input(Input::MeetingSignal, now + Duration::from_secs(62)),
+            None
+        );
+        assert_eq!(
+            controller.on_input(Input::AudioSignal, now + Duration::from_secs(62)),
+            None
+        );
+        assert_eq!(
+            controller.on_input(Input::Tick, now + Duration::from_secs(120)),
+            None
+        );
+    }
     #[test]
     fn starts_when_meeting_signal_arrives_and_session_is_inactive() {
         let mut controller = Controller::with_policy(test_policy());

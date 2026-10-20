@@ -1,97 +1,89 @@
+import { formatModelSize } from "@/lib/model-metadata";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-// Note: These strings need to be translated where they are used since this is a constants file
-import type { SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
+import type { ModelCapabilities, SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
 
-export const LANGUAGE_OPTIONS = [
-  {
-    key: "balanced" as const,
-    iconClass: "ri-wifi-off-line",
-    get label() {
-      return i18n._(msg`Multilingual`);
-    },
-    get description() {
-      return i18n._(msg`High accuracy across 50+ languages`);
-    },
-    accuracy: 3, // Large Turbo - high accuracy
-    speed: 2, // Large Turbo - moderate speed
-    modelKey: "QuantizedLargeTurbo", // AUTO-DOWNLOADED MODEL
-    size: "574 MB", // Large Turbo Q5_0 size
-    hasInfo: false,
-    isLocal: true,
+export type SttProvider = "NVIDIA" | "OpenAI" | "Distil-Whisper" | "AssemblyAI";
+export type SttModelMetadata = {
+  name: string;
+  provider: SttProvider;
+  description: string;
+
+  size: string;
+
+  languageSupport: "multilingual" | "english-only";
+  huggingface?: string;
+};
+
+const whisper = (name: string, size: string, englishOnly: boolean, file: string): SttModelMetadata => ({
+  get name() {
+    return englishOnly ? i18n._(msg`${name} (English)`) : name;
   },
-  {
-    key: "english" as const,
-    iconClass: "ri-english-input",
-    get label() {
-      return i18n._(msg`English`);
-    },
-    get description() {
-      return i18n._(msg`Best accuracy for English-only content`);
-    },
-    accuracy: 3, // Distil Large - highest accuracy
-    speed: 3, // Distil model - optimized for speed
-    modelKey: "DistilLargeV35En", // HIGH-QUALITY ENGLISH MODEL
-    size: "1.5 GB", // Distil Large model size
-    hasInfo: false,
-    isLocal: true,
-    hidden: true, // Hidden from UI - English-only model
+  provider: "OpenAI",
+  get description() {
+    return englishOnly
+      ? i18n._(msg`Text appears after you pause. English only.`)
+      : i18n._(msg`Text appears after you pause. Works offline in many languages.`);
   },
-  // Hidden from UI - alternate multilingual model
-  // {
-  //   key: "multilingual" as const,
-  //   iconClass: "ri-global-line",
-  //   label: "Multilingual high accuracy",
-  //   description: "Best for international meetings",
-  //   accuracy: 3, // Large Turbo intelligence rating
-  //   speed: 2, // Large Turbo speed rating (fast but not fastest)
-  //   modelKey: "QuantizedLargeTurbo", // High-accuracy multilingual model
-  //   size: "874 MB", // Large Turbo model size
-  //   hasInfo: true,
-  //   isLocal: true,
-  // },
-  // AssemblyAI U3 Pro: Multilingual real-time transcription (6 languages with code-switching)
-  {
-    key: "assemblyai-universal" as const,
-    iconClass: "ri-flashlight-fill",
-    get label() {
-      return i18n._(msg`Multilingual`);
-    },
+
+  size,
+
+  languageSupport: englishOnly ? "english-only" : "multilingual",
+  huggingface: `https://huggingface.co/ggerganov/whisper.cpp/blob/main/${file}`,
+});
+
+export const sttModelMetadata: Record<SupportedSttModel | "AssemblyAIUniversal", SttModelMetadata> = {
+  Nemotron3p5Streaming: {
+    name: "Nemotron 3.5",
+    provider: "NVIDIA",
     get description() {
-      return i18n._(msg`Works with any language automatically`);
+      return i18n._(msg`Live text as you speak. Works offline.`);
     },
-    accuracy: 3, // High accuracy
-    speed: 3, // Fast (real-time streaming)
-    modelKey: "AssemblyAIUniversal",
-    size: "0 MB", // Cloud-based
-    hasInfo: false,
-    isCloud: true,
-    isLocal: false,
+
+    size: "741 MB",
+
+    languageSupport: "multilingual",
+    huggingface: "https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b",
   },
-] as const;
+  QuantizedTiny: whisper("Whisper Tiny", "44 MB", false, "ggml-tiny-q8_0.bin"),
+  QuantizedTinyEn: whisper("Whisper Tiny", "44 MB", true, "ggml-tiny.en-q8_0.bin"),
+  QuantizedBase: whisper("Whisper Base", "82 MB", false, "ggml-base-q8_0.bin"),
+  QuantizedBaseEn: whisper("Whisper Base", "82 MB", true, "ggml-base.en-q8_0.bin"),
+  QuantizedSmall: whisper("Whisper Small", "264 MB", false, "ggml-small-q8_0.bin"),
+  QuantizedSmallEn: whisper("Whisper Small", "264 MB", true, "ggml-small.en-q8_0.bin"),
+  QuantizedLargeTurbo: whisper("Whisper Large v3 Turbo", "574 MB", false, "ggml-large-v3-turbo-q5_0.bin"),
+  DistilLargeV35En: {
+    get name() {
+      return i18n._(msg`Distil-Whisper Large v3.5 (English)`);
+    },
+    provider: "Distil-Whisper",
+    get description() {
+      return i18n._(msg`Text appears after you pause. English only.`);
+    },
 
-/** Icons for the cloud vs local *category*, used in info rows and badges. */
-export const MODEL_CATEGORY_ICONS = {
-  cloud: "ri-flashlight-fill",
-  local: "ri-cloud-off-line",
-} as const;
+    size: "1.5 GB",
 
-export type LocalLanguageOption = "balanced" | "english";
-export type CloudLanguageOption = "assemblyai-universal";
-export type LanguageOption = LocalLanguageOption | CloudLanguageOption;
+    languageSupport: "english-only",
+    huggingface: "https://huggingface.co/distil-whisper/distil-large-v3.5-ggml/blob/main/ggml-model.bin",
+  },
+  AssemblyAIUniversal: {
+    name: "Universal Streaming Multilingual",
+    provider: "AssemblyAI",
+    get description() {
+      const count = ASSEMBLYAI_STT_LANGUAGES.length;
+      return i18n._(msg`Live text in ${count} languages. Requires an API key.`);
+    },
 
-export const DEFAULT_LOCAL_STT_LANGUAGE: LocalLanguageOption = "balanced";
-const defaultLocalSttOption = LANGUAGE_OPTIONS.find((option) => option.key === DEFAULT_LOCAL_STT_LANGUAGE);
+    size: "0 MB",
 
-if (!defaultLocalSttOption || !("modelKey" in defaultLocalSttOption)) {
-  // Developer configuration invariant; this message is never part of normal model selection.
-  // eslint-disable-next-line typr-i18n/ui-strings
-  throw new Error(`Default local STT language is not backed by a local model: ${DEFAULT_LOCAL_STT_LANGUAGE}`);
-}
-
-export const DEFAULT_LOCAL_STT_MODEL = defaultLocalSttOption.modelKey as SupportedSttModel;
+    languageSupport: "multilingual",
+  },
+};
 
 export const SETTINGS_LOCAL_STT_MODEL_KEYS = [
+  "Nemotron3p5Streaming",
+  "QuantizedTiny",
+  "QuantizedTinyEn",
   "QuantizedBase",
   "QuantizedBaseEn",
   "QuantizedSmall",
@@ -99,248 +91,92 @@ export const SETTINGS_LOCAL_STT_MODEL_KEYS = [
   "QuantizedLargeTurbo",
   "DistilLargeV35En",
 ] as const satisfies readonly SupportedSttModel[];
+export type LanguageOption = SupportedSttModel | "balanced" | "english" | "nemotron-streaming" | "assemblyai-universal";
+export type LocalLanguageOption = Exclude<LanguageOption, "assemblyai-universal">;
+export type CloudLanguageOption = "assemblyai-universal";
+export const DEFAULT_LOCAL_STT_LANGUAGE = "balanced" as const;
+export const DEFAULT_LOCAL_STT_MODEL: SupportedSttModel = "QuantizedLargeTurbo";
+export const ASSEMBLYAI_STT_LANGUAGES = ["en", "es", "fr", "de", "it", "pt"] as const;
 
-/**
- * Detailed metadata for every backend SupportedModel enum variant.
- * Single source of truth for name, description, icon, ratings, and HuggingFace links.
- */
-export const sttModelMetadata: Record<string, {
-  name: string;
-  description: string;
-  iconClass: string;
-  intelligence: number;
-  speed: number;
-  size: string;
-  inputType: string[];
-  outputType: string[];
-  languageSupport: "multilingual" | "english-only";
-  huggingface?: string;
-}> = {
-  "QuantizedTiny": {
-    get name() {
-      return i18n._(msg`Tiny`);
-    },
-    get description() {
-      return i18n._(msg`Fastest, lowest accuracy. Good for offline, low-resource use.`);
-    },
-    iconClass: "ri-wifi-off-line",
-    intelligence: 1,
-    speed: 3,
-    size: "44 MB",
-    inputType: ["audio"],
-    outputType: ["text"],
-    languageSupport: "multilingual",
-    huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-tiny-q8_0.bin",
-  },
-  "QuantizedTinyEn": {
-    get name() {
-      return i18n._(msg`Tiny - English`);
-    },
-    get description() {
-      return i18n._(msg`Fastest, English-only. Optimized for speed on English audio.`);
-    },
-    iconClass: "ri-wifi-off-line",
-    intelligence: 1,
-    speed: 3,
-    size: "44 MB",
-    inputType: ["audio"],
-    outputType: ["text"],
-    languageSupport: "english-only",
-    huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-tiny.en-q8_0.bin",
-  },
-  "QuantizedBase": {
-    get name() {
-      return i18n._(msg`Base`);
-    },
-    get description() {
-      return i18n._(msg`Good balance of speed and accuracy for multilingual use.`);
-    },
-    iconClass: "ri-wifi-off-line",
-    intelligence: 2,
-    speed: 2,
-    size: "82 MB",
-    inputType: ["audio"],
-    outputType: ["text"],
-    languageSupport: "multilingual",
-    huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-base-q8_0.bin",
-  },
-  "QuantizedBaseEn": {
-    get name() {
-      return i18n._(msg`Base - English`);
-    },
-    get description() {
-      return i18n._(msg`Balanced speed and accuracy, optimized for English audio.`);
-    },
-    iconClass: "ri-wifi-off-line",
-    intelligence: 2,
-    speed: 2,
-    size: "82 MB",
-    inputType: ["audio"],
-    outputType: ["text"],
-    languageSupport: "english-only",
-    huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-base.en-q8_0.bin",
-  },
-  "QuantizedSmall": {
-    get name() {
-      return i18n._(msg`Small`);
-    },
-    get description() {
-      return i18n._(msg`Higher accuracy, moderate speed for multilingual transcription.`);
-    },
-    iconClass: "ri-wifi-off-line",
-    intelligence: 2,
-    speed: 2,
-    size: "264 MB",
-    inputType: ["audio"],
-    outputType: ["text"],
-    languageSupport: "multilingual",
-    huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-small-q8_0.bin",
-  },
-  "QuantizedSmallEn": {
-    get name() {
-      return i18n._(msg`Small - English`);
-    },
-    get description() {
-      return i18n._(msg`Higher accuracy, moderate speed, optimized for English audio.`);
-    },
-    iconClass: "ri-wifi-off-line",
-    intelligence: 3,
-    speed: 2,
-    size: "264 MB",
-    inputType: ["audio"],
-    outputType: ["text"],
-    languageSupport: "english-only",
-    huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-small.en-q8_0.bin",
-  },
-  "QuantizedLargeTurbo": {
-    get name() {
-      return i18n._(msg`Large`);
-    },
-    get description() {
-      return i18n._(msg`Best accuracy across 50+ languages. Recommended for most users.`);
-    },
-    iconClass: "ri-wifi-off-line",
-    intelligence: 3,
-    speed: 2,
-    size: "574 MB",
-    inputType: ["audio"],
-    outputType: ["text"],
-    languageSupport: "multilingual",
-    huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-large-v3-turbo-q5_0.bin",
-  },
-  "DistilLargeV35En": {
-    get name() {
-      return i18n._(msg`Distil v3.5 - English`);
-    },
-    get description() {
-      return i18n._(msg`Highest quality English transcription. Optimized for meetings and conversations.`);
-    },
-    iconClass: "ri-english-input",
-    intelligence: 3,
-    speed: 3,
-    size: "1.5 GB",
-    inputType: ["audio"],
-    outputType: ["text"],
-    languageSupport: "english-only",
-    huggingface: "https://huggingface.co/distil-whisper/distil-large-v3.5-ggml/blob/main/ggml-model.bin",
-  },
-};
-
-// WER Performance data from existing werPerformanceData
-export const WER_PERFORMANCE_TIERS = {
-  excellent: {
-    get range() {
-      return i18n._(msg`2.8-5.0% error`);
-    },
-    languages: [
-      "Spanish",
-      "Italian",
-      "Korean",
-      "Portuguese",
-      "English",
-      "Polish",
-      "Catalan",
-      "Japanese",
-      "German",
-      "Russian",
-    ],
-  },
-  good: {
-    get range() {
-      return i18n._(msg`5.2-7.8% error`);
-    },
-    languages: [
-      "Dutch",
-      "French",
-      "Indonesian",
-      "Ukrainian",
-      "Turkish",
-      "Malay",
-      "Swedish",
-      "Mandarin",
-      "Finnish",
-      "Norwegian",
-    ],
-  },
-  moderate: {
-    get range() {
-      return i18n._(msg`8.2-10.9% error`);
-    },
-    languages: [
-      "Romanian",
-      "Thai",
-      "Vietnamese",
-      "Slovak",
-      "Arabic",
-      "Czech",
-      "Croatian",
-      "Greek",
-    ],
-  },
-  weak: {
-    get range() {
-      return i18n._(msg`11.6-14.8% error`);
-    },
-    languages: [
-      "Serbian",
-      "Danish",
-      "Bulgarian",
-      "Hungarian",
-      "Filipino",
-      "Bosnian",
-      "Galician",
-      "Macedonian",
-    ],
-  },
-  poor: {
-    get range() {
-      return i18n._(msg`17.0-19.7% error`);
-    },
-    languages: [
-      "Hindi",
-      "Estonian",
-      "Slovenian",
-      "Tamil",
-      "Latvian",
-      "Azerbaijani",
-    ],
-  },
+const aliases = {
+  balanced: "QuantizedLargeTurbo",
+  english: "DistilLargeV35En",
+  "nemotron-streaming": "Nemotron3p5Streaming",
+  "assemblyai-universal": "AssemblyAIUniversal",
 } as const;
+export function getSttModelMetadata(model: string | null | undefined): SttModelMetadata | undefined {
+  const canonical = model ? aliases[model as keyof typeof aliases] ?? model : "";
+  return sttModelMetadata[canonical as keyof typeof sttModelMetadata];
+}
+export function getSttModelSize(model: string, capabilities?: readonly ModelCapabilities[]): string {
+  const canonical = aliases[model as keyof typeof aliases] ?? model;
+  const nativeModel = capabilities?.find(capability => capability.model === canonical);
+  return nativeModel ? formatModelSize(nativeModel.size_bytes) : getSttModelMetadata(model)?.size ?? "";
+}
+export function getSttModelDescription(model: string, capabilities?: readonly ModelCapabilities[]) {
+  const metadata = getSttModelMetadata(model);
+  const languages = getSttSupportedLanguages(model, capabilities);
+  if (metadata?.provider === "NVIDIA" && languages?.length) {
+    const count = languages.length;
+    return i18n._(msg`Live text as you speak. ${count} languages. Works offline.`);
+  }
+  return metadata?.description ?? i18n._(msg`Choose a transcription model.`);
+}
+export function getSttSupportedLanguages(
+  model: string,
+  capabilities?: readonly ModelCapabilities[],
+): readonly string[] | null {
+  const metadata = getSttModelMetadata(model);
+  if (metadata?.provider === "AssemblyAI") {
+    return ASSEMBLYAI_STT_LANGUAGES;
+  }
+  if (metadata?.languageSupport === "english-only") {
+    return ["en"];
+  }
+  const canonical = LANGUAGE_OPTIONS.find(option => option.key === model || option.modelKey === model)?.modelKey;
+  return capabilities?.find(capability => capability.model === canonical)?.supported_languages ?? null;
+}
+export function getSttModelLabel(model: string | null | undefined) {
+  return getSttModelMetadata(model)?.name ?? i18n._(msg`Transcription model`);
+}
 
-export const SUPPORTED_LANGUAGES_COUNT = Object.values(WER_PERFORMANCE_TIERS)
-  .reduce((total, tier) => total + tier.languages.length, 0);
+function option(key: LanguageOption, modelKey: SupportedSttModel | "AssemblyAIUniversal") {
+  const metadata = sttModelMetadata[modelKey];
+  return {
+    key,
+    modelKey,
+    get label() {
+      return metadata.name;
+    },
+    get description() {
+      return metadata.description;
+    },
 
-// Export filtered options based on platform
-export function getAvailableLanguageOptions(supportsLocal: boolean) {
-  return LANGUAGE_OPTIONS.filter(option => {
-    // Hide local models on Windows
-    if (!supportsLocal && option.isLocal) {
-      return false;
-    }
-    // Hide explicitly marked hidden options
-    if ("hidden" in option && option.hidden) {
-      return false;
-    }
-    return true;
-  });
+    size: metadata.size,
+    isLocal: modelKey !== "AssemblyAIUniversal",
+    isCloud: modelKey === "AssemblyAIUniversal",
+  };
+}
+export const LANGUAGE_OPTIONS = [
+  ...SETTINGS_LOCAL_STT_MODEL_KEYS.map(model =>
+    option(
+      model === "QuantizedLargeTurbo"
+        ? "balanced"
+        : model === "DistilLargeV35En"
+        ? "english"
+        : model === "Nemotron3p5Streaming"
+        ? "nemotron-streaming"
+        : model,
+      model,
+    )
+  ),
+  option("assemblyai-universal", "AssemblyAIUniversal"),
+];
+export const MODEL_CATEGORY_ICONS = { cloud: "ri-flashlight-fill", local: "ri-cloud-off-line" } as const;
+
+export function getAvailableLanguageOptions(supportsLocal: boolean, availableModels?: readonly SupportedSttModel[]) {
+  return LANGUAGE_OPTIONS.filter(option =>
+    !option.isLocal
+    || supportsLocal && (option.modelKey !== "Nemotron3p5Streaming" || availableModels?.includes(option.modelKey))
+  );
 }

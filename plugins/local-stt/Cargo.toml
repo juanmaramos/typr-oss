@@ -13,6 +13,7 @@ harness = false
 
 [features]
 default = []
+nemotron = []
 coreml = ["dep:typr-pyannote-local", "typr-whisper-local/coreml", "typr-pyannote-local/coreml"]
 directml = ["dep:typr-pyannote-local", "typr-whisper-local/directml", "typr-pyannote-local/directml"]
 cuda = ["typr-whisper-local/cuda"]
@@ -27,6 +28,8 @@ load-dynamic = ["dep:typr-pyannote-local", "typr-pyannote-local/load-dynamic"]
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dev-dependencies]
+hound = { workspace = true }
+tempfile = { workspace = true }
 typr-data = { workspace = true }
 typr-language = { workspace = true, features = ["whisper"] }
 
@@ -42,10 +45,13 @@ specta-typescript = { workspace = true }
 tokio-tungstenite = { workspace = true }
 
 [dependencies]
+sha2 = { workspace = true }
 typr-audio-utils = { workspace = true }
 typr-chunker = { workspace = true }
 typr-file = { workspace = true }
+typr-language = { workspace = true, features = ["whisper"] }
 typr-listener-interface = { workspace = true }
+typr-nemotron-runtime = { workspace = true }
 typr-pyannote-local = { workspace = true, optional = true }
 typr-whisper = { workspace = true }
 typr-whisper-local = { workspace = true }
@@ -72,6 +78,6 @@ axum-extra = { workspace = true, features = ["query"] }
 tower-http = { workspace = true, features = ["cors", "trace"] }
 
 futures-util = { workspace = true }
-tokio = { workspace = true, features = ["rt", "macros"] }
+tokio = { workspace = true, features = ["rt", "macros", "process", "io-util"] }
 tokio-util = { workspace = true }
 tracing = { workspace = true }

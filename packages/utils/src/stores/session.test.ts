@@ -6,6 +6,7 @@ vi.mock("@typr/plugin-db", () => ({
   commands: {
     upsertSession: vi.fn(async (session: Session) => session),
     getSession: vi.fn(async () => null),
+    updateSessionNoteFields: vi.fn(async () => null),
   },
 }));
 
@@ -15,6 +16,7 @@ import { createSessionsStore } from "./sessions";
 
 const mockUpsert = vi.mocked(dbCommands.upsertSession);
 const mockGetSession = vi.mocked(dbCommands.getSession);
+const mockUpdateNoteFields = vi.mocked(dbCommands.updateSessionNoteFields);
 
 function makeSession(overrides: Partial<Session> = {}): Session {
   return {
@@ -41,6 +43,8 @@ function makeSession(overrides: Partial<Session> = {}): Session {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockUpdateNoteFields.mockReset();
+  mockUpdateNoteFields.mockResolvedValue(null);
   vi.useFakeTimers();
 });
 
@@ -52,7 +56,6 @@ describe("createSessionStore", () => {
   describe("persistSession — shared debounce", () => {
     it("coalesces multiple rapid calls into a single DB write", async () => {
       const session = makeSession();
-      mockGetSession.mockResolvedValue(session);
 
       const store = createSessionStore(session);
 
@@ -63,38 +66,32 @@ describe("createSessionStore", () => {
       store.getState().persistSession(makeSession({ title: "v4" }));
       store.getState().persistSession(makeSession({ title: "v5" }));
 
-      // Before debounce fires: no upsert calls yet (only getSession reads)
-      expect(mockUpsert).not.toHaveBeenCalled();
+      expect(mockUpdateNoteFields).not.toHaveBeenCalled();
 
       // Advance past debounce window
       await vi.advanceTimersByTimeAsync(100);
 
       // Shared debounce should coalesce to a single write with the last data
-      expect(mockUpsert).toHaveBeenCalledTimes(1);
-      expect(mockUpsert).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "v5" }),
-      );
+      expect(mockUpdateNoteFields).toHaveBeenCalledTimes(1);
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [{ field: "title", value: "v5" }]);
+      expect(mockUpsert).not.toHaveBeenCalled();
+      expect(mockGetSession).not.toHaveBeenCalled();
     });
 
     it("force: true bypasses debounce and writes immediately", async () => {
       const session = makeSession();
-      mockGetSession.mockResolvedValue(session);
 
       const store = createSessionStore(session);
 
       await store.getState().persistSession(makeSession({ title: "forced" }), true);
 
       // Should write immediately without waiting for debounce
-      expect(mockUpsert).toHaveBeenCalledTimes(1);
-      expect(mockUpsert).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "forced" }),
-      );
+      expect(mockUpdateNoteFields).toHaveBeenCalledTimes(1);
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [{ field: "title", value: "forced" }]);
     });
 
-    it("preserves DB-owned needs_enhance when persisting stale session state", async () => {
+    it("does not send DB-owned needs_enhance from stale session state", async () => {
       const staleSession = makeSession({ needs_enhance: true });
-      const claimedDbSession = makeSession({ needs_enhance: false });
-      mockGetSession.mockResolvedValue(claimedDbSession);
 
       const store = createSessionStore(staleSession);
 
@@ -106,17 +103,189 @@ describe("createSessionStore", () => {
         true,
       );
 
-      expect(mockUpsert).toHaveBeenCalledTimes(1);
-      expect(mockUpsert).toHaveBeenCalledWith(
-        expect.objectContaining({
-          enhanced_memo_html: "<p>Streaming summary</p>",
-          needs_enhance: false,
-        }),
-      );
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [{
+        field: "enhanced_memo_html", value: "<p>Streaming summary</p>",
+      }]);
+      expect(mockUpsert).not.toHaveBeenCalled();
+    });
+
+    it("coalesces edits to different fields and keeps the latest value for each", async () => {
+      const store = createSessionStore(makeSession());
+      store.getState().updateRawNote("First notes");
+      store.getState().updateTitle("Meeting title");
+      store.getState().updateRawNote("Latest notes");
+
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(mockUpdateNoteFields).toHaveBeenCalledTimes(1);
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [
+        { field: "raw_memo_html", value: "Latest notes" },
+        { field: "title", value: "Meeting title" },
+      ]);
+    });
+
+    it.each([true, false])("preserves completion with needs_enhance=%s before a queued memo edit", async (needsEnhance) => {
+      const words = [{ text: "Final", speaker: null, confidence: null, start_ms: 0, end_ms: 100 }];
+      let databaseSession = makeSession({ record_start: "2025-01-01T01:00:00Z" });
+      mockUpdateNoteFields.mockImplementation(async (_id, updates) => {
+        for (const update of updates) {
+          Object.assign(databaseSession, { [update.field]: update.value });
+        }
+        return databaseSession;
+      });
+      const store = createSessionStore(databaseSession);
+      store.getState().updateRawNote("Private notes");
+
+      // Native completion and summary saving happen during the debounce window.
+      databaseSession = makeSession({
+        record_start: "2025-01-01T01:00:00Z",
+        record_end: "2025-01-01T02:00:00Z",
+        enhanced_memo_html: needsEnhance ? null : "<p>Final summary</p>",
+        auto_enhanced_memo_html: needsEnhance ? null : "<p>Final summary</p>",
+        source_metadata: '{"summary_template_id":"chosen"}',
+        needs_enhance: needsEnhance,
+        words,
+      });
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(databaseSession).toEqual(makeSession({
+        raw_memo_html: "Private notes",
+        record_start: "2025-01-01T01:00:00Z",
+        record_end: "2025-01-01T02:00:00Z",
+        enhanced_memo_html: needsEnhance ? null : "<p>Final summary</p>",
+        auto_enhanced_memo_html: needsEnhance ? null : "<p>Final summary</p>",
+        source_metadata: '{"summary_template_id":"chosen"}',
+        needs_enhance: needsEnhance,
+        words,
+      }));
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [
+        { field: "raw_memo_html", value: "Private notes" },
+      ]);
+    });
+
+    it("forced flush does not resend stale fields after native summary completion", async () => {
+      const staleSession = makeSession({ enhanced_memo_html: "<p>Old summary</p>" });
+      const store = createSessionStore(staleSession);
+      store.getState().updateRawNote("New notes");
+
+      await store.getState().persistSession(undefined, true);
+      await store.getState().persistSession(undefined, true);
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(mockUpdateNoteFields).toHaveBeenCalledTimes(1);
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [
+        { field: "raw_memo_html", value: "New notes" },
+      ]);
+    });
+
+    it("flushes pending note changes together with an immediate auto-summary snapshot", async () => {
+      const store = createSessionStore(makeSession());
+      store.getState().updatePreMeetingNote("Before the meeting");
+      store.getState().updateEnhancedNote("<p>Summary</p>");
+      store.getState().snapshotAutoEnhanced("<p>Summary</p>");
+      await store.getState().persistSession(undefined, true);
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(mockUpdateNoteFields).toHaveBeenCalledExactlyOnceWith("session-1", [
+        { field: "pre_meeting_memo_html", value: "Before the meeting" },
+        { field: "enhanced_memo_html", value: "<p>Summary</p>" },
+        { field: "auto_enhanced_memo_html", value: "<p>Summary</p>" },
+      ]);
+    });
+
+    it("serializes forced writes behind earlier writes", async () => {
+      let finishFirst: (session: Session | null) => void = () => {};
+      mockUpdateNoteFields.mockImplementationOnce(() => new Promise((resolve) => {
+        finishFirst = resolve;
+      }));
+      const store = createSessionStore(makeSession());
+      store.getState().updateRawNote("First edit");
+      const first = store.getState().persistSession(undefined, true);
+      await Promise.resolve();
+      store.getState().updateRawNote("Second edit");
+      const second = store.getState().persistSession(undefined, true);
+
+      expect(mockUpdateNoteFields).toHaveBeenCalledTimes(1);
+      finishFirst(makeSession({ raw_memo_html: "First edit" }));
+      await Promise.all([first, second]);
+
+      expect(mockUpdateNoteFields).toHaveBeenNthCalledWith(2, "session-1", [
+        { field: "raw_memo_html", value: "Second edit" },
+      ]);
+    });
+
+    it("retries a failed raw edit with a later title edit and forced flush", async () => {
+      let databaseSession = makeSession();
+      mockUpdateNoteFields.mockRejectedValueOnce(new Error("offline"));
+      mockUpdateNoteFields.mockImplementation(async (_id, updates) => {
+        for (const update of updates) {
+          databaseSession = { ...databaseSession, [update.field]: update.value };
+        }
+        return databaseSession;
+      });
+      const store = createSessionStore(makeSession());
+      const rawEdit = makeSession({ raw_memo_html: "Unsaved raw notes" });
+      const first = store.getState().persistSession(rawEdit, true);
+      store.setState({ session: rawEdit });
+      await expect(first).rejects.toThrow("offline");
+
+      store.getState().updateTitle("Later title");
+      await store.getState().persistSession(undefined, true);
+      await vi.advanceTimersByTimeAsync(100);
+
+      expect(databaseSession.raw_memo_html).toBe("Unsaved raw notes");
+      expect(databaseSession.title).toBe("Later title");
+      expect(mockUpdateNoteFields).toHaveBeenNthCalledWith(2, "session-1", [
+        { field: "raw_memo_html", value: "Unsaved raw notes" },
+        { field: "title", value: "Later title" },
+      ]);
+    });
+
+    it("an earlier acknowledgement preserves a newer queued revision of the same field", async () => {
+      let finishFirst: (session: Session | null) => void = () => {};
+      mockUpdateNoteFields.mockImplementationOnce(() => new Promise((resolve) => {
+        finishFirst = resolve;
+      }));
+      const store = createSessionStore(makeSession());
+      const firstEdit = makeSession({ raw_memo_html: "First edit" });
+      const first = store.getState().persistSession(firstEdit, true);
+      store.setState({ session: firstEdit });
+      await Promise.resolve();
+      store.getState().updateRawNote("Latest edit");
+
+      finishFirst(firstEdit);
+      await first;
+      await vi.advanceTimersByTimeAsync(100);
+      await store.getState().persistSession(undefined, true);
+
+      expect(mockUpdateNoteFields).toHaveBeenNthCalledWith(2, "session-1", [
+        { field: "raw_memo_html", value: "Latest edit" },
+      ]);
+      expect(mockUpdateNoteFields).toHaveBeenCalledTimes(2);
+    });
+
+    it("notifies with the current DB result and ignores a deleted session", async () => {
+      const persisted = makeSession({ title: "New title", record_end: "2025-01-01T02:00:00Z" });
+      mockUpdateNoteFields.mockResolvedValueOnce(persisted).mockResolvedValueOnce(null);
+      const onSessionPersisted = vi.fn();
+      const store = createSessionStore(makeSession(), { onSessionPersisted });
+
+      await store.getState().persistSession(makeSession({ title: "New title" }), true);
+      await store.getState().persistSession(makeSession({ title: "Deleted" }), true);
+
+      expect(onSessionPersisted).toHaveBeenCalledExactlyOnceWith(persisted);
     });
   });
 
   describe("refresh", () => {
+    it("does not send source metadata when persisting note edits", async () => {
+      const store = createSessionStore(makeSession());
+      await store.getState().persistSession(makeSession({ raw_memo_html: "Edited notes" }), true);
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [
+        { field: "raw_memo_html", value: "Edited notes" },
+      ]);
+    });
+
     it("pulls latest data from DB into the store", async () => {
       const session = makeSession({ title: "original" });
       const store = createSessionStore(session);
@@ -162,10 +331,10 @@ describe("createSessionStore", () => {
 
       expect(store.getState().session.enhanced_memo_html).toBe("<p>Previous summary</p>");
       expect(store.getState().showRaw).toBe(false);
-      expect(mockUpsert).toHaveBeenCalledTimes(1);
-      expect(mockUpsert).toHaveBeenCalledWith(
-        expect.objectContaining({ enhanced_memo_html: "<p>Previous summary</p>" }),
-      );
+      expect(mockUpdateNoteFields).toHaveBeenCalledTimes(1);
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [
+        { field: "enhanced_memo_html", value: "<p>Previous summary</p>" },
+      ]);
     });
 
     it("can restore to no AI notes and switch back to private notes", async () => {
@@ -180,10 +349,10 @@ describe("createSessionStore", () => {
 
       expect(store.getState().session.enhanced_memo_html).toBeNull();
       expect(store.getState().showRaw).toBe(true);
-      expect(mockUpsert).toHaveBeenCalledTimes(1);
-      expect(mockUpsert).toHaveBeenCalledWith(
-        expect.objectContaining({ enhanced_memo_html: null }),
-      );
+      expect(mockUpdateNoteFields).toHaveBeenCalledTimes(1);
+      expect(mockUpdateNoteFields).toHaveBeenCalledWith("session-1", [
+        { field: "enhanced_memo_html", value: null },
+      ]);
     });
   });
 });

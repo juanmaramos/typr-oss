@@ -238,7 +238,7 @@ impl<R: tauri::Runtime, T: tauri::Manager<R> + tauri::Listener<R>> NotificationP
     }
 }
 
-fn first_deep_link_scheme<R: tauri::Runtime, T: tauri::Manager<R>>(app: &T) -> Option<String> {
+pub(crate) fn first_deep_link_scheme<R: tauri::Runtime, T: tauri::Manager<R>>(app: &T) -> Option<String> {
     let deep_link = app.config().plugins.0.get("deep-link")?;
     let schemes = deep_link
         .get("desktop")
@@ -564,7 +564,9 @@ async fn start_auto_session<R: tauri::Runtime>(
     }
 
     *auto_session_id = Some(session_id.clone());
-    controller.mark_auto_session_started(now);
+    // A notification click is the same explicit recording intent as manual Start.
+    // App/audio inactivity must not manage its pause, resume, or completion.
+    controller.mark_user_session_started();
     Some(session_id)
 }
 
@@ -575,6 +577,12 @@ async fn process_lifecycle_input<R: tauri::Runtime>(
     input: LifecycleInput,
 ) {
     let now = Instant::now();
+    if matches!(
+        input,
+        LifecycleInput::SessionStateChanged(crate::lifecycle::SessionState::Inactive)
+    ) {
+        *auto_session_id = None;
+    }
     let Some(action) = controller.on_input(input, now) else {
         return;
     };

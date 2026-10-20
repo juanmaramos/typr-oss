@@ -12,6 +12,7 @@ const COMMANDS: &[&str] = &[
     "get_current_model",
     "set_current_model",
     "list_supported_models",
+    "list_model_capabilities",
     "process_recorded",
 ];
 

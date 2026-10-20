@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-update-session-note-fields"
+description = "Enables the update_session_note_fields command without any pre-configured scope."
+commands.allow = ["update_session_note_fields"]
+
+[[permission]]
+identifier = "deny-update-session-note-fields"
+description = "Denies the update_session_note_fields command without any pre-configured scope."
+commands.deny = ["update_session_note_fields"]

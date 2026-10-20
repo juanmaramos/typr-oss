@@ -1,5 +1,5 @@
 import { useAudioUpload } from "@/contexts/audio-upload";
-import { transcriptionModelQueryOptions } from "@/lib/model-selection";
+import { sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { useAudioUploadStore } from "@/stores/audio-upload";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,13 +12,12 @@ import { TranscriptActionBar } from "../../transcript/actions/TranscriptActionBa
 import type { TranscriptState } from "../../transcript/hooks/useTranscriptState";
 
 import { useTypr } from "@/contexts";
-import { useModelState } from "@/hooks/useModelState";
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
+import { useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
 import { commands as dbCommands, Word } from "@typr/plugin-db";
-import { commands as localSttCommands } from "@typr/plugin-local-stt";
 
-import TranscriptEditor, { type SpeakerViewInnerProps, type TranscriptEditorRef } from "@typr/tiptap/transcript";
+import TranscriptEditor, { type TranscriptEditorRef } from "@typr/tiptap/transcript";
 
-import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { AnimatedIconDisplay, BUTTON_VARIANTS, CONTENT_VARIANTS } from "@/components/ui/animated-icon-display";
 import { Loader } from "@/components/ui/loader";
 import { debugLogFor } from "@/components/utils/debug-logger";
@@ -29,8 +28,9 @@ import { Button } from "@typr/ui/components/ui/button";
 import { Spinner } from "@typr/ui/components/ui/spinner";
 import { useOngoingSession } from "@typr/utils/contexts";
 import { STTLanguageSelector } from "../../transcript/actions/STTLanguageSelector";
-import { LANGUAGE_OPTIONS, type LanguageOption } from "../../transcript/constants/languageData";
+import { getSttModelDescription, getSttModelLabel, LANGUAGE_OPTIONS } from "../../transcript/constants/languageData";
 import { useSTTModel } from "../../transcript/hooks/useSTTModel";
+import { STTProviderIcon } from "../../transcript/STTProviderIcon";
 import { SearchHeader } from "../components/search";
 import { useTranscriptWidget } from "../hooks/useTranscriptWidget";
 import { shouldPersistTranscriptUpdate } from "./transcript-persistence";
@@ -133,8 +133,9 @@ export function TranscriptView({
     isActive: s.status === "running_active",
     isPaused: s.status === "running_paused",
   }));
-  const { showEmptyMessage, hasTranscript, isLive, words } = useTranscriptWidget(sessionId);
-  const isWaitingForLiveWords = isLive && words.length === 0;
+  const { showEmptyMessage, hasTranscript, isLive, words, previews } = useTranscriptWidget(sessionId);
+  const isWaitingForLiveWords = isLive && words.length === 0
+    && !Object.values(previews).some(words => words.length > 0);
   const { remaining, isWarning, isDanger, shouldShowTimer } = useRecordingTimer();
   const transcriptState = useMemo<TranscriptState>(() => {
     if (showEmptyMessage && ongoingSession.isInactive) {
@@ -194,10 +195,6 @@ export function TranscriptView({
       }
 
       editorRef.current?.setWords(words ?? []);
-
-      if (isLive && !editorRef.current?.editor?.isFocused) {
-        editorRef.current?.scrollToBottom();
-      }
     });
   }, [words, isLive, sessionId]);
 
@@ -313,8 +310,6 @@ export function TranscriptView({
     );
   }
 
-  const SpeakerComponent = SpeakerLabel;
-
   const formatTime = (minutes: number) => {
     const mins = Math.floor(minutes);
     const secs = Math.floor((minutes % 1) * 60);
@@ -348,8 +343,6 @@ export function TranscriptView({
         onMoveToSidebar={onMoveToSidebar}
       />
 
-      <AISetupIndicator />
-
       <div className="flex-1 overflow-hidden flex flex-col">
         {showEmptyMessage
           ? <RenderEmpty sessionId={sessionId} containerRef={containerRef} layout={layout} />
@@ -379,9 +372,9 @@ export function TranscriptView({
                   key={sessionId}
                   ref={editorRef}
                   initialWords={words}
+                  previews={previews}
                   editable={ongoingSession.isInactive}
                   onUpdate={handleUpdate}
-                  c={SpeakerComponent}
                 />
 
                 <div className="absolute bottom-0 left-0 right-0 h-6 pointer-events-none z-[5]">
@@ -451,37 +444,17 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
 
   const panelWidth = useContainerWidth(containerRef);
   const isOnboardingSession = sessionId === thankYouSessionId;
-  const { models } = useModelState();
+  const { availability, retry } = useTranscriptionAvailability();
+  const statusLabel = useModelAvailabilityLabel();
   const isUploadProcessing = useAudioUploadStore((s) => s.progress.status === "processing");
-  const { selectedLanguage, handleLanguageChange, isChanging } = useSTTModel();
-
-  const supportedModelsQuery = useQuery({
-    queryKey: ["supported-stt-models"],
-    queryFn: () => localSttCommands.listSupportedModels(),
-    staleTime: 60 * 1000,
-  });
-
-  const selectedSttModelQuery = useQuery(transcriptionModelQueryOptions());
-
-  const anyModelDownloaded = {
-    data: (() => {
-      const hasLocalDownloaded =
-        supportedModelsQuery.data?.some(model => models.find(m => m.id === model.toString())?.isDownloaded || false)
-        || false;
-
-      const hasCloudSelected = (selectedSttModelQuery.data && selectedSttModelQuery.data.includes("assemblyai"))
-        || false;
-
-      return hasLocalDownloaded || hasCloudSelected;
-    })(),
-    isLoading: supportedModelsQuery.isLoading || selectedSttModelQuery.isLoading,
-  };
+  const { selectedLanguage, handleLanguageChange } = useSTTModel();
+  const capabilities = useQuery(sttCapabilitiesQueryOptions());
 
   const handleStartRecording = () => {
     if (isUploadProcessing) {
       return;
     }
-    if (ongoingSession.status === "inactive" && anyModelDownloaded.data) {
+    if (ongoingSession.status === "inactive" && availability.canStart) {
       ongoingSession.start(sessionId);
     }
   };
@@ -491,19 +464,6 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
   const selectedModelSource = selectedModel && "isCloud" in selectedModel && selectedModel.isCloud
     ? t`Cloud`
     : t`On-device`;
-
-  const getSelectedModelLabel = (key: LanguageOption) => {
-    switch (key) {
-      case "balanced":
-        return t`Multilingual`;
-      case "english":
-        return t`English high accuracy`;
-      case "assemblyai-universal":
-        return t`Real-time multilingual`;
-      default:
-        return key;
-    }
-  };
 
   return (
     <motion.div
@@ -527,9 +487,9 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
           <Trans>Start a transcription</Trans>
         </h2>
         <p className="text-sm text-muted-foreground max-w-[280px] leading-relaxed">
-          <Trans>
-            Convert your audio to text in real-time.
-          </Trans>
+          {availability.status !== "ready" || availability.reason === "native-fallback"
+            ? statusLabel(availability)
+            : getSttModelDescription(selectedModel?.modelKey ?? "", capabilities.data)}
         </p>
       </motion.div>
 
@@ -538,8 +498,9 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
           variants={BUTTON_VARIANTS}
           className="mb-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground"
         >
+          {selectedModel && <STTProviderIcon model={selectedModel.modelKey} />}
           <span className="font-medium text-foreground/80">
-            {selectedModel ? getSelectedModelLabel(selectedModel.key) : <Trans>Transcription model</Trans>}
+            {selectedModel ? getSttModelLabel(selectedModel.key) : <Trans>Transcription model</Trans>}
           </span>
           <span>·</span>
           <span>{selectedModelSource}</span>
@@ -547,7 +508,7 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
           <STTLanguageSelector
             value={selectedLanguage}
             onChange={handleLanguageChange}
-            disabled={isChanging || ongoingSession.status !== "inactive"}
+            disabled={ongoingSession.status !== "inactive"}
             size="compact"
             triggerLabel={t`Change`}
             triggerVariant="inline"
@@ -561,7 +522,7 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
             <Button
               variant="default"
               onClick={isUploadProcessing ? undefined : handleStartRecording}
-              disabled={ongoingSession.loading || !anyModelDownloaded.data || isOnboardingSession || isUploadProcessing}
+              disabled={ongoingSession.loading || !availability.canStart || isOnboardingSession || isUploadProcessing}
               className={`${isUltraCompact ? "px-3" : "px-6"} mb-3 gap-2`}
               title={isUltraCompact
                 ? (
@@ -571,8 +532,8 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
                     ? t`Try the demo video above first!`
                     : ongoingSession.loading
                     ? t`Starting...`
-                    : !anyModelDownloaded.data
-                    ? t`Download a model first`
+                    : !availability.canStart
+                    ? statusLabel(availability)
                     : t`Start transcribing`
                 )
                 : undefined}
@@ -603,6 +564,12 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
         </Popover>
       </motion.div>
 
+      {availability.canRetry && (
+        <Button variant="ghost" size="sm" onClick={() => void retry()}>
+          <Trans>Retry</Trans>
+        </Button>
+      )}
+
       {!isUltraCompact && !isOnboardingSession && layout !== "floating" && (
         <motion.div variants={BUTTON_VARIANTS} className="flex flex-col items-center gap-2">
           <UploadAudioButton sessionId={sessionId} disabled={false} />
@@ -612,8 +579,8 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
       <motion.p variants={BUTTON_VARIANTS} className="text-xs text-muted-foreground/70">
         {isOnboardingSession
           ? <Trans>Watch the demo video above to see how Typr transcription works!</Trans>
-          : anyModelDownloaded.data === false
-          ? <Trans>Download a transcription model above to begin</Trans>
+          : !availability.canStart
+          ? statusLabel(availability)
           : ongoingSession.loading
           ? <Trans>Loading AI model into memory... This may take a few seconds on first start</Trans>
           : null}
@@ -621,20 +588,3 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
     </motion.div>
   );
 }
-
-const SpeakerLabel = ({ speakerIndex, speakerId, speakerLabel }: SpeakerViewInnerProps) => {
-  const { i18n } = useLingui();
-  let label = speakerLabel ?? "";
-
-  if (!label && (speakerIndex === 0 || speakerId === "you")) {
-    label = i18n._("You");
-  } else if (!label && (speakerIndex != null || speakerId)) {
-    label = i18n._("Them");
-  }
-
-  return (
-    <span className="font-medium text-foreground text-xs">
-      {label}
-    </span>
-  );
-};

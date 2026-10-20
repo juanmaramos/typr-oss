@@ -7,6 +7,10 @@ Default permissions for the plugin
 - `allow-onboarding-session-id`
 - `allow-thank-you-session-id`
 - `allow-upsert-session`
+- `allow-set-summary-template`
+- `allow-save-recording-summary`
+- `allow-update-session-note-fields`
+- `allow-save-recording-title`
 - `allow-list-sessions`
 - `allow-get-session`
 - `allow-visit-session`
@@ -1958,6 +1962,58 @@ Denies the retry_project_knowledge_job command without any pre-configured scope.
 <tr>
 <td>
 
+`db:allow-save-recording-summary`
+
+</td>
+<td>
+
+Enables the save_recording_summary command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`db:deny-save-recording-summary`
+
+</td>
+<td>
+
+Denies the save_recording_summary command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`db:allow-save-recording-title`
+
+</td>
+<td>
+
+Enables the save_recording_title command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`db:deny-save-recording-title`
+
+</td>
+<td>
+
+Denies the save_recording_title command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `db:allow-session-add-participant`
 
 </td>
@@ -2140,6 +2196,32 @@ Denies the set_session_event command without any pre-configured scope.
 <tr>
 <td>
 
+`db:allow-set-summary-template`
+
+</td>
+<td>
+
+Enables the set_summary_template command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`db:deny-set-summary-template`
+
+</td>
+<td>
+
+Denies the set_summary_template command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `db:allow-simulate-live-transcription`
 
 </td>
@@ -2263,6 +2345,32 @@ Enables the unassign_tag_from_session command without any pre-configured scope.
 <td>
 
 Denies the unassign_tag_from_session command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`db:allow-update-session-note-fields`
+
+</td>
+<td>
+
+Enables the update_session_note_fields command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`db:deny-update-session-note-fields`
+
+</td>
+<td>
+
+Denies the update_session_note_fields command without any pre-configured scope.
 
 </td>
 </tr>

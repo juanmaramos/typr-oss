@@ -40,7 +40,7 @@ import {
   smoothStream,
   streamText,
 } from "@typr/utils/ai";
-import { useOngoingSession, useSession, useSessions } from "@typr/utils/contexts";
+import { useSession, useSessions } from "@typr/utils/contexts";
 import { SearchHeader } from "../right-panel/components/search/search-header";
 import { enhanceFailedToast } from "../toast/shared";
 
@@ -1402,52 +1402,18 @@ function useAutoEnhance({
   enhanceStatus: string;
   enhanceMutate: (params: { triggerType: "auto"; templateId?: string | null }) => void;
 }) {
-  const ongoingSessionStatus = useOngoingSession((s) => s.status);
-  const autoEnhanceTemplate = useOngoingSession((s) => s.autoEnhanceTemplate);
-  const setAutoEnhanceTemplate = useOngoingSession((s) => s.setAutoEnhanceTemplate);
-  const prevOngoingSessionStatus = usePreviousValue(ongoingSessionStatus);
   const setShowRaw = useSession(sessionId, (s) => s.setShowRaw);
   const needsEnhance = useSession(sessionId, (s) => s.session.needs_enhance);
+  const recordStart = useSession(sessionId, (s) => s.session.record_start);
   const refreshSession = useSession(sessionId, (s) => s.refresh);
   const claimedRef = useRef(false);
-
-  // Regular recording auto-enhancement (existing logic)
-  useEffect(() => {
-    if (
-      (prevOngoingSessionStatus === "running_active" || prevOngoingSessionStatus === "running_paused")
-      && ongoingSessionStatus === "inactive"
-      && enhanceStatus !== "pending"
-    ) {
-      setShowRaw(false);
-
-      // Use the selected template and then clear it
-      console.info("[TemplateTrace] auto-enhance:recording-stop", {
-        session_id: sessionId,
-        auto_enhance_template_id: autoEnhanceTemplate ?? null,
-      });
-      enhanceMutate({
-        triggerType: "auto",
-        templateId: autoEnhanceTemplate,
-      });
-
-      // Clear the template after using it (one-time use)
-      setAutoEnhanceTemplate(null);
-    }
-  }, [
-    ongoingSessionStatus,
-    enhanceStatus,
-    sessionId,
-    enhanceMutate,
-    setShowRaw,
-    autoEnhanceTemplate,
-    setAutoEnhanceTemplate,
-    prevOngoingSessionStatus,
-  ]);
 
   // Claim needs_enhance sessions for foreground enhancement (YouTube, audio upload, etc.)
   // This gives the same streaming UI as regular transcription sessions.
   useEffect(() => {
-    if (!needsEnhance || enhanceStatus === "pending" || claimedRef.current) {
+    // Native recording completion belongs to BackgroundEnhanceWorker, including
+    // when this editor has navigated to a different note or is unmounted.
+    if (recordStart || !needsEnhance || enhanceStatus === "pending" || claimedRef.current) {
       return;
     }
 
@@ -1477,7 +1443,7 @@ function useAutoEnhance({
       claimedRef.current = false;
       console.error("[AutoEnhance] Failed to claim session", { sessionId, error });
     });
-  }, [needsEnhance, enhanceStatus, sessionId, setShowRaw, enhanceMutate, refreshSession]);
+  }, [recordStart, needsEnhance, enhanceStatus, sessionId, setShowRaw, enhanceMutate, refreshSession]);
 
   // Reset claimed ref when navigating to a different session
   useEffect(() => {

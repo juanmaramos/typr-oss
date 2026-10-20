@@ -14,3 +14,14 @@ const localChatDescriptions = {
 export function getLocalChatModelDescription(model: SupportedModel): string {
   return i18n._(localChatDescriptions[model]);
 }
+
+/** Decimal download units match the native model byte counts. */
+export function formatModelSize(bytes: number): string {
+  const gigabytes = bytes >= 1_000_000_000;
+  const value = gigabytes ? bytes / 1_000_000_000 : bytes / 1_000_000;
+  const size = new Intl.NumberFormat(i18n.locale || "en", {
+    maximumFractionDigits: gigabytes ? 1 : 0,
+    useGrouping: false,
+  }).format(value);
+  return `${size} ${gigabytes ? "GB" : "MB"}`;
+}

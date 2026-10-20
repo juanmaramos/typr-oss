@@ -1,5 +1,5 @@
 import { useModelPreferences } from "@/hooks/useModelPreferences";
-import { transcriptionModelQueryOptions, localTranscriptionModelQueryOptions } from "@/lib/model-selection";
+import { localTranscriptionModelQueryOptions, transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
 
@@ -7,11 +7,11 @@ import { debugLogFor } from "@/components/utils/debug-logger";
 import { useTypr } from "@/contexts";
 import { safeAnalyticsEvent } from "@/utils/analytics-safe";
 import { openSettingsWindow } from "@/utils/open-settings-window";
-import { sonnerToast } from "@typr/ui/components/ui/toast";
 import { useLingui } from "@lingui/react/macro";
+import { sonnerToast } from "@typr/ui/components/ui/toast";
 
 import { type SupportedModel } from "@typr/plugin-local-stt";
-import { LANGUAGE_OPTIONS, sttModelMetadata, type LanguageOption } from "../constants/languageData";
+import { LANGUAGE_OPTIONS, type LanguageOption } from "../constants/languageData";
 
 export function useSTTModel() {
   const { t } = useLingui();
@@ -19,11 +19,9 @@ export function useSTTModel() {
   const { selectTranscription } = useModelPreferences();
   const { data: connectorModel } = useQuery(transcriptionModelQueryOptions());
   const localModelQuery = useQuery(localTranscriptionModelQueryOptions());
-  const selectedLanguage: LanguageOption = LANGUAGE_OPTIONS.find(option =>
-    option.key === connectorModel || option.modelKey === connectorModel
-  )?.key ?? (connectorModel && sttModelMetadata[connectorModel]?.languageSupport === "english-only"
-    ? "english"
-    : "balanced");
+  const selectedLanguage: LanguageOption =
+    LANGUAGE_OPTIONS.find(option => option.key === connectorModel || option.modelKey === connectorModel)?.key
+      ?? "balanced";
 
   // Mutation to change STT model
   const changeModelMutation = useMutation({

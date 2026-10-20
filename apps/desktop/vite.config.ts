@@ -22,6 +22,18 @@ const shouldUploadSentrySourcemaps = Boolean(
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
+  test: {
+    // Use the same ESM entry as the browser bundle. The package's Node main is
+    // CommonJS and would instantiate a second ProseMirror class graph in tests.
+    alias: {
+      "@sereneinserenade/tiptap-search-and-replace": path.resolve(
+        __dirname,
+        "../../packages/tiptap/node_modules/@sereneinserenade/tiptap-search-and-replace/dist/index.js",
+      ),
+    },
+    // Editor plugins and EditorView must share one ProseMirror class identity in Node tests.
+    server: { deps: { inline: [/@sereneinserenade\/tiptap-search-and-replace/] } },
+  },
   resolve: {
     dedupe: ["@lingui/core", "@lingui/react"],
     alias: [

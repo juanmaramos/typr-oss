@@ -4,6 +4,14 @@ Default permissions for the plugin
 
 #### This default permission set includes the following:
 
+- `allow-open-call-detection-settings`
+- `allow-show-call-end-notification`
+- `allow-get-call-end-enabled`
+- `allow-set-call-end-enabled`
+- `allow-get-call-end-status`
+- `allow-associate-call`
+- `allow-keep-recording`
+- `allow-stop-associated-recording`
 - `allow-get-event-notification`
 - `allow-set-event-notification`
 - `allow-get-detect-notification`
@@ -28,6 +36,32 @@ Default permissions for the plugin
 <tr>
 <td>
 
+`notification:allow-associate-call`
+
+</td>
+<td>
+
+Enables the associate_call command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:deny-associate-call`
+
+</td>
+<td>
+
+Denies the associate_call command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `notification:allow-check-notification-permission`
 
 </td>
@@ -47,6 +81,58 @@ Enables the check_notification_permission command without any pre-configured sco
 <td>
 
 Denies the check_notification_permission command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:allow-get-call-end-enabled`
+
+</td>
+<td>
+
+Enables the get_call_end_enabled command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:deny-get-call-end-enabled`
+
+</td>
+<td>
+
+Denies the get_call_end_enabled command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:allow-get-call-end-status`
+
+</td>
+<td>
+
+Enables the get_call_end_status command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:deny-get-call-end-status`
+
+</td>
+<td>
+
+Denies the get_call_end_status command without any pre-configured scope.
 
 </td>
 </tr>
@@ -106,6 +192,58 @@ Denies the get_event_notification command without any pre-configured scope.
 <tr>
 <td>
 
+`notification:allow-keep-recording`
+
+</td>
+<td>
+
+Enables the keep_recording command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:deny-keep-recording`
+
+</td>
+<td>
+
+Denies the keep_recording command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:allow-open-call-detection-settings`
+
+</td>
+<td>
+
+Enables the open_call_detection_settings command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:deny-open-call-detection-settings`
+
+</td>
+<td>
+
+Denies the open_call_detection_settings command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `notification:allow-open-notification-settings`
 
 </td>
@@ -151,6 +289,32 @@ Enables the request_notification_permission command without any pre-configured s
 <td>
 
 Denies the request_notification_permission command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:allow-set-call-end-enabled`
+
+</td>
+<td>
+
+Enables the set_call_end_enabled command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:deny-set-call-end-enabled`
+
+</td>
+<td>
+
+Denies the set_call_end_enabled command without any pre-configured scope.
 
 </td>
 </tr>
@@ -210,6 +374,32 @@ Denies the set_event_notification command without any pre-configured scope.
 <tr>
 <td>
 
+`notification:allow-show-call-end-notification`
+
+</td>
+<td>
+
+Enables the show_call_end_notification command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:deny-show-call-end-notification`
+
+</td>
+<td>
+
+Denies the show_call_end_notification command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `notification:allow-start-detect-notification`
 
 </td>
@@ -255,6 +445,32 @@ Enables the start_event_notification command without any pre-configured scope.
 <td>
 
 Denies the start_event_notification command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:allow-stop-associated-recording`
+
+</td>
+<td>
+
+Enables the stop_associated_recording command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`notification:deny-stop-associated-recording`
+
+</td>
+<td>
+
+Denies the stop_associated_recording command without any pre-configured scope.
 
 </td>
 </tr>

@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-open-call-detection-settings"
+description = "Enables the open_call_detection_settings command without any pre-configured scope."
+commands.allow = ["open_call_detection_settings"]
+
+[[permission]]
+identifier = "deny-open-call-detection-settings"
+description = "Denies the open_call_detection_settings command without any pre-configured scope."
+commands.deny = ["open_call_detection_settings"]

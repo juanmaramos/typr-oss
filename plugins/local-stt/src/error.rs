@@ -16,6 +16,8 @@ pub enum Error {
     StoreError(#[from] tauri_plugin_store2::Error),
     #[error(transparent)]
     WhisperLocalError(#[from] typr_whisper_local::Error),
+    #[error("Nemotron backend: {0}")]
+    Streaming(String),
     #[error("Model not downloaded")]
     ModelNotDownloaded,
     #[error("Feature not supported: {0}")]

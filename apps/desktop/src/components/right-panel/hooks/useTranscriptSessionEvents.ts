@@ -37,10 +37,23 @@ export function useTranscriptSessionEvents(sessionId: string | null) {
         queryClient.invalidateQueries({
           queryKey: ["session", sessionId],
         });
-      } else if (payload.type === "transcriptError" && payload.session_id === sessionId) {
-        toast.error(t`Failed to add speaker labels`, {
-          id: "speaker-processing",
+      } else if (payload.type === "modelFallback" && payload.session_id === sessionId) {
+        toast.info(t`Nemotron could not start. Using Whisper for this recording.`, {
+          id: `local-transcription-fallback-${sessionId}`,
+          duration: 5000,
         });
+      } else if (payload.type === "transcriptError" && payload.session_id === sessionId) {
+        if (payload.status === "local_stream_failed") {
+          toast.error(t`Live transcription stopped`, {
+            id: "local-transcription-recovery",
+            description: t`Committed text is preserved. Stop recording and select Whisper before continuing.`,
+            duration: 10000,
+          });
+        } else {
+          toast.error(t`Failed to add speaker labels`, {
+            id: "speaker-processing",
+          });
+        }
       }
     }).then((fn) => {
       if (disposed) {

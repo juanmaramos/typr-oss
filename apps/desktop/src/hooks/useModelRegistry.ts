@@ -2,17 +2,10 @@ import { getLocalChatModelDescription } from "@/lib/model-metadata";
 import { useLingui } from "@lingui/react";
 import { useQuery } from "@tanstack/react-query";
 
+import { localModelAvailability } from "@/lib/model-availability";
 import { commands as localLlmCommands, type SupportedModel } from "@typr/plugin-local-llm";
-import { useModelState } from "./useModelState";
+import { useModelLifecycle } from "./useModelState";
 
-/**
- * 🎯 CLEAN: Single source of truth for model data
- *
- * Senior engineer approach:
- * - Backend is authoritative (no hardcoded data)
- * - No transformations (use backend types directly)
- * - Simple, predictable behavior
- */
 export function useModelRegistry() {
   useLingui();
   // Fetch model metadata directly from backend (static data)
@@ -23,14 +16,16 @@ export function useModelRegistry() {
   });
 
   // ✅ FIXED: Use event-driven state instead of polling
-  const { getModel, isLoading: stateLoading } = useModelState();
+  const lifecycle = useModelLifecycle("llm");
+  const { getModel } = lifecycle;
 
   // Enhanced models with status (no transformations, clean types)
   const modelsWithStatus = (modelsQuery.data || []).map(model => ({
     ...model,
     description: getLocalChatModelDescription(model.id),
-    isDownloaded: getModel(model.id.toString())?.isDownloaded || false,
-    isDownloading: getModel(model.id.toString())?.isDownloading || false,
+    isDownloaded: getModel(model.id.toString())?.isDownloaded,
+    isDownloading: getModel(model.id.toString())?.isDownloading,
+    availability: localModelAvailability(lifecycle, getModel(model.id.toString())),
   }));
 
   return {
@@ -42,12 +37,13 @@ export function useModelRegistry() {
     downloadingModels: modelsWithStatus.filter(m => m.isDownloading),
 
     // Status
-    isLoading: modelsQuery.isLoading || stateLoading,
-    error: modelsQuery.error,
+    isLoading: modelsQuery.isPending || lifecycle.isPending,
+    error: modelsQuery.error ?? lifecycle.error,
 
     // Actions
     refetch: () => {
-      modelsQuery.refetch(); // Only refetch metadata, state comes via events
+      void modelsQuery.refetch();
+      void lifecycle.refetch();
     },
   };
 }

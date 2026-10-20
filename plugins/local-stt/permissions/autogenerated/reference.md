@@ -16,6 +16,7 @@ Default permissions for the plugin
 - `allow-get-current-model`
 - `allow-set-current-model`
 - `allow-list-supported-models`
+- `allow-list-model-capabilities`
 - `allow-process-recorded`
 
 ## Permission Table
@@ -257,6 +258,32 @@ Enables the list_ggml_backends command without any pre-configured scope.
 <td>
 
 Denies the list_ggml_backends command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`local-stt:allow-list-model-capabilities`
+
+</td>
+<td>
+
+Enables the list_model_capabilities command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`local-stt:deny-list-model-capabilities`
+
+</td>
+<td>
+
+Denies the list_model_capabilities command without any pre-configured scope.
 
 </td>
 </tr>

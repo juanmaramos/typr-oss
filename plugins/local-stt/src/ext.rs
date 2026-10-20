@@ -89,6 +89,10 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
             return Ok(false);
         }
 
+        if model.sha256().is_some() {
+            return Ok(typr_file::file_size(&model_path)? == model.model_size());
+        }
+
         // Size sanity check: allow 90-110% of expected size
         // Handles CDN variations while catching truncated downloads
         let actual_size = typr_file::file_size(&model_path)?;
@@ -146,10 +150,28 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
             return Err(crate::Error::ModelNotDownloaded);
         }
 
+        if model.sha256().is_some() {
+            let verify_model = model.clone();
+            let path = cache_dir.join(model.file_name());
+            let valid =
+                tokio::task::spawn_blocking(move || verify_pinned_model(&verify_model, &path))
+                    .await
+                    .map_err(|error| crate::Error::Streaming(error.to_string()))??;
+            if !valid {
+                // Invalidating the exact app-managed artifact lets Download retry;
+                // size-only status polling must not keep corrupt files selected.
+                let _ = self
+                    .emit_model_state(model.to_string(), ModelState::NotDownloaded)
+                    .await;
+                return Err(crate::Error::Streaming(
+                    "Model integrity verification failed".into(),
+                ));
+            }
+        }
         let state = self.state::<crate::SharedState>();
         let mut s = state.lock().await;
         if let (Some(api_base), Some(_server)) = (&s.api_base, &s.server) {
-            if s.server_model.as_ref() == Some(&model) {
+            if s.server_model.as_ref() == Some(&model) && !model.is_streaming() {
                 return Ok(api_base.clone());
             }
         }
@@ -159,10 +181,14 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
         s.api_base = None;
         s.server_model = None;
 
-        let server_state = crate::ServerStateBuilder::default()
+        let mut server_builder = crate::ServerStateBuilder::default()
             .model_cache_dir(cache_dir)
-            .model_type(model.clone())
-            .build();
+            .model_type(model.clone());
+        if model.backend() == crate::SttBackend::NemotronStreaming {
+            server_builder.worker_paths =
+                Some(crate::streaming::WorkerPaths::resolve(self.app_handle())?);
+        }
+        let server_state = server_builder.build();
 
         let server = crate::run_server(server_state).await?;
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
@@ -250,6 +276,7 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
                         };
                         let _ = app_handle.emit("stt-model-state-changed", &event);
                     }
+                    DownloadProgress::Finished if m.sha256().is_some() => {}
                     DownloadProgress::Finished => {
                         if let Some(channel) = channel.as_ref() {
                             let _ = channel.send(100);
@@ -266,9 +293,33 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
                     }
                 };
 
-                if let Err(e) =
-                    download_file_with_callback(m.model_url(), model_path, callback).await
-                {
+                let result = async {
+                    download_file_with_callback(m.model_url(), &model_path, callback).await?;
+                    if m.sha256().is_some() {
+                        let verify_model = m.clone();
+                        let verify_path = model_path.clone();
+                        let valid = tokio::task::spawn_blocking(move || {
+                            verify_pinned_model(&verify_model, &verify_path)
+                        })
+                        .await
+                        .map_err(|error| crate::Error::Streaming(error.to_string()))??;
+                        if !valid {
+                            let _ = tokio::fs::remove_file(&model_path).await;
+                            return Err(crate::Error::Streaming(
+                                "Downloaded model failed integrity verification".into(),
+                            ));
+                        }
+                        if let Some(channel) = channel.as_ref() {
+                            let _ = channel.send(100);
+                        }
+                        let _ = app_handle
+                            .emit_model_state(emit_model_id.clone(), ModelState::Downloaded)
+                            .await;
+                    }
+                    Ok::<(), crate::Error>(())
+                }
+                .await;
+                if let Err(e) = result {
                     tracing::error!("model_download_error: {}", e);
                     if let Some(channel) = channel.as_ref() {
                         let _ = channel.send(-1);
@@ -543,5 +594,67 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
 
         tracing::info!("Emitted STT model state: {} -> {:?}", model_id, event.state);
         Ok(())
+    }
+}
+
+// Nemotron artifacts are immutable and verified before use. Hash outside async
+// executor threads; checking size first avoids reading incomplete downloads.
+fn verify_pinned_model(
+    model: &crate::SupportedModel,
+    path: &std::path::Path,
+) -> Result<bool, crate::Error> {
+    verify_and_invalidate(
+        path,
+        model.model_size(),
+        model.sha256().expect("pinned model"),
+    )
+}
+
+fn verify_and_invalidate(
+    path: &std::path::Path,
+    size: u64,
+    expected_sha256: &str,
+) -> Result<bool, crate::Error> {
+    use sha2::{Digest, Sha256};
+    use std::io::Read;
+    let mut valid = std::fs::metadata(path)?.len() == size;
+    if valid {
+        let mut file = std::fs::File::open(path)?;
+        let mut hasher = Sha256::new();
+        let mut buffer = [0; 65536];
+        loop {
+            let count = file.read(&mut buffer)?;
+            if count == 0 {
+                break;
+            }
+            hasher.update(&buffer[..count]);
+        }
+        valid = format!("{:x}", hasher.finalize()) == expected_sha256;
+    }
+    if !valid {
+        std::fs::remove_file(path)?;
+    }
+    Ok(valid)
+}
+
+#[cfg(test)]
+mod integrity_tests {
+    use super::*;
+    #[test]
+    fn equal_size_corrupt_artifact_is_invalidated_so_download_can_retry() {
+        use sha2::{Digest, Sha256};
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().join("pinned-model.gguf");
+        let correct = b"valid model bytes";
+        let digest = format!("{:x}", Sha256::digest(correct));
+        std::fs::write(&path, vec![0; correct.len()]).unwrap();
+        assert!(!verify_and_invalidate(&path, correct.len() as u64, &digest).unwrap());
+        assert!(
+            !path.exists(),
+            "status must allow a new download after failed verification"
+        );
+        std::fs::write(&path, correct).unwrap();
+        assert!(verify_and_invalidate(&path, correct.len() as u64, &digest).unwrap());
+        assert!(path.exists());
     }
 }

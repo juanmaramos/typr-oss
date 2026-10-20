@@ -1,3 +1,4 @@
+import { useAIAvailability } from "@/hooks/useAIAvailability";
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
 import { EmptyChatResponseError, getUserFriendlyChatErrorMessage } from "./chat-errors";
@@ -116,6 +117,7 @@ export function useChatLogic({
   setResearchMode,
 }: UseChatLogicProps) {
   const { t } = useLingui();
+  const { availability } = useAIAvailability();
   // Removed noisy log - only log on mode changes, not every render
   // Use Zustand store for messages and isGenerating so they persist across tab switches
   const {
@@ -234,7 +236,10 @@ export function useChatLogic({
   };
 
   const handleImproveWriting = async (selectedText: string, range: { from: number; to: number }) => {
-    if (!sessionId || useChatState.getState().isGenerating(sessionId) || hasActiveChatGeneration(sessionId)) {
+    if (
+      !availability.canStart || !sessionId || useChatState.getState().isGenerating(sessionId)
+      || hasActiveChatGeneration(sessionId)
+    ) {
       return;
     }
 
@@ -1121,6 +1126,9 @@ Leave everything else in the document completely unchanged.`;
 
   const beginSubmission = (content: string, analyticsEvent: string, source: string, bypassDebounce = false) => {
     const trimmedContent = content.trim();
+    if (!availability.canStart) {
+      return { accepted: false, capturedSessionId: null, trimmedContent, controller: null };
+    }
 
     if (!trimmedContent) {
       logChatSubmit("submit_blocked_empty", {

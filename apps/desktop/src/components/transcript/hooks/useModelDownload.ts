@@ -1,53 +1,30 @@
 import { useCallback } from "react";
 
+import { useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
 import { commands as localSttCommands, type SupportedModel } from "@typr/plugin-local-stt";
-import { useModelState } from "../../../hooks/useModelState";
 import { LANGUAGE_OPTIONS } from "../constants/languageData";
 
-export interface ModelDownloadState {
-  isDownloaded: boolean;
-  isDownloading: boolean;
-  error: string | null;
-}
-
+/** UI option names map to native IDs; the shared policy owns all action gates. */
 export function useModelDownload() {
-  const { getModel, isLoading } = useModelState(); // Event-driven state
+  const { getAvailability, retry } = useTranscriptionAvailability();
 
-  // SAME INTERFACE - components don't change
-  const getModelStatus = useCallback((languageKey: string): ModelDownloadState => {
-    const option = LANGUAGE_OPTIONS.find(opt => opt.key === languageKey);
-    if (!option) {
-      return { isDownloaded: false, isDownloading: false, error: "Invalid model key" };
-    }
-
-    const modelState = getModel(option.modelKey);
-    return {
-      isDownloaded: modelState?.isDownloaded || false,
-      isDownloading: modelState?.isDownloading || false,
-      error: modelState?.error || null,
-    };
-  }, [getModel]);
+  const getModelAvailability = useCallback((languageKey: string) => {
+    const option = LANGUAGE_OPTIONS.find(option => option.key === languageKey || option.modelKey === languageKey);
+    return getAvailability(option?.modelKey ?? languageKey);
+  }, [getAvailability]);
 
   const downloadModel = useCallback(async (languageKey: string) => {
-    const option = LANGUAGE_OPTIONS.find(opt => opt.key === languageKey);
-    if (!option) {
-      console.error("Invalid language key:", languageKey);
+    const option = LANGUAGE_OPTIONS.find(option => option.key === languageKey || option.modelKey === languageKey);
+    if (!option?.isLocal || !getAvailability(option.modelKey).canDownload) {
       return;
     }
-
-    const modelKey = option.modelKey as SupportedModel;
-
     try {
-      // Events handle progress and state updates. Selection changes after the model is available.
-      await localSttCommands.downloadModelBackground(modelKey);
+      await localSttCommands.downloadModelBackground(option.modelKey as SupportedModel);
     } catch (error) {
       console.error("Download failed:", error);
+      await retry();
     }
-  }, []);
+  }, [getAvailability, retry]);
 
-  return {
-    getModelStatus, // SAME
-    downloadModel, // SAME
-    isLoading, // SAME
-  };
+  return { getModelAvailability, downloadModel, retry };
 }
