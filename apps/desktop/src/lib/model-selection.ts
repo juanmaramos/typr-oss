@@ -11,6 +11,8 @@ import {
 } from "@typr/utils";
 import { modelLifecycleKey, type ModelStateMap } from "./model-lifecycle";
 
+import { downloadTranscriptionSetup } from "./stt-setup";
+
 export const MODEL_SELECTION_CHANGED_EVENT = "model-selection-changed";
 export const MODEL_NOT_DOWNLOADED = "model_not_downloaded";
 export const CLOUD_TRANSCRIPTION_MODEL = "assemblyai-universal";
@@ -139,6 +141,7 @@ function createModelSelectionController(queryClient: QueryClient) {
   }
 
   return {
+    downloadTranscription: (model: LocalTranscriptionModel) => downloadTranscriptionSetup(queryClient, model),
     selectLocalChat: (model: LocalChatModel) => update(() => setLocalChat(model)),
     selectCloudChat: (model: string) =>
       update(async () => {

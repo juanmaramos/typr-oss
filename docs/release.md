@@ -45,7 +45,7 @@ Then inspect the generated app metadata:
 5. Publish the release with one of these equivalent paths:
    - Push a tag matching the app version, for example `v0.1.12`.
    - Run `OSS Release` manually with `publish=true`.
-6. Let the `OSS Release` workflow publish the GitHub Release assets and `latest.json`.
+6. Let the `OSS Release` workflow finish all platform builds, signature checks, and updater validation. Assets stay in a draft until all checks pass; the final job publishes the complete release and `latest.json`. A published tag cannot be overwritten by rerunning the workflow.
 7. Download the release asset on a clean macOS machine and verify Gatekeeper opens it without warning.
 8. Update the Homebrew tap after the release assets exist:
 
@@ -56,3 +56,11 @@ Then inspect the generated app metadata:
    Commit that file to `juanmaramos/homebrew-typr`, then run `brew audit --cask --strict typr-oss` and a local install smoke test.
 
 Manual `workflow_dispatch` runs default to a draft prerelease tag named `oss-test-v<version>-<run>` so the signing and notarization path can be tested without changing the public latest release. Set `publish=true` only when you want the run to publish the official `v<version>` release.
+
+## Apple Silicon transcription runtime
+
+Apple Silicon releases build the pinned Nemotron SDK and private worker with a macOS 14.2 deployment target and portable CPU instructions. Every dylib and the worker receive the same Developer ID team signature and hardened runtime as the app before notarization. The release verifies the final bundle's architecture, deployment target, dependencies, signatures, and real English/Spanish transcription through the bundled worker.
+
+Nemotron is the first-run recommendation only when its runtime is included and available. Saved connector and legacy model choices take precedence. Setup downloads the selected streaming model and its advertised Whisper recovery model; fallback completion never changes the selection. Intel macOS builds retain Whisper, and Windows retains cloud setup. Model weights download separately and are not included in the app bundle.
+
+The publish job requires macOS Apple Silicon, macOS Intel, and Windows updater payloads, checks their manifest URLs and detached signatures, and verifies each payload against the existing updater public key. Do not rotate that key when bumping a version.
