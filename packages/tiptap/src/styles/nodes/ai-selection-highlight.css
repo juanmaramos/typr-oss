@@ -1,4 +1,4 @@
-/* 
+/*
  * AI Selection Highlight Styles
  * Cursor-style persistent selection indicator
  * Shows "we're working with this text" during AI editing
@@ -11,7 +11,7 @@
     246,
     0.08
   ); /* Subtle blue - less than diff marks */
-  border-radius: 2px;
+  border-radius: var(--radius-compact);
 }
 
 /* Dark mode support */

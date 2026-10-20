@@ -31,7 +31,7 @@ export function ProjectBriefSidebarButton() {
           size="icon"
           onClick={handleClick}
           className={cn(
-            "size-8 rounded-md text-muted-foreground hover:bg-surface-400 hover:text-foreground",
+            "size-8 text-muted-foreground hover:bg-surface-400 hover:text-foreground",
             isActive && "bg-surface-400 text-foreground",
           )}
         >

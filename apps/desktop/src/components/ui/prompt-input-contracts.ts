@@ -1,12 +1,12 @@
 export const promptInputClassNames = {
   root: "border-input bg-muted/50 cursor-text rounded-composer border p-2",
-  editAura: "ai-edit-aura absolute -inset-[2px] rounded-floating-pill",
+  editAura: "ai-edit-aura absolute -inset-[2px] rounded-floating",
   projectInlineSurface: "rounded-composer border border-border/60 bg-background px-3 py-1.5 shadow-2xs",
   floatingInlineSurface: "rounded-composer border border-border/60 bg-background px-3.5 py-2.5 shadow-float-pill",
-  floatingDockSurface: "border-0 rounded-floating-pill bg-sidebar px-4 py-2 shadow-float-pill",
+  floatingDockSurface: "border-0 rounded-floating bg-sidebar px-4 py-2 shadow-float-pill",
   floatingShellSurface:
-    "pointer-events-auto flex w-full overflow-hidden rounded-floating-pill bg-sidebar shadow-float-surface",
-  floatingExpandedSurface: "max-w-none overflow-hidden rounded-floating-surface bg-sidebar shadow-float-dock",
+    "pointer-events-auto flex w-full overflow-hidden rounded-floating bg-sidebar shadow-float-surface",
+  floatingExpandedSurface: "max-w-none overflow-hidden rounded-floating bg-sidebar shadow-float-dock",
 } as const;
 
 export const promptTextareaContracts = {

@@ -8,7 +8,7 @@ import { endOfMonth, startOfMonth, subMonths } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChevronDownIcon, TrashIcon } from "lucide-react";
 import { motion } from "motion/react";
-import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { type DragEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import * as Collapsible from "@radix-ui/react-collapsible";
 
@@ -16,10 +16,10 @@ import { MarqueeTitle } from "@/components/left-sidebar/marquee-title";
 import { Loader } from "@/components/ui/loader";
 import { debugLog } from "@/components/utils/debug-logger";
 import { useTypr } from "@/contexts";
-import { endNoteProjectDrag, startNoteProjectDrag } from "@/lib/note-project-drag";
-import { listProjects, projectQueryKeys } from "@/lib/projects";
 import { useEnhancePendingState } from "@/hooks/enhance-pending";
 import { useMultiSelectKeyboard } from "@/hooks/useMultiSelectKeyboard";
+import { endNoteProjectDrag, startNoteProjectDrag } from "@/lib/note-project-drag";
+import { listProjects, projectQueryKeys } from "@/lib/projects";
 import { useMultiSelectNotes } from "@/stores/useMultiSelectNotes";
 import { deleteSessionWithWelcomeDismissal } from "@/utils/delete-session";
 import { removeSessionsFromCache } from "@/utils/session-cache";
@@ -412,7 +412,7 @@ export function NoteItem({
           <Checkbox
             checked={isNoteSelected}
             className={cn(
-              "size-4 rounded-[4px]",
+              "size-4 ",
               !isNoteSelected && "border-muted-foreground/30 shadow-none",
             )}
             onCheckedChange={() => toggleNote(currentSessionId)}
@@ -460,7 +460,7 @@ export function NoteItem({
               type="button"
               aria-label={t`Note actions`}
               className={cn(
-                "absolute right-0 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md",
+                "absolute right-0 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-control",
                 "text-muted-foreground transition-all duration-150",
                 "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",

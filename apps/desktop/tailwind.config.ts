@@ -1,5 +1,5 @@
-import uiConfig from "@typr/ui/tailwind.config";
 import typography from "@tailwindcss/typography";
+import uiConfig from "@typr/ui/tailwind.config";
 import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
 
@@ -19,14 +19,6 @@ const config = {
           "Racing Sans One",
           "cursive",
         ],
-      },
-      borderRadius: {
-        composer: "var(--radius-composer)",
-        "floating-pill": "var(--radius-floating-pill)",
-        "floating-surface": "var(--radius-floating-surface)",
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
       },
       colors: {
         background: "hsl(var(--background))",

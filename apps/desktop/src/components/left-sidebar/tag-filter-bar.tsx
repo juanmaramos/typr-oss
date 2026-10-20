@@ -97,7 +97,7 @@ export function TagFilterBar({ selectedTags, onTagsChange, visibleNotesCount }: 
               <Button
                 variant="ghost"
                 className={cn(
-                  "h-7 w-7 rounded-md p-0 text-muted-foreground",
+                  "h-7 w-7 p-0 text-muted-foreground",
                   "transition-colors hover:bg-surface-400/60 hover:text-foreground",
                   "focus-visible:ring-[3px] focus-visible:ring-ring/35",
                   selectedTags.length > 0 && "text-foreground",
@@ -117,7 +117,7 @@ export function TagFilterBar({ selectedTags, onTagsChange, visibleNotesCount }: 
             <PopoverContent
               side="bottom"
               align="end"
-              className="w-[270px] rounded-md border bg-background p-0 shadow-md"
+              className="w-[270px] border bg-background p-0 shadow-md"
             >
               <Command className="rounded-md border-0 bg-transparent">
                 <CommandInput
@@ -177,7 +177,7 @@ export function TagFilterBar({ selectedTags, onTagsChange, visibleNotesCount }: 
               key={tag.id}
               type="button"
               onClick={() => toggleTag(tag.id)}
-              className="inline-flex h-6 items-center gap-1 rounded-md bg-muted px-2 text-ui-caption font-medium text-foreground/80 transition-colors hover:bg-surface-400/80"
+              className="inline-flex h-6 items-center gap-1 rounded-control bg-muted px-2 text-ui-caption font-medium text-foreground/80 transition-colors hover:bg-surface-400/80"
             >
               <span className="max-w-[130px] truncate">{tag.name}</span>
               <i className="ri-close-line text-[12px] text-muted-foreground" />

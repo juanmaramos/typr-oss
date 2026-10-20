@@ -1,6 +1,7 @@
 "use client";
 
 import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import { radii, type RadiusRole } from "../../lib/radii";
 import { cn } from "../../lib/utils";
 
 interface NeonColorsProps {
@@ -34,12 +35,9 @@ interface NeonGradientCardProps extends React.HTMLAttributes<HTMLDivElement> {
   borderSize?: number;
 
   /**
-   * @default 8
-   * @type number
-   * @description
-   * The size of the radius in pixels
+   * Surface shape role from the shared design system.
    */
-  borderRadius?: number;
+  radius?: RadiusRole;
 
   /**
    * @default "{ firstColor: '#3b82f6', secondColor: '#8b5cf6' }"
@@ -59,7 +57,7 @@ export function NeonGradientCard({
   className,
   children,
   borderSize = 2,
-  borderRadius = 8,
+  radius = "surface",
   neonColors = {
     firstColor: "hsl(var(--primary))",
     secondColor: "hsl(var(--primary) / 0.6)",
@@ -97,12 +95,12 @@ export function NeonGradientCard({
       ref={containerRef}
       style={{
         "--border-size": `${borderSize}px`,
-        "--border-radius": `${borderRadius}px`,
+        "--border-radius": radii[radius],
         "--neon-first-color": neonColors.firstColor,
         "--neon-second-color": neonColors.secondColor,
         "--card-width": `${dimensions.width}px`,
         "--card-height": `${dimensions.height}px`,
-        "--card-content-radius": `${borderRadius - borderSize}px`,
+        "--card-content-radius": `calc(${radii[radius]} - ${borderSize}px)`,
         "--pseudo-element-background-image":
           `linear-gradient(0deg, ${neonColors.firstColor}, ${neonColors.secondColor})`,
         "--pseudo-element-width": `${dimensions.width + borderSize * 2}px`,

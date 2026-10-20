@@ -233,7 +233,7 @@ export function STTLanguageSelector({
                   key={option.key}
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 rounded-md whitespace-normal",
+                    "w-full justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 whitespace-normal",
                     isSelected && "bg-muted/50 border border",
                     !isCloud && modelStatus && !modelStatus.isDownloaded && "opacity-75",
                   )}
@@ -356,7 +356,7 @@ export function STTLanguageSelector({
                   key={option.key}
                   variant="ghost"
                   className={cn(
-                    "w-full justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 rounded-md whitespace-normal",
+                    "w-full justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 whitespace-normal",
                     isSelected && "bg-muted/50 border border",
                     !isCloud && modelStatus && !modelStatus.isDownloaded && "opacity-75",
                   )}

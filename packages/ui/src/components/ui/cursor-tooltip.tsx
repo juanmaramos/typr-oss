@@ -72,7 +72,7 @@ const CursorFollowTooltip: React.FC<CursorFollowTooltipProps> = ({
             padding: "4px 8px",
             background: "hsl(var(--popover))",
             color: "hsl(var(--popover-foreground))",
-            borderRadius: "var(--radius)",
+            borderRadius: "var(--radius-control)",
             border: "1px solid hsl(var(--border))",
             boxShadow: "0 2px 10px hsla(var(--card-foreground), 0.1)",
             pointerEvents: "none",

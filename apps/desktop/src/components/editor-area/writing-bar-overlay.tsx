@@ -101,29 +101,31 @@ export function WritingBarOverlay({ sessionId, phase, onCancel }: WritingBarOver
                 </span>
               </span>
             </div>
-            {onCancel ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label={t`Cancel and restore previous notes`}
-                    onClick={onCancel}
-                    className={cn(
-                      "flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground",
-                      "opacity-0 transition-[opacity,background-color,color] duration-150",
-                      "hover:bg-muted hover:text-foreground",
-                      "focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      "group-hover:opacity-100",
-                    )}
-                  >
-                    <X className="size-4" aria-hidden="true" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="text-xs">
-                  <Trans>Cancel and restore previous notes</Trans>
-                </TooltipContent>
-              </Tooltip>
-            ) : null}
+            {onCancel
+              ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label={t`Cancel and restore previous notes`}
+                      onClick={onCancel}
+                      className={cn(
+                        "flex size-7 shrink-0 items-center justify-center rounded-control text-muted-foreground",
+                        "opacity-0 transition-[opacity,background-color,color] duration-150",
+                        "hover:bg-muted hover:text-foreground",
+                        "focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        "group-hover:opacity-100",
+                      )}
+                    >
+                      <X className="size-4" aria-hidden="true" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="text-xs">
+                    <Trans>Cancel and restore previous notes</Trans>
+                  </TooltipContent>
+                </Tooltip>
+              )
+              : null}
           </div>
         </div>
       </motion.div>

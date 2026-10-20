@@ -1,4 +1,6 @@
 import { getSpaceActionErrorMessage } from "@/lib/spaces";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { commands as dbCommands, type Session } from "@typr/plugin-db";
 import { Button } from "@typr/ui/components/ui/button";
 import { Checkbox } from "@typr/ui/components/ui/checkbox";
@@ -21,8 +23,6 @@ import {
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
 import { toast } from "@typr/ui/components/ui/toast";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 
@@ -131,7 +131,7 @@ export function SpaceNotesPickerDialog({ onOpenChange, open, spaceId, userId }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[820px] gap-0 overflow-hidden rounded-[28px] border bg-background p-0 shadow-2xl">
+      <DialogContent className="max-w-[820px] gap-0 overflow-hidden border bg-background p-0 shadow-2xl">
         <DialogHeader className="px-6 pt-6 pb-0 text-left">
           <DialogTitle className="text-lg font-semibold text-foreground">
             <Trans>Add notes</Trans>
@@ -146,7 +146,7 @@ export function SpaceNotesPickerDialog({ onOpenChange, open, spaceId, userId }: 
         <div className="px-6 pt-4">
           <Command
             shouldFilter={false}
-            className="overflow-hidden rounded-[24px] border border bg-background shadow-none"
+            className="overflow-hidden border border bg-background shadow-none"
           >
             <CommandInput
               value={query}

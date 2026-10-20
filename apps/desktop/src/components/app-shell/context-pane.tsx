@@ -2,10 +2,10 @@ import LeftSidebar from "@/components/left-sidebar";
 import { NavUser } from "@/components/left-sidebar/nav-user";
 import { useLeftSidebar } from "@/contexts";
 import { FEATURES } from "@/lib/features";
-import { Card, CardDescription, CardHeader, CardTitle } from "@typr/ui/components/ui/card";
-import { cn } from "@typr/ui/lib/utils";
 import { Trans } from "@lingui/react/macro";
 import { useLocation } from "@tanstack/react-router";
+import { Card, CardDescription, CardHeader, CardTitle } from "@typr/ui/components/ui/card";
+import { cn } from "@typr/ui/lib/utils";
 import { CONTEXT_PANE_TRANSITION } from "./transitions";
 import { useShellMode } from "./use-shell-mode";
 
@@ -31,7 +31,7 @@ function AskTyprPane({ variant = "global" }: { variant?: "global" | "meeting" })
       <div className="flex-1 space-y-3 overflow-y-auto p-4">
         <Card
           variant="outline"
-          className="rounded-2xl border-dashed border-sidebar-border bg-background/60 shadow-none"
+          className="border-dashed border-sidebar-border bg-background/60 shadow-none"
         >
           <CardHeader spacing="compact" className="p-4">
             <CardTitle className="text-sm font-medium text-foreground">

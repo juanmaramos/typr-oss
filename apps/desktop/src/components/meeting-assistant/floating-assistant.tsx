@@ -489,7 +489,7 @@ export function FloatingMeetingAssistant() {
           <button
             type="button"
             onClick={toggleVariant}
-            className="rounded-md bg-black/60 px-2 py-0.5 font-mono text-ui-tiny text-white/70 backdrop-blur-sm transition-colors hover:bg-black/80 hover:text-white"
+            className="rounded-control bg-black/60 px-2 py-0.5 font-mono text-ui-tiny text-white/70 backdrop-blur-sm transition-colors hover:bg-black/80 hover:text-white"
           >
             {variant === "dock" ? t`dock` : t`rail`} ⌘⇧U
           </button>

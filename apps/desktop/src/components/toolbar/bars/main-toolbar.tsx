@@ -3,18 +3,18 @@ import {
   COLLAPSED_MAIN_PANEL_TITLEBAR_INSET_CLASS,
 } from "@/components/app-shell/titlebar-layout";
 import { AskConversationToolbar } from "@/components/ask/ask-conversation-toolbar";
-import { Button } from "@typr/ui/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useMatch, useNavigate, useSearch } from "@tanstack/react-router";
+import { Button } from "@typr/ui/components/ui/button";
 
 import { NewNoteButton } from "@/components/toolbar/buttons/new-note-button";
 import { NewWindowButton } from "@/components/toolbar/buttons/new-window-button";
 import { useLeftSidebar } from "@/contexts";
 import { getProject, projectQueryKeys } from "@/lib/projects";
-import { getCurrentWebviewWindowLabel } from "@typr/plugin-windows";
-import { cn } from "@typr/ui/lib/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { type as getOsType } from "@tauri-apps/plugin-os";
+import { getCurrentWebviewWindowLabel } from "@typr/plugin-windows";
+import { cn } from "@typr/ui/lib/utils";
 
 export function MainToolbar() {
   const noteMatch = useMatch({ from: "/app/note/$id", shouldThrow: false });
@@ -95,7 +95,7 @@ function BackToProjectButton({ projectId }: { projectId: string }) {
     <Button
       variant="ghost"
       size="sm"
-      className="h-8 min-w-0 max-w-full shrink rounded-xl px-3 text-xs font-medium text-muted-foreground hover:bg-surface-400/70 hover:text-foreground"
+      className="h-8 min-w-0 max-w-full shrink px-3 text-xs font-medium text-muted-foreground hover:bg-surface-400/70 hover:text-foreground"
       onClick={() => navigate({ to: "/app/projects/$projectId", params: { projectId } })}
       aria-label={label}
       title={label}

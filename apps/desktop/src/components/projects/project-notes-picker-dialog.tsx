@@ -8,6 +8,8 @@ import {
   projectQueryKeys,
 } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { commands as dbCommands, type Session } from "@typr/plugin-db";
 import { Button } from "@typr/ui/components/ui/button";
 import { Checkbox } from "@typr/ui/components/ui/checkbox";
@@ -23,8 +25,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } f
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
 import { toast } from "@typr/ui/components/ui/toast";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 
@@ -219,7 +219,7 @@ export function ProjectNotesPickerDialog({ onOpenChange, open, projectId, userId
                             <Checkbox
                               checked={isSelected}
                               className={cn(
-                                "pointer-events-none size-4 rounded-[4px]",
+                                "pointer-events-none size-4 ",
                                 !isSelected && "border-muted-foreground/30 shadow-none",
                               )}
                             />
@@ -264,7 +264,7 @@ export function ProjectNotesPickerDialog({ onOpenChange, open, projectId, userId
 function ProjectCandidateRowSkeleton() {
   return (
     <div className="flex h-9 items-center gap-3 rounded-md px-2">
-      <Skeleton className="size-4 rounded-[4px]" />
+      <Skeleton className="size-4 rounded-compact" />
       <Skeleton className="size-4 rounded-sm" />
       <Skeleton className="h-3.5 w-56 max-w-full rounded-full" />
       <Skeleton className="ml-auto h-3 w-10 rounded-full" />

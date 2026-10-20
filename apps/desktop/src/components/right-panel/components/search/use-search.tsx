@@ -29,7 +29,7 @@ export function useSearch({ target, onClose, hasReplace = false }: UseSearchProp
       style.textContent = `
         .search-highlight {
           background-color: hsl(var(--highlight)) !important;
-          border-radius: 0.125rem !important;
+          border-radius: var(--radius-compact) !important;
           padding: 0 0.125rem !important;
         }
         .search-highlight-current {

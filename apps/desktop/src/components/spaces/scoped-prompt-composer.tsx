@@ -1,8 +1,8 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useLayoutEffect, useRef, useState } from "react";
 
 interface ScopedPromptComposerProps {
@@ -37,7 +37,7 @@ export function ScopedPromptComposer({
   return (
     <div
       className={cn(
-        "rounded-[24px] border border bg-background p-4 shadow-sm",
+        "rounded-composer border border bg-background p-4 shadow-sm",
         className,
       )}
     >

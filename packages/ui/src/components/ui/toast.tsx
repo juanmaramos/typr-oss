@@ -29,7 +29,7 @@ export function CustomToast(props: CustomToastProps) {
   const { id, title, content, buttons = [], dismissible, children } = props;
 
   return (
-    <div className="relative flex flex-col gap-2 rounded-lg border-0 bg-background p-4 text-foreground shadow-md">
+    <div className="relative flex flex-col gap-2 rounded-surface border-0 bg-background p-4 text-foreground shadow-md">
       {dismissible && (
         <button
           onClick={() => sonnerToast.dismiss(id)}
@@ -54,8 +54,8 @@ export function CustomToast(props: CustomToastProps) {
                 sonnerToast.dismiss(id);
               }}
               className={button.primary
-                ? "px-3 py-1.5 text-sm bg-foreground/80 text-background rounded-md hover:bg-foreground/60"
-                : "px-3 py-1.5 text-sm bg-secondary text-foreground rounded-md hover:bg-surface-400"}
+                ? "px-3 py-1.5 text-sm bg-foreground/80 text-background rounded-control hover:bg-foreground/60"
+                : "px-3 py-1.5 text-sm bg-secondary text-foreground rounded-control hover:bg-surface-400"}
             >
               {button.label}
             </button>
@@ -71,7 +71,7 @@ export function CustomToast(props: CustomToastProps) {
 export function toast(props: CustomToastProps) {
   return sonnerToast.custom(
     (id) => (
-      <div className="group w-[300px] overflow-clip rounded-lg">
+      <div className="group w-[300px] overflow-clip rounded-surface">
         <CustomToast
           id={id}
           title={props.title}
@@ -103,7 +103,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-background group-[.toaster]:border-0 group-[.toaster]:shadow-md group-[.toaster]:rounded-lg group-[.toaster]:overflow-visible group-[.toaster]:w-[300px]",
+            "group toast group-[.toaster]:bg-background group-[.toaster]:border-0 group-[.toaster]:shadow-md group-[.toaster]:rounded-surface group-[.toaster]:overflow-visible group-[.toaster]:w-[300px]",
           description: "group-[.toast]:text-muted-foreground",
           closeButton: "z-10",
           actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",

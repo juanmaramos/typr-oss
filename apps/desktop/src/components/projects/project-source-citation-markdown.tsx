@@ -1,8 +1,8 @@
 import { Markdown } from "@/components/ui/markdown";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { type ReactNode, useMemo } from "react";
 
 const PROJECT_SOURCE_CITATION_HREF_PREFIX = "#project-source:";
@@ -151,7 +151,7 @@ function ProjectSourceCitation({
               key={`${source.key}-${source.sourceId}`}
               type="button"
               variant="ghost"
-              className="h-auto w-full justify-start gap-2 rounded-md px-2 py-2 text-left whitespace-normal hover:bg-muted"
+              className="h-auto w-full justify-start gap-2 px-2 py-2 text-left whitespace-normal hover:bg-muted"
               onClick={() => onOpenSource(source)}
             >
               <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">

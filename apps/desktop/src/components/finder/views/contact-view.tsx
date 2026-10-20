@@ -152,7 +152,7 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
             <button
               onClick={() => setSelectedOrganization(null)}
               className={cn(
-                "w-full text-left px-3 py-2 rounded-md text-sm flex items-center gap-2 hover:bg-surface-400 transition-colors",
+                "w-full text-left px-3 py-2 rounded-control text-sm flex items-center gap-2 hover:bg-surface-400 transition-colors",
                 !selectedOrganization && "bg-muted",
               )}
             >
@@ -188,7 +188,7 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
                   >
                     <button
                       onClick={() => setSelectedOrganization(org.id)}
-                      className="w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-surface-400 transition-colors rounded-md"
+                      className="w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-surface-400 transition-colors rounded-control"
                     >
                       <Building2 className="h-4 w-4 text-muted-foreground" />
                       {org.name}
@@ -244,7 +244,7 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
                 key={person.id}
                 onClick={() => setSelectedPerson(person.id)}
                 className={cn(
-                  "w-full text-left px-3 py-2 rounded-md text-sm hover:bg-surface-400 transition-colors flex items-center gap-2",
+                  "w-full text-left px-3 py-2 rounded-control text-sm hover:bg-surface-400 transition-colors flex items-center gap-2",
                   selectedPerson === person.id && "bg-muted",
                 )}
               >
@@ -304,7 +304,7 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
                           </div>
                           <button
                             onClick={() => handleEditPerson(selectedPersonData.id)}
-                            className="p-2 rounded-md hover:bg-surface-400 transition-colors"
+                            className="p-2 rounded-control hover:bg-surface-400 transition-colors"
                           >
                             <Pencil className="h-4 w-4 text-muted-foreground" />
                           </button>
@@ -325,7 +325,7 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
                               <button
                                 key={session.id}
                                 onClick={() => handleSessionClick(session.id)}
-                                className="w-full text-left p-3 rounded-md border border hover:bg-surface-400/50 transition-colors"
+                                className="w-full text-left p-3 rounded-control border border hover:bg-surface-400/50 transition-colors"
                               >
                                 <div className="flex items-center gap-2 mb-1">
                                   <FileText className="h-4 w-4 text-muted-foreground" />

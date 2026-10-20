@@ -127,7 +127,7 @@ function ProjectsIndex() {
               value={search}
               onChange={event => setSearch(event.target.value)}
               placeholder={t`Search projects`}
-              className="h-9 w-56 rounded-xl border bg-background text-sm"
+              className="h-9 w-56 border bg-background text-sm"
             />
           </div>
         </div>
@@ -184,7 +184,7 @@ function ProjectsIndex() {
                           to: "/app/projects/$projectId",
                           params: { projectId: project.id },
                         })}
-                      className="h-auto min-w-0 flex-1 justify-start gap-3 rounded-lg px-0 py-0 text-left whitespace-normal hover:bg-transparent"
+                      className="h-auto min-w-0 flex-1 justify-start gap-3 px-0 py-0 text-left whitespace-normal hover:bg-transparent"
                     >
                       <ProjectIcon icon={project.icon_value} color={project.icon_color} />
                       <div className="min-w-0 flex-1">
@@ -213,9 +213,9 @@ function ProjectsIndex() {
                             <i className="ri-more-2-fill text-base" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44 rounded-xl border bg-background p-1.5">
+                        <DropdownMenuContent align="end" className="w-44 border bg-background p-1.5">
                           <DropdownMenuItem
-                            className="rounded-lg text-sm text-destructive focus:bg-destructive/5 focus:text-destructive"
+                            className="text-sm text-destructive focus:bg-destructive/5 focus:text-destructive"
                             onSelect={() => setProjectToDelete(project)}
                           >
                             <i className="ri-delete-bin-line text-sm" />
@@ -240,7 +240,7 @@ function ProjectsIndex() {
           }
         }}
       >
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               <Trans>Delete “{projectDeleteName}”?</Trans>

@@ -3,10 +3,14 @@ import {
   COLLAPSED_MAIN_PANEL_TITLEBAR_INSET_CLASS,
 } from "@/components/app-shell/titlebar-layout";
 import { ProjectIcon } from "@/components/projects/project-icon";
-import { useTypr, useLeftSidebar } from "@/contexts";
+import { useLeftSidebar, useTypr } from "@/contexts";
 import { askQueryKeys, createAskThread, getAskThread, listAskThreads } from "@/lib/ask";
 import { getProject, listProjects, type Project, projectQueryKeys } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { type as getOsType } from "@tauri-apps/plugin-os";
 import type { AskThread } from "@typr/plugin-db";
 import { getCurrentWebviewWindowLabel } from "@typr/plugin-windows";
 import { Button } from "@typr/ui/components/ui/button";
@@ -14,10 +18,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
 import { toast } from "@typr/ui/components/ui/toast";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
-import { type as getOsType } from "@tauri-apps/plugin-os";
 import { differenceInCalendarDays, format } from "date-fns";
 import { useMemo, useState } from "react";
 
@@ -219,7 +219,7 @@ function AskHistoryPopover({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent align="end" sideOffset={8} className="w-80 rounded-xl border bg-background p-2 shadow-lg sm:w-96">
+      <PopoverContent align="end" sideOffset={8} className="w-80 border bg-background p-2 shadow-lg sm:w-96">
         {isLoading && (
           <div className="space-y-2 p-2">
             {Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-9 rounded-lg" />)}
@@ -249,7 +249,7 @@ function AskHistoryPopover({
                         key={thread.id}
                         type="button"
                         className={cn(
-                          "flex h-10 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-left text-sm transition-colors",
+                          "flex h-10 w-full min-w-0 items-center gap-2 rounded-control px-2 text-left text-sm transition-colors",
                           "hover:bg-surface-400 focus-visible:bg-surface-400 focus-visible:outline-none",
                           isSelected && "bg-surface-400",
                         )}
