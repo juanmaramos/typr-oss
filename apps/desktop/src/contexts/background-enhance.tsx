@@ -9,22 +9,27 @@ import { commands as configCommands } from "@typr/plugin-config";
 import { commands as dbCommands, type Session } from "@typr/plugin-db";
 import { commands as miscCommands } from "@typr/plugin-misc";
 import { commands as templateCommands, type Grammar } from "@typr/plugin-template";
+import { getCurrentWebviewWindowLabel } from "@typr/plugin-windows";
 import { CLOUD_GENERATION_TOKEN_BUDGETS } from "@typr/utils";
 import { generateText, getTemplateTypeForTask, localProviderName, modelProvider, streamText } from "@typr/utils/ai";
 import { useSessions } from "@typr/utils/contexts";
 
 const ENHANCE_MIN_WORDS = 5;
 const POLL_INTERVAL_MS = 5_000;
+const recordingSummariesInFlight = new Set<string>();
 
 export function BackgroundEnhanceWorker({ children }: { children: React.ReactNode }) {
   const { userId } = useTypr();
+  const isMainWindow = getCurrentWebviewWindowLabel() === "main";
   const sessionsStore = useSessions((s) => s.sessions);
   const processingRef = useRef(false);
+  const retryAfterRef = useRef(new Map<string, number>());
   const queryClient = useQueryClient();
 
   const processSession = useCallback(async (session: Session) => {
+    if (session.record_start && !isMainWindow) return;
     const freshSession = await dbCommands.getSession({ id: session.id });
-    if (!freshSession?.needs_enhance) {
+    if (!freshSession?.needs_enhance || (freshSession.record_start && !freshSession.record_end)) {
       console.log(`[BackgroundEnhance] Skipping — session already claimed ${session.id}`);
       return;
     }
@@ -33,11 +38,15 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
 
     if (session.words.length < ENHANCE_MIN_WORDS) {
       console.log(`[BackgroundEnhance] Skipping — only ${session.words.length} words`);
-      await dbCommands.upsertSession({ ...session, needs_enhance: false });
+      if (!session.record_start) await dbCommands.upsertSession({ ...session, needs_enhance: false });
       return;
     }
 
-    await dbCommands.upsertSession({ ...session, needs_enhance: false });
+    // Recorded sessions remain durable pending work until the generated result
+    // is saved. The editor only claims imports, so recording has one consumer.
+    if (!session.record_start) {
+      await dbCommands.upsertSession({ ...session, needs_enhance: false });
+    }
     const loadedSessionStore = sessionsStore[session.id];
     if (loadedSessionStore) {
       await loadedSessionStore.getState().refresh();
@@ -60,7 +69,12 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
         user: isYoutube ? "enhance_youtube.user" : "enhance.user",
       };
 
-      const selectedTemplateId = general.selected_template_id ?? null;
+      const summaryMetadata: unknown = session.source_metadata ? JSON.parse(session.source_metadata) : null;
+      const selectedTemplateId = session.record_start && summaryMetadata && typeof summaryMetadata === "object"
+        && "summary_template_id" in summaryMetadata
+        && (summaryMetadata.summary_template_id === null || typeof summaryMetadata.summary_template_id === "string")
+        ? summaryMetadata.summary_template_id
+        : general.selected_template_id ?? null;
       const selectedTemplate = selectedTemplateId
         ? await TemplateService.getTemplate(selectedTemplateId)
         : null;
@@ -82,7 +96,7 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
         }),
         templateCommands.render(templateKeys.user, {
           type: templateType,
-          editor: "",
+          editor: session.record_start ? session.raw_memo_html : "",
           words: JSON.stringify(session.words),
           participants: await dbCommands.sessionListParticipants(session.id),
           templateInfo: selectedTemplate,
@@ -113,31 +127,46 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
       });
 
       let acc = "";
+      let finished = false;
       for await (const chunk of fullStream) {
+        if (chunk.type === "error") {
+          throw chunk.error;
+        }
         if (chunk.type === "text-delta") {
           acc += chunk.textDelta;
         }
+        if (chunk.type === "finish") {
+          finished = chunk.finishReason !== "error" && chunk.finishReason !== "length";
+        }
       }
 
-      if (!acc.trim()) {
-        console.error(`[BackgroundEnhance] Empty result for ${session.id}`);
-        await dbCommands.upsertSession({ ...session, needs_enhance: false });
-        return;
+      if (!acc.trim() || (session.record_start && !finished)) {
+        console.error(`[BackgroundEnhance] Incomplete summary for ${session.id}`);
+        throw new Error();
       }
 
       const finalHtml = await miscCommands.opinionatedMdToHtml(acc);
 
-      await dbCommands.upsertSession({
-        ...session,
-        auto_enhanced_memo_html: finalHtml,
-        enhanced_memo_html: finalHtml,
-        needs_enhance: false,
-      });
+      if (session.record_start && session.record_end) {
+        const saved = await dbCommands.saveRecordingSummary(
+          session.id, session.words, session.record_end, session.enhanced_memo_html, finalHtml,
+        );
+        if (!saved) return;
+      } else {
+        await dbCommands.upsertSession({
+          ...session,
+          auto_enhanced_memo_html: finalHtml,
+          enhanced_memo_html: finalHtml,
+          needs_enhance: false,
+        });
+      }
+      retryAfterRef.current.delete(session.id);
 
       // Refresh session store if loaded
       const sessionStore = sessionsStore[session.id];
       if (sessionStore) {
         await sessionStore.getState().refresh();
+        if (session.record_start) sessionStore.getState().setShowRaw(false);
       }
 
       console.log(`[BackgroundEnhance] Enhanced session ${session.id} (${acc.length} chars)`);
@@ -157,6 +186,7 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
       );
     } catch (error) {
       console.error(`[BackgroundEnhance] Failed for session ${session.id}:`, error);
+      if (session.record_start) retryAfterRef.current.set(session.id, Date.now() + 60_000);
 
       // Clear stuck toast — if upload store is waiting for this session's enhance, reset it
       const uploadState = useAudioUploadStore.getState().progress;
@@ -164,29 +194,42 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
         useAudioUploadStore.getState().setProgress({ status: "idle" });
       }
     }
-  }, [sessionsStore, queryClient]);
+  }, [isMainWindow, sessionsStore, queryClient]);
 
   const pollAndProcess = useCallback(async () => {
     if (processingRef.current || !userId) {
       return;
     }
 
+    processingRef.current = true;
     try {
+      for (const [id, retryAt] of retryAfterRef.current) {
+        if (retryAt <= Date.now()) retryAfterRef.current.delete(id);
+      }
       const pending = await dbCommands.listSessions({
         type: "needsEnhance",
         user_id: userId,
         limit: 10,
+        exclude_ids: [...retryAfterRef.current.keys()],
       });
 
       if (pending.length === 0) {
         return;
       }
 
-      processingRef.current = true;
       console.log(`[BackgroundEnhance] Found ${pending.length} session(s) to enhance`);
 
       for (const session of pending) {
-        await processSession(session);
+        if ((retryAfterRef.current.get(session.id) ?? 0) > Date.now()) continue;
+        if (session.record_start) {
+          if (recordingSummariesInFlight.has(session.id)) continue;
+          recordingSummariesInFlight.add(session.id);
+        }
+        try {
+          await processSession(session);
+        } finally {
+          recordingSummariesInFlight.delete(session.id);
+        }
       }
     } catch (error) {
       console.error("[BackgroundEnhance] Poll error:", error);
@@ -277,7 +320,12 @@ async function generateTitleForSession(
     return;
   }
 
-  await dbCommands.upsertSession({ ...freshSession, title: resolvedTitle.title });
+  if (session.record_start && session.record_end) {
+    const saved = await dbCommands.saveRecordingTitle(session.id, session.record_end, session.title, resolvedTitle.title);
+    if (!saved) return;
+  } else {
+    await dbCommands.upsertSession({ ...freshSession, title: resolvedTitle.title });
+  }
 
   const sessionStore = sessions[session.id];
   if (sessionStore) {

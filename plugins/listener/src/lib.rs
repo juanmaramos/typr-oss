@@ -4,6 +4,7 @@ use tokio::sync::Mutex;
 
 mod client;
 mod commands;
+mod completion;
 mod error;
 mod events;
 mod ext;
