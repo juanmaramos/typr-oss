@@ -1,3 +1,4 @@
+import { localTranscriptionModelQueryOptions } from "@/lib/model-selection";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronDownIcon, ChevronUpIcon, PauseIcon, PlayIcon, StopCircleIcon } from "lucide-react";
@@ -38,11 +39,7 @@ export default function ListenButton({ sessionId }: { sessionId: string }) {
   const { isDownloaded } = useModelState();
 
   // Get current model status
-  const currentModelQuery = useQuery({
-    queryKey: ["current-stt-model"],
-    queryFn: () => localSttCommands.getCurrentModel(),
-    staleTime: 60 * 1000, // Static data - cache for 1 minute
-  });
+  const currentModelQuery = useQuery(localTranscriptionModelQueryOptions());
 
   const modelDownloaded = {
     data: currentModelQuery.data ? isDownloaded(currentModelQuery.data.toString()) : false,

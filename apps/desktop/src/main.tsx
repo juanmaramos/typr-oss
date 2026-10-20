@@ -2,6 +2,8 @@ import "@typr/ui/globals.css";
 import "remixicon/fonts/remixicon.css";
 import "./styles/globals.css";
 
+import { useModelSelectionSync } from "./hooks/useModelSelectionSync";
+
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider, useQueries, useQueryClient } from "@tanstack/react-query";
@@ -189,6 +191,7 @@ declare module "@tanstack/react-router" {
 const rootElement = document.getElementById("root")!;
 
 function App() {
+  useModelSelectionSync();
   const queryClient = useQueryClient();
   const [i18nReady, setI18nReady] = useState(false);
   const [bootError, setBootError] = useState<string | null>(null);

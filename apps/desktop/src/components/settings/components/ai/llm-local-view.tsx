@@ -11,7 +11,6 @@ import {
   getCloudProviderLabel,
 } from "@/hooks/cloud-model-catalog";
 import { commands as connectorCommands } from "@typr/plugin-connector";
-import { commands as localLlmCommands } from "@typr/plugin-local-llm";
 import { Button } from "@typr/ui/components/ui/button";
 import { Input } from "@typr/ui/components/ui/input";
 import { cn } from "@typr/ui/lib/utils";
@@ -24,8 +23,6 @@ type CloudApiKeys = {
 };
 
 export function LLMLocalView({
-  customLLMEnabled,
-  setSelectedLLMModel,
   downloadingModels,
   handleModelDownload,
   handleShowFileLocation,
@@ -44,17 +41,6 @@ export function LLMLocalView({
   });
   const [expandedCloudProvider, setExpandedCloudProvider] = useState<CloudProviderId | null>(null);
   const [modelSearch, setModelSearch] = useState("");
-
-  const currentLLMModel = useQuery({
-    queryKey: ["current-llm-model"],
-    queryFn: () => localLlmCommands.getCurrentModel(),
-  });
-
-  useEffect(() => {
-    if (currentLLMModel.data && !customLLMEnabled.data) {
-      setSelectedLLMModel(currentLLMModel.data);
-    }
-  }, [currentLLMModel.data, customLLMEnabled.data, setSelectedLLMModel]);
 
   const cloudApiKeysQuery = useQuery({
     queryKey: ["cloud-api-keys"],

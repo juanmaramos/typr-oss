@@ -62,3 +62,28 @@ impl AsRef<Connection> for ConnectionSTT {
         }
     }
 }
+
+/// A session-start snapshot: provider, model and credentials are captured together.
+/// Connection setup must consume this value rather than rereading preferences.
+pub enum SttSelection {
+    Local(tauri_plugin_local_stt::SupportedModel),
+    AssemblyAi { api_key: Option<String> },
+}
+
+impl SttSelection {
+    pub fn model_id(&self) -> String {
+        match self {
+            Self::Local(model) => model.to_string(),
+            Self::AssemblyAi { .. } => "assemblyai-universal".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SessionModelOverride {
+    pub session_id: String,
+    pub model: tauri_plugin_local_stt::SupportedModel,
+}
+
+// Runtime-only state: saving any preference cannot serialize recovery overrides.
+pub type SessionModelOverrideState = tokio::sync::Mutex<Option<SessionModelOverride>>;

@@ -1,3 +1,4 @@
+import { customEndpointEnabledQueryOptions } from "@/lib/model-selection";
 import { useMemo } from "react";
 
 import { commands as connectorCommands } from "@typr/plugin-connector";
@@ -31,11 +32,7 @@ export function useAIAvailability() {
   const { hasCloudSelection, isLoading: cloudSelectionLoading, selectedCloudModelId } = useCloudModelSelection();
   const cloudApiKeysQuery = useCloudApiKeys();
 
-  const customEnabledQuery = useQuery({
-    queryKey: ["custom-llm-enabled"],
-    queryFn: () => connectorCommands.getCustomLlmEnabled(),
-    staleTime: 30 * 1000,
-  });
+  const customEnabledQuery = useQuery(customEndpointEnabledQueryOptions());
 
   const customConnectionQuery = useQuery({
     queryKey: ["custom-llm-connection"],

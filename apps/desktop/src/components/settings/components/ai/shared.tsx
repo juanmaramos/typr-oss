@@ -94,10 +94,7 @@ export type CustomFormValues = {
 };
 
 export interface SharedSTTProps {
-  selectedSTTModel: string;
-  setSelectedSTTModel: (model: string) => void;
   sttModels: STTModel[];
-  setSttModels: React.Dispatch<React.SetStateAction<STTModel[]>>;
   downloadingModels: Set<string>;
   handleModelDownload: (modelKey: string) => Promise<void>;
   handleShowFileLocation: (modelType: "stt" | "llm") => Promise<void>;
@@ -105,14 +102,6 @@ export interface SharedSTTProps {
 }
 
 export interface SharedLLMProps {
-  // Core State
-  customLLMEnabled: UseQueryResult<boolean>;
-  selectedLLMModel: string;
-  setSelectedLLMModel: (model: string) => void;
-
-  // Critical Mutations
-  setCustomLLMEnabledMutation: UseMutationResult<null, Error, boolean, unknown>;
-
   // Model State
   downloadingModels: Set<string>;
 
@@ -125,6 +114,8 @@ export interface SharedLLMProps {
 }
 
 export interface SharedCustomEndpointProps extends SharedLLMProps {
+  customLLMEnabled: UseQueryResult<boolean>;
+  setCustomLLMEnabledMutation: UseMutationResult<null, Error, boolean, unknown>;
   // Custom Endpoint Configuration
   configureCustomEndpoint: (config: ConfigureEndpointConfig) => void;
 

@@ -26,6 +26,7 @@ pub type SharedState = std::sync::Arc<tokio::sync::Mutex<State>>;
 pub struct State {
     pub api_base: Option<String>,
     pub server: Option<crate::server::ServerHandle>,
+    pub server_model: Option<SupportedModel>,
     pub download_task: HashMap<SupportedModel, tokio::task::JoinHandle<()>>,
 }
 
@@ -110,6 +111,57 @@ mod test {
                 "./js/bindings.gen.ts",
             )
             .unwrap()
+    }
+
+    #[tokio::test]
+    async fn session_model_server_reuses_or_replaces_the_effective_model() {
+        let mut ctx = tauri::test::mock_context(tauri::test::noop_assets());
+        ctx.config_mut().identifier = format!(
+            "com.typr.oss.runtime-model-selection-test-{}",
+            std::process::id()
+        );
+        let app = tauri::test::mock_builder()
+            .plugin(tauri_plugin_store::Builder::default().build())
+            .manage(SharedState::default())
+            .build(ctx)
+            .unwrap();
+        let preferred = SupportedModel::QuantizedTinyEn;
+        let recovery = SupportedModel::QuantizedBaseEn;
+        let models_dir = app.models_dir();
+        std::fs::create_dir_all(&models_dir).unwrap();
+        // Sparse size-only fixtures: server startup defers model parsing until
+        // an audio connection arrives. No model downloads or audio are needed.
+        for model in [&preferred, &recovery] {
+            std::fs::File::create(models_dir.join(model.file_name()))
+                .unwrap()
+                .set_len(model.model_size())
+                .unwrap();
+        }
+        app.set_current_model(preferred.clone()).unwrap();
+        let initial_server = app.start_server().await.unwrap();
+        assert_eq!(app.start_server().await.unwrap(), initial_server);
+        let recovery_server = app.start_server_for_model(recovery.clone()).await.unwrap();
+        assert_eq!(
+            app.start_server_for_model(recovery.clone()).await.unwrap(),
+            recovery_server
+        );
+        assert_ne!(recovery_server, initial_server);
+        assert_eq!(
+            app.state::<SharedState>().lock().await.server_model,
+            Some(recovery)
+        );
+        assert_eq!(app.get_current_model().unwrap(), preferred);
+        let restored_server = app.start_server().await.unwrap();
+        assert_ne!(restored_server, recovery_server);
+        assert_eq!(
+            app.state::<SharedState>().lock().await.server_model,
+            Some(preferred.clone())
+        );
+        app.stop_server().await.unwrap();
+        for model in [&preferred, &SupportedModel::QuantizedBaseEn] {
+            std::fs::remove_file(models_dir.join(model.file_name())).unwrap();
+        }
+        std::fs::remove_dir(models_dir).unwrap();
     }
 
     fn create_app<R: tauri::Runtime>(builder: tauri::Builder<R>) -> tauri::App<R> {

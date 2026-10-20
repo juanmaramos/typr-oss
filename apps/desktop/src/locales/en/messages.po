@@ -1249,7 +1249,8 @@ msgstr "Cloud transcription"
 #~ msgid "Cloud transcription API keys"
 #~ msgstr "Cloud transcription API keys"
 
-#: src/hooks/useTranscriptionFallback.ts:99
+#: src/hooks/useTranscriptionFallback.ts:126
+#: src/hooks/useTranscriptionFallback.ts:255
 msgid "Cloud transcription failed"
 msgstr "Cloud transcription failed"
 
@@ -1736,7 +1737,8 @@ msgstr "Don't remind me again"
 msgid "Download"
 msgstr "Download"
 
-#: src/components/right-panel/views/transcript-view.tsx:620
+#: src/components/right-panel/views/transcript-view.tsx:577
+#: src/components/transcript/hooks/useSTTModel.ts:88
 msgid "Download a model first"
 msgstr "Download a model first"
 

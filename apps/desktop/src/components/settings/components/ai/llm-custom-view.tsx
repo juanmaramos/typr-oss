@@ -40,8 +40,6 @@ const openrouterModels = [
 
 export function LLMCustomView({
   customLLMEnabled,
-  selectedLLMModel,
-  setSelectedLLMModel,
   setCustomLLMEnabledMutation,
   configureCustomEndpoint,
   openAccordion,
@@ -140,7 +138,6 @@ export function LLMCustomView({
 
     // Enable custom LLM and clear local model selection
     setCustomLLMEnabledMutation.mutate(true);
-    setSelectedLLMModel("");
   };
 
   return (

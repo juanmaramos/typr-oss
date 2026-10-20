@@ -253,7 +253,7 @@ impl ListenClientBuilder {
         self
     }
 
-    fn build_uri(&self, audio_mode: typr_listener_interface::AudioMode) -> String {
+    pub(crate) fn build_uri(&self, audio_mode: typr_listener_interface::AudioMode) -> String {
         let params = typr_listener_interface::ListenParams {
             audio_mode,
             ..self.params.clone().unwrap_or_default()

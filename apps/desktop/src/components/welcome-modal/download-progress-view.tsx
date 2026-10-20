@@ -1,3 +1,4 @@
+import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -26,6 +27,7 @@ export const DownloadProgressView = ({
   onContinue,
 }: DownloadProgressViewProps) => {
   const { t } = useLingui();
+  const modelPreferences = useModelPreferences();
   const { getModel } = useModelState();
   const didStartDownloads = useRef(false);
   const didSetupStt = useRef(false);
@@ -93,8 +95,7 @@ export const DownloadProgressView = ({
 
       didSetupStt.current = true;
       try {
-        await localSttCommands.setCurrentModel(selectedSttModel);
-        await localSttCommands.startServer();
+        await modelPreferences.completeTranscriptionDownload(selectedSttModel);
       } catch (error) {
         didSetupStt.current = false;
         console.error("Error setting up STT:", error);
@@ -108,8 +109,7 @@ export const DownloadProgressView = ({
 
       didSetupLlm.current = true;
       try {
-        await localLlmCommands.setCurrentModel(selectedLlmModel);
-        await localLlmCommands.startServer();
+        await modelPreferences.completeChatDownload(selectedLlmModel);
       } catch (error) {
         didSetupLlm.current = false;
         console.error("Error setting up LLM:", error);
@@ -118,7 +118,7 @@ export const DownloadProgressView = ({
 
     handleSttCompletion();
     handleLlmCompletion();
-  }, [sttCompleted, llmCompleted, selectedLlmModel, selectedSttModel]);
+  }, [sttCompleted, llmCompleted, selectedLlmModel, selectedSttModel, modelPreferences]);
 
   useEffect(() => {
     if (!bothCompleted || didPersistComplete.current) {

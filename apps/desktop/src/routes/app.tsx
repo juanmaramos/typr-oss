@@ -1,3 +1,4 @@
+import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -46,7 +47,6 @@ import { commands } from "@/types";
 import { events as windowsEvents, getCurrentWebviewWindowLabel } from "@typr/plugin-windows";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@typr/ui/components/ui/resizable";
 import { cn } from "@typr/ui/lib/utils";
-import { AUTO_CLOUD_MODEL_ID, LEGACY_WINDOWS_DEFAULT_CLOUD_MODEL_ID } from "@typr/utils";
 import { OngoingSessionProvider, SessionsProvider } from "@typr/utils/contexts";
 import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
@@ -119,7 +119,7 @@ function Component() {
         <OngoingSessionProvider store={ongoingSessionStore}>
           <LayoutProvider>
             <InitializeDefaultModels />
-            <TranscriptionFallbackBridge />
+            {isMain && <TranscriptionFallbackBridge />}
             <MainWindowStateEventSupport />
             <ShortcutsProvider>
               <SettingsDialogProvider>
@@ -270,47 +270,12 @@ function TranscriptionFallbackBridge() {
 }
 
 function InitializeDefaultModels() {
-  const queryClient = useQueryClient();
-
+  const { initializePlatformDefaults } = useModelPreferences();
   useEffect(() => {
-    const initializeModels = async () => {
-      try {
-        const osType = await getOsType();
-        const currentSttModel = await connectorCommands.getSttModel().catch(() => "");
-
-        // Only on Windows, ensure cloud models are set
-        if (osType === "windows") {
-          // Force cloud STT model on Windows if local model is set or empty
-          const isLocalSttModel = !currentSttModel || !currentSttModel.includes("assemblyai");
-
-          if (isLocalSttModel) {
-            await connectorCommands.setSttModel("assemblyai-universal");
-            queryClient.invalidateQueries({ queryKey: ["stt-model-connector"] });
-          }
-
-          const currentLlmModel = await connectorCommands.getCloudModel().catch(() => "");
-
-          // Force cloud Auto when no model is configured or a legacy default is still stored.
-          if (
-            !currentLlmModel
-            || currentLlmModel === "groq-openai/gpt-oss-20b"
-            || currentLlmModel === LEGACY_WINDOWS_DEFAULT_CLOUD_MODEL_ID
-          ) {
-            await connectorCommands.setCloudModel(AUTO_CLOUD_MODEL_ID);
-
-            // Invalidate queries to update UI immediately
-            queryClient.invalidateQueries({ queryKey: ["cloud-model"] });
-            queryClient.invalidateQueries({ queryKey: ["models"] });
-          }
-        }
-      } catch (error) {
-        console.error("[Model Init] Failed to initialize default models:", error);
-      }
-    };
-
-    initializeModels();
-  }, [queryClient]);
-
+    initializePlatformDefaults(getOsType()).catch((error) => {
+      console.error("[Model Init] Failed to initialize default models:", error);
+    });
+  }, [initializePlatformDefaults]);
   return null;
 }
 
@@ -335,6 +300,7 @@ function MainWindowStateEventSupport() {
 }
 
 function DeepLinkHandler() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const search = useSearch({ from: "/app" });
   const { openDialog } = useSettingsDialog();
@@ -359,6 +325,10 @@ function DeepLinkHandler() {
             api_key: search.apiKey,
           });
           await connectorCommands.setCustomLlmEnabled(true);
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ["custom-llm-enabled"] }),
+            queryClient.invalidateQueries({ queryKey: ["custom-llm-connection"] }),
+          ]);
         } catch (error) {
           console.error("Failed to configure custom LLM from deep link:", error);
         }

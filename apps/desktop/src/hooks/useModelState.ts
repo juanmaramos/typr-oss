@@ -1,4 +1,5 @@
-import { commands as connectorCommands } from "@typr/plugin-connector";
+import { useQuery } from "@tanstack/react-query";
+import { transcriptionModelQueryOptions, localTranscriptionModelQueryOptions } from "@/lib/model-selection";
 import { commands as localLlmCommands } from "@typr/plugin-local-llm";
 import { commands as localSttCommands } from "@typr/plugin-local-stt";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
@@ -34,78 +35,15 @@ export interface ModelInfo {
 
 type ModelStateMap = Record<string, ModelInfo>;
 
-interface SttSelectionEvent {
-  local_model: string | null;
-  cloud_model: string | null;
-}
-
 export function useModelState() {
   const [models, setModels] = useState<ModelStateMap>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedLocalModel, setSelectedLocalModel] = useState<string | null>(null);
-  const [selectedCloudModel, setSelectedCloudModel] = useState<string | null>(null);
-  const [selectionLoading, setSelectionLoading] = useState(true);
-
-  // Load initial model selection and listen for changes
-  useEffect(() => {
-    let disposed = false;
-    let selectionUnlisten: UnlistenFn;
-
-    const setup = async () => {
-      try {
-        // Load initial selection state
-        const [currentLocal, currentCloud] = await Promise.all([
-          localSttCommands.getCurrentModel().catch(() => null),
-          connectorCommands.getSttModel().catch(() => ""),
-        ]);
-
-        if (!disposed) {
-          if (currentLocal) {
-            setSelectedLocalModel(currentLocal.toString());
-          }
-          if (currentCloud && currentCloud.trim() !== "") {
-            const isCloud = currentCloud.includes("assemblyai");
-            if (isCloud) {
-              setSelectedCloudModel(currentCloud);
-            } else {
-              // connector store has a local model key
-              setSelectedLocalModel(currentCloud);
-            }
-          }
-          debugLogFor("DEBUG_MODEL", "ModelDebug", "init", { local: currentLocal?.toString(), cloud: currentCloud });
-          setSelectionLoading(false);
-        }
-
-        // Listen for selection changes from backend
-        selectionUnlisten = await listen<SttSelectionEvent>("stt-model-selection-changed", (event) => {
-          const { local_model, cloud_model } = event.payload;
-          debugLogFor("DEBUG_MODEL", "ModelDebug", "selection changed", { local_model, cloud_model });
-          if (local_model) {
-            setSelectedLocalModel(local_model);
-            setSelectedCloudModel(null);
-          } else if (cloud_model) {
-            setSelectedCloudModel(cloud_model);
-            setSelectedLocalModel(null);
-          }
-        });
-        if (disposed) {
-          safeUnlisten(selectionUnlisten, "useModelState.selection.listener.late-dispose");
-        }
-      } catch (error) {
-        console.error("Failed to setup model selection listener:", error);
-        if (!disposed) {
-          setSelectionLoading(false);
-        }
-      }
-    };
-
-    setup();
-
-    return () => {
-      disposed = true;
-      safeUnlisten(selectionUnlisten, "useModelState.selection.listener");
-    };
-  }, []);
+  const preferenceQuery = useQuery(transcriptionModelQueryOptions());
+  const localPreferenceQuery = useQuery(localTranscriptionModelQueryOptions());
+  const preference = preferenceQuery.data || localPreferenceQuery.data || null;
+  const selectedCloudModel = preference?.includes("assemblyai") ? preference : null;
+  const selectedLocalModel = selectedCloudModel ? null : preference;
+  const selectionLoading = preferenceQuery.isLoading || localPreferenceQuery.isLoading;
 
   useEffect(() => {
     let disposed = false;

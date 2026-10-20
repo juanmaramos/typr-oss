@@ -116,18 +116,17 @@ async setSttModel(model: string) : Promise<null> {
     return await TAURI_INVOKE("plugin:connector|set_stt_model", { model });
 },
 /**
- * Set a transient session-level STT model override. This is NOT saved to disk.
- * Used by fallback logic to switch models mid-session without touching the user's preference.
- * Clear it with `clear_stt_model_session` when the session ends.
+ * Set a transient recovery model for one recording session without saving preferences.
+ * Other recording sessions and uploads continue to use the durable default.
  */
-async setSttModelSession(model: string) : Promise<null> {
-    return await TAURI_INVOKE("plugin:connector|set_stt_model_session", { model });
+async setSttModelSession(sessionId: string, model: string) : Promise<null> {
+    return await TAURI_INVOKE("plugin:connector|set_stt_model_session", { sessionId, model });
 },
 /**
- * Clear the transient session STT model override, restoring the user's persisted preference.
+ * Clear only the matching session's recovery model without changing its saved default.
  */
-async clearSttModelSession() : Promise<null> {
-    return await TAURI_INVOKE("plugin:connector|clear_stt_model_session");
+async clearSttModelSession(sessionId: string) : Promise<null> {
+    return await TAURI_INVOKE("plugin:connector|clear_stt_model_session", { sessionId });
 },
 async getCloudModel() : Promise<string> {
     return await TAURI_INVOKE("plugin:connector|get_cloud_model");

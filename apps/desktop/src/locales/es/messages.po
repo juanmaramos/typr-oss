@@ -1249,7 +1249,8 @@ msgstr "Transcripción en la nube"
 #~ msgid "Cloud transcription API keys"
 #~ msgstr "Claves de API de transcripción en la nube"
 
-#: src/hooks/useTranscriptionFallback.ts:99
+#: src/hooks/useTranscriptionFallback.ts:126
+#: src/hooks/useTranscriptionFallback.ts:255
 msgid "Cloud transcription failed"
 msgstr "Falló la transcripción en la nube"
 
@@ -1736,7 +1737,8 @@ msgstr "No recordar de nuevo"
 msgid "Download"
 msgstr "Descargar"
 
-#: src/components/right-panel/views/transcript-view.tsx:620
+#: src/components/right-panel/views/transcript-view.tsx:577
+#: src/components/transcript/hooks/useSTTModel.ts:88
 msgid "Download a model first"
 msgstr "Descarga un modelo primero"
 

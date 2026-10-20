@@ -7,6 +7,19 @@ Platform support:
 - macOS supports local STT, local LLMs, and BYOK cloud providers.
 - Windows builds are cloud-first. Local models are currently hidden because performance and runtime compatibility vary across Windows devices. BYOK cloud chat and AssemblyAI transcription remain supported.
 
+## Selection ownership
+
+`apps/desktop/src/lib/model-selection.ts` is the desktop entry point for durable model selections. Settings cards, Defaults pickers, transcript controls, onboarding, platform initialization, and download completion call this controller rather than writing preferences themselves. React Query owns the shared selection state; components derive selection from the canonical query options instead of copying preferences into local state.
+
+- Selecting local chat saves the native model, updates a running local server when needed, and clears cloud/Auto and legacy custom-endpoint selection. A failed local save preserves the prior cloud preference.
+- Selecting cloud chat or Auto updates the cloud preference. Project brief and meeting summary overrides remain independent; a null override follows Chat and Ask. Task updates read the latest saved defaults before changing one field.
+- Selecting transcription writes through native commands. Defaults and Use cards observe the same connector preference; native local-model queries use a separate canonical key.
+- Successful downloads retain the existing auto-select and server warm-up policy, using the same operations as manual selection.
+- Every selection refreshes canonical queries even after partial failure. Native transcription events and controller broadcasts refresh other webviews; each webview mounts one synchronization listener bridge.
+- Rust owns persistence, native model loading, and transcription recovery scoped to a recording session ID. Each recording setup captures one effective model/provider selection and uses it for both the connection and request parameters. Another recording or an upload uses its own saved default and cannot inherit that recovery model. The override is cleared when its session ends; reconnecting the same session retains it. Only the main webview orchestrates recovery.
+
+The request-time resolver in `packages/utils/src/ai.ts` remains responsible for resolving feature overrides, task defaults, cloud Auto, and local runtime routing. Selection changes do not duplicate that resolution policy in React.
+
 ## Local STT
 
 Local speech-to-text models are downloaded on demand from public Hugging Face repositories. The OSS app does not use private S3 mirrors for model files.

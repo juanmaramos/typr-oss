@@ -1,13 +1,14 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
-import { debugLogFor } from "@/components/utils/debug-logger";
-import { commands as localLlmCommands, type SupportedModel } from "@typr/plugin-local-llm";
+import { localChatModelQueryOptions } from "@/lib/model-selection";
+import { useModelPreferences } from "./useModelPreferences";
+import { type SupportedModel } from "@typr/plugin-local-llm";
 import { AUTO_MODEL_ID, useCloudModelSelection } from "./useCloudModelSelection";
-import { isGroqModel, useGroqModels } from "./useGroqModels";
+import { useGroqModels } from "./useGroqModels";
 import { useModelRegistry } from "./useModelRegistry";
-import { isOpenAIModel, useOpenAIModels } from "./useOpenAIModels";
-import { isOpenRouterModel, useOpenRouterModels } from "./useOpenRouterModels";
+import { useOpenAIModels } from "./useOpenAIModels";
+import { useOpenRouterModels } from "./useOpenRouterModels";
 
 import { ModelOption, ModelProvider, ModelType } from "../types/models";
 
@@ -17,18 +18,10 @@ import { ModelOption, ModelProvider, ModelType } from "../types/models";
 export function useLocalModels() {
   const { selectableModels: models, isLoading: modelsLoading, error: modelsError, refetch: refetchModels } =
     useModelRegistry();
-  const { hasCloudSelection, isLoading: cloudSelectionLoading } = useCloudModelSelection();
+  const { hasCloudSelection, isAutoMode, isLoading: cloudSelectionLoading } = useCloudModelSelection();
 
   // Get current selected model
-  const currentModelQuery = useQuery({
-    queryKey: ["models", "current"],
-    queryFn: async () => {
-      const result = await localLlmCommands.getCurrentModel();
-      debugLogFor("DEBUG_MODEL", "ModelDebug", "current model from backend", { model: result });
-      return result;
-    },
-    staleTime: 30 * 1000,
-  });
+  const currentModelQuery = useQuery(localChatModelQueryOptions());
 
   // Transform for legacy compatibility (clean approach)
   const localModelOptions = useMemo((): ModelOption[] => {
@@ -41,12 +34,12 @@ export function useLocalModels() {
       isDownloaded: model.isDownloaded,
       isDownloading: model.isDownloading,
       // If cloud model is selected, no local model should show as selected
-      isSelected: !hasCloudSelection && currentModelQuery.data === model.id,
+      isSelected: !hasCloudSelection && !isAutoMode && currentModelQuery.data === model.id,
       description: model.description,
       size: model.size,
       customIcon: model.icon,
     }));
-  }, [models, currentModelQuery.data, hasCloudSelection]);
+  }, [models, currentModelQuery.data, hasCloudSelection, isAutoMode]);
 
   return {
     models: localModelOptions,
@@ -101,67 +94,19 @@ export function useCustomModels() {
  * 🎯 CLEAN: Model selection actions
  */
 export function useModelSelection() {
-  const queryClient = useQueryClient();
-  const { selectCloudModel, clearCloudSelection } = useCloudModelSelection();
-
-  const selectLocalModel = useCallback(async (modelId: SupportedModel) => {
-    try {
-      // Clear any cloud model selection when selecting local model
-      await clearCloudSelection();
-
-      const previousModel = await localLlmCommands.getCurrentModel().catch(() => null);
-      await localLlmCommands.setCurrentModel(modelId);
-
-      const isServerRunning = await localLlmCommands.isServerRunning().catch(() => false);
-      if (isServerRunning && previousModel !== modelId) {
-        debugLogFor("DEBUG_MODEL", "ModelDebug", "restarting local LLM server for selected model", {
-          previousModel,
-          modelId,
-        });
-        await localLlmCommands.restartServer();
-      }
-
-      // Invalidate model queries
-      queryClient.invalidateQueries({ queryKey: ["models", "current"] });
-      queryClient.invalidateQueries({ queryKey: ["cloud-model", "current"] });
-      queryClient.invalidateQueries({ queryKey: ["models"] });
-    } catch (error) {
-      console.error("❌ Failed to select local model:", error);
-      throw error;
-    }
-  }, [queryClient, clearCloudSelection]);
-
+  const { selectLocalChat, selectCloudChat } = useModelPreferences();
   const selectModel = useCallback(async (model: ModelOption) => {
     if (model.type === ModelType.LOCAL) {
-      const modelId = model.id.replace("local-", "") as SupportedModel;
-      await selectLocalModel(modelId);
-    } else if (model.type === ModelType.CLOUD && !model.isAvailable) {
-      throw new Error("cloud_api_key_missing");
-    } else if (model.type === ModelType.CLOUD && isOpenAIModel(model.id)) {
-      // Select cloud model first - no need to clear local model
-      // The cloud model selection takes precedence in the AI provider logic
-      await selectCloudModel(model.id);
-
-      // Force invalidate local model queries
-      queryClient.invalidateQueries({ queryKey: ["models", "current"] });
-    } else if (model.type === ModelType.CLOUD && isGroqModel(model.id)) {
-      // Select cloud model first - no need to clear local model
-      // The cloud model selection takes precedence in the AI provider logic
-      await selectCloudModel(model.id);
-
-      // Force invalidate local model queries
-      queryClient.invalidateQueries({ queryKey: ["models", "current"] });
-    } else if (model.type === ModelType.CLOUD && isOpenRouterModel(model.id)) {
-      await selectCloudModel(model.id);
-
-      queryClient.invalidateQueries({ queryKey: ["models", "current"] });
+      await selectLocalChat(model.id.replace(/^local-/, "") as SupportedModel);
+    } else if (model.type === ModelType.CLOUD) {
+      if (!model.isAvailable) {
+        throw new Error("cloud_api_key_missing");
+      }
+      await selectCloudChat(model.id);
     }
-  }, [selectLocalModel, selectCloudModel, queryClient]);
+  }, [selectLocalChat, selectCloudChat]);
 
-  return {
-    selectModel,
-    selectLocalModel,
-  };
+  return { selectModel, selectLocalModel: selectLocalChat };
 }
 
 /**

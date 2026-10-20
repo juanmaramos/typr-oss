@@ -21,8 +21,7 @@ pub enum StoreKey {
     GeminiModel,
     OpenrouterModel,
     SttModel,
-    SttModelSession, // Transient: active model override for current session only (not saved to disk)
-    CloudModel,      // Selected cloud model (OpenAI, etc.)
+    CloudModel, // Selected cloud model (OpenAI, etc.)
     AiTaskDefaults,
 }
 

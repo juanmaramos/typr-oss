@@ -1,6 +1,6 @@
-import { commands as connectorCommands } from "@typr/plugin-connector";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useModelPreferences } from "./useModelPreferences";
+import { cloudChatModelQueryOptions } from "@/lib/model-selection";
 
 /** Sentinel value stored when user selects Auto mode */
 export const AUTO_MODEL_ID = "auto";
@@ -19,44 +19,16 @@ export const AUTO_MODEL_ID = "auto";
  * immediately displayed as Auto after the cloud model selection is cleared.
  */
 export function useCloudModelSelection() {
-  const queryClient = useQueryClient();
-
-  // Get current cloud model selection from store.
-  const cloudModelQuery = useQuery({
-    queryKey: ["cloud-model", "current"],
-    queryFn: async () => {
-      const result = await connectorCommands.getCloudModel();
-      return result?.trim() ?? "";
-    },
-    staleTime: 30 * 1000,
-  });
-
-  const selectCloudModel = useCallback(async (modelId: string) => {
-    await connectorCommands.setCloudModel(modelId);
-
-    // Invalidate relevant queries to trigger re-renders
-    queryClient.invalidateQueries({ queryKey: ["cloud-model", "current"] });
-    queryClient.invalidateQueries({ queryKey: ["models", "current"] });
-    queryClient.invalidateQueries({ queryKey: ["models"] });
-  }, [queryClient]);
-
-  const clearCloudSelection = useCallback(async () => {
-    await connectorCommands.setCloudModel("");
-
-    // Invalidate queries
-    queryClient.invalidateQueries({ queryKey: ["cloud-model", "current"] });
-    queryClient.invalidateQueries({ queryKey: ["models", "current"] });
-    queryClient.invalidateQueries({ queryKey: ["models"] });
-  }, [queryClient]);
+  const { selectCloudChat } = useModelPreferences();
+  const cloudModelQuery = useQuery(cloudChatModelQueryOptions());
 
   const selectedCloudModelId = cloudModelQuery.data ?? "";
   const isAutoMode = selectedCloudModelId === AUTO_MODEL_ID;
 
   return {
     selectedCloudModelId,
-    selectCloudModel,
-    clearCloudSelection,
-    hasCloudSelection: selectedCloudModelId.length > 0 && selectedCloudModelId !== AUTO_MODEL_ID,
+    selectCloudModel: selectCloudChat,
+    hasCloudSelection: selectedCloudModelId.length > 0 && !isAutoMode,
     isAutoMode,
     isLoading: cloudModelQuery.isLoading,
   };

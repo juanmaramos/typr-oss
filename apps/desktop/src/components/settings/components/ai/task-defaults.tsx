@@ -1,12 +1,14 @@
+import { useModelPreferences } from "@/hooks/useModelPreferences";
+import { aiTaskDefaultsQueryOptions, transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { SETTINGS_LOCAL_STT_MODEL_KEYS, sttModelMetadata } from "@/components/transcript/constants/languageData";
 import { useModelState } from "@/hooks/useModelState";
 import { useAllModels, useCustomModels, useModelSelection, useModelSelectionState } from "@/hooks/useModels";
 import { usePlatform } from "@/hooks/usePlatform";
 import { ModelType, type ModelOption } from "@/types/models";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { commands as connectorCommands } from "@typr/plugin-connector";
-import { commands as localSttCommands, type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
+import { type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@typr/ui/components/ui/select";
 import { cn } from "@typr/ui/lib/utils";
 import { AUTO_CLOUD_MODEL_ID, normalizeAiTaskDefaults, type AiTaskDefaults, type AiTextTask } from "@typr/utils";
@@ -15,7 +17,6 @@ import type { ReactNode } from "react";
 
 const FOLLOW_CHAT_VALUE = "__follow_chat__";
 const ASSEMBLYAI_STT_MODEL = "assemblyai-universal";
-const DEFAULT_LOCAL_STT_MODEL = "QuantizedLargeTurbo";
 
 type TextTaskRow = {
   description: ReactNode;
@@ -25,8 +26,6 @@ type TextTaskRow = {
   task: Exclude<AiTextTask, "chat">;
 };
 
-const aiTaskDefaultsQueryKey = ["ai-task-defaults"] as const;
-const sttModelQueryKey = ["stt-model-connector"] as const;
 const cloudSttApiKeysQueryKey = ["cloud-stt-api-keys"] as const;
 
 function getModelOptionLabel(model: ModelOption | null | undefined, fallback = "") {
@@ -77,7 +76,7 @@ function isSettingsLocalSttModel(modelId: string): modelId is SupportedSttModel 
 
 export function AiTaskDefaultsSettings() {
   const { t } = useLingui();
-  const queryClient = useQueryClient();
+  const { selectTranscription, setTaskDefault } = useModelPreferences();
   const { supportsLocalModels } = usePlatform();
   const { getModel: getModelState, isLoading: modelStateLoading } = useModelState();
   const { allModels, selectedModel, isAutoMode, isLoading: allModelsLoading } = useAllModels();
@@ -85,14 +84,8 @@ export function AiTaskDefaultsSettings() {
   const { selectModel } = useModelSelection();
   const { setAutoMode } = useModelSelectionState();
 
-  const defaultsQuery = useQuery({
-    queryKey: aiTaskDefaultsQueryKey,
-    queryFn: () => connectorCommands.getAiTaskDefaults(),
-  });
-  const sttModelQuery = useQuery({
-    queryKey: sttModelQueryKey,
-    queryFn: () => connectorCommands.getSttModel(),
-  });
+  const defaultsQuery = useQuery(aiTaskDefaultsQueryOptions());
+  const sttModelQuery = useQuery(transcriptionModelQueryOptions());
   const cloudSttApiKeysQuery = useQuery({
     queryKey: cloudSttApiKeysQueryKey,
     queryFn: async () => ({
@@ -121,10 +114,7 @@ export function AiTaskDefaultsSettings() {
   ];
 
   const updateDefaultsMutation = useMutation({
-    mutationFn: (nextDefaults: AiTaskDefaults) => connectorCommands.setAiTaskDefaults(normalizeAiTaskDefaults(nextDefaults)),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: aiTaskDefaultsQueryKey });
-    },
+    mutationFn: ({ task, model }: { task: keyof AiTaskDefaults; model: string | null }) => setTaskDefault(task, model),
   });
 
   const updateChatDefault = async (value: string) => {
@@ -143,10 +133,7 @@ export function AiTaskDefaultsSettings() {
 
   const updateTextTaskDefault = (keyName: keyof AiTaskDefaults, value: string) => {
     const nextValue = value === FOLLOW_CHAT_VALUE ? null : value;
-    updateDefaultsMutation.mutate({
-      ...defaults,
-      [keyName]: nextValue,
-    });
+    updateDefaultsMutation.mutate({ task: keyName, model: nextValue });
   };
 
   const updateTranscriptionDefault = async (value: string) => {
@@ -158,58 +145,13 @@ export function AiTaskDefaultsSettings() {
       if (!isSettingsLocalSttModel(value) || !getModelState(value)?.isDownloaded) {
         return;
       }
-
-      await localSttCommands.setCurrentModel(value as SupportedSttModel);
     }
 
-    await connectorCommands.setSttModel(value);
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: sttModelQueryKey }),
-      queryClient.invalidateQueries({ queryKey: ["stt-local-model"] }),
-      queryClient.invalidateQueries({ queryKey: ["stt-model", "current"] }),
-    ]);
+    await selectTranscription(value as SupportedSttModel | "assemblyai-universal");
   };
 
   const hasAssemblyAiApiKey = (cloudSttApiKeysQuery.data?.assemblyai ?? "").trim().length > 0;
-  const downloadedLocalSttValue = useMemo(() => {
-    if (modelStateLoading) {
-      return undefined;
-    }
-
-    const orderedLocalModels: SupportedSttModel[] = [
-      DEFAULT_LOCAL_STT_MODEL,
-      ...SETTINGS_LOCAL_STT_MODEL_KEYS.filter(modelKey => modelKey !== DEFAULT_LOCAL_STT_MODEL),
-    ];
-
-    return orderedLocalModels.find(modelKey => getModelState(modelKey)?.isDownloaded);
-  }, [getModelState, modelStateLoading]);
-  const storedTranscriptionValue = sttModelQuery.data?.trim();
-  const preferredTranscriptionValue = storedTranscriptionValue
-    || (supportsLocalModels ? DEFAULT_LOCAL_STT_MODEL : ASSEMBLYAI_STT_MODEL);
-  const preferredLocalModelState = isSettingsLocalSttModel(preferredTranscriptionValue)
-    ? getModelState(preferredTranscriptionValue)
-    : undefined;
-  const transcriptionValue = (() => {
-    if (preferredTranscriptionValue === ASSEMBLYAI_STT_MODEL) {
-      if (!hasAssemblyAiApiKey && supportsLocalModels && downloadedLocalSttValue) {
-        return downloadedLocalSttValue;
-      }
-
-      return preferredTranscriptionValue;
-    }
-
-    if (
-      !modelStateLoading
-      && supportsLocalModels
-      && isSettingsLocalSttModel(preferredTranscriptionValue)
-      && !preferredLocalModelState?.isDownloaded
-      && downloadedLocalSttValue
-    ) {
-      return downloadedLocalSttValue;
-    }
-
-    return preferredTranscriptionValue;
-  })();
+  const transcriptionValue = sttModelQuery.data ?? "";
   const chatModelLabel = chatModelValue === AUTO_CLOUD_MODEL_ID
     ? t`Auto`
     : getModelNameLabel(selectedModel ?? allModels.find(model => model.id === chatModelValue), chatModelValue);

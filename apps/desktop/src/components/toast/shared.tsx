@@ -1,3 +1,4 @@
+import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { Trans } from "@lingui/react/macro";
 import { QueryClient, useQuery } from "@tanstack/react-query";
 import { Channel } from "@tauri-apps/api/core";
@@ -133,6 +134,7 @@ function SttModelDownloadToastContent({
   toastId: string;
 }) {
   const { getModel } = useModelState();
+  const modelPreferences = useModelPreferences();
   const completedRef = useRef(false);
   const modelState = getModel(model);
   const progress = modelState?.isDownloaded ? 100 : modelState?.progress || 0;
@@ -150,8 +152,7 @@ function SttModelDownloadToastContent({
     completedRef.current = true;
     void (async () => {
       sonnerToast.dismiss(toastId);
-      await localSttCommands.setCurrentModel(model);
-      await localSttCommands.startServer();
+      await modelPreferences.completeTranscriptionDownload(model);
 
       if (queryClient) {
         queryClient.invalidateQueries({ queryKey: ["stt-model-downloading"] });
@@ -161,7 +162,7 @@ function SttModelDownloadToastContent({
 
       onComplete?.();
     })().catch(console.error);
-  }, [model, modelState?.isDownloaded, onComplete, queryClient, toastId]);
+  }, [model, modelState?.isDownloaded, modelPreferences, onComplete, queryClient, toastId]);
 
   if (error) {
     return (
@@ -210,6 +211,7 @@ function LlmModelDownloadToastContent({
   toastId: string;
 }) {
   const { getModel } = useModelState();
+  const modelPreferences = useModelPreferences();
   const completedRef = useRef(false);
   const modelState = getModel(model);
   const progress = modelState?.isDownloaded ? 100 : modelState?.progress || 0;
@@ -232,20 +234,16 @@ function LlmModelDownloadToastContent({
     completedRef.current = true;
     void (async () => {
       sonnerToast.dismiss(toastId);
-      await localLlmCommands.setCurrentModel(model);
-      await localLlmCommands.startServer();
+      await modelPreferences.completeChatDownload(model);
 
       if (queryClient) {
-        queryClient.invalidateQueries({ queryKey: ["models"] });
-        queryClient.invalidateQueries({ queryKey: ["models", "current"] });
-        queryClient.invalidateQueries({ queryKey: ["cloud-model", "current"] });
         queryClient.invalidateQueries({ queryKey: ["llm-model-downloading"] });
         queryClient.invalidateQueries({ queryKey: ["check-model-downloaded"] });
       }
 
       onComplete?.();
     })().catch(console.error);
-  }, [model, modelState?.isDownloaded, onComplete, queryClient, toastId]);
+  }, [model, modelState?.isDownloaded, modelPreferences, onComplete, queryClient, toastId]);
 
   if (error) {
     return (

@@ -6,7 +6,8 @@ import { debugLogFor } from "@/components/utils/debug-logger";
 import { useTypr } from "@/contexts";
 import { safeAnalyticsEvent } from "@/utils/analytics-safe";
 import { safeUnlisten } from "@/utils/safe-unlisten";
-import { commands as localSttCommands } from "@typr/plugin-local-stt";
+import { commands as localSttCommands, type SupportedModel } from "@typr/plugin-local-stt";
+import { commands as connectorCommands } from "@typr/plugin-connector";
 import { sonnerToast } from "@typr/ui/components/ui/toast";
 import { useOngoingSession } from "@typr/utils/contexts";
 
@@ -26,14 +27,40 @@ export function useTranscriptionFallback(props?: UseTranscriptionFallbackProps) 
   const { userId } = useTypr();
   const reconnectToastId = "cloud-stt-reconnecting";
   const reconnectStateRef = useRef<"idle" | "scheduled" | "started">("idle");
+  const pendingFallback = useRef<{
+    sessionId: string;
+    model: SupportedModel;
+    phase: "stopping" | "preparing" | "starting";
+  } | null>(null);
+  const checkingFallback = useRef(false);
+  const ownedOverride = useRef<string | null>(null);
+  const clearOverride = useCallback(async (sessionId = ownedOverride.current) => {
+    if (!sessionId) {
+      return;
+    }
+    await connectorCommands.clearSttModelSession(sessionId);
+    if (ownedOverride.current === sessionId) {
+      ownedOverride.current = null;
+    }
+  }, []);
+  const mounted = useRef(true);
   const ongoingSession = useOngoingSession((s) => ({
     sessionId: s.sessionId,
     status: s.status,
+    loading: s.loading,
     start: s.start,
     stop: s.stop,
   }));
 
+  const currentSession = useRef(ongoingSession);
+  currentSession.current = ongoingSession;
+
   const handleCloudFailure = useCallback(async (errorType: string, failedModel: string) => {
+    const failedSessionId = currentSession.current.sessionId;
+    if (!failedSessionId || currentSession.current.status === "inactive" || currentSession.current.loading || checkingFallback.current || pendingFallback.current) {
+      return false;
+    }
+    checkingFallback.current = true;
     // Cloud model failed - find best local fallback
     const localModels = LANGUAGE_OPTIONS.filter(o => o.isLocal);
     let bestFallback: (typeof LANGUAGE_OPTIONS)[number] | null = null;
@@ -43,7 +70,7 @@ export function useTranscriptionFallback(props?: UseTranscriptionFallbackProps) 
       const option = localModels.find(o => o.key === model);
       if (option) {
         try {
-          const isDownloaded = await localSttCommands.isModelDownloaded(option.modelKey as any);
+          const isDownloaded = await localSttCommands.isModelDownloaded(option.modelKey as SupportedModel);
           if (isDownloaded) {
             bestFallback = option;
             break;
@@ -52,6 +79,12 @@ export function useTranscriptionFallback(props?: UseTranscriptionFallbackProps) 
           console.warn(`Failed to check model ${option.key}:`, error);
         }
       }
+    }
+
+    checkingFallback.current = false;
+    const latestSession = { ...currentSession.current };
+    if (!mounted.current || latestSession.sessionId !== failedSessionId || latestSession.status === "inactive" || latestSession.loading) {
+      return false;
     }
 
     if (bestFallback) {
@@ -77,19 +110,13 @@ export function useTranscriptionFallback(props?: UseTranscriptionFallbackProps) 
         });
       }
 
-      // Switch to fallback model using direct commands (avoid circular dependencies)
       if ("modelKey" in bestFallback) {
-        await localSttCommands.setCurrentModel(bestFallback.modelKey as any);
-        debugLogFor("DEBUG_STT", "SttDebug", "fallback to local model", { model: bestFallback.key });
-
-        // Restart current session with local model
-        if (ongoingSession.sessionId && ongoingSession.status !== "inactive") {
-          ongoingSession.stop();
-          setTimeout(() => {
-            ongoingSession.start(ongoingSession.sessionId!);
-            debugLogFor("DEBUG_STT", "SttDebug", "session restarted with local model", { model: bestFallback.key });
-          }, 500);
-        }
+        pendingFallback.current = {
+          sessionId: failedSessionId,
+          model: bestFallback.modelKey as SupportedModel,
+          phase: "stopping",
+        };
+        currentSession.current.stop();
       }
       return true;
     } else {
@@ -117,7 +144,7 @@ export function useTranscriptionFallback(props?: UseTranscriptionFallbackProps) 
 
       return false;
     }
-  }, [t, userId, ongoingSession]);
+  }, [t, userId]);
 
   // Listen for backend failure events
   useEffect(() => {
@@ -188,17 +215,61 @@ export function useTranscriptionFallback(props?: UseTranscriptionFallbackProps) 
     };
   }, [handleCloudFailure]);
 
-  // When the session ends, clear any transient session model override so the next
-  // session starts fresh with the user's persisted preference.
+  // Native overrides belong to one recording session. Wait for stop to finish,
+  // then install recovery for that session before asking the native runtime to start it.
   useEffect(() => {
-    if (ongoingSession.status === "inactive") {
-      import("@typr/plugin-connector").then(({ commands: connectorCommands }) => {
-        connectorCommands.clearSttModelSession().catch((err) => {
-          console.warn("[FALLBACK] Failed to clear session model override:", err);
-        });
-      });
+    if (ongoingSession.loading) {
+      return;
     }
-  }, [ongoingSession.status]);
+    const pending = pendingFallback.current;
+    if (ongoingSession.status !== "inactive") {
+      if (pending?.phase !== "preparing") {
+        pendingFallback.current = null;
+      }
+      if (ownedOverride.current && ongoingSession.sessionId !== ownedOverride.current) {
+        void clearOverride().catch(console.error);
+      }
+      return;
+    }
+    if (pending?.phase === "preparing") {
+      return;
+    }
+    if (pending?.phase === "stopping") {
+      pending.phase = "preparing";
+      ownedOverride.current = pending.sessionId;
+      void (async () => {
+        await connectorCommands.setSttModelSession(pending.sessionId, pending.model);
+        const current = currentSession.current;
+        if (!mounted.current || current.status !== "inactive" || current.loading) {
+          pendingFallback.current = null;
+          await clearOverride(pending.sessionId);
+          return;
+        }
+        pending.phase = "starting";
+        current.start(pending.sessionId);
+        debugLogFor("DEBUG_STT", "SttDebug", "session restarted with local model", { model: pending.model });
+      })().catch((error) => {
+        pendingFallback.current = null;
+        void clearOverride(pending.sessionId).catch(console.error);
+        console.error("[FALLBACK] Local recovery failed:", error);
+        sonnerToast.error(t`Cloud transcription failed`);
+      });
+      return;
+    }
+    pendingFallback.current = null;
+    void clearOverride().catch((error) => {
+      console.warn("[FALLBACK] Failed to clear session model override:", error);
+    });
+  }, [ongoingSession.status, ongoingSession.loading, ongoingSession.sessionId, clearOverride, t]);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      pendingFallback.current = null;
+      void clearOverride().catch(console.error);
+    };
+  }, [clearOverride]);
 
   return { handleCloudFailure };
 }
