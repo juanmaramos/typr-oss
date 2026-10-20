@@ -263,7 +263,7 @@ export function SelectionActions({
       <BubbleMenu
         editor={editor}
         pluginKey="selectionActions"
-        updateDelay={0}
+        updateDelay={200}
         shouldShow={({ editor, view, state, element, from, to }) =>
           editor.isEditable && !state.selection.empty && !!state.doc.textBetween(from, to).trim()
           && (view.hasFocus() || element.contains(document.activeElement) || submenuOpen.current)}

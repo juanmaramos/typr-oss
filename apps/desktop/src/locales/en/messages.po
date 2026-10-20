@@ -2510,7 +2510,7 @@ msgstr "Disconnect failed"
 msgid "Disconnecting..."
 msgstr "Disconnecting..."
 
-#: ../../packages/ui/src/components/ui/toast.tsx:37
+#: ../../packages/ui/src/components/ui/toast.tsx:39
 #: src/components/audio-upload-toast.tsx:184
 #: src/components/audio-upload-toast.tsx:211
 #: src/components/toast/changelog.tsx:65
@@ -4127,7 +4127,7 @@ msgstr "notes"
 msgid "Notes"
 msgstr "Notes"
 
-#: ../../packages/ui/src/components/ui/toast.tsx:101
+#: ../../packages/ui/src/components/ui/toast.tsx:106
 #: src/components/settings-dialog/content.tsx:36
 #: src/components/settings-dialog/sidebar.tsx:32
 msgid "Notifications"

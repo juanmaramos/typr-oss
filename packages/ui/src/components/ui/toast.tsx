@@ -4,6 +4,8 @@ import { useTheme } from "next-themes";
 import React from "react";
 import { toast as sonnerToast, Toaster as Sonner } from "sonner";
 
+import { cn } from "../../lib/utils";
+
 export { sonnerToast };
 
 const DEFAULT_TOAST_DURATION_MS = 5000;
@@ -45,7 +47,7 @@ export function CustomToast(props: CustomToastProps) {
       {content && <div className="text-sm text-muted-foreground">{content}</div>}
 
       {buttons.length > 0 && (
-        <div className="flex gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2">
           {buttons.map((button, index) => (
             <button
               key={index}
@@ -53,9 +55,12 @@ export function CustomToast(props: CustomToastProps) {
                 button.onClick();
                 sonnerToast.dismiss(id);
               }}
-              className={button.primary
-                ? "px-3 py-1.5 text-sm bg-foreground/80 text-background rounded-control hover:bg-foreground/60"
-                : "px-3 py-1.5 text-sm bg-secondary text-foreground rounded-control hover:bg-surface-400"}
+              className={cn(
+                "max-w-full flex-auto shrink-0 whitespace-normal break-normal px-3 py-1.5 text-sm rounded-control",
+                button.primary
+                  ? "bg-foreground/80 text-background hover:bg-foreground/60"
+                  : "bg-secondary text-foreground hover:bg-surface-400",
+              )}
             >
               {button.label}
             </button>
