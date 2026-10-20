@@ -685,10 +685,11 @@ export default function EditorArea({
       </div>
 
       {/* Selection Actions Toolbar */}
-      {editable && isAgentWritingEnabled && (
+      {editable && (
         <SelectionActions
           editor={editorInstance}
           sessionId={sessionId}
+          isAgentWritingEnabled={isAgentWritingEnabled}
           onImproveWriting={handleImproveWriting}
         />
       )}

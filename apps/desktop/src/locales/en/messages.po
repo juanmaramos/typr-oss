@@ -680,11 +680,6 @@ msgid "{month} {year}"
 msgstr "{month} {year}"
 
 #. js-lingui-explicit-id
-#: ../../packages/tiptap/src/editor/mention.tsx:162
-msgid "Loading..."
-msgstr "Loading..."
-
-#. js-lingui-explicit-id
 #: ../../packages/tiptap/src/shared/extensions.ts:46
 msgid "Start taking notes..."
 msgstr "Start taking notes..."
@@ -708,6 +703,11 @@ msgstr "To-do"
 #: ../../packages/tiptap/src/shared/extensions.ts:62
 msgid "Empty quote"
 msgstr "Empty quote"
+
+#. js-lingui-explicit-id
+#: ../../packages/tiptap/src/editor/mention.tsx:162
+msgid "Loading..."
+msgstr "Loading..."
 
 #: src/routes/app.human.$id.tsx:181
 msgid " at "
@@ -1147,7 +1147,7 @@ msgstr "Add tags"
 msgid "Add this note to one or more projects."
 msgstr "Add this note to one or more projects."
 
-#: src/components/editor-area/selection-actions.tsx:248
+#: src/components/editor-area/selection-actions.tsx:440
 msgid "Add to Chat"
 msgstr "Add to Chat"
 
@@ -1355,6 +1355,10 @@ msgstr "Apple Calendar"
 msgid "Apple Contacts"
 msgstr "Apple Contacts"
 
+#: src/components/editor-area/selection-actions.tsx:392
+msgid "Apply link"
+msgstr "Apply link"
+
 #: src/lib/language-labels.ts:5
 msgid "Arabic"
 msgstr "Arabic"
@@ -1489,7 +1493,7 @@ msgstr "Audio permissions"
 msgid "Audio Settings"
 msgstr "Audio Settings"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:130
+#: src/components/transcript/actions/TranscriptActionBar.tsx:134
 msgid "Audio setup"
 msgstr "Audio setup"
 
@@ -1643,6 +1647,15 @@ msgstr "Best quality for complex work"
 msgid "Beta"
 msgstr "Beta"
 
+#: src/components/editor-area/selection-actions.tsx:403
+msgid "Block style"
+msgstr "Block style"
+
+#: src/components/editor-area/selection-actions.tsx:290
+#: src/components/editor-area/selection-actions.tsx:291
+msgid "Bold"
+msgstr "Bold"
+
 #: src/data/shortcuts.ts:173
 msgid "Bold selected text"
 msgstr "Bold selected text"
@@ -1706,6 +1719,10 @@ msgstr "Built-in Templates"
 #: src/lib/language-labels.ts:8
 msgid "Bulgarian"
 msgstr "Bulgarian"
+
+#: src/components/editor-area/selection-actions.tsx:410
+msgid "Bulleted list"
+msgstr "Bulleted list"
 
 #: src/components/finder/view-selector.tsx:40
 #: src/components/settings-dialog/content.tsx:34
@@ -2703,9 +2720,14 @@ msgstr "Edit"
 msgid "Edit Contact"
 msgstr "Edit Contact"
 
-#: src/components/editor-area/selection-actions.tsx:248
+#: src/components/editor-area/selection-actions.tsx:440
 msgid "Edit in Chat"
 msgstr "Edit in Chat"
+
+#: src/components/editor-area/selection-actions.tsx:325
+#: src/components/editor-area/selection-actions.tsx:326
+msgid "Edit link"
+msgstr "Edit link"
 
 #: src/hooks/useEditModeModelSwitch.tsx:36
 msgid "Edit mode uses cloud models for better AI writing"
@@ -2825,6 +2847,10 @@ msgstr "Enter a valid date."
 #: src/lib/validation-messages.ts:12
 msgid "Enter a valid email address."
 msgstr "Enter a valid email address."
+
+#: src/components/editor-area/selection-actions.tsx:374
+msgid "Enter a valid HTTP or HTTPS URL."
+msgstr "Enter a valid HTTP or HTTPS URL."
 
 #: src/lib/validation-messages.ts:15
 msgid "Enter a valid URL."
@@ -3350,6 +3376,14 @@ msgstr "Group related notes around a client, topic, initiative, or area of work.
 msgid "Haiku 4.5"
 msgstr "Haiku 4.5"
 
+#: src/components/editor-area/selection-actions.tsx:408
+msgid "Heading 2"
+msgstr "Heading 2"
+
+#: src/components/editor-area/selection-actions.tsx:409
+msgid "Heading 3"
+msgstr "Heading 3"
+
 #: src/components/settings/views/profile.tsx:183
 msgid "Helps AI provide better context in meeting summaries"
 msgstr "Helps AI provide better context in meeting summaries"
@@ -3438,7 +3472,7 @@ msgstr "Importing..."
 msgid "Improve selected text"
 msgstr "Improve selected text"
 
-#: src/components/editor-area/selection-actions.tsx:235
+#: src/components/editor-area/selection-actions.tsx:427
 msgid "Improve writing"
 msgstr "Improve writing"
 
@@ -3490,6 +3524,11 @@ msgstr "Invited Only"
 #: src/lib/language-labels.ts:25
 msgid "Italian"
 msgstr "Italian"
+
+#: src/components/editor-area/selection-actions.tsx:301
+#: src/components/editor-area/selection-actions.tsx:302
+msgid "Italic"
+msgstr "Italic"
 
 #: src/data/shortcuts.ts:180
 msgid "Italic selected text"
@@ -3616,6 +3655,15 @@ msgstr "Line {start}"
 #: src/components/ui/inline-citation.tsx:28
 msgid "Lines {start}-{end}"
 msgstr "Lines {start}-{end}"
+
+#: src/components/editor-area/selection-actions.tsx:325
+#: src/components/editor-area/selection-actions.tsx:326
+msgid "Link"
+msgstr "Link"
+
+#: src/components/editor-area/selection-actions.tsx:360
+msgid "Link URL"
+msgstr "Link URL"
 
 #: src/components/right-panel/views/transcript-view.tsx:366
 msgid "Listening. Text appears after speech pauses."
@@ -3768,7 +3816,7 @@ msgstr "Microphone Access"
 #: src/components/meeting-assistant/floating-assistant.tsx:209
 #: src/components/meeting-assistant/floating-dock-variant.tsx:332
 #: src/components/right-panel/views/chat-view.tsx:664
-#: src/components/transcript/actions/TranscriptActionBar.tsx:212
+#: src/components/transcript/actions/TranscriptActionBar.tsx:216
 msgid "Minimize"
 msgstr "Minimize"
 
@@ -3815,8 +3863,8 @@ msgstr "More models"
 msgid "More settings"
 msgstr "More settings"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:154
-#: src/components/transcript/actions/TranscriptActionBar.tsx:155
+#: src/components/transcript/actions/TranscriptActionBar.tsx:158
+#: src/components/transcript/actions/TranscriptActionBar.tsx:159
 msgid "More transcript actions"
 msgstr "More transcript actions"
 
@@ -3830,7 +3878,7 @@ msgid "Move chat to sidebar"
 msgstr "Move chat to sidebar"
 
 #: src/components/right-panel/views/chat-view.tsx:652
-#: src/components/transcript/actions/TranscriptActionBar.tsx:201
+#: src/components/transcript/actions/TranscriptActionBar.tsx:205
 msgid "Move to sidebar"
 msgstr "Move to sidebar"
 
@@ -4192,6 +4240,10 @@ msgstr "Notes"
 msgid "Notifications"
 msgstr "Notifications"
 
+#: src/components/editor-area/selection-actions.tsx:411
+msgid "Numbered list"
+msgstr "Numbered list"
+
 #: src/components/settings/components/template-list.tsx:124
 msgid "Official Templates"
 msgstr "Official Templates"
@@ -4409,6 +4461,10 @@ msgstr "Owner"
 #: src/components/right-panel/components/floating-view-toggle.tsx:17
 msgid "Panel view"
 msgstr "Panel view"
+
+#: src/components/editor-area/selection-actions.tsx:407
+msgid "Paragraph"
+msgstr "Paragraph"
 
 #: src/components/editor-area/note-header/chips/participants-chip.tsx:105
 msgid "Participants"
@@ -4829,7 +4885,7 @@ msgstr "Recommended multilingual model for most meetings"
 msgid "Recording could not be started. Check your audio settings."
 msgstr "Recording could not be started. Check your audio settings."
 
-#: src/components/editor-area/index.tsx:888
+#: src/components/editor-area/index.tsx:889
 msgid "Recording too short"
 msgstr "Recording too short"
 
@@ -4930,6 +4986,10 @@ msgstr "Remove from project"
 #: src/components/settings/views/templates.tsx:543
 msgid "Remove from quick access"
 msgstr "Remove from quick access"
+
+#: src/components/editor-area/selection-actions.tsx:390
+msgid "Remove link"
+msgstr "Remove link"
 
 #: src/lib/validation-messages.ts:108
 msgid "Remove unrecognized fields."
@@ -5792,6 +5852,10 @@ msgstr "Template for recurring one-on-one meetings between a manager and direct 
 msgid "Templates"
 msgstr "Templates"
 
+#: src/components/editor-area/selection-actions.tsx:272
+msgid "Text formatting"
+msgstr "Text formatting"
+
 #: src/components/projects/project-files-dropzone.tsx:109
 msgid "Text, Markdown, CSV, JSON, YAML, HTML, logs, PDF, and DOCX files are indexed locally for Ask."
 msgstr "Text, Markdown, CSV, JSON, YAML, HTML, logs, PDF, and DOCX files are indexed locally for Ask."
@@ -6029,7 +6093,7 @@ msgstr "Transcribing your speech. Words appear after natural pauses."
 msgid "Transcript"
 msgstr "Transcript"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:143
+#: src/components/transcript/actions/TranscriptActionBar.tsx:147
 msgid "Transcript actions"
 msgstr "Transcript actions"
 
@@ -6165,7 +6229,7 @@ msgstr "Typr - AI note taker"
 msgid "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
 msgstr "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
 
-#: src/components/editor-area/index.tsx:889
+#: src/components/editor-area/index.tsx:890
 msgid "Typr needs at least {wordsThreshold} words to enhance your note"
 msgstr "Typr needs at least {wordsThreshold} words to enhance your note"
 
@@ -6534,7 +6598,7 @@ msgid "Whole project"
 msgstr "Whole project"
 
 #: src/components/right-panel/views/chat-view.tsx:648
-#: src/components/transcript/actions/TranscriptActionBar.tsx:197
+#: src/components/transcript/actions/TranscriptActionBar.tsx:201
 msgid "Window controls"
 msgstr "Window controls"
 
