@@ -16,7 +16,7 @@ import { useModelState } from "@/hooks/useModelState";
 import { commands as dbCommands, Word } from "@typr/plugin-db";
 import { commands as localSttCommands } from "@typr/plugin-local-stt";
 
-import TranscriptEditor, { type SpeakerViewInnerProps, type TranscriptEditorRef } from "@typr/tiptap/transcript";
+import TranscriptEditor, { type TranscriptEditorRef } from "@typr/tiptap/transcript";
 
 import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { AnimatedIconDisplay, BUTTON_VARIANTS, CONTENT_VARIANTS } from "@/components/ui/animated-icon-display";
@@ -310,8 +310,6 @@ export function TranscriptView({
     );
   }
 
-  const SpeakerComponent = SpeakerLabel;
-
   const formatTime = (minutes: number) => {
     const mins = Math.floor(minutes);
     const secs = Math.floor((minutes % 1) * 60);
@@ -380,7 +378,6 @@ export function TranscriptView({
                   previews={previews}
                   editable={ongoingSession.isInactive}
                   onUpdate={handleUpdate}
-                  c={SpeakerComponent}
                 />
 
                 <div className="absolute bottom-0 left-0 right-0 h-6 pointer-events-none z-[5]">
@@ -620,20 +617,3 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
     </motion.div>
   );
 }
-
-const SpeakerLabel = ({ speakerIndex, speakerId, speakerLabel }: SpeakerViewInnerProps) => {
-  const { i18n } = useLingui();
-  let label = speakerLabel ?? "";
-
-  if (!label && (speakerIndex === 0 || speakerId === "you")) {
-    label = i18n._("You");
-  } else if (!label && (speakerIndex != null || speakerId)) {
-    label = i18n._("Them");
-  }
-
-  return (
-    <span className="font-medium text-foreground text-xs">
-      {label}
-    </span>
-  );
-};

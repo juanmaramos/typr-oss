@@ -14,10 +14,9 @@ import { SpeakerSplit } from "./extensions";
 import { SpeakerNode } from "./nodes";
 import { TranscriptPreview, type TranscriptPreviews, transcriptPreviewsKey } from "./previews";
 import { fromEditorToWords, fromWordsToEditor, getSpeakerLabel, type SpeakerAttributes, type Word } from "./utils";
-import type { SpeakerViewInnerComponent, SpeakerViewInnerProps } from "./views";
 
 export { SPEAKER_ID_ATTR, SPEAKER_INDEX_ATTR, SPEAKER_LABEL_ATTR } from "./utils";
-export { getSpeakerLabel, SpeakerViewInnerProps };
+export { getSpeakerLabel };
 
 export function shouldEmitTranscriptUpdate({
   isFocused,
@@ -34,7 +33,6 @@ interface TranscriptEditorProps {
   initialWords: Word[] | null;
   previews?: TranscriptPreviews;
   onUpdate?: (words: Word[]) => void;
-  c: SpeakerViewInnerComponent;
 }
 
 export interface TranscriptEditorRef {
@@ -61,7 +59,7 @@ function shouldFollowTranscriptTail(container: HTMLElement | null, editor: Tipta
 // SearchAndReplace commands are declared in shared/extensions.ts
 
 const TranscriptEditor = forwardRef<TranscriptEditorRef, TranscriptEditorProps>(
-  ({ editable = true, c, onUpdate, initialWords, previews }, ref) => {
+  ({ editable = true, onUpdate, initialWords, previews }, ref) => {
     const { i18n } = useLingui();
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const isProgrammaticUpdate = useRef(false);
@@ -71,7 +69,7 @@ const TranscriptEditor = forwardRef<TranscriptEditorRef, TranscriptEditorProps>(
       Document.configure({ content: "speaker+" }),
       History,
       Text,
-      SpeakerNode(c),
+      SpeakerNode,
       SpeakerSplit,
       TranscriptPreview,
       SearchAndReplace.configure({

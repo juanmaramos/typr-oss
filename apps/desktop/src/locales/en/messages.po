@@ -408,18 +408,6 @@ msgid "Update installation failed"
 msgstr "Update installation failed"
 
 #. js-lingui-explicit-id
-#: ../../packages/tiptap/src/transcript/utils.ts:128
-#: src/components/right-panel/views/transcript-view.tsx:629
-msgid "You"
-msgstr "You"
-
-#. js-lingui-explicit-id
-#: ../../packages/tiptap/src/transcript/utils.ts:130
-#: src/components/right-panel/views/transcript-view.tsx:631
-msgid "Them"
-msgstr "Them"
-
-#. js-lingui-explicit-id
 #: ../../packages/utils/src/datetime.ts:71
 #: ../../packages/utils/src/datetime.ts:409
 #: src/components/left-sidebar/notes-list.tsx:552
@@ -678,6 +666,17 @@ msgstr "This Week"
 #: ../../packages/utils/src/datetime.ts:432
 msgid "{month} {year}"
 msgstr "{month} {year}"
+
+#. js-lingui-explicit-id
+#: ../../packages/tiptap/src/transcript/utils.ts:128
+msgid "You"
+msgstr "You"
+
+#. js-lingui-explicit-id
+#: ../../packages/tiptap/src/transcript/utils.ts:131
+#: ../../packages/tiptap/src/transcript/utils.ts:133
+msgid "Them"
+msgstr "Them"
 
 #. js-lingui-explicit-id
 #: ../../packages/tiptap/src/shared/extensions.ts:46
@@ -1493,11 +1492,11 @@ msgstr "Audio permissions"
 msgid "Audio Settings"
 msgstr "Audio Settings"
 
-#: src/components/right-panel/views/transcript-view.tsx:568
+#: src/components/right-panel/views/transcript-view.tsx:565
 msgid "Audio upload in progress"
 msgstr "Audio upload in progress"
 
-#: src/components/right-panel/views/transcript-view.tsx:598
+#: src/components/right-panel/views/transcript-view.tsx:595
 msgid "Audio upload in progress. Live transcription is unavailable until it finishes."
 msgstr "Audio upload in progress. Live transcription is unavailable until it finishes."
 
@@ -1760,7 +1759,7 @@ msgstr "carousel"
 msgid "Catalan"
 msgstr "Catalan"
 
-#: src/components/right-panel/views/transcript-view.tsx:551
+#: src/components/right-panel/views/transcript-view.tsx:548
 msgid "Change"
 msgstr "Change"
 
@@ -1936,7 +1935,7 @@ msgstr "Close modal/dialog"
 msgid "Close project brief"
 msgstr "Close project brief"
 
-#: src/components/right-panel/views/transcript-view.tsx:491
+#: src/components/right-panel/views/transcript-view.tsx:488
 #: src/components/settings/components/ai/llm-local-view.tsx:254
 #: src/components/settings/components/ai/stt-view.tsx:468
 msgid "Cloud"
@@ -2128,7 +2127,7 @@ msgstr "Conversation not found"
 msgid "Conversations"
 msgstr "Conversations"
 
-#: src/components/right-panel/views/transcript-view.tsx:529
+#: src/components/right-panel/views/transcript-view.tsx:526
 msgid "Convert your audio to text in real-time."
 msgstr "Convert your audio to text in real-time."
 
@@ -2580,7 +2579,7 @@ msgstr "Download"
 msgid "Download {0}"
 msgstr "Download {0}"
 
-#: src/components/right-panel/views/transcript-view.tsx:574
+#: src/components/right-panel/views/transcript-view.tsx:571
 #: src/components/transcript/hooks/useSTTModel.ts:88
 msgid "Download a model first"
 msgstr "Download a model first"
@@ -2593,7 +2592,7 @@ msgstr "Download a speech-to-text model in Settings → AI models to transcribe 
 msgid "Download a speech-to-text model to transcribe audio files."
 msgstr "Download a speech-to-text model to transcribe audio files."
 
-#: src/components/right-panel/views/transcript-view.tsx:615
+#: src/components/right-panel/views/transcript-view.tsx:612
 msgid "Download a transcription model above to begin"
 msgstr "Download a transcription model above to begin"
 
@@ -2778,7 +2777,7 @@ msgid "English"
 msgstr "English"
 
 #: src/components/editor-area/note-header/transcription-bar.tsx:535
-#: src/components/right-panel/views/transcript-view.tsx:499
+#: src/components/right-panel/views/transcript-view.tsx:496
 #: src/components/transcript/actions/STTLanguageSelector.tsx:70
 msgid "English high accuracy"
 msgstr "English high accuracy"
@@ -3119,7 +3118,7 @@ msgstr "Finalizing"
 #: src/components/editor-area/index.tsx:609
 #: src/components/right-panel/components/search/chat-search-header.tsx:119
 #: src/components/right-panel/components/search/search-header.tsx:112
-#: src/components/right-panel/views/transcript-view.tsx:330
+#: src/components/right-panel/views/transcript-view.tsx:328
 msgid "Find"
 msgstr "Find"
 
@@ -3452,7 +3451,7 @@ msgstr "Include in brief"
 msgid "Indonesian"
 msgstr "Indonesian"
 
-#: src/components/right-panel/views/transcript-view.tsx:589
+#: src/components/right-panel/views/transcript-view.tsx:586
 msgid "Initializing model..."
 msgstr "Initializing model..."
 
@@ -3619,7 +3618,7 @@ msgstr "Line {start}"
 msgid "Lines {start}-{end}"
 msgstr "Lines {start}-{end}"
 
-#: src/components/right-panel/views/transcript-view.tsx:364
+#: src/components/right-panel/views/transcript-view.tsx:362
 msgid "Listening. Text appears after speech pauses."
 msgstr "Listening. Text appears after speech pauses."
 
@@ -3643,7 +3642,7 @@ msgstr "Llama 3.3 70B"
 msgid "Loading"
 msgstr "Loading"
 
-#: src/components/right-panel/views/transcript-view.tsx:617
+#: src/components/right-panel/views/transcript-view.tsx:614
 msgid "Loading AI model into memory... This may take a few seconds on first start"
 msgstr "Loading AI model into memory... This may take a few seconds on first start"
 
@@ -3831,7 +3830,7 @@ msgid "Move to sidebar"
 msgstr "Move to sidebar"
 
 #: src/components/editor-area/note-header/transcription-bar.tsx:533
-#: src/components/right-panel/views/transcript-view.tsx:497
+#: src/components/right-panel/views/transcript-view.tsx:494
 #: src/components/settings/components/ai/shared.tsx:40
 #: src/components/transcript/actions/STTLanguageSelector.tsx:68
 #: src/components/transcript/actions/STTLanguageSelector.tsx:74
@@ -4205,7 +4204,7 @@ msgstr "Official Templates"
 msgid "Older"
 msgstr "Older"
 
-#: src/components/right-panel/views/transcript-view.tsx:492
+#: src/components/right-panel/views/transcript-view.tsx:489
 #: src/components/settings/components/ai/llm-local-view.tsx:178
 #: src/components/settings/components/ai/stt-view.tsx:195
 #: src/components/transcript/actions/STTLanguageSelector.tsx:232
@@ -4799,7 +4798,7 @@ msgstr "Readable source has no compiled digest yet."
 msgid "Ready"
 msgstr "Ready"
 
-#: src/components/right-panel/views/transcript-view.tsx:501
+#: src/components/right-panel/views/transcript-view.tsx:498
 #: src/components/settings/components/ai/stt-view.tsx:221
 #: src/components/settings/components/ai/stt-view.tsx:590
 #: src/components/settings/views/ai.tsx:50
@@ -4890,7 +4889,7 @@ msgid "Reliable transcription quality"
 msgstr "Reliable transcription quality"
 
 #: src/components/right-panel/components/listening-indicator.tsx:83
-#: src/components/right-panel/views/transcript-view.tsx:410
+#: src/components/right-panel/views/transcript-view.tsx:407
 msgid "remaining"
 msgstr "remaining"
 
@@ -5563,7 +5562,7 @@ msgstr "Start a conversation"
 msgid "Start a cross-meeting query from the main canvas and your threads will appear in this list."
 msgstr "Start a cross-meeting query from the main canvas and your threads will appear in this list."
 
-#: src/components/right-panel/views/transcript-view.tsx:526
+#: src/components/right-panel/views/transcript-view.tsx:523
 msgid "Start a transcription"
 msgstr "Start a transcription"
 
@@ -5592,8 +5591,8 @@ msgstr "Start Recording"
 msgid "Start taking notes..."
 msgstr "Start taking notes..."
 
-#: src/components/right-panel/views/transcript-view.tsx:575
-#: src/components/right-panel/views/transcript-view.tsx:589
+#: src/components/right-panel/views/transcript-view.tsx:572
+#: src/components/right-panel/views/transcript-view.tsx:586
 msgid "Start transcribing"
 msgstr "Start transcribing"
 
@@ -5602,7 +5601,7 @@ msgstr "Start transcribing"
 msgid "Start transcription"
 msgstr "Start transcription"
 
-#: src/components/right-panel/views/transcript-view.tsx:572
+#: src/components/right-panel/views/transcript-view.tsx:569
 msgid "Starting..."
 msgstr "Starting..."
 
@@ -6060,7 +6059,7 @@ msgid "Transcription languages (optional)"
 msgstr "Transcription languages (optional)"
 
 #: src/components/editor-area/note-header/transcription-bar.tsx:383
-#: src/components/right-panel/views/transcript-view.tsx:541
+#: src/components/right-panel/views/transcript-view.tsx:538
 #: src/components/transcript/actions/STTLanguageSelector.tsx:201
 msgid "Transcription model"
 msgstr "Transcription model"
@@ -6124,7 +6123,7 @@ msgstr "Try another search."
 msgid "Try new capabilities currently in development. These features may have occasional issues and are refined based on your feedback."
 msgstr "Try new capabilities currently in development. These features may have occasional issues and are refined based on your feedback."
 
-#: src/components/right-panel/views/transcript-view.tsx:570
+#: src/components/right-panel/views/transcript-view.tsx:567
 msgid "Try the demo video above first!"
 msgstr "Try the demo video above first!"
 
@@ -6298,7 +6297,7 @@ msgstr "Update Available"
 msgid "Update now"
 msgstr "Update now"
 
-#: src/components/right-panel/views/transcript-view.tsx:433
+#: src/components/right-panel/views/transcript-view.tsx:430
 msgid "Upload audio file"
 msgstr "Upload audio file"
 
@@ -6476,7 +6475,7 @@ msgstr "Wait..."
 msgid "Watch live transcription demo (30 secs)"
 msgstr "Watch live transcription demo (30 secs)"
 
-#: src/components/right-panel/views/transcript-view.tsx:613
+#: src/components/right-panel/views/transcript-view.tsx:610
 msgid "Watch the demo video above to see how Typr transcription works!"
 msgstr "Watch the demo video above to see how Typr transcription works!"
 

@@ -5,9 +5,16 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import type { Word } from "@typr/plugin-db";
 import TranscriptEditor, { type TranscriptEditorRef } from "@typr/tiptap/transcript";
+import { readFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import postcss from "postcss";
 import { act, createRef } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import tailwindcss from "tailwindcss";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { typography } from "../../../../../../packages/ui/src/lib/typography";
+import uiConfig from "../../../../../../packages/ui/tailwind.config";
 
 let root: Root;
 let container: HTMLDivElement;
@@ -20,16 +27,13 @@ const word = (text: string, index = 0): Word => ({
   end_ms: null,
   confidence: null,
 });
-const Speaker = ({ speakerIndex }: { speakerIndex: number | undefined }) => (
-  <span>{speakerIndex === 0 ? "You" : "Them"}</span>
-);
+
 async function render(previews: Record<string, Word[]> = {}, editable = false) {
   await act(async () => {
     root.render(
       <I18nProvider i18n={i18n}>
         <TranscriptEditor
           ref={ref}
-          c={Speaker}
           initialWords={[word("Committed")]}
           previews={previews}
           editable={editable}
@@ -44,6 +48,21 @@ async function setWords(words: Word[]) {
   await act(async () => ref.current?.setWords(words));
 }
 const preview = (channel: string) => container.querySelector<HTMLElement>(`[data-transcript-preview="${channel}"]`);
+
+let stylesheet: HTMLStyleElement;
+beforeAll(async () => {
+  const transcriptCss = await readFile(
+    resolve(dirname(fileURLToPath(import.meta.url)), "../../../../../../packages/tiptap/src/styles/transcript.css"),
+    "utf8",
+  );
+  const result = await postcss([tailwindcss({ presets: [uiConfig], content: [{ raw: "" }] })]).process(transcriptCss, {
+    from: undefined,
+  });
+  stylesheet = document.createElement("style");
+  stylesheet.textContent = result.css;
+  document.head.append(stylesheet);
+});
+afterAll(() => stylesheet.remove());
 
 beforeEach(() => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -87,12 +106,12 @@ describe("inline interim transcript presentation", () => {
     await render({ mic: [word("hello")], speaker: [word("hola", 1)] });
     expect(preview("mic")?.tagName).toBe("SPAN");
     expect(preview("speaker")?.tagName).toBe("DIV");
-    expect(preview("speaker")?.textContent).toBe("Them hola");
+    expect(preview("speaker")?.textContent).toBe("Themhola");
     expect(preview("speaker")?.parentElement?.classList.contains("tiptap-transcript")).toBe(true);
     await render({ speaker: [word("hola", 1)] });
     await setWords([word("Committed"), word("hello")]);
     expect(preview("mic")).toBeNull();
-    expect(preview("speaker")?.textContent).toBe("Them hola");
+    expect(preview("speaker")?.textContent).toBe("Themhola");
     await render({}, true);
     expect(container.querySelector("[data-transcript-preview]")).toBeNull();
     expect(ref.current!.getWords()?.map(word => word.text)).toEqual(["Committed", "hello"]);
@@ -105,7 +124,7 @@ describe("inline interim transcript presentation", () => {
     expect(preview("mic")?.tagName).toBe("SPAN");
     await setWords([word("Committed"), word("Hola", 1)]);
     expect(preview("mic")?.tagName).toBe("DIV");
-    expect(preview("mic")?.textContent).toBe("You pending");
+    expect(preview("mic")?.textContent).toBe("Youpending");
     await setWords([word("Committed"), word("Hola", 1), word("Final", 0)]);
     expect(preview("mic")?.tagName).toBe("SPAN");
     expect(preview("mic")?.textContent).toBe(" pending");
@@ -132,9 +151,9 @@ describe("inline interim transcript presentation", () => {
     const previews = { speaker: [word("Hola", 1)] };
     i18n.load("es", spanishMessages);
     await render(previews);
-    expect(preview("speaker")?.textContent).toBe("Them Hola");
+    expect(preview("speaker")?.textContent).toBe("ThemHola");
     await act(async () => i18n.activate("es"));
-    expect(preview("speaker")?.textContent).toBe("Otros Hola");
+    expect(preview("speaker")?.textContent).toBe("OtrosHola");
     expect(ref.current!.getWords()?.map(word => word.text)).toEqual(["Committed"]);
   });
 
@@ -142,7 +161,7 @@ describe("inline interim transcript presentation", () => {
     await render();
     await setWords([]);
     await render({ mic: [word("<img src=x onerror=alert(1)>")] });
-    expect(preview("mic")?.textContent).toBe("You <img src=x onerror=alert(1)>");
+    expect(preview("mic")?.textContent).toBe("You<img src=x onerror=alert(1)>");
     expect(preview("mic")?.querySelector("img")).toBeNull();
     expect(container.querySelector(".transcript-preview-empty")).not.toBeNull();
     expect(ref.current!.getWords()).toEqual([]);
@@ -150,6 +169,72 @@ describe("inline interim transcript presentation", () => {
     await render({});
     expect(container.querySelector(".transcript-preview-empty")).toBeNull();
   });
+
+  it.each(["en", "es"])(
+    "uses one speaker layout and generated typography for preliminary and final text in %s",
+    async (locale) => {
+      i18n.load("es", spanishMessages);
+      await act(async () => i18n.activate(locale));
+      const cases: { speaker: Word["speaker"]; label: string }[] = [
+        { speaker: { type: "unassigned", value: { index: 0 } }, label: locale === "en" ? "You" : "Tú" },
+        { speaker: { type: "unassigned", value: { index: 1 } }, label: locale === "en" ? "Them" : "Otros" },
+        { speaker: { type: "assigned", value: { id: "you", label: "" } }, label: locale === "en" ? "You" : "Tú" },
+        { speaker: { type: "assigned", value: { id: "person", label: "Dr Ramos" } }, label: "Dr Ramos" },
+        { speaker: null, label: "" },
+      ];
+      const metrics = (element: HTMLElement) => {
+        const style = getComputedStyle(element);
+        return {
+          fontSize: style.fontSize,
+          fontWeight: style.fontWeight,
+          lineHeight: style.lineHeight,
+          display: style.display,
+          marginBottom: style.marginBottom,
+        };
+      };
+      await render();
+      for (const scenario of cases) {
+        await setWords([]);
+        const spoken = { ...word("Spoken words"), speaker: scenario.speaker };
+        await render({ mic: [spoken] });
+        const preliminary = preview("mic")!;
+        const provisionalLabel = preliminary.querySelector<HTMLElement>(".transcript-speaker-label");
+        const provisionalBody = preliminary.querySelector<HTMLElement>(".transcript-speaker-content")!;
+        expect(provisionalLabel?.textContent ?? "").toBe(scenario.label);
+        const labelMetrics = provisionalLabel ? metrics(provisionalLabel) : null;
+        const bodyMetrics = metrics(provisionalBody);
+        expect(bodyMetrics).toMatchObject({
+          fontSize: typography.fontSize["ui-control"],
+          fontWeight: typography.fontWeight.normal,
+          lineHeight: "1.5rem",
+          display: "block",
+        });
+        if (provisionalLabel) {
+          expect(labelMetrics).toMatchObject({
+            fontSize: typography.fontSize["ui-label"],
+            fontWeight: typography.fontWeight.medium,
+            lineHeight: "1rem",
+            display: "block",
+          });
+          expect(provisionalLabel.nextElementSibling).toBe(provisionalBody);
+        }
+        await render({});
+        await setWords([spoken]);
+        const final = container.querySelector<HTMLElement>(".transcript-speaker")!;
+        const finalLabel = final.querySelector<HTMLElement>(".transcript-speaker-label");
+        const finalBody = final.querySelector<HTMLElement>(".transcript-speaker-content")!;
+        expect(finalLabel?.textContent ?? "").toBe(scenario.label);
+        expect(metrics(finalBody)).toEqual(bodyMetrics);
+        expect(finalLabel ? metrics(finalLabel) : null).toEqual(labelMetrics);
+        if (finalLabel) {
+          expect(finalLabel.nextElementSibling).toBe(finalBody);
+        }
+        const exportLabel = scenario.label || (locale === "en" ? "Them" : "Otros");
+        expect(ref.current!.toText()).toBe(`[${exportLabel}]\nSpoken words`);
+      }
+      expect(onUpdate).not.toHaveBeenCalled();
+    },
+  );
 
   it("follows preview and final growth only while reading the transcript tail", async () => {
     await render();

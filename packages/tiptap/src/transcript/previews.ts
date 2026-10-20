@@ -3,14 +3,7 @@ import type { Node } from "@tiptap/pm/model";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
-import {
-  fromWordsToEditor,
-  getSpeakerLabel,
-  SPEAKER_ID_ATTR,
-  SPEAKER_INDEX_ATTR,
-  SPEAKER_LABEL_ATTR,
-  type Word,
-} from "./utils";
+import { fromWordsToEditor, getSpeakerLabel, SPEAKER_ID_ATTR, SPEAKER_INDEX_ATTR, type Word } from "./utils";
 
 export type TranscriptPreviews = Record<string, Word[]>;
 export const transcriptPreviewsKey = new PluginKey<{ previews: TranscriptPreviews; decorations: DecorationSet }>(
@@ -31,7 +24,7 @@ function decorationsFor(doc: Node, previews: TranscriptPreviews): DecorationSet 
       const text = block.content.map(node => node.text).join("");
       const sameSpeaker = !empty && last
         && [SPEAKER_ID_ATTR, SPEAKER_INDEX_ATTR].every(attr => last.attrs[attr] === block.attrs[attr]);
-      const labelText = getSpeakerLabel(block.attrs);
+      const labelText = getSpeakerLabel(block.attrs, "");
       const position = sameSpeaker ? doc.content.size - 1 : empty ? 0 : doc.content.size;
       decorations.push(Decoration.widget(position, () => {
         const element = document.createElement(sameSpeaker ? "span" : "div");
@@ -41,14 +34,13 @@ function decorationsFor(doc: Node, previews: TranscriptPreviews): DecorationSet 
         if (sameSpeaker) {
           element.textContent = ` ${text}`;
         } else {
-          const attrs = block.attrs;
-          if (attrs[SPEAKER_ID_ATTR] || attrs[SPEAKER_INDEX_ATTR] !== null || attrs[SPEAKER_LABEL_ATTR]) {
-            const label = document.createElement("span");
+          if (labelText) {
+            const label = document.createElement("div");
             label.className = "transcript-speaker-label";
             label.textContent = labelText;
-            element.append(label, document.createTextNode(" "));
+            element.append(label);
           }
-          const content = document.createElement("span");
+          const content = document.createElement("div");
           content.className = "transcript-speaker-content";
           content.textContent = text;
           element.append(content);
