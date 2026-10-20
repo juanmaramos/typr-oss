@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trans } from "@lingui/react/macro";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,14 +10,18 @@ import { Badge } from "@typr/ui/components/ui/badge";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@typr/ui/components/ui/form";
 import { Switch } from "@typr/ui/components/ui/switch";
 
+import { CallEndPermissionNotice, useCallEndStatus } from "../../call-end-permission";
+
 const schema = z.object({
   detect: z.boolean().optional(),
   event: z.boolean().optional(),
+  callEnd: z.boolean().optional(),
 });
 
 type Schema = z.infer<typeof schema>;
 
 export default function NotificationsComponent() {
+  const queryClient = useQueryClient();
   const eventNotification = useQuery({
     queryKey: ["notification", "event"],
     queryFn: () => notificationCommands.getEventNotification(),
@@ -28,11 +32,18 @@ export default function NotificationsComponent() {
     queryFn: () => notificationCommands.getDetectNotification(),
   });
 
+  const callEndEnabled = useQuery({
+    queryKey: ["notification", "call-end"],
+    queryFn: () => notificationCommands.getCallEndEnabled(),
+  });
+  const callEndStatus = useCallEndStatus(callEndEnabled.data === true);
+
   const form = useForm<Schema>({
     resolver: zodResolver(schema),
     values: {
       detect: detectNotification.data ?? false,
       event: eventNotification.data ?? false,
+      callEnd: callEndEnabled.data ?? false,
     },
   });
 
@@ -74,6 +85,19 @@ export default function NotificationsComponent() {
     },
   });
 
+  const callEndMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      if (enabled) await notificationCommands.requestNotificationPermission();
+      await notificationCommands.setCallEndEnabled(enabled);
+      return enabled;
+    },
+    onSuccess: (enabled) => {
+      queryClient.setQueryData(["notification", "call-end"], enabled);
+      void queryClient.invalidateQueries({ queryKey: ["notification", "call-end-status"] });
+    },
+    onError: () => { void callEndEnabled.refetch(); },
+  });
+
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
       if (name === "detect") {
@@ -105,9 +129,7 @@ export default function NotificationsComponent() {
                       </Badge>
                     </FormLabel>
                     <FormDescription>
-                      <Trans>
-                        Automatically starts, pauses, and stops transcription when meetings are detected.
-                      </Trans>
+                      <Trans>Shows a notification when a call is detected.</Trans>
                     </FormDescription>
                   </div>
 
@@ -118,6 +140,29 @@ export default function NotificationsComponent() {
                     />
                   </FormControl>
                 </div>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="callEnd"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex flex-row items-center justify-between gap-4">
+                  <div>
+                    <FormLabel><Trans>Stop recording after a call</Trans></FormLabel>
+                    <FormDescription>
+                      <Trans>Link a recording to Zoom, Teams, or Google Meet. Recording stops two minutes after the call ends, unless you rejoin. If we’re unsure the call ended, we’ll ask before stopping.</Trans>
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch checked={field.value} onCheckedChange={enabled => callEndMutation.mutate(enabled)}
+                      disabled={callEndEnabled.isPending || callEndMutation.isPending} />
+                  </FormControl>
+                </div>
+                {callEndEnabled.data === true && callEndStatus.data?.type === "permission_required"
+                  && <CallEndPermissionNotice />}
+                {callEndMutation.isError && <p className="text-sm text-destructive" role="alert"><Trans>Couldn’t change this setting. Try again.</Trans></p>}
               </FormItem>
             )}
           />

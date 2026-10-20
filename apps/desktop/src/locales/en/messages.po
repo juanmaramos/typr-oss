@@ -996,6 +996,10 @@ msgstr "Access multiple AI models through OpenRouter with your API key"
 msgid "Access your meeting notes directly from ChatGPT."
 msgstr "Access your meeting notes directly from ChatGPT."
 
+#: src/components/call-end-bridge.tsx:52
+msgid "Accessibility permission needed"
+msgstr "Accessibility permission needed"
+
 #: src/components/settings-dialog/sidebar.tsx:134
 msgid "Account"
 msgstr "Account"
@@ -1493,13 +1497,9 @@ msgstr "Auto - Best available configured model"
 msgid "Auto-detect"
 msgstr "Auto-detect"
 
-#: src/components/settings/views/notifications.tsx:102
+#: src/components/settings/views/notifications.tsx:126
 msgid "Auto-detect meetings"
 msgstr "Auto-detect meetings"
-
-#: src/components/settings/views/notifications.tsx:108
-msgid "Automatically starts, pauses, and stops transcription when meetings are detected."
-msgstr "Automatically starts, pauses, and stops transcription when meetings are detected."
 
 #: src/lib/language-labels.ts:6
 msgid "Azerbaijani"
@@ -1548,7 +1548,7 @@ msgstr "Best quality for complex work"
 #: src/components/settings/views/lab.tsx:45
 #: src/components/settings/views/lab.tsx:61
 #: src/components/settings/views/lab.tsx:77
-#: src/components/settings/views/notifications.tsx:104
+#: src/components/settings/views/notifications.tsx:128
 msgid "Beta"
 msgstr "Beta"
 
@@ -1625,6 +1625,11 @@ msgstr "Calendar"
 #: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:100
 msgid "Calendar access"
 msgstr "Calendar access"
+
+#: src/components/call-end-bridge.tsx:39
+#: src/components/call-end-bridge.tsx:78
+msgid "Call ended"
+msgstr "Call ended"
 
 #: src/components/audio-upload-dialog.tsx:354
 #: src/components/audio-upload-toast.tsx:142
@@ -1756,6 +1761,10 @@ msgstr "Checking for a newer version..."
 #: src/hooks/useModelAvailabilityLabel.ts:10
 msgid "Checking model availability…"
 msgstr "Checking model availability…"
+
+#: src/components/call-end-bridge.tsx:82
+msgid "Choose a call to stop recording two minutes after it ends."
+msgstr "Choose a call to stop recording two minutes after it ends."
 
 #: src/lib/validation-messages.ts:48
 msgid "Choose a date after {date}."
@@ -2124,6 +2133,10 @@ msgstr "Couldn’t add project"
 msgid "Couldn’t answer"
 msgstr "Couldn’t answer"
 
+#: src/components/settings/views/notifications.tsx:165
+msgid "Couldn’t change this setting. Try again."
+msgstr "Couldn’t change this setting. Try again."
+
 #: src/components/projects/project-brief-sidebar-view.tsx:143
 msgid "Couldn’t copy brief"
 msgstr "Couldn’t copy brief"
@@ -2145,6 +2158,10 @@ msgstr "Couldn’t delete project"
 #: src/routes/app.ask.$threadId.tsx:232
 msgid "Couldn’t open file source"
 msgstr "Couldn’t open file source"
+
+#: src/components/call-end-permission.tsx:35
+msgid "Couldn’t open permission settings. Open System Settings and allow Typr to control your Mac."
+msgstr "Couldn’t open permission settings. Open System Settings and allow Typr to control your Mac."
 
 #: src/hooks/useProjectBriefRefresh.ts:122
 msgid "Couldn’t refresh brief"
@@ -2186,6 +2203,10 @@ msgstr "Couldn’t start Ask"
 #: src/routes/app.ask.tsx:97
 msgid "Couldn’t start new chat"
 msgstr "Couldn’t start new chat"
+
+#: src/components/call-end-bridge.tsx:120
+msgid "Couldn’t update call controls. Try again."
+msgstr "Couldn’t update call controls. Try again."
 
 #: src/routes/app.projects.$projectId.tsx:170
 msgid "Couldn’t update project"
@@ -2490,8 +2511,8 @@ msgstr "Don't transcribe"
 msgid "Download"
 msgstr "Download"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:197
-#: src/components/transcript/actions/STTLanguageSelector.tsx:198
+#: src/components/transcript/actions/STTLanguageSelector.tsx:200
+#: src/components/transcript/actions/STTLanguageSelector.tsx:201
 msgid "Download {size}"
 msgstr "Download {size}"
 
@@ -3002,6 +3023,10 @@ msgstr "Find notes and actions..."
 msgid "Finish setup"
 msgstr "Finish setup"
 
+#: src/components/call-end-bridge.tsx:77
+msgid "Finishing recording…"
+msgstr "Finishing recording…"
+
 #: src/lib/language-labels.ts:17
 msgid "Finnish"
 msgstr "Finnish"
@@ -3310,6 +3335,11 @@ msgstr "Invite members"
 msgid "Invited Only"
 msgstr "Invited Only"
 
+#: src/components/call-end-bridge.tsx:38
+#: src/components/call-end-bridge.tsx:75
+msgid "Is your call still going?"
+msgstr "Is your call still going?"
+
 #: src/lib/language-labels.ts:25
 msgid "Italian"
 msgstr "Italian"
@@ -3339,6 +3369,10 @@ msgstr "John Doe"
 #: src/components/editor-area/note-header/chips/event-chip.tsx:231
 msgid "Join meeting"
 msgstr "Join meeting"
+
+#: src/components/call-end-bridge.tsx:111
+msgid "Keep recording"
+msgstr "Keep recording"
 
 #: src/components/settings/components/ai/llm-local-view.tsx:334
 msgid "Key configured"
@@ -3426,6 +3460,15 @@ msgstr "Line {start}"
 #: src/components/ui/inline-citation.tsx:28
 msgid "Lines {start}-{end}"
 msgstr "Lines {start}-{end}"
+
+#: src/components/settings/views/notifications.tsx:155
+msgid "Link a recording to Zoom, Teams, or Google Meet. Recording stops two minutes after the call ends, unless you rejoin. If we’re unsure the call ended, we’ll ask before stopping."
+msgstr "Link a recording to Zoom, Teams, or Google Meet. Recording stops two minutes after the call ends, unless you rejoin. If we’re unsure the call ended, we’ll ask before stopping."
+
+#: src/components/call-end-bridge.tsx:36
+#: src/components/call-end-bridge.tsx:73
+msgid "Link this recording to a call?"
+msgstr "Link this recording to a call?"
 
 #: src/components/right-panel/views/transcript-view.tsx:359
 msgid "Listening. Text appears after speech pauses."
@@ -3652,6 +3695,10 @@ msgstr "More models"
 #: src/components/editor-area/note-header/transcription-bar.tsx:192
 msgid "More settings"
 msgstr "More settings"
+
+#: src/components/call-end-bridge.tsx:97
+msgid "More than one call is open in the same app. Keep only the call you want to link open, or keep recording independently."
+msgstr "More than one call is open in the same app. Keep only the call you want to link open, or keep recording independently."
 
 #: src/components/transcript/actions/TranscriptActionBar.tsx:158
 #: src/components/transcript/actions/TranscriptActionBar.tsx:159
@@ -4094,6 +4141,10 @@ msgstr "Open in new window"
 msgid "Open note actions menu"
 msgstr "Open note actions menu"
 
+#: src/components/call-end-permission.tsx:31
+msgid "Open permission settings"
+msgstr "Open permission settings"
+
 #: src/components/ask/ask-conversation-toolbar.tsx:176
 #: src/components/ask/ask-conversation-toolbar.tsx:177
 msgid "Open project"
@@ -4126,9 +4177,9 @@ msgstr "Open settings"
 #: src/components/settings/views/sound.tsx:134
 #: src/components/toast/shared.tsx:413
 #: src/components/toast/shared.tsx:463
-#: src/components/transcript/actions/STTLanguageSelector.tsx:222
-#: src/components/transcript/actions/STTLanguageSelector.tsx:223
-#: src/components/transcript/actions/STTLanguageSelector.tsx:241
+#: src/components/transcript/actions/STTLanguageSelector.tsx:225
+#: src/components/transcript/actions/STTLanguageSelector.tsx:226
+#: src/components/transcript/actions/STTLanguageSelector.tsx:244
 #: src/components/welcome-modal/audio-permissions-view.tsx:137
 msgid "Open Settings"
 msgstr "Open Settings"
@@ -4144,6 +4195,10 @@ msgstr "Open transcript"
 #: src/data/shortcuts.ts:46
 msgid "Open transcript panel"
 msgstr "Open transcript panel"
+
+#: src/components/call-end-bridge.tsx:42
+msgid "Open Typr to choose what happens to this recording."
+msgstr "Open Typr to choose what happens to this recording."
 
 #: src/components/settings/components/ai/llm-custom-view.tsx:175
 msgid "OpenAI"
@@ -4633,6 +4688,14 @@ msgstr "Recording could not be started. Check your audio settings."
 msgid "Recording too short"
 msgstr "Recording too short"
 
+#: src/components/call-end-bridge.tsx:41
+msgid "Recording will stop soon. Open Typr to keep recording."
+msgstr "Recording will stop soon. Open Typr to keep recording."
+
+#: src/components/call-end-bridge.tsx:87
+msgid "Recording will stop when the countdown ends. Rejoining the call cancels it."
+msgstr "Recording will stop when the countdown ends. Rejoining the call cancels it."
+
 #: src/components/transcript/actions/MicrophoneSelector.tsx:184
 msgid "Refresh"
 msgstr "Refresh"
@@ -4803,8 +4866,8 @@ msgstr "Resume Recording"
 #: src/components/settings/components/ai/task-defaults.tsx:349
 #: src/components/toast/shared.tsx:181
 #: src/components/toast/shared.tsx:262
-#: src/components/transcript/actions/STTLanguageSelector.tsx:209
-#: src/components/transcript/actions/STTLanguageSelector.tsx:210
+#: src/components/transcript/actions/STTLanguageSelector.tsx:212
+#: src/components/transcript/actions/STTLanguageSelector.tsx:213
 #: src/components/ui/ai-setup-indicator.tsx:32
 #: src/components/ui/model-selector.tsx:347
 #: src/components/welcome-modal/download-progress-view.tsx:166
@@ -4868,6 +4931,10 @@ msgstr "Saved model"
 #: src/components/projects/project-files-dropzone.tsx:124
 msgid "Saving"
 msgstr "Saving"
+
+#: src/components/call-end-bridge.tsx:86
+msgid "Saving the rest of your transcript."
+msgstr "Saving the rest of your transcript."
 
 #: src/components/projects/project-files-dropzone.tsx:112
 #: src/components/settings/views/profile.tsx:298
@@ -5246,6 +5313,10 @@ msgstr "Show transcription consent reminder"
 msgid "Show upcoming events in sidebar"
 msgstr "Show upcoming events in sidebar"
 
+#: src/components/settings/views/notifications.tsx:132
+msgid "Shows a notification when a call is detected."
+msgstr "Shows a notification when a call is detected."
+
 #: src/components/toolbar/buttons/right-sidebar-button.tsx:66
 msgid "Sidebar"
 msgstr "Sidebar"
@@ -5401,6 +5472,10 @@ msgstr "Stop and summarize transcript"
 msgid "Stop generating"
 msgstr "Stop generating"
 
+#: src/components/call-end-bridge.tsx:116
+msgid "Stop now"
+msgstr "Stop now"
+
 #: src/components/transcript/actions/STTLanguageSelector.tsx:136
 msgid "Stop or pause recording to change transcription model"
 msgstr "Stop or pause recording to change transcription model"
@@ -5408,6 +5483,10 @@ msgstr "Stop or pause recording to change transcription model"
 #: src/routes/app.control.tsx:208
 msgid "Stop Recording"
 msgstr "Stop Recording"
+
+#: src/components/settings/views/notifications.tsx:153
+msgid "Stop recording after a call"
+msgstr "Stop recording after a call"
 
 #: src/components/meeting-assistant/floating-assistant.tsx:361
 #: src/components/meeting-assistant/floating-dock-variant.tsx:170
@@ -5699,6 +5778,10 @@ msgstr "This setting only affects offline transcription models."
 msgid "This video doesn't have captions available"
 msgstr "This video doesn't have captions available"
 
+#: src/components/call-end-bridge.tsx:90
+msgid "Time until recording stops"
+msgstr "Time until recording stops"
+
 #. placeholder {0}: startDate.toLocaleTimeString(i18n.locale || undefined, { hour: "numeric", minute: "2-digit", hour12: undefined, })
 #: src/components/toolbar/utils/content-formatter.ts:202
 #: src/components/toolbar/utils/pdf-export.ts:251
@@ -5938,6 +6021,10 @@ msgstr "Typr - AI note taker"
 #: src/components/settings/views/integrations.tsx:138
 msgid "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
 msgstr "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
+
+#: src/components/call-end-permission.tsx:27
+msgid "Typr needs Accessibility access to detect when calls end. Without access, recordings continue until you stop them."
+msgstr "Typr needs Accessibility access to detect when calls end. Without access, recordings continue until you stop them."
 
 #: src/components/editor-area/index.tsx:889
 msgid "Typr needs at least {wordsThreshold} words to enhance your note"
@@ -6255,6 +6342,11 @@ msgstr "Watch live transcription demo (30 secs)"
 #: src/components/right-panel/views/transcript-view.tsx:581
 msgid "Watch the demo video above to see how Typr transcription works!"
 msgstr "Watch the demo video above to see how Typr transcription works!"
+
+#. placeholder {0}: prompt.source.label
+#: src/components/call-end-bridge.tsx:84
+msgid "We can’t confirm whether {0} ended. Recording will continue until you choose."
+msgstr "We can’t confirm whether {0} ended. Recording will continue until you choose."
 
 #: src/components/error-modal.tsx:44
 msgid "We encountered an unexpected error. The error has been automatically reported to our team."
