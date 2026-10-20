@@ -1123,7 +1123,7 @@ msgstr "Añadir etiquetas"
 msgid "Add this note to one or more projects."
 msgstr "Añade esta nota a uno o más proyectos."
 
-#: src/components/editor-area/selection-actions.tsx:248
+#: src/components/editor-area/selection-actions.tsx:521
 msgid "Add to Chat"
 msgstr "Añadir al chat"
 
@@ -1322,6 +1322,10 @@ msgstr "Calendario de Apple"
 #: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:161
 msgid "Apple Contacts"
 msgstr "Contactos de Apple"
+
+#: src/components/editor-area/selection-actions.tsx:447
+msgid "Apply link"
+msgstr "Aplicar enlace"
 
 #: src/lib/language-labels.ts:5
 msgid "Arabic"
@@ -1552,6 +1556,15 @@ msgstr "Mejor calidad para trabajo complejo"
 msgid "Beta"
 msgstr "Beta"
 
+#: src/components/editor-area/selection-actions.tsx:466
+msgid "Block style"
+msgstr "Estilo de bloque"
+
+#: src/components/editor-area/selection-actions.tsx:319
+#: src/components/editor-area/selection-actions.tsx:320
+msgid "Bold"
+msgstr "Negrita"
+
 #: src/data/shortcuts.ts:173
 msgid "Bold selected text"
 msgstr "Poner el texto seleccionado en negrita"
@@ -1615,6 +1628,10 @@ msgstr "Plantillas disponibles"
 #: src/lib/language-labels.ts:8
 msgid "Bulgarian"
 msgstr "Búlgaro"
+
+#: src/components/editor-area/selection-actions.tsx:488
+msgid "Bulleted list"
+msgstr "Lista con viñetas"
 
 #: src/components/finder/view-selector.tsx:40
 #: src/components/settings-dialog/content.tsx:34
@@ -2614,9 +2631,14 @@ msgstr "Editar"
 msgid "Edit Contact"
 msgstr "Editar contacto"
 
-#: src/components/editor-area/selection-actions.tsx:248
+#: src/components/editor-area/selection-actions.tsx:521
 msgid "Edit in Chat"
 msgstr "Editar en Chat"
+
+#: src/components/editor-area/selection-actions.tsx:366
+#: src/components/editor-area/selection-actions.tsx:367
+msgid "Edit link"
+msgstr "Editar enlace"
 
 #: src/hooks/useEditModeModelSwitch.tsx:36
 msgid "Edit mode uses cloud models for better AI writing"
@@ -2729,6 +2751,10 @@ msgstr "Introduce una fecha válida."
 #: src/lib/validation-messages.ts:12
 msgid "Enter a valid email address."
 msgstr "Introduce una dirección de correo válida."
+
+#: src/components/editor-area/selection-actions.tsx:424
+msgid "Enter a valid HTTP or HTTPS URL."
+msgstr "Introduce una URL HTTP o HTTPS válida."
 
 #: src/lib/validation-messages.ts:15
 msgid "Enter a valid URL."
@@ -3223,6 +3249,14 @@ msgstr "Agrupa notas relacionadas por cliente, tema, iniciativa o área de traba
 msgid "Haiku 4.5"
 msgstr "Haiku 4.5"
 
+#: src/components/editor-area/selection-actions.tsx:482
+msgid "Heading 2"
+msgstr "Encabezado 2"
+
+#: src/components/editor-area/selection-actions.tsx:485
+msgid "Heading 3"
+msgstr "Encabezado 3"
+
 #: src/components/settings/views/profile.tsx:183
 msgid "Helps AI provide better context in meeting summaries"
 msgstr "Ayuda a la IA a proporcionar mejor contexto en los resúmenes de reuniones"
@@ -3286,7 +3320,7 @@ msgstr "Importando..."
 msgid "Improve selected text"
 msgstr "Mejorar el texto seleccionado"
 
-#: src/components/editor-area/selection-actions.tsx:235
+#: src/components/editor-area/selection-actions.tsx:508
 msgid "Improve writing"
 msgstr "Mejorar escritura"
 
@@ -3343,6 +3377,11 @@ msgstr "¿Sigues en la llamada?"
 #: src/lib/language-labels.ts:25
 msgid "Italian"
 msgstr "Italiano"
+
+#: src/components/editor-area/selection-actions.tsx:336
+#: src/components/editor-area/selection-actions.tsx:337
+msgid "Italic"
+msgstr "Cursiva"
 
 #: src/data/shortcuts.ts:180
 msgid "Italic selected text"
@@ -3461,6 +3500,11 @@ msgstr "Línea {start}"
 msgid "Lines {start}-{end}"
 msgstr "Líneas {start}-{end}"
 
+#: src/components/editor-area/selection-actions.tsx:366
+#: src/components/editor-area/selection-actions.tsx:367
+msgid "Link"
+msgstr "Enlace"
+
 #: src/components/settings/views/notifications.tsx:155
 msgid "Link a recording to Zoom, Teams, or Google Meet. Recording stops two minutes after the call ends, unless you rejoin. If we’re unsure the call ended, we’ll ask before stopping."
 msgstr "Vincula una grabación a Zoom, Teams o Google Meet. La grabación se detiene dos minutos después de que termine la llamada, a menos que vuelvas a unirte. Si no estamos seguros de que haya terminado, te preguntaremos antes de detener la grabación."
@@ -3469,6 +3513,10 @@ msgstr "Vincula una grabación a Zoom, Teams o Google Meet. La grabación se det
 #: src/components/call-end-bridge.tsx:73
 msgid "Link this recording to a call?"
 msgstr "¿Vincular esta grabación a una llamada?"
+
+#: src/components/editor-area/selection-actions.tsx:406
+msgid "Link URL"
+msgstr "URL del enlace"
 
 #: src/components/right-panel/views/transcript-view.tsx:359
 msgid "Listening. Text appears after speech pauses."
@@ -4059,6 +4107,10 @@ msgstr "Notas"
 msgid "Notifications"
 msgstr "Notificaciones"
 
+#: src/components/editor-area/selection-actions.tsx:491
+msgid "Numbered list"
+msgstr "Lista numerada"
+
 #: src/components/settings/components/template-list.tsx:124
 msgid "Official Templates"
 msgstr "Plantillas oficiales"
@@ -4280,6 +4332,10 @@ msgstr "Propietario"
 #: src/components/right-panel/components/floating-view-toggle.tsx:17
 msgid "Panel view"
 msgstr "Vista del panel"
+
+#: src/components/editor-area/selection-actions.tsx:479
+msgid "Paragraph"
+msgstr "Párrafo"
 
 #: src/components/editor-area/note-header/chips/participants-chip.tsx:105
 msgid "Participants"
@@ -4684,7 +4740,7 @@ msgstr "Novedades recientes"
 msgid "Recording could not be started. Check your audio settings."
 msgstr "No se pudo iniciar la grabación. Verifica tu configuración de audio."
 
-#: src/components/editor-area/index.tsx:888
+#: src/components/editor-area/index.tsx:891
 msgid "Recording too short"
 msgstr "Grabación demasiado corta"
 
@@ -4792,6 +4848,10 @@ msgstr "Quitar del proyecto"
 #: src/components/settings/views/templates.tsx:543
 msgid "Remove from quick access"
 msgstr "Quitar del acceso rápido"
+
+#: src/components/editor-area/selection-actions.tsx:443
+msgid "Remove link"
+msgstr "Eliminar enlace"
 
 #: src/lib/validation-messages.ts:108
 msgid "Remove unrecognized fields."
@@ -5653,6 +5713,10 @@ msgstr "El texto aparece cuando haces una pausa. Solo inglés."
 msgid "Text appears after you pause. Works offline in many languages."
 msgstr "El texto aparece cuando haces una pausa. Funciona sin conexión en muchos idiomas."
 
+#: src/components/editor-area/selection-actions.tsx:301
+msgid "Text formatting"
+msgstr "Formato de texto"
+
 #: src/components/projects/project-files-dropzone.tsx:109
 msgid "Text, Markdown, CSV, JSON, YAML, HTML, logs, PDF, and DOCX files are indexed locally for Ask."
 msgstr "Los archivos de texto, Markdown, CSV, JSON, YAML, HTML, registros, PDF y DOCX se indexan localmente para Ask."
@@ -6026,7 +6090,7 @@ msgstr "Typr aparece en tus conectores de Claude. Pregunta cosas como <0>\"¿Ten
 msgid "Typr needs Accessibility access to detect when calls end. Without access, recordings continue until you stop them."
 msgstr "Typr necesita permiso de Accesibilidad para detectar cuándo terminan las llamadas. Sin este permiso, las grabaciones continúan hasta que las detengas."
 
-#: src/components/editor-area/index.tsx:889
+#: src/components/editor-area/index.tsx:892
 msgid "Typr needs at least {wordsThreshold} words to enhance your note"
 msgstr "Typr necesita al menos {wordsThreshold} palabras para mejorar tu nota"
 
