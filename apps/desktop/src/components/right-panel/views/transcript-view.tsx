@@ -19,7 +19,6 @@ import { commands as localSttCommands } from "@typr/plugin-local-stt";
 
 import TranscriptEditor, { type TranscriptEditorRef } from "@typr/tiptap/transcript";
 
-import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { AnimatedIconDisplay, BUTTON_VARIANTS, CONTENT_VARIANTS } from "@/components/ui/animated-icon-display";
 import { Loader } from "@/components/ui/loader";
 import { debugLogFor } from "@/components/utils/debug-logger";
@@ -345,8 +344,6 @@ export function TranscriptView({
         onClose={onClose}
         onMoveToSidebar={onMoveToSidebar}
       />
-
-      <AISetupIndicator />
 
       <div className="flex-1 overflow-hidden flex flex-col">
         {showEmptyMessage

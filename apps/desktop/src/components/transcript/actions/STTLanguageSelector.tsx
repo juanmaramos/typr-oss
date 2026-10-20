@@ -111,7 +111,7 @@ export function STTLanguageSelector({
       {isActive
         ? (
           // Active state: just the model icon
-          displayOption && <STTProviderIcon model={displayOption.modelKey} />
+          <STTProviderIcon model={displayOption?.modelKey ?? ""} />
         )
         : showCustomTrigger
         ? (
@@ -139,7 +139,7 @@ export function STTLanguageSelector({
           // Inactive state: model name + optional chevron
           <>
             <div className="flex items-center gap-1.5">
-              {displayOption && <STTProviderIcon model={displayOption.modelKey} />}
+              <STTProviderIcon model={displayOption?.modelKey ?? ""} />
               <span className={isCompact ? "text-xs" : "text-xs font-medium"}>
                 {displayOption ? getSttModelLabel(displayOption.key) : <Trans>Select model</Trans>}
               </span>

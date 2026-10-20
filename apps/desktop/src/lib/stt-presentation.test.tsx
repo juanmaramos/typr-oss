@@ -6,6 +6,7 @@ import {
   getSttModelMetadata,
   getSttSupportedLanguages,
   LANGUAGE_OPTIONS,
+  type LanguageOption,
   SETTINGS_LOCAL_STT_MODEL_KEYS,
 } from "@/components/transcript/constants/languageData";
 import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
@@ -21,13 +22,15 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const platform = vi.hoisted(() => ({ supportsLocalModels: true }));
+const downloadState = vi.hoisted(() => ({ isDownloaded: true, isDownloading: false }));
+const downloadModel = vi.hoisted(() => vi.fn());
 vi.mock("@/hooks/usePlatform", () => ({ usePlatform: () => platform }));
 vi.mock(
   "@/components/transcript/hooks/useModelDownload",
   () => ({
     useModelDownload: () => ({
-      getModelStatus: () => ({ isDownloaded: true, isDownloading: false }),
-      downloadModel: vi.fn(),
+      getModelStatus: () => downloadState,
+      downloadModel,
     }),
   }),
 );
@@ -59,6 +62,9 @@ async function render(node: React.ReactNode) {
 beforeEach(() => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   platform.supportsLocalModels = true;
+  downloadState.isDownloaded = true;
+  downloadState.isDownloading = false;
+  downloadModel.mockClear();
   i18n.load("en", english);
   i18n.load("es", spanish);
   i18n.activate("en");
@@ -134,7 +140,8 @@ describe("canonical STT presentation", () => {
     ]);
     expect(makers.every(node => node.getAttribute("aria-hidden") === "true")).toBe(true);
     expect(makers[0].querySelector("svg path")?.getAttribute("fill")).toBe("currentColor");
-    expect(makers[1].querySelector("i")?.className).toBe("ri-openai-fill");
+    expect(makers[1].querySelector("svg path")).not.toBeNull();
+    expect(makers[1].querySelector("i")).toBeNull();
     expect(makers[2].querySelector("img")?.getAttribute("src")).toBe("/icons/huggingface-mono.svg");
     expect([...makers[3].querySelectorAll("img")].map(node => node.getAttribute("src"))).toEqual([
       "/icons/assemblyai-mono.svg",
@@ -154,6 +161,37 @@ describe("canonical STT presentation", () => {
     expect(cloud).toBeTruthy();
     await act(async () => cloud.click());
     expect(onChange).toHaveBeenCalledWith("assemblyai-universal");
+  });
+
+  it("keeps the icon-only picker visible and openable with no recognized selection or downloaded model", async () => {
+    downloadState.isDownloaded = false;
+    const onChange = vi.fn();
+    await render(<STTLanguageSelector value={"" as LanguageOption} onChange={onChange} isActive />);
+    const trigger = container.querySelector("button")!;
+    expect(trigger.disabled).toBe(false);
+    expect(trigger.textContent).toContain("Select model");
+    expect(trigger.querySelector("svg path")).not.toBeNull();
+    await act(async () => trigger.click());
+    const base = [...document.body.querySelectorAll("button")].find(button =>
+      button.textContent?.includes("Whisper Base")
+    )!;
+    expect(base.textContent).toContain("Not downloaded");
+    await act(async () => base.click());
+    expect(onChange).not.toHaveBeenCalled();
+    const download = base.querySelector("[class*=cursor-pointer]") as HTMLElement;
+    await act(async () => download.click());
+    expect(downloadModel).toHaveBeenCalledWith("QuantizedBase");
+  });
+
+  it("preserves the model icon when switching models is disabled during recording", async () => {
+    const onChange = vi.fn();
+    await render(<STTLanguageSelector value="balanced" onChange={onChange} isActive disabled />);
+    const trigger = container.querySelector("button")!;
+    expect(trigger.disabled).toBe(true);
+    expect(trigger.querySelector("[data-stt-provider]")?.getAttribute("data-stt-provider")).toBe("OpenAI");
+    await act(async () => trigger.click());
+    expect(onChange).not.toHaveBeenCalled();
+    expect(document.querySelector("[data-radix-popper-content-wrapper]")).toBeNull();
   });
 
   it.each(["QuantizedBase", "QuantizedSmall", "balanced", "nemotron-streaming"] as const)(

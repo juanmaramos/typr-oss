@@ -30,10 +30,10 @@ export function ModelDownloadBanner({ className }: ModelDownloadBannerProps) {
 
           {/* Content */}
           <div className="flex-1">
-            <div className="font-medium text-info dark:text-info/80 text-sm">
+            <div className="font-medium text-foreground text-sm">
               {t`Setting up AI assistant`}
             </div>
-            <div className="text-info dark:text-info/80 text-xs mt-0.5">
+            <div className="text-foreground text-xs mt-0.5">
               {t`You'll be able to chat when the download completes`}
             </div>
           </div>

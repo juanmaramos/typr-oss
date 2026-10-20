@@ -1,4 +1,5 @@
 import { NvidiaIcon } from "@/components/ui/nvidia-icon";
+import { RiOpenaiFill, RiVoiceprintLine } from "@remixicon/react";
 import { getSttModelMetadata } from "./constants/languageData";
 
 /** Provider marks identify the model maker; execution location has its own badge. */
@@ -17,7 +18,9 @@ export function STTProviderIcon({ model, className = "" }: { model: string; clas
         ? <img src="/icons/assemblyai-mono.svg" alt="" className="size-4 object-contain dark:invert" />
         : provider === "Distil-Whisper"
         ? <img src="/icons/huggingface-mono.svg" alt="" className="size-4 object-contain dark:invert" />
-        : <i className={provider === "OpenAI" ? "ri-openai-fill" : "ri-voiceprint-line"} />}
+        : provider === "OpenAI"
+        ? <RiOpenaiFill className="size-4" />
+        : <RiVoiceprintLine className="size-4" />}
     </span>
   );
 }
