@@ -3,6 +3,8 @@
 
 #[cfg(target_os = "macos")]
 mod macos;
+#[cfg(target_os = "windows")]
+mod windows;
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum CallPresence {
@@ -18,6 +20,8 @@ pub struct CallSource {
     pub label: String,
     #[cfg(target_os = "macos")]
     handle: macos::SourceHandle,
+    #[cfg(target_os = "windows")]
+    handle: windows::SourceHandle,
 }
 
 impl std::fmt::Debug for CallSource {
@@ -70,7 +74,11 @@ pub fn scan_calls(bound: Option<&CallSource>) -> CallScan {
     {
         macos::scan_calls(bound)
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "windows")]
+    {
+        windows::scan_calls(bound)
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
     {
         let _ = bound;
         CallScan::default()
