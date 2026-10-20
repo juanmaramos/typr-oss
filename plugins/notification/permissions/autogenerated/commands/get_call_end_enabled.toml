@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-get-call-end-enabled"
+description = "Enables the get_call_end_enabled command without any pre-configured scope."
+commands.allow = ["get_call_end_enabled"]
+
+[[permission]]
+identifier = "deny-get-call-end-enabled"
+description = "Denies the get_call_end_enabled command without any pre-configured scope."
+commands.deny = ["get_call_end_enabled"]

@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-show-call-end-notification"
+description = "Enables the show_call_end_notification command without any pre-configured scope."
+commands.allow = ["show_call_end_notification"]
+
+[[permission]]
+identifier = "deny-show-call-end-notification"
+description = "Denies the show_call_end_notification command without any pre-configured scope."
+commands.deny = ["show_call_end_notification"]

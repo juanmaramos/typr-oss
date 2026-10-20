@@ -34,6 +34,12 @@ pub trait ListenerPluginExt<R: tauri::Runtime> {
 
     fn get_state(&self) -> impl Future<Output = crate::fsm::State>;
     fn stop_session(&self) -> impl Future<Output = ()>;
+    fn stop_session_if_matching(
+        &self,
+        session_id: &str,
+        started_at: &str,
+        permit: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    ) -> impl Future<Output = bool>;
     fn start_session(&self, id: impl Into<String>) -> impl Future<Output = ()>;
     fn pause_session(&self) -> impl Future<Output = ()>;
     fn resume_session(&self) -> impl Future<Output = ()>;
@@ -332,6 +338,29 @@ impl<R: tauri::Runtime, T: tauri::Manager<R>> ListenerPluginExt<R> for T {
             let event = crate::fsm::StateEvent::Stop;
             guard.fsm.handle(&event).await;
         }
+    }
+
+    async fn stop_session_if_matching(
+        &self,
+        session_id: &str,
+        started_at: &str,
+        permit: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    ) -> bool {
+        let state = self.state::<crate::SharedState>();
+        let mut guard = state.lock().await;
+        let status = guard.fsm.pipeline_status().await;
+        if !permit.load(std::sync::atomic::Ordering::SeqCst)
+            || status.session_id.as_deref() != Some(session_id)
+            || status.started_at.as_deref() != Some(started_at)
+            || !matches!(
+                guard.fsm.state(),
+                crate::fsm::State::RunningActive {} | crate::fsm::State::RunningPaused {}
+            )
+        {
+            return false;
+        }
+        guard.fsm.handle(&crate::fsm::StateEvent::Stop).await;
+        true
     }
 
     #[tracing::instrument(skip_all)]
