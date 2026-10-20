@@ -32,7 +32,6 @@ import { STTLanguageSelector } from "../../transcript/actions/STTLanguageSelecto
 import { LANGUAGE_OPTIONS, type LanguageOption } from "../../transcript/constants/languageData";
 import { useSTTModel } from "../../transcript/hooks/useSTTModel";
 import { SearchHeader } from "../components/search";
-import { TranscriptPreviews } from "../components/transcript-previews";
 import { useTranscriptWidget } from "../hooks/useTranscriptWidget";
 import { shouldPersistTranscriptUpdate } from "./transcript-persistence";
 
@@ -196,10 +195,6 @@ export function TranscriptView({
       }
 
       editorRef.current?.setWords(words ?? []);
-
-      if (isLive && !editorRef.current?.editor?.isFocused) {
-        editorRef.current?.scrollToBottom();
-      }
     });
   }, [words, isLive, sessionId]);
 
@@ -382,6 +377,7 @@ export function TranscriptView({
                   key={sessionId}
                   ref={editorRef}
                   initialWords={words}
+                  previews={previews}
                   editable={ongoingSession.isInactive}
                   onUpdate={handleUpdate}
                   c={SpeakerComponent}
@@ -391,8 +387,6 @@ export function TranscriptView({
                   <div className="absolute inset-0 backdrop-opacity-75 bg-gradient-to-t from-background/65 via-background/35 to-transparent" />
                 </div>
               </div>
-
-              <TranscriptPreviews previews={previews} />
 
               {shouldShowTimer && (
                 <div className="flex flex-col items-center gap-2 py-3 pb-4">

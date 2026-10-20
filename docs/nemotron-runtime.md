@@ -82,6 +82,12 @@ existing Whisper fallback centrally. Fallback must neither overwrite the user's
 default nor replay already committed audio. A native crash cannot unwind through
 the desktop process.
 
+The transcript view renders preliminary words as muted decorations in the same
+speaker flow and scroll surface as final words. They remain outside the editor
+document, undo history, persistence, search, and exports. A finalized channel
+clears its decoration and displays the committed words through the existing
+transcript update path.
+
 ## Verification
 
 `cargo test -p typr-nemotron-runtime` exercises framing, malformed/oversized

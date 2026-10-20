@@ -58,3 +58,12 @@
 .ProseMirror-selectednode {
   outline: 2px solid hsl(var(--primary));
 }
+
+/* Presentation-only hypotheses inherit the transcript's type scale. */
+.transcript-preview {
+  color: hsl(var(--muted-foreground));
+}
+
+.transcript-preview-empty {
+  display: none;
+}

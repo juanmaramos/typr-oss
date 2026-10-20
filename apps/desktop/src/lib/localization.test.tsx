@@ -6,7 +6,6 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { TranscriptPreviews } from "@/components/right-panel/components/transcript-previews";
 import { getShortcutById, getShortcutsByCategory, shortcutsData } from "@/data/shortcuts";
 import { Spinner } from "@typr/ui/components/ui/spinner";
 import { CustomToast } from "@typr/ui/components/ui/toast";
@@ -57,28 +56,6 @@ describe("desktop and shared UI localization", () => {
     await act(async () => i18n.activate("en"));
     expect(container.querySelector("[role=\"status\"]")?.getAttribute("aria-label")).toBe("Loading");
     expect(container.querySelector("p")?.textContent).toBe("Toggle assistant panel");
-  });
-
-  it("localizes transient transcription status without altering recognized English or Spanish speech", async () => {
-    const i18n = setupI18n({ locale: "en", messages: { en: enMessages, es: esMessages } });
-    const previews = {
-      mic: [{ text: "Hello there", speaker: null, confidence: null, start_ms: null, end_ms: null }],
-      speaker: [{ text: "Hola a todos", speaker: null, confidence: null, start_ms: null, end_ms: null }],
-    };
-    await act(async () =>
-      root.render(
-        <I18nProvider i18n={i18n}>
-          <TranscriptPreviews previews={previews} />
-        </I18nProvider>,
-      )
-    );
-    expect(container.querySelector("[aria-label]")?.getAttribute("aria-label")).toBe("Interim transcription");
-    expect(container.textContent).toContain("Live preview · may change");
-    await act(async () => i18n.activate("es"));
-    expect(container.querySelector("[aria-label]")?.getAttribute("aria-label")).toBe("Transcripción provisional");
-    expect(container.textContent).toContain("Vista previa en directo · puede cambiar");
-    expect(container.textContent).toContain("Hello there");
-    expect(container.textContent).toContain("Hola a todos");
   });
 
   it("includes Spanish messages for every registered shortcut and category", () => {
