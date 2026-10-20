@@ -3,6 +3,17 @@ use chrono::{DateTime, Utc};
 use crate::user_common_derives;
 
 user_common_derives! {
+    #[serde(tag = "field", content = "value", rename_all = "snake_case")]
+    pub enum SessionNoteUpdate {
+        Title(String),
+        RawMemoHtml(String),
+        EnhancedMemoHtml(Option<String>),
+        AutoEnhancedMemoHtml(Option<String>),
+        PreMeetingMemoHtml(Option<String>),
+    }
+}
+
+user_common_derives! {
     pub struct Session {
         pub id: String,
         pub created_at: DateTime<Utc>,
@@ -120,6 +131,9 @@ user_common_derives! {
         #[serde(rename = "tagFilter")]
         TagFilter { tag_ids: Vec<String> },
         #[serde(rename = "needsEnhance")]
-        NeedsEnhance {},
+        NeedsEnhance {
+            #[serde(default)]
+            exclude_ids: Option<Vec<String>>,
+        },
     }
 }

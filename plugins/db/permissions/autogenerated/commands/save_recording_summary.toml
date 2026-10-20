@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-save-recording-summary"
+description = "Enables the save_recording_summary command without any pre-configured scope."
+commands.allow = ["save_recording_summary"]
+
+[[permission]]
+identifier = "deny-save-recording-summary"
+description = "Denies the save_recording_summary command without any pre-configured scope."
+commands.deny = ["save_recording_summary"]

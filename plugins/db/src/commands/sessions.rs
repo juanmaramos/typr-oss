@@ -1,5 +1,72 @@
 #[tauri::command]
 #[specta::specta]
+pub async fn update_session_note_fields(
+    state: tauri::State<'_, crate::ManagedState>,
+    session_id: String,
+    updates: Vec<typr_db_user::SessionNoteUpdate>,
+) -> Result<Option<typr_db_user::Session>, String> {
+    let guard = state.lock().await;
+    let db = guard.db.as_ref().ok_or("database is None")?;
+    db.update_session_note_fields(&session_id, updates)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn save_recording_title(
+    state: tauri::State<'_, crate::ManagedState>,
+    session_id: String,
+    record_end: chrono::DateTime<chrono::Utc>,
+    previous_title: String,
+    title: String,
+) -> Result<bool, String> {
+    let guard = state.lock().await;
+    let db = guard.db.as_ref().ok_or("database is None")?;
+    db.save_recording_title(&session_id, record_end, &previous_title, &title)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn set_summary_template(
+    state: tauri::State<'_, crate::ManagedState>,
+    session_id: String,
+    template_id: Option<String>,
+) -> Result<(), String> {
+    let guard = state.lock().await;
+    let db = guard.db.as_ref().ok_or("database is None")?;
+    db.set_summary_template(&session_id, template_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn save_recording_summary(
+    state: tauri::State<'_, crate::ManagedState>,
+    session_id: String,
+    words: Vec<typr_listener_interface::Word>,
+    record_end: chrono::DateTime<chrono::Utc>,
+    previous_html: Option<String>,
+    html: String,
+) -> Result<bool, String> {
+    let guard = state.lock().await;
+    let db = guard.db.as_ref().ok_or("database is None")?;
+    let words = serde_json::to_string(&words).map_err(|e| e.to_string())?;
+    db.save_recording_summary(
+        &session_id,
+        &words,
+        record_end,
+        previous_html.as_deref(),
+        &html,
+    )
+    .await
+    .map_err(|e| e.to_string())
+}
+#[tauri::command]
+#[specta::specta]
 #[tracing::instrument(skip(state))]
 pub async fn thank_you_session_id(
     state: tauri::State<'_, crate::ManagedState>,

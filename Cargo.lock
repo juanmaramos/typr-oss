@@ -12247,10 +12247,12 @@ dependencies = [
 name = "tauri-plugin-db"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "db-core",
  "db-user",
  "listener-interface",
  "serde",
+ "serde_json",
  "specta",
  "specta-typescript",
  "tauri",
