@@ -1,10 +1,12 @@
 mod app;
 mod browser;
+mod call;
 mod mic;
 mod utils;
 
 pub use app::*;
 pub use browser::*;
+pub use call::*;
 pub use mic::*;
 
 use utils::*;
