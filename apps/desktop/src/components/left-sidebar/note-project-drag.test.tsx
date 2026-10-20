@@ -7,15 +7,11 @@ import { act, createElement, Fragment } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ProjectsSection } from "@/components/left-sidebar/projects-section";
-import NotesList, { NoteItem } from "@/components/left-sidebar/notes-list";
 import { BulkActionBar } from "@/components/left-sidebar/bulk-delete-button";
-import {
-  endNoteProjectDrag,
-  NOTE_PROJECT_DRAG_TYPE,
-  startNoteProjectDrag,
-} from "@/lib/note-project-drag";
-import { projectQueryKeys, type Project } from "@/lib/projects";
+import NotesList, { NoteItem } from "@/components/left-sidebar/notes-list";
+import { ProjectsSection } from "@/components/left-sidebar/projects-section";
+import { endNoteProjectDrag, NOTE_PROJECT_DRAG_TYPE, startNoteProjectDrag } from "@/lib/note-project-drag";
+import { type Project, projectQueryKeys } from "@/lib/projects";
 
 const testMocks = vi.hoisted(() => ({
   navigate: vi.fn(),
@@ -77,18 +73,20 @@ vi.mock("@/hooks/useMultiSelectKeyboard", () => ({ useMultiSelectKeyboard: vi.fn
 vi.mock("@/hooks/useBulkDelete", () => ({ useBulkDelete: () => ({ handleBulkDelete: vi.fn(), isDeleting: false }) }));
 vi.mock("@/stores/useMultiSelectNotes", () => ({ useMultiSelectNotes: () => testMocks.multiSelect.current }));
 vi.mock("@typr/utils/contexts", () => ({
-  useSession: (_sessionId: string, selector: (state: unknown) => unknown) => selector({
-    session: {
-      title: "Dragged note",
-      created_at: "2026-10-01T12:00:00.000Z",
-      record_start: null,
-      needs_enhance: false,
-    },
-  }),
-  useSessions: (selector: (state: unknown) => unknown) => selector({
-    sessions: testMocks.sessionState.current,
-    insert: testMocks.insertSession,
-  }),
+  useSession: (_sessionId: string, selector: (state: unknown) => unknown) =>
+    selector({
+      session: {
+        title: "Dragged note",
+        created_at: "2026-10-01T12:00:00.000Z",
+        record_start: null,
+        needs_enhance: false,
+      },
+    }),
+  useSessions: (selector: (state: unknown) => unknown) =>
+    selector({
+      sessions: testMocks.sessionState.current,
+      insert: testMocks.insertSession,
+    }),
 }));
 vi.mock("@typr/plugin-db", () => ({
   commands: { sessionGetEvent: testMocks.sessionGetEvent, listSessions: testMocks.listSessions },
@@ -99,16 +97,17 @@ vi.mock("@/utils/delete-session", () => ({ deleteSessionWithWelcomeDismissal: vi
 vi.mock("@/utils/session-cache", () => ({ removeSessionsFromCache: vi.fn() }));
 vi.mock("@/components/utils/debug-logger", () => ({ debugLog: vi.fn() }));
 vi.mock("@typr/ui/components/ui/checkbox", () => ({
-  Checkbox: ({ checked, onCheckedChange, onClick, ...props }: Record<string, any>) => createElement("button", {
-    ...props,
-    type: "button",
-    role: "checkbox",
-    "aria-checked": checked,
-    onClick: (event: MouseEvent) => {
-      onClick?.(event);
-      onCheckedChange?.(!checked);
-    },
-  }),
+  Checkbox: ({ checked, onCheckedChange, onClick, ...props }: Record<string, any>) =>
+    createElement("button", {
+      ...props,
+      type: "button",
+      role: "checkbox",
+      "aria-checked": checked,
+      onClick: (event: MouseEvent) => {
+        onClick?.(event);
+        onCheckedChange?.(!checked);
+      },
+    }),
 }));
 vi.mock("@typr/ui/components/ui/dropdown-menu", () => ({
   DropdownMenu: ({ children }: { children: React.ReactNode }) => createElement(Fragment, null, children),
@@ -196,14 +195,20 @@ function createDataTransfer(files: File[] = []) {
   const types: string[] = [];
   const transfer = {
     files: Object.assign(files, { length: files.length }),
-    get types() { return types; },
+    get types() {
+      return types;
+    },
     effectAllowed: "none",
     dropEffect: "none",
     setData(type: string, value: string) {
-      if (!types.includes(type)) types.push(type);
+      if (!types.includes(type)) {
+        types.push(type);
+      }
       data.set(type, value);
     },
-    getData(type: string) { return data.get(type) ?? ""; },
+    getData(type: string) {
+      return data.get(type) ?? "";
+    },
   } as unknown as DataTransfer;
   return transfer;
 }
@@ -220,7 +225,9 @@ function dispatchDrag(target: Element, type: string, dataTransfer: DataTransfer,
 
 function projectRow() {
   const row = [...container!.querySelectorAll("button")].find(button => button.textContent?.includes(project.name));
-  if (!row) throw new Error("Project row was not rendered");
+  if (!row) {
+    throw new Error("Project row was not rendered");
+  }
   return row;
 }
 
@@ -284,15 +291,20 @@ beforeEach(() => {
   };
   queryClient.setQueryData(["projects"], [project]);
   queryClient.setQueryData(["event", noteId], null);
-  vi.stubGlobal("IntersectionObserver", class {
-    observe() {}
-    disconnect() {}
-  });
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      observe() {}
+      disconnect() {}
+    },
+  );
 });
 
 afterEach(async () => {
   act(() => endNoteProjectDrag(noteId));
-  if (root) await act(async () => root?.unmount());
+  if (root) {
+    await act(async () => root?.unmount());
+  }
   queryClient?.clear();
   vi.unstubAllGlobals();
   container?.remove();
@@ -303,8 +315,12 @@ afterEach(async () => {
 
 describe("sidebar note to project drag and drop", () => {
   it("highlights a valid project without assigning during hover, then adds the note on drop", async () => {
-    testMocks.assignSessionToProject.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(null), 0)));
-    await render(createElement(Fragment, null, createElement(NotesList, { filter: () => true }), createElement(ProjectsSection)));
+    testMocks.assignSessionToProject.mockImplementation(() =>
+      new Promise(resolve => setTimeout(() => resolve(null), 0))
+    );
+    await render(
+      createElement(Fragment, null, createElement(NotesList, { filter: () => true }), createElement(ProjectsSection)),
+    );
     await flushMutations();
     await flushMutations();
     const noteTitle = [...container!.querySelectorAll("span")].find(span => span.textContent === "Dragged note");
@@ -333,9 +349,12 @@ describe("sidebar note to project drag and drop", () => {
     expect(noteTitle?.isConnected).toBe(true);
 
     dispatchDrag(projectButton, "drop", transfer);
-    await flushMutations();
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(testMocks.markAndEnqueueProjectBriefRefresh).toHaveBeenCalledExactlyOnceWith(projectId);
+      });
+    });
     expect(testMocks.assignSessionToProject).toHaveBeenCalledExactlyOnceWith(noteId, projectId);
-    expect(testMocks.markAndEnqueueProjectBriefRefresh).toHaveBeenCalledExactlyOnceWith(projectId);
     expect(testMocks.trackEvent).toHaveBeenCalledWith("project_notes_added", "user-1", {
       project_id: projectId,
       note_count: 1,
@@ -370,7 +389,11 @@ describe("sidebar note to project drag and drop", () => {
 
   it("allows only one assignment for duplicate pending drops and clears the guard after failure", async () => {
     let rejectAssignment: ((error: Error) => void) | undefined;
-    testMocks.assignSessionToProject.mockImplementationOnce(() => new Promise((_, reject) => { rejectAssignment = reject; }));
+    testMocks.assignSessionToProject.mockImplementationOnce(() =>
+      new Promise((_, reject) => {
+        rejectAssignment = reject;
+      })
+    );
     testMocks.assignSessionToProject.mockResolvedValueOnce(null);
     await render(createElement(ProjectsSection));
     const projectButton = projectRow();
@@ -381,7 +404,9 @@ describe("sidebar note to project drag and drop", () => {
     dispatchDrag(projectButton, "dragover", transfer);
     dispatchDrag(projectButton, "drop", transfer);
     dispatchDrag(projectButton, "drop", transfer);
-    await act(async () => { await Promise.resolve(); });
+    await act(async () => {
+      await Promise.resolve();
+    });
     expect(testMocks.assignSessionToProject).toHaveBeenCalledTimes(1);
 
     await act(async () => {
@@ -410,7 +435,9 @@ describe("sidebar note to project drag and drop", () => {
   });
 
   it("clears the project highlight when a drag is cancelled or an invalid drop arrives", async () => {
-    await render(createElement(Fragment, null, createElement(NotesList, { filter: () => true }), createElement(ProjectsSection)));
+    await render(
+      createElement(Fragment, null, createElement(NotesList, { filter: () => true }), createElement(ProjectsSection)),
+    );
     await flushMutations();
     const noteTitle = [...container!.querySelectorAll("span")].find(span => span.textContent === "Dragged note");
     const noteDragHandle = noteTitle?.parentElement;
@@ -431,11 +458,13 @@ describe("sidebar note to project drag and drop", () => {
     expect(testMocks.assignSessionToProject).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ["Included", false],
-    ["ExcludedFromBrief", true],
-    ["NeedsReview", true],
-  ] as const)("only skips a cached %s membership when it is already Included", async (status, shouldAssign) => {
+  it.each(
+    [
+      ["Included", false],
+      ["ExcludedFromBrief", true],
+      ["NeedsReview", true],
+    ] as const,
+  )("only skips a cached %s membership when it is already Included", async (status, shouldAssign) => {
     await render(createElement(ProjectsSection));
     queryClient?.setQueryData([projectQueryKeys.sources, projectId], [
       { project_id: projectId, session_id: noteId, status },
@@ -478,7 +507,7 @@ describe("sidebar note to project drag and drop", () => {
     const title = [...container!.querySelectorAll("span")].find(span => span.textContent === "Dragged note");
     act(() => title?.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     expect(testMocks.navigate).toHaveBeenCalledWith({ to: "/app/note/$id", params: { id: noteId } });
-    act(() => container!.querySelector<HTMLButtonElement>('button[aria-label="Note actions"]')?.click());
+    act(() => container!.querySelector<HTMLButtonElement>("button[aria-label=\"Note actions\"]")?.click());
     expect(testMocks.navigate).toHaveBeenCalledTimes(1);
 
     testMocks.navigate.mockClear();
@@ -499,7 +528,7 @@ describe("sidebar note to project drag and drop", () => {
       await Promise.resolve();
     });
     expect(container!.querySelector("[draggable]")?.getAttribute("draggable")).toBe("false");
-    const checkbox = container!.querySelector<HTMLButtonElement>('[role="checkbox"]');
+    const checkbox = container!.querySelector<HTMLButtonElement>("[role=\"checkbox\"]");
     expect(checkbox).not.toBeNull();
     act(() => checkbox?.click());
     expect(testMocks.toggleNote).toHaveBeenCalledWith(noteId);
@@ -511,8 +540,12 @@ describe("sidebar note to project drag and drop", () => {
     });
     await flushMutations();
     expect(container!.innerHTML).toContain(project.name);
-    expect([...container!.querySelectorAll("button")].some(button => button.textContent?.includes(project.name))).toBe(true);
-    act(() => [...container!.querySelectorAll("button")].find(button => button.textContent?.includes(project.name))?.click());
+    expect([...container!.querySelectorAll("button")].some(button => button.textContent?.includes(project.name))).toBe(
+      true,
+    );
+    act(() =>
+      [...container!.querySelectorAll("button")].find(button => button.textContent?.includes(project.name))?.click()
+    );
     await flushMutations();
     expect(testMocks.assignSessionToProject).toHaveBeenCalledTimes(2);
     expect(testMocks.trackEvent).toHaveBeenCalledWith("project_notes_added", "user-1", {
