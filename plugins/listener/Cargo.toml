@@ -11,6 +11,7 @@ description = ""
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dev-dependencies]
+tauri-plugin-store = { workspace = true }
 tauri-plugin-local-stt = { workspace = true }
 
 rodio = { workspace = true, features = ["wav"] }

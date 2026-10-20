@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { openPath } from "@tauri-apps/plugin-opener";
 import { useMemo, useState } from "react";
 
@@ -6,7 +6,6 @@ import { SETTINGS_LOCAL_STT_MODEL_KEYS, sttModelMetadata } from "@/components/tr
 import { type AISettingsSection, useSettingsDialog } from "@/contexts/settings-dialog";
 import { usePlatform } from "@/hooks/usePlatform";
 import { Trans } from "@lingui/react/macro";
-import { commands as connectorCommands } from "@typr/plugin-connector";
 import { commands as localLlmCommands, SupportedModel } from "@typr/plugin-local-llm";
 
 import { commands as localSttCommands, type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
@@ -57,11 +56,9 @@ export default function LocalAI() {
 
   // STT State
   const [isWerModalOpen, setIsWerModalOpen] = useState(false);
-  const [selectedSTTModel, setSelectedSTTModel] = useState("QuantizedLargeTurbo"); // Default to multilingual
-  const [sttModels, setSttModels] = useState(visibleSttModels);
+  const sttModels = visibleSttModels;
 
   // LLM State
-  const [selectedLLMModel, setSelectedLLMModel] = useState("Gemma4E4b");
   const [downloadingModels, setDownloadingModels] = useState<Set<string>>(new Set());
 
   // Shared Model Download Function
@@ -81,36 +78,13 @@ export default function LocalAI() {
     setDownloadingModels(prev => new Set([...prev, modelKey]));
 
     showSttModelDownloadToast(modelKey as SupportedSttModel, () => {
-      setSttModels(prev =>
-        prev.map(model =>
-          model.key === modelKey
-            ? { ...model, downloaded: true }
-            : model
-        )
-      );
       setDownloadingModels(prev => {
         const newSet = new Set(prev);
         newSet.delete(modelKey);
         return newSet;
       });
-
-      setSelectedSTTModel(modelKey);
-      localSttCommands.setCurrentModel(modelKey as SupportedSttModel);
     }, queryClient);
   };
-
-  // Queries needed by LLM download flow
-  const customLLMEnabled = useQuery({
-    queryKey: ["custom-llm-enabled"],
-    queryFn: () => connectorCommands.getCustomLlmEnabled(),
-  });
-
-  const setCustomLLMEnabledMutation = useMutation({
-    mutationFn: (enabled: boolean) => connectorCommands.setCustomLlmEnabled(enabled),
-    onSuccess: () => {
-      customLLMEnabled.refetch();
-    },
-  });
 
   const handleLlmModelDownload = async (modelKey: string) => {
     setDownloadingModels((prev) => new Set([...prev, modelKey]));
@@ -121,10 +95,6 @@ export default function LocalAI() {
         s.delete(modelKey);
         return s;
       });
-
-      setSelectedLLMModel(modelKey);
-      localLlmCommands.setCurrentModel(modelKey as SupportedModel);
-      setCustomLLMEnabledMutation.mutate(false);
     }, queryClient);
   };
 
@@ -135,10 +105,7 @@ export default function LocalAI() {
 
   // Prepare props for child components
   const sttProps: SharedSTTProps & { isWerModalOpen: boolean; setIsWerModalOpen: (open: boolean) => void } = {
-    selectedSTTModel,
-    setSelectedSTTModel,
     sttModels,
-    setSttModels,
     downloadingModels,
     handleModelDownload,
     handleShowFileLocation,
@@ -148,10 +115,6 @@ export default function LocalAI() {
   };
 
   const localLlmProps: SharedLLMProps = {
-    customLLMEnabled,
-    selectedLLMModel,
-    setSelectedLLMModel,
-    setCustomLLMEnabledMutation,
     downloadingModels,
     handleModelDownload,
     handleShowFileLocation,

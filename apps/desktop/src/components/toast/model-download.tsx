@@ -1,4 +1,4 @@
-import { commands as connectorCommands } from "@typr/plugin-connector";
+import { cloudChatModelQueryOptions, customEndpointEnabledQueryOptions, transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { sonnerToast, toast } from "@typr/ui/components/ui/toast";
 import { useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
@@ -22,23 +22,9 @@ export default function ModelDownloadNotification() {
     );
   });
 
-  const selectedSttModelQuery = useQuery({
-    queryKey: ["stt-model", "current"],
-    queryFn: () => connectorCommands.getSttModel().catch(() => ""),
-    staleTime: 30 * 1000,
-  });
-
-  const selectedCloudModelQuery = useQuery({
-    queryKey: ["cloud-model", "current"],
-    queryFn: () => connectorCommands.getCloudModel().catch(() => ""),
-    staleTime: 30 * 1000,
-  });
-
-  const llmConnectionQuery = useQuery({
-    queryKey: ["llm-connection", "current"],
-    queryFn: () => connectorCommands.getLlmConnection().catch(() => null),
-    staleTime: 30 * 1000,
-  });
+  const selectedSttModelQuery = useQuery(transcriptionModelQueryOptions());
+  const selectedCloudModelQuery = useQuery(cloudChatModelQueryOptions());
+  const customEndpointQuery = useQuery(customEndpointEnabledQueryOptions());
 
   const { getModel } = useModelState();
 
@@ -75,9 +61,9 @@ export default function ModelDownloadNotification() {
   const selectedSttModel = selectedSttModelQuery.data || "";
   const selectedCloudModel = selectedCloudModelQuery.data || "";
   const isUsingCloudStt = selectedSttModel.includes("assemblyai");
-  const isUsingCloudLlm = llmConnectionQuery.data?.type === "CloudProvider" || selectedCloudModel.length > 0;
+  const isUsingCloudLlm = selectedCloudModel.length > 0 || customEndpointQuery.data === true;
   const isSelectionLoading = selectedSttModelQuery.isLoading || selectedCloudModelQuery.isLoading
-    || llmConnectionQuery.isLoading;
+    || customEndpointQuery.isLoading;
 
   useEffect(() => {
     // On Windows, cloud models are always available - don't show download prompt

@@ -20,6 +20,10 @@ pub trait LocalSttPluginExt<R: Runtime> {
 
     fn is_server_running(&self) -> impl Future<Output = bool>;
     fn start_server(&self) -> impl Future<Output = Result<String, crate::Error>>;
+    fn start_server_for_model(
+        &self,
+        model: crate::SupportedModel,
+    ) -> impl Future<Output = Result<String, crate::Error>>;
     fn stop_server(&self) -> impl Future<Output = Result<(), crate::Error>>;
 
     fn get_current_model(&self) -> Result<crate::SupportedModel, crate::Error>;
@@ -126,8 +130,15 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
 
     #[tracing::instrument(skip_all)]
     async fn start_server(&self) -> Result<String, crate::Error> {
+        self.start_server_for_model(self.get_current_model()?).await
+    }
+
+    #[tracing::instrument(skip_all)]
+    async fn start_server_for_model(
+        &self,
+        model: crate::SupportedModel,
+    ) -> Result<String, crate::Error> {
         let cache_dir = self.models_dir();
-        let model = self.get_current_model()?;
 
         tracing::info!("[STT_SERVER_START] Using model: {:?}", model);
 
@@ -138,12 +149,19 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
         let state = self.state::<crate::SharedState>();
         let mut s = state.lock().await;
         if let (Some(api_base), Some(_server)) = (&s.api_base, &s.server) {
-            return Ok(api_base.clone());
+            if s.server_model.as_ref() == Some(&model) {
+                return Ok(api_base.clone());
+            }
         }
+        if let Some(server) = s.server.take() {
+            let _ = server.shutdown.send(());
+        }
+        s.api_base = None;
+        s.server_model = None;
 
         let server_state = crate::ServerStateBuilder::default()
             .model_cache_dir(cache_dir)
-            .model_type(model)
+            .model_type(model.clone())
             .build();
 
         let server = crate::run_server(server_state).await?;
@@ -153,6 +171,7 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
 
         s.api_base = Some(api_base.clone());
         s.server = Some(server);
+        s.server_model = Some(model);
 
         Ok(api_base)
     }
@@ -165,6 +184,8 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
         if let Some(server) = s.server.take() {
             let _ = server.shutdown.send(());
         }
+        s.api_base = None;
+        s.server_model = None;
         Ok(())
     }
 

@@ -1,3 +1,4 @@
+import { transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LANGUAGES_ISO_639_1 } from "@huggingface/languages";
 import { i18n } from "@lingui/core";
@@ -15,7 +16,6 @@ import { commands } from "@/types";
 import { restartForLanguageChange } from "@/utils/app-restart";
 import { openSettingsWindow } from "@/utils/open-settings-window";
 import { commands as configCommands, type ConfigGeneral } from "@typr/plugin-config";
-import { commands as connectorCommands } from "@typr/plugin-connector";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@typr/ui/components/ui/command";
@@ -99,11 +99,7 @@ export default function General() {
   });
 
   // Get current STT model to show model-aware UI
-  const { data: connectorModel } = useQuery({
-    queryKey: ["stt-model-connector"],
-    queryFn: () => connectorCommands.getSttModel(),
-    refetchOnWindowFocus: false,
-  });
+  const { data: connectorModel } = useQuery(transcriptionModelQueryOptions());
 
   // Determine if using cloud (Real-time multilingual) model
   const selectedModelOption = LANGUAGE_OPTIONS.find(o =>

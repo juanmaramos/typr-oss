@@ -1,10 +1,12 @@
+import { useModelPreferences } from "@/hooks/useModelPreferences";
+import { transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { Trans } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 
 import { sttModelMetadata, WER_PERFORMANCE_TIERS } from "@/components/transcript/constants/languageData";
 import { commands as connectorCommands } from "@typr/plugin-connector";
-import { commands as localSttCommands, type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
+import { type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
 import { Button } from "@typr/ui/components/ui/button";
 import { Input } from "@typr/ui/components/ui/input";
 import { cn } from "@typr/ui/lib/utils";
@@ -89,10 +91,7 @@ type CloudSttApiKeys = {
 };
 
 export function STTView({
-  selectedSTTModel,
-  setSelectedSTTModel,
   sttModels,
-  setSttModels,
   downloadingModels,
   handleModelDownload,
   handleShowFileLocation,
@@ -105,20 +104,9 @@ export function STTView({
     assemblyai: "",
   });
 
-  // Get current selected STT model from connector store (stores enum names)
-  const currentSTTModel = useQuery({
-    queryKey: ["current-stt-model"],
-    queryFn: async () => {
-      const model = await connectorCommands.getSttModel();
-      return model || "QuantizedLargeTurbo"; // Default to QuantizedLargeTurbo
-    },
-  });
-
-  useEffect(() => {
-    if (currentSTTModel.data) {
-      setSelectedSTTModel(currentSTTModel.data);
-    }
-  }, [currentSTTModel.data, setSelectedSTTModel]);
+  const { selectTranscription } = useModelPreferences();
+  const currentSTTModel = useQuery(transcriptionModelQueryOptions());
+  const selectedSTTModel = currentSTTModel.data ?? "";
 
   const cloudSttApiKeysQuery = useQuery({
     queryKey: ["cloud-stt-api-keys"],
@@ -142,11 +130,7 @@ export function STTView({
   const isAssemblyAiSelected = selectedSTTModel === "assemblyai-universal"
     || selectedSTTModel === "AssemblyAIUniversal";
 
-  const selectCloudModel = async () => {
-    setSelectedSTTModel("assemblyai-universal");
-    await connectorCommands.setSttModel("assemblyai-universal");
-    await currentSTTModel.refetch();
-  };
+  const selectCloudModel = () => selectTranscription("assemblyai-universal");
 
   // ✅ Derive model download state directly from useModelState (same pattern as useModelDownload)
   const { getModel } = useModelState();
@@ -157,11 +141,7 @@ export function STTView({
     return metadata?.languageSupport === "multilingual" || modelKey === "AssemblyAIUniversal";
   };
 
-  const selectLocalModel = async (modelKey: string) => {
-    setSelectedSTTModel(modelKey);
-    await localSttCommands.setCurrentModel(modelKey as SupportedSttModel);
-    await currentSTTModel.refetch();
-  };
+  const selectLocalModel = (modelKey: string) => selectTranscription(modelKey as SupportedSttModel);
 
   const renderLocalModelDescription = (modelKey: string) => {
     switch (modelKey) {

@@ -1,6 +1,9 @@
 use std::future::Future;
 
-use crate::{Connection, ConnectionLLM, ConnectionSTT, StoreKey};
+use crate::{
+    Connection, ConnectionLLM, ConnectionSTT, SessionModelOverride, SessionModelOverrideState,
+    StoreKey, SttSelection,
+};
 use tauri_plugin_store2::StorePluginExt;
 
 fn non_empty(value: Option<String>) -> Option<String> {
@@ -56,6 +59,20 @@ pub trait ConnectorPluginExt<R: tauri::Runtime> {
 
     fn get_llm_connection(&self) -> impl Future<Output = Result<ConnectionLLM, crate::Error>>;
     fn get_stt_connection(&self) -> impl Future<Output = Result<ConnectionSTT, crate::Error>>;
+    fn get_stt_selection(
+        &self,
+        session_id: Option<&str>,
+    ) -> impl Future<Output = Result<SttSelection, crate::Error>>;
+    fn connect_stt_selection(
+        &self,
+        selection: SttSelection,
+    ) -> impl Future<Output = Result<ConnectionSTT, crate::Error>>;
+    fn set_stt_model_session(
+        &self,
+        session_id: String,
+        model: tauri_plugin_local_stt::SupportedModel,
+    ) -> impl Future<Output = Result<(), crate::Error>>;
+    fn clear_stt_model_session(&self, session_id: &str) -> impl Future<Output = ()>;
 
     fn get_admin_connection(&self) -> Result<Option<Connection>, crate::Error>;
     fn set_admin_connection(&self, connection: Connection) -> Result<(), crate::Error>;
@@ -214,50 +231,93 @@ impl<R: tauri::Runtime, T: tauri::Manager<R> + tauri::Emitter<R>> ConnectorPlugi
         }
     }
 
-    async fn get_stt_connection(&self) -> Result<ConnectionSTT, crate::Error> {
-        let store = self.connector_store();
-
-        // Check session override first (set by fallback logic, not persisted to disk).
-        // Falls back to the user's persisted preference if no session override is active.
-        let session_model = store
-            .get::<String>(StoreKey::SttModelSession)?
-            .unwrap_or_default();
-        let stt_model = if !session_model.is_empty() {
-            session_model
-        } else {
-            store.get::<String>(StoreKey::SttModel)?.unwrap_or_default()
-        };
-
-        let stt_model = stt_model.to_lowercase();
-        if stt_model.contains("assemblyai") {
-            let api_key =
-                non_empty(store.get::<String>(StoreKey::AssemblyaiApiKey)?).ok_or_else(|| {
-                    crate::Error::UnknownError("missing AssemblyAI API key".to_string())
-                })?;
-
-            return Ok(ConnectionSTT::CloudProvider(Connection {
-                api_base: "https://api.assemblyai.com".to_string(),
-                api_key: Some(api_key),
-            }));
+    async fn set_stt_model_session(
+        &self,
+        session_id: String,
+        model: tauri_plugin_local_stt::SupportedModel,
+    ) -> Result<(), crate::Error> {
+        if session_id.trim().is_empty() {
+            return Err(crate::Error::UnknownError(
+                "missing transcription session ID".to_string(),
+            ));
         }
+        *self.state::<SessionModelOverrideState>().lock().await =
+            Some(SessionModelOverride { session_id, model });
+        Ok(())
+    }
 
+    async fn clear_stt_model_session(&self, session_id: &str) {
+        let state = self.state::<SessionModelOverrideState>();
+        let mut selection = state.lock().await;
+        if selection
+            .as_ref()
+            .is_some_and(|selection| selection.session_id == session_id)
         {
-            use tauri_plugin_local_stt::{LocalSttPluginExt, SharedState};
-
-            let api_base = if self.is_server_running().await {
-                let state = self.state::<SharedState>();
-                let guard = state.lock().await;
-                guard.api_base.clone().unwrap()
-            } else {
-                self.start_server().await?
-            };
-
-            let conn = ConnectionSTT::TyprLocal(Connection {
-                api_base,
-                api_key: None,
-            });
-            Ok(conn)
+            *selection = None;
         }
+    }
+
+    async fn get_stt_selection(
+        &self,
+        session_id: Option<&str>,
+    ) -> Result<SttSelection, crate::Error> {
+        use tauri_plugin_local_stt::LocalSttPluginExt;
+
+        // A different recording, upload, or native start must never inherit another
+        // session's recovery choice. Keep the model snapshot independent of later writes.
+        let session_model = self
+            .state::<SessionModelOverrideState>()
+            .lock()
+            .await
+            .clone()
+            .filter(|selection| Some(selection.session_id.as_str()) == session_id);
+        if let Some(selection) = session_model {
+            return Ok(SttSelection::Local(selection.model));
+        }
+
+        let store = self.connector_store();
+        let model = store.get::<String>(StoreKey::SttModel)?.unwrap_or_default();
+        let model = model.trim();
+        if model.to_lowercase().contains("assemblyai") {
+            let api_key = non_empty(store.get::<String>(StoreKey::AssemblyaiApiKey)?);
+            return Ok(SttSelection::AssemblyAi { api_key });
+        }
+        let model = if model.is_empty() {
+            self.get_current_model()?
+        } else {
+            serde_json::from_value(serde_json::Value::String(model.to_string())).map_err(|_| {
+                crate::Error::UnknownError("unsupported transcription model".to_string())
+            })?
+        };
+        Ok(SttSelection::Local(model))
+    }
+
+    async fn connect_stt_selection(
+        &self,
+        selection: SttSelection,
+    ) -> Result<ConnectionSTT, crate::Error> {
+        match selection {
+            SttSelection::AssemblyAi { api_key } => Ok(ConnectionSTT::CloudProvider(Connection {
+                api_base: "https://api.assemblyai.com".to_string(),
+                api_key: Some(api_key.ok_or_else(|| {
+                    crate::Error::UnknownError("missing AssemblyAI API key".to_string())
+                })?),
+            })),
+            SttSelection::Local(model) => {
+                use tauri_plugin_local_stt::LocalSttPluginExt;
+                let api_base = self.start_server_for_model(model).await?;
+                Ok(ConnectionSTT::TyprLocal(Connection {
+                    api_base,
+                    api_key: None,
+                }))
+            }
+        }
+    }
+
+    async fn get_stt_connection(&self) -> Result<ConnectionSTT, crate::Error> {
+        // Non-session callers (including uploads) always resolve the durable default.
+        let selection = self.get_stt_selection(None).await?;
+        self.connect_stt_selection(selection).await
     }
     fn get_admin_connection(&self) -> Result<Option<Connection>, crate::Error> {
         let api_base = self.connector_store().get(StoreKey::AdminApiBase)?;

@@ -1,4 +1,6 @@
-use crate::{AiTaskDefaults, Connection, ConnectionLLM, ConnectionSTT, ConnectorPluginExt, StoreKey};
+use crate::{
+    AiTaskDefaults, Connection, ConnectionLLM, ConnectionSTT, ConnectorPluginExt, StoreKey,
+};
 use typr_listener_interface::Word;
 
 #[tauri::command]
@@ -404,36 +406,30 @@ pub async fn set_stt_model<R: tauri::Runtime>(
     Ok(())
 }
 
-/// Set a transient session-level STT model override. This is NOT saved to disk.
-/// Used by fallback logic to switch models mid-session without touching the user's preference.
-/// Clear it with `clear_stt_model_session` when the session ends.
+/// Set a transient recovery model for one recording session without saving preferences.
+/// Other recording sessions and uploads continue to use the durable default.
 #[tauri::command]
 #[specta::specta]
 pub async fn set_stt_model_session<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
+    session_id: String,
     model: String,
 ) -> Result<(), String> {
-    tracing::debug!("[SET_STT_MODEL_SESSION] Session override: {}", model);
-    let store = app.connector_store();
-    store
-        .set(StoreKey::SttModelSession, model)
-        .map_err(|e| e.to_string())?;
-    // Intentionally no store.save() — this override must not persist across restarts
-    Ok(())
+    let model: tauri_plugin_local_stt::SupportedModel =
+        serde_json::from_value(serde_json::Value::String(model)).map_err(|e| e.to_string())?;
+    app.set_stt_model_session(session_id, model)
+        .await
+        .map_err(|e| e.to_string())
 }
 
-/// Clear the transient session STT model override, restoring the user's persisted preference.
+/// Clear only the matching session's recovery model without changing its saved default.
 #[tauri::command]
 #[specta::specta]
 pub async fn clear_stt_model_session<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
+    session_id: String,
 ) -> Result<(), String> {
-    tracing::debug!("[CLEAR_STT_MODEL_SESSION] Restoring user preference");
-    let store = app.connector_store();
-    store
-        .set(StoreKey::SttModelSession, String::new())
-        .map_err(|e| e.to_string())?;
-    // Intentionally no store.save()
+    app.clear_stt_model_session(&session_id).await;
     Ok(())
 }
 
@@ -515,4 +511,57 @@ pub async fn process_recorded_cloud<R: tauri::Runtime>(
     crate::recorded::transcribe_with_provider(&api_base, &api_key, &audio_path)
         .await
         .map_err(|e| e.to_string())
+}
+
+#[cfg(test)]
+mod session_model_tests {
+    use super::*;
+    use crate::{SessionModelOverride, SessionModelOverrideState};
+    use tauri::Manager;
+    use tauri_plugin_local_stt::SupportedModel;
+
+    #[tokio::test]
+    async fn session_model_commands_are_scoped_and_do_not_need_a_preference_store() {
+        let app = tauri::test::mock_builder()
+            .manage(SessionModelOverrideState::default())
+            .build(tauri::test::mock_context(tauri::test::noop_assets()))
+            .unwrap();
+        let handle = app.handle().clone();
+        set_stt_model_session(
+            handle.clone(),
+            "session-1".into(),
+            "QuantizedLargeTurbo".into(),
+        )
+        .await
+        .unwrap();
+        let expected = Some(SessionModelOverride {
+            session_id: "session-1".into(),
+            model: SupportedModel::QuantizedLargeTurbo,
+        });
+        assert_eq!(
+            *app.state::<SessionModelOverrideState>().lock().await,
+            expected
+        );
+        assert!(
+            set_stt_model_session(handle.clone(), "session-1".into(), "invalid-model".into())
+                .await
+                .is_err()
+        );
+        assert!(
+            set_stt_model_session(handle.clone(), "".into(), "QuantizedLargeTurbo".into())
+                .await
+                .is_err()
+        );
+        clear_stt_model_session(handle.clone(), "session-2".into())
+            .await
+            .unwrap();
+        assert_eq!(
+            *app.state::<SessionModelOverrideState>().lock().await,
+            expected
+        );
+        clear_stt_model_session(handle, "session-1".into())
+            .await
+            .unwrap();
+        assert_eq!(*app.state::<SessionModelOverrideState>().lock().await, None);
+    }
 }

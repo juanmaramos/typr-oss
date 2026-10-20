@@ -621,7 +621,8 @@ pub struct Session {
     device_monitor_handle: Option<typr_audio::DeviceMonitorHandle>,
     process_mic_tx: Option<flume::Sender<Vec<f32>>>,
     process_speaker_tx: Option<flume::Sender<Vec<f32>>>,
-    is_local_stt: bool, // Track if using local STT for silence injection
+    is_local_stt: bool,        // Track if using local STT for silence injection
+    stt_model: Option<String>, // Effective selection captured for this session startup
     lifecycle_policy: crate::policy::SessionLifecyclePolicy,
     pipeline_status: std::sync::Arc<tokio::sync::Mutex<PipelineStatus>>,
     stream_connected_rx: Option<tokio::sync::watch::Receiver<bool>>,
@@ -653,6 +654,7 @@ impl Session {
             process_mic_tx: None,
             process_speaker_tx: None,
             is_local_stt: false,
+            stt_model: None,
             lifecycle_policy: crate::policy::SessionLifecyclePolicy::default(),
             pipeline_status: std::sync::Arc::new(tokio::sync::Mutex::new(
                 PipelineStatus::inactive(),
@@ -981,13 +983,8 @@ impl Session {
     }
 
     fn current_cloud_stt_model(&self) -> Option<String> {
-        use tauri_plugin_connector::{ConnectorPluginExt, StoreKey};
-
-        self.app
-            .connector_store()
-            .get::<String>(StoreKey::SttModel)
-            .ok()
-            .flatten()
+        self.stt_model
+            .clone()
             .filter(|model| is_cloud_stt_model(model))
     }
 
@@ -1184,15 +1181,13 @@ impl Session {
         // ============================================================================
         tracing::info!("🔌 [PHASE 1] Connecting to transcription service...");
 
-        // Determine which provider we're using (need this for connection setup)
-        let selected_model: Option<String> = {
-            use tauri_plugin_connector::ConnectorPluginExt;
-            self.app
-                .connector_store()
-                .get::<String>(tauri_plugin_connector::StoreKey::SttModel)
-                .ok()
-                .flatten()
-        };
+        // Capture model + credentials once. The same immutable selection supplies
+        // provider flags, local server startup, and the final websocket parameters.
+        use tauri_plugin_connector::ConnectorPluginExt;
+        self.stt_model = None;
+        let selection = self.app.get_stt_selection(Some(&session_id)).await?;
+        let selected_model = Some(selection.model_id());
+        self.stt_model = selected_model.clone();
 
         let provider = SttProvider::from_model(selected_model.as_deref());
         let is_local = provider.is_local();
@@ -1224,48 +1219,52 @@ impl Session {
             "⏳ [CONNECTION] Attempting to connect to transcription service (10s timeout)..."
         );
         let connection_timeout = Duration::from_secs(10);
-        let (listen_client, listen_provider) = match tokio::time::timeout(
-            connection_timeout,
-            setup_listen_client(
-                &self.app,
-                languages.clone(),
-                jargons.clone(),
-                session_id == onboarding_session_id,
-                redemption_time_ms,
-            ),
-        )
-        .await
-        {
-            Err(_) => {
-                tracing::error!(
-                    "🔌 [PHASE 1] Connection timeout after {:?}",
-                    connection_timeout
-                );
-                emit_cloud_failure_event(
+        let (listen_client, listen_provider) =
+            match tokio::time::timeout(connection_timeout, async {
+                let user_id = self.app.db_user_id().await.ok().flatten();
+                setup_listen_client(
                     &self.app,
-                    selected_model.as_deref(),
-                    "connection_timeout",
-                    "Transcription service connection timeout",
-                );
-                return Err(crate::Error::Custom(
-                    "Transcription service connection timeout".to_string(),
-                ));
-            }
-            Ok(Err(err)) => {
-                tracing::error!(
-                    "🔌 [PHASE 1] Failed to initialize transcription client: {:?}",
-                    err
-                );
-                emit_cloud_failure_event(
-                    &self.app,
-                    selected_model.as_deref(),
-                    "connection_setup_failed",
-                    &err.to_string(),
-                );
-                return Err(err);
-            }
-            Ok(Ok(client)) => client,
-        };
+                    selection,
+                    languages.clone(),
+                    jargons.clone(),
+                    session_id == onboarding_session_id,
+                    redemption_time_ms,
+                    user_id,
+                )
+                .await
+            })
+            .await
+            {
+                Err(_) => {
+                    tracing::error!(
+                        "🔌 [PHASE 1] Connection timeout after {:?}",
+                        connection_timeout
+                    );
+                    emit_cloud_failure_event(
+                        &self.app,
+                        selected_model.as_deref(),
+                        "connection_timeout",
+                        "Transcription service connection timeout",
+                    );
+                    return Err(crate::Error::Custom(
+                        "Transcription service connection timeout".to_string(),
+                    ));
+                }
+                Ok(Err(err)) => {
+                    tracing::error!(
+                        "🔌 [PHASE 1] Failed to initialize transcription client: {:?}",
+                        err
+                    );
+                    emit_cloud_failure_event(
+                        &self.app,
+                        selected_model.as_deref(),
+                        "connection_setup_failed",
+                        &err.to_string(),
+                    );
+                    return Err(err);
+                }
+                Ok(Ok((builder, provider))) => (builder.build_dual(), provider),
+            };
 
         tracing::info!("🔌 [PHASE 1] Service connection established");
 
@@ -2357,34 +2356,21 @@ impl Session {
 
 async fn setup_listen_client<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
+    selection: tauri_plugin_connector::SttSelection,
     languages: Vec<typr_language::Language>,
     jargons: Vec<String>,
     is_onboarding: bool,
     redemption_time_ms: u32,
-) -> Result<(crate::client::ListenClientDual, SttProvider), crate::Error> {
+    user_id: Option<String>,
+) -> Result<(crate::client::ListenClientBuilder, SttProvider), crate::Error> {
+    let selected_model = Some(selection.model_id());
+    let provider = SttProvider::from_model(selected_model.as_deref());
     let conn = {
         use tauri_plugin_connector::{Connection, ConnectorPluginExt};
-        let conn: Connection = app.get_stt_connection().await?.into();
+        let conn: Connection = app.connect_stt_selection(selection).await?.into();
         conn
     };
     let api_base = conn.api_base;
-
-    // Get selected STT model from connector store
-    let selected_model: Option<String> = {
-        use tauri_plugin_connector::ConnectorPluginExt;
-        let result = app
-            .connector_store()
-            .get::<String>(tauri_plugin_connector::StoreKey::SttModel)
-            .ok()
-            .flatten();
-        tracing::warn!(
-            "[STT_MODEL_RETRIEVAL] Retrieved model from store: {:?}",
-            result
-        );
-        result
-    };
-
-    let provider = SttProvider::from_model(selected_model.as_deref());
 
     let api_key = if provider.is_cloud() {
         conn.api_key.unwrap_or_default()
@@ -2392,27 +2378,14 @@ async fn setup_listen_client<R: tauri::Runtime>(
         String::new()
     };
 
-    let user_id = {
-        use tauri_plugin_db::DatabasePluginExt;
-        app.db_user_id().await.ok().flatten()
-    };
-
-    // Include custom vocabulary in static prompt to improve transcription accuracy
     let static_prompt = if jargons.is_empty() {
-        "".to_string()
+        String::new()
     } else {
         format!("The following terms may appear: {}", jargons.join(", "))
     };
-    let jargon_count = jargons.len();
-
     tracing::info!(
         "[STT_SESSION_CONFIG] provider={} model={:?} languages_count={} jargon_count={} static_prompt_enabled={} redemption_time_ms={}",
-        provider.label(),
-        selected_model,
-        languages.len(),
-        jargon_count,
-        !static_prompt.trim().is_empty(),
-        redemption_time_ms
+        provider.label(), selected_model, languages.len(), jargons.len(), !static_prompt.trim().is_empty(), redemption_time_ms
     );
 
     // Speaker attribution strategy:
@@ -2442,15 +2415,14 @@ async fn setup_listen_client<R: tauri::Runtime>(
                 redemption_time_ms: if is_onboarding {
                     70
                 } else if provider.is_cloud() {
-                    200 // Low latency for cloud streaming
+                    200
                 } else {
-                    (redemption_time_ms as u64).max(400) // Stable for local models
+                    (redemption_time_ms as u64).max(400)
                 },
                 model: selected_model,
                 user_id,
                 ..Default::default()
-            })
-            .build_dual(),
+            }),
         provider,
     ))
 }
@@ -2562,6 +2534,136 @@ fn merge_assemblyai_turn_words(
 #[cfg(test)]
 mod tests {
     use super::{merge_assemblyai_turn_words, AssemblyAITurnProgress};
+
+    #[tokio::test]
+    async fn session_model_override_routes_only_the_matching_session_to_local_params_and_url() {
+        use tauri::Manager;
+        use tauri_plugin_connector::{Connection, ConnectionSTT, ConnectorPluginExt, StoreKey};
+        use tauri_plugin_local_stt::{LocalSttPluginExt, SupportedModel};
+
+        let mut ctx = tauri::test::mock_context(tauri::test::noop_assets());
+        ctx.config_mut().identifier = format!(
+            "com.typr.oss.listener-selection-test-{}",
+            uuid::Uuid::new_v4()
+        );
+        let app = tauri::test::mock_builder()
+            .plugin(tauri_plugin_store::Builder::default().build())
+            .plugin(tauri_plugin_connector::init())
+            .manage(tauri_plugin_local_stt::SharedState::default())
+            .build(ctx)
+            .unwrap();
+        let store = app.connector_store();
+        store
+            .set(StoreKey::SttModel, "assemblyai-universal")
+            .unwrap();
+        store
+            .set(StoreKey::AssemblyaiApiKey, "original-test-key")
+            .unwrap();
+        let fallback = SupportedModel::QuantizedTinyEn;
+        app.set_stt_model_session("session-1".into(), fallback.clone())
+            .await
+            .unwrap();
+
+        let local_selection = app.get_stt_selection(Some("session-1")).await.unwrap();
+        assert_eq!(local_selection.model_id(), "QuantizedTinyEn");
+        let other_selection = app.get_stt_selection(Some("session-2")).await.unwrap();
+        assert_eq!(other_selection.model_id(), "assemblyai-universal");
+        // The same resolution is used by native/control starts and ordinary uploads.
+        assert!(matches!(
+            app.get_stt_connection().await.unwrap(),
+            ConnectionSTT::CloudProvider(_)
+        ));
+        assert!(app
+            .state::<tauri_plugin_local_stt::SharedState>()
+            .lock()
+            .await
+            .server
+            .is_none());
+        app.clear_stt_model_session("session-2").await;
+        assert_eq!(
+            app.get_stt_selection(Some("session-1"))
+                .await
+                .unwrap()
+                .model_id(),
+            "QuantizedTinyEn"
+        );
+
+        let models_dir = app.models_dir();
+        std::fs::create_dir_all(&models_dir).unwrap();
+        // Size-only sparse fixture; no model parsing, download, or audio capture.
+        let model_path = models_dir.join(fallback.file_name());
+        std::fs::File::create(&model_path)
+            .unwrap()
+            .set_len(fallback.model_size())
+            .unwrap();
+        // Exercise the production snapshot-to-connection/params assembly. A saved
+        // model read reintroduced inside setup_listen_client must route this to the
+        // wrong URL and fail the assertions below.
+        let (builder, provider) = super::setup_listen_client(
+            app.handle(),
+            local_selection,
+            vec![],
+            vec![],
+            false,
+            200,
+            None,
+        )
+        .await
+        .unwrap();
+        assert_eq!(provider, crate::SttProvider::Local);
+        let uri = builder.build_uri(typr_listener_interface::AudioMode::Dual);
+        let uri = url::Url::parse(&uri).unwrap();
+        assert_eq!(uri.scheme(), "ws");
+        assert_eq!(uri.host_str(), Some("127.0.0.1"));
+        assert_eq!(uri.path(), "/api/desktop/listen/realtime");
+        assert!(uri
+            .query_pairs()
+            .any(|(name, value)| name == "model" && value == "QuantizedTinyEn"));
+        assert!(uri
+            .query_pairs()
+            .any(|(name, value)| name == "redemption_time_ms" && value == "400"));
+        assert_eq!(
+            store.get::<String>(StoreKey::SttModel).unwrap().as_deref(),
+            Some("assemblyai-universal")
+        );
+        assert_eq!(
+            app.state::<tauri_plugin_local_stt::SharedState>()
+                .lock()
+                .await
+                .server_model,
+            Some(fallback)
+        );
+
+        // A concurrent preference/credential write cannot change an already captured
+        // session snapshot into a different provider or pair it with a new credential.
+        store
+            .set(StoreKey::AssemblyaiApiKey, "updated-test-key")
+            .unwrap();
+        let cloud_connection: Connection = app
+            .connect_stt_selection(other_selection)
+            .await
+            .unwrap()
+            .into();
+        assert_eq!(
+            cloud_connection.api_key.as_deref(),
+            Some("original-test-key")
+        );
+        app.clear_stt_model_session("session-1").await;
+        assert_eq!(
+            app.get_stt_selection(Some("session-1"))
+                .await
+                .unwrap()
+                .model_id(),
+            "assemblyai-universal"
+        );
+        assert_eq!(
+            store.get::<String>(StoreKey::SttModel).unwrap().as_deref(),
+            Some("assemblyai-universal")
+        );
+        app.stop_server().await.unwrap();
+        std::fs::remove_file(model_path).unwrap();
+        std::fs::remove_dir(models_dir).unwrap();
+    }
 
     fn word(text: &str, start: u64, end: u64) -> typr_listener_interface::Word {
         typr_listener_interface::Word {
@@ -2882,8 +2984,15 @@ impl Session {
             tracing::info!("[SESSION_END] Using dual stream mode - no async diarization needed");
         }
 
+        // Only a terminal stop clears recovery. Device/stream rebuilds keep the
+        // matching session override and resolve it again during setup.
+        if let Some(session_id) = &self.session_id {
+            use tauri_plugin_connector::ConnectorPluginExt;
+            self.app.clear_stt_model_session(session_id).await;
+        }
         // Teardown immediately - no async diarization with dual stream mode
         self.teardown_resources(true).await;
+        self.stt_model = None;
     }
 
     #[action]

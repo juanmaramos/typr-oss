@@ -1,3 +1,4 @@
+import { transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { useAudioUpload } from "@/contexts/audio-upload";
 import { useAudioUploadStore } from "@/stores/audio-upload";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
@@ -12,7 +13,6 @@ import type { TranscriptState } from "../../transcript/hooks/useTranscriptState"
 
 import { useTypr } from "@/contexts";
 import { useModelState } from "@/hooks/useModelState";
-import { commands as connectorCommands } from "@typr/plugin-connector";
 import { commands as dbCommands, Word } from "@typr/plugin-db";
 import { commands as localSttCommands } from "@typr/plugin-local-stt";
 
@@ -463,11 +463,7 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
     staleTime: 60 * 1000,
   });
 
-  const selectedSttModelQuery = useQuery({
-    queryKey: ["stt-model-connector"],
-    queryFn: () => connectorCommands.getSttModel(),
-    staleTime: 5 * 1000,
-  });
+  const selectedSttModelQuery = useQuery(transcriptionModelQueryOptions());
 
   const anyModelDownloaded = {
     data: (() => {

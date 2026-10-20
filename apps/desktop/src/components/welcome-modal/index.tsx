@@ -1,17 +1,17 @@
+import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
 import { useTypr } from "@/contexts";
 
 import { commands } from "@/types";
 import { type SupportedModel as SupportedLlmModel } from "@typr/plugin-local-llm";
-import { commands as localSttCommands, SupportedModel } from "@typr/plugin-local-stt";
+import { SupportedModel } from "@typr/plugin-local-stt";
 
 import { Dialog, DialogContent, DialogTitle } from "@typr/ui/components/ui/dialog";
 
 import { commands as configCommands } from "@typr/plugin-config";
-import { commands as connectorCommands } from "@typr/plugin-connector";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { AUTO_CLOUD_MODEL_ID } from "@typr/utils";
 import { type as getOsType } from "@tauri-apps/plugin-os";
@@ -37,16 +37,13 @@ type OnboardingStep = "user-setup" | "permissions" | "welcome" | "download-progr
 export function WelcomeModal({ isOpen, onClose, onBackgroundSetupStart }: WelcomeModalProps) {
   const { i18n } = useLingui();
   const queryClient = useQueryClient();
+  const modelPreferences = useModelPreferences();
   const { userId } = useTypr();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>("user-setup");
   const [selectedSttModel, setSelectedSttModel] = useState<SupportedModel>(DEFAULT_ONBOARDING_STT_MODEL);
   const [selectedLlmModel, setSelectedLlmModel] = useState<SupportedLlmModel>(DEFAULT_ONBOARDING_LLM_MODEL);
   const [existingUserData, setExistingUserData] = useState<{ fullName?: string; displayLanguage?: string }>({});
   const didStartBackgroundSetup = useRef(false);
-
-  const selectSTTModel = useMutation({
-    mutationFn: (model: SupportedModel) => localSttCommands.setCurrentModel(model),
-  });
 
   // Load existing onboarding data when modal opens
   useEffect(() => {
@@ -120,7 +117,7 @@ export function WelcomeModal({ isOpen, onClose, onBackgroundSetupStart }: Welcom
   }, [currentStep, isOpen, onBackgroundSetupStart]);
 
   const handleDownloadProgressContinue = async () => {
-    await localSttCommands.setCurrentModel(selectedSttModel);
+    await modelPreferences.selectTranscription(selectedSttModel);
     await commands.setOnboardingModelSetup(createOnboardingModelSetup("complete", null, {
       sttModel: selectedSttModel,
       llmModel: selectedLlmModel,
@@ -182,8 +179,8 @@ export function WelcomeModal({ isOpen, onClose, onBackgroundSetupStart }: Welcom
 
     if (isWindows) {
       // Windows: cloud chat + cloud STT are the required defaults for a usable first-run experience.
-      await connectorCommands.setCloudModel(AUTO_CLOUD_MODEL_ID);
-      await connectorCommands.setSttModel("assemblyai-universal");
+      await modelPreferences.selectCloudChat(AUTO_CLOUD_MODEL_ID);
+      await modelPreferences.selectTranscription("assemblyai-universal");
       await commands.setOnboardingModelSetup(createOnboardingModelSetup("complete", null, {
         sttModel: selectedSttModel,
         llmModel: selectedLlmModel,
@@ -196,7 +193,6 @@ export function WelcomeModal({ isOpen, onClose, onBackgroundSetupStart }: Welcom
     }
 
     // macOS: local models are required for the free first-run experience.
-    await selectSTTModel.mutateAsync(DEFAULT_ONBOARDING_STT_MODEL);
     setSelectedSttModel(DEFAULT_ONBOARDING_STT_MODEL);
     setSelectedLlmModel(DEFAULT_ONBOARDING_LLM_MODEL);
     await commands.setOnboardingModelSetup(createOnboardingModelSetup("pending", null, {
