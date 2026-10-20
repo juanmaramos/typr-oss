@@ -135,10 +135,9 @@ describe("canonical STT presentation", () => {
     expect(makers.every(node => node.getAttribute("aria-hidden") === "true")).toBe(true);
     expect(makers[0].querySelector("svg path")?.getAttribute("fill")).toBe("currentColor");
     expect(makers[1].querySelector("i")?.className).toBe("ri-openai-fill");
-    expect(makers[2].querySelector("i")?.className).toBe("ri-voiceprint-line");
+    expect(makers[2].querySelector("img")?.getAttribute("src")).toBe("/icons/huggingface-mono.svg");
     expect([...makers[3].querySelectorAll("img")].map(node => node.getAttribute("src"))).toEqual([
-      "/icons/assemblyai-light.svg",
-      "/icons/assemblyai-dark.svg",
+      "/icons/assemblyai-mono.svg",
     ]);
   });
 

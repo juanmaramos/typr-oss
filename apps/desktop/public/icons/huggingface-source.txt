@@ -1,0 +1,5 @@
+Official Hugging Face monochrome logo, retrieved 2026-10-20.
+Source: https://huggingface.co/datasets/huggingface/brand-assets
+Revision: 233827f
+Asset: hf-logo-monochrome.svg
+Bundled unchanged. Used for the Hugging Face Distil-Whisper project, not to indicate model hosting.

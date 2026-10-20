@@ -14,12 +14,9 @@ export function STTProviderIcon({ model, className = "" }: { model: string; clas
       {provider === "NVIDIA"
         ? <NvidiaIcon className="size-4" />
         : provider === "AssemblyAI"
-        ? (
-          <>
-            <img src="/icons/assemblyai-light.svg" alt="" className="size-4 object-contain dark:hidden" />
-            <img src="/icons/assemblyai-dark.svg" alt="" className="hidden size-4 object-contain dark:block" />
-          </>
-        )
+        ? <img src="/icons/assemblyai-mono.svg" alt="" className="size-4 object-contain dark:invert" />
+        : provider === "Distil-Whisper"
+        ? <img src="/icons/huggingface-mono.svg" alt="" className="size-4 object-contain dark:invert" />
         : <i className={provider === "OpenAI" ? "ri-openai-fill" : "ri-voiceprint-line"} />}
     </span>
   );

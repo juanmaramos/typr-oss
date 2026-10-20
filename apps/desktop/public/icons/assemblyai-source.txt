@@ -1,5 +1,2 @@
-Official AssemblyAI secondary logomarks, retrieved 2026-10-20.
-Source: https://www.assemblyai.com/media
-Light: https://www.assemblyai.com/media/logos/secondary-light.svg
-Dark: https://www.assemblyai.com/media/logos/secondary-dark.svg
-Black and white marks preserved without modification.
+AssemblyAI monochrome logomark supplied by the user as assemblyai-mono.svg.
+Bundled unchanged. Related official brand source: https://www.assemblyai.com/media
