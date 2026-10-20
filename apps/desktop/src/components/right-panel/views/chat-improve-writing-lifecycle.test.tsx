@@ -25,6 +25,7 @@ const mocks = vi.hoisted(() => {
     }),
     consumeFloatingPrompt: vi.fn(),
     getChatGroupId: vi.fn(),
+    groups: [] as Array<{ id: string }>,
     activeSessionId: "session-1",
     newChatRequest: null as null | { sessionId: string; requestId: number },
     isNewChatRequestedInQuery: false,
@@ -46,7 +47,14 @@ vi.mock("@tanstack/react-router", () => ({
       ? { params: { id: mocks.activeSessionId } }
       : null,
 }));
-vi.mock("@typr/ui", () => ({ ResponsiveIconButton: () => null }));
+vi.mock(
+  "@typr/ui",
+  () => ({
+    ResponsiveIconButton: ({ text, disabled, onClick }: { text: string; disabled?: boolean; onClick?: () => void }) => (
+      <button title={text} disabled={disabled} onClick={onClick}>{text}</button>
+    ),
+  }),
+);
 vi.mock("@typr/ui/lib/utils", () => ({ cn: (...args: unknown[]) => args.filter(Boolean).join(" ") }));
 vi.mock("@/components/ui/ai-setup-indicator", () => ({ AISetupIndicator: () => null }));
 vi.mock("@/components/ui/tab", () => ({ Tab: () => null }));
@@ -114,7 +122,7 @@ vi.mock("../hooks/useChatQueries", () => ({
   useChatQueries: (options: { isNewChatRequested: boolean }) => {
     mocks.isNewChatRequestedInQuery = options.isNewChatRequested;
     return ({
-      chatGroupsQuery: { data: [] },
+      chatGroupsQuery: { data: mocks.groups },
       sessionData: { data: { title: "Test" }, refetch: async () => ({ data: { title: "Test", words: [] } }) },
       fetchSessionData: async () => ({ title: "Test", words: [] }),
       getChatGroupId: mocks.getChatGroupId,
@@ -214,6 +222,7 @@ async function sendImproveWritingEvent() {
 describe("same-session improve-writing requests", () => {
   beforeEach(() => {
     mocks.canStart = true;
+    mocks.groups = [];
     vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
       queueMicrotask(() => callback(0));
@@ -290,6 +299,54 @@ describe("same-session improve-writing requests", () => {
     }
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  it("groups floating Chat navigation, text actions and window controls without moving window controls when messages arrive", async () => {
+    const dock = vi.fn(), minimize = vi.fn();
+    const view = () => (
+      <I18nProvider i18n={i18n}>
+        <ChatView layout="floating" onMoveToSidebar={dock} onClose={minimize} />
+      </I18nProvider>
+    );
+    await act(async () => root.render(view()));
+    const windows = container.querySelector("[aria-label=\"Window controls\"]");
+    expect(windows).not.toBeNull();
+    expect([...container.querySelectorAll("[role=\"group\"]")].map(group => group.getAttribute("aria-label"))).toEqual([
+      "Chat navigation",
+      "Window controls",
+    ]);
+    mocks.groups = [{ id: "group-1" }];
+    await act(async () => {
+      useChatState.getState().setMessages("session-1", [{
+        id: "one",
+        content: "Hello",
+        isUser: true,
+        timestamp: new Date(),
+      }]);
+      root.render(view());
+    });
+    expect([...container.querySelectorAll("[role=\"group\"]")].map(group => group.getAttribute("aria-label"))).toEqual([
+      "Chat navigation",
+      "Chat actions",
+      "Window controls",
+    ]);
+    expect(container.querySelector("[aria-label=\"Window controls\"]")).toBe(windows);
+    expect(
+      [...container.querySelectorAll("[aria-label=\"Chat navigation\"] button")].map(button =>
+        button.getAttribute("title")
+      ),
+    ).toEqual(["New chat", "History"]);
+    expect(
+      [...container.querySelectorAll("[aria-label=\"Chat actions\"] button")].map(button =>
+        button.getAttribute("title")
+      ),
+    ).toEqual(["Search", "Copy"]);
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>("button[title=\"Move to sidebar\"]")!.click();
+      container.querySelector<HTMLButtonElement>("button[title=\"Minimize\"]")!.click();
+    });
+    expect(dock).toHaveBeenCalledOnce();
+    expect(minimize).toHaveBeenCalledOnce();
   });
 
   it("does not start editor improvement when the central policy blocks the selected model", async () => {

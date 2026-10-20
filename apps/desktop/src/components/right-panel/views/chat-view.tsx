@@ -4,6 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { ResponsiveIconButton } from "@typr/ui";
+import { floatingToolbarClassNames } from "@typr/ui/lib/floating-toolbar";
 import { cn } from "@typr/ui/lib/utils";
 
 import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
@@ -518,7 +519,7 @@ export function ChatView({
                         <div className="truncate text-sm font-semibold leading-tight text-foreground">
                           {title || sessionData.data?.title || t`Current note`}
                         </div>
-                        <div className="pt-0.5 text-ui-label leading-tight text-muted-foreground">
+                        <div className="truncate pt-0.5 text-ui-label leading-tight text-muted-foreground">
                           {t`Ask in context of this meeting`}
                         </div>
                       </div>
@@ -527,88 +528,102 @@ export function ChatView({
                   {/* Right side - Action buttons */}
                   <div
                     className={layout === "floating"
-                      ? "flex items-center gap-2"
+                      ? floatingToolbarClassNames.actions
                       : "flex items-center gap-0.5"}
                   >
-                    <ResponsiveIconButton
-                      icon={PlusIcon}
-                      text={t`New chat`}
-                      onClick={handleNewChat}
-                      disabled={!hasMessages}
-                      displayMode="icon"
-                      variant="ghost"
-                      size="icon"
-                      className={layout === "floating"
-                        ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70 disabled:opacity-40"
-                        : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50 disabled:opacity-40"}
-                    />
-
-                    {chatGroupsQuery.data && chatGroupsQuery.data.length > 0 && (
+                    <div
+                      role="group"
+                      aria-label={t`Chat navigation`}
+                      className={layout === "floating" ? floatingToolbarClassNames.group : "flex items-center gap-0.5"}
+                    >
                       <ResponsiveIconButton
-                        icon={ChatHistoryIcon}
-                        text={t`History`}
-                        onClick={handleViewHistory}
+                        icon={PlusIcon}
+                        text={t`New chat`}
+                        onClick={handleNewChat}
+                        disabled={!hasMessages}
                         displayMode="icon"
                         variant="ghost"
                         size="icon"
                         className={layout === "floating"
-                          ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-                          : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
+                          ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70 disabled:opacity-40"
+                          : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50 disabled:opacity-40"}
                       />
-                    )}
 
+                      {chatGroupsQuery.data && chatGroupsQuery.data.length > 0 && (
+                        <ResponsiveIconButton
+                          icon={ChatHistoryIcon}
+                          text={t`History`}
+                          onClick={handleViewHistory}
+                          displayMode="icon"
+                          variant="ghost"
+                          size="icon"
+                          className={layout === "floating"
+                            ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
+                            : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
+                        />
+                      )}
+                    </div>
                     {hasMessages && (
-                      <ResponsiveIconButton
-                        icon={TextSearchIcon}
-                        text={t`Search`}
-                        onClick={() => setIsSearchActive(true)}
-                        displayMode="icon"
-                        variant="ghost"
-                        size="icon"
+                      <div
+                        role="group"
+                        aria-label={t`Chat actions`}
                         className={layout === "floating"
-                          ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-                          : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
-                      />
-                    )}
+                          ? floatingToolbarClassNames.group
+                          : "flex items-center gap-0.5"}
+                      >
+                        <ResponsiveIconButton
+                          icon={TextSearchIcon}
+                          text={t`Search`}
+                          onClick={() => setIsSearchActive(true)}
+                          displayMode="icon"
+                          variant="ghost"
+                          size="icon"
+                          className={layout === "floating"
+                            ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
+                            : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
+                        />
 
-                    {hasMessages && (
-                      <ResponsiveIconButton
-                        icon={copied ? CheckIcon : CopyIcon}
-                        text={copied ? t`Copied!` : t`Copy`}
-                        onClick={handleCopyChat}
-                        displayMode="icon"
-                        variant="ghost"
-                        size="icon"
-                        className={cn(
-                          "h-7 w-7 transition-all duration-200",
-                          layout === "floating" ? "hover:bg-surface-400/70" : "hover:bg-background/50",
-                          copied ? "text-success" : "text-foreground hover:text-foreground",
+                        <ResponsiveIconButton
+                          icon={copied ? CheckIcon : CopyIcon}
+                          text={copied ? t`Copied!` : t`Copy`}
+                          onClick={handleCopyChat}
+                          displayMode="icon"
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                            "h-7 w-7 transition-all duration-200",
+                            layout === "floating" ? "hover:bg-surface-400/70" : "hover:bg-background/50",
+                            copied ? "text-success" : "text-foreground hover:text-foreground",
+                          )}
+                        />
+                      </div>
+                    )}
+                    {layout === "floating" && (onMoveToSidebar || onClose) && (
+                      <div role="group" aria-label={t`Window controls`} className={floatingToolbarClassNames.group}>
+                        {onMoveToSidebar && (
+                          <ResponsiveIconButton
+                            icon={SidebarIcon}
+                            text={t`Move to sidebar`}
+                            onClick={onMoveToSidebar}
+                            displayMode="icon"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
+                          />
                         )}
-                      />
-                    )}
 
-                    {layout === "floating" && onMoveToSidebar && (
-                      <ResponsiveIconButton
-                        icon={SidebarIcon}
-                        text={t`Move to sidebar`}
-                        onClick={onMoveToSidebar}
-                        displayMode="icon"
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-                      />
-                    )}
-
-                    {layout === "floating" && onClose && (
-                      <ResponsiveIconButton
-                        icon={MinimizeIcon}
-                        text={t`Minimize`}
-                        onClick={onClose}
-                        displayMode="icon"
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-                      />
+                        {onClose && (
+                          <ResponsiveIconButton
+                            icon={MinimizeIcon}
+                            text={t`Minimize`}
+                            onClick={onClose}
+                            displayMode="icon"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
+                          />
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

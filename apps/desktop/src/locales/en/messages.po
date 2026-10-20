@@ -1364,7 +1364,7 @@ msgstr "Ask about this project..."
 msgid "Ask about your meeting content, transcript, and notes"
 msgstr "Ask about your meeting content, transcript, and notes"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:214
+#: src/components/transcript/actions/TranscriptActionBar.tsx:216
 msgid "Ask AI"
 msgstr "Ask AI"
 
@@ -1380,7 +1380,7 @@ msgstr "Ask conversation"
 msgid "Ask generation requires at least one user message"
 msgstr "Ask generation requires at least one user message"
 
-#: src/components/right-panel/views/chat-view.tsx:522
+#: src/components/right-panel/views/chat-view.tsx:523
 msgid "Ask in context of this meeting"
 msgstr "Ask in context of this meeting"
 
@@ -1422,7 +1422,7 @@ msgid "Assign formal tags to notes and filter related notes from the sidebar."
 msgstr "Assign formal tags to notes and filter related notes from the sidebar."
 
 #: src/components/right-panel/components/search/chat-search-header.tsx:31
-#: src/components/right-panel/views/chat-view.tsx:391
+#: src/components/right-panel/views/chat-view.tsx:392
 msgid "Assistant: "
 msgstr "Assistant: "
 
@@ -1451,15 +1451,15 @@ msgstr "Audio permissions"
 msgid "Audio Settings"
 msgstr "Audio Settings"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:147
+#: src/components/transcript/actions/TranscriptActionBar.tsx:149
 msgid "Audio setup"
 msgstr "Audio setup"
 
-#: src/components/right-panel/views/transcript-view.tsx:529
+#: src/components/right-panel/views/transcript-view.tsx:530
 msgid "Audio upload in progress"
 msgstr "Audio upload in progress"
 
-#: src/components/right-panel/views/transcript-view.tsx:559
+#: src/components/right-panel/views/transcript-view.tsx:560
 msgid "Audio upload in progress. Live transcription is unavailable until it finishes."
 msgstr "Audio upload in progress. Live transcription is unavailable until it finishes."
 
@@ -1673,7 +1673,7 @@ msgstr "carousel"
 msgid "Catalan"
 msgstr "Catalan"
 
-#: src/components/right-panel/views/transcript-view.tsx:512
+#: src/components/right-panel/views/transcript-view.tsx:513
 msgid "Change"
 msgstr "Change"
 
@@ -1697,12 +1697,16 @@ msgstr "Changes highlighted in editor"
 msgid "Changes rejected"
 msgstr "Changes rejected"
 
-#: src/components/right-panel/views/chat-view.tsx:502
+#: src/components/right-panel/views/chat-view.tsx:503
 #: src/components/settings/components/ai/llm-local-view.tsx:151
 #: src/components/settings/views/ai.tsx:123
-#: src/components/transcript/actions/TranscriptActionBar.tsx:136
+#: src/components/transcript/actions/TranscriptActionBar.tsx:138
 msgid "Chat"
 msgstr "Chat"
+
+#: src/components/right-panel/views/chat-view.tsx:569
+msgid "Chat actions"
+msgstr "Chat actions"
 
 #: src/components/settings/components/ai/task-defaults.tsx:170
 msgid "Chat and Ask"
@@ -1724,6 +1728,10 @@ msgstr "Chat Assistant"
 #: src/components/right-panel/components/chat/header/chat-header.tsx:105
 msgid "Chat Group {0}"
 msgstr "Chat Group {0}"
+
+#: src/components/right-panel/views/chat-view.tsx:536
+msgid "Chat navigation"
+msgstr "Chat navigation"
 
 #: src/components/settings/views/integrations.tsx:189
 msgid "ChatGPT"
@@ -1861,7 +1869,7 @@ msgstr "Close modal/dialog"
 msgid "Close project brief"
 msgstr "Close project brief"
 
-#: src/components/right-panel/views/transcript-view.tsx:464
+#: src/components/right-panel/views/transcript-view.tsx:465
 #: src/components/settings/components/ai/llm-local-view.tsx:292
 #: src/components/settings/components/ai/stt-view.tsx:251
 msgid "Cloud"
@@ -2052,13 +2060,13 @@ msgid "Copied brief"
 msgstr "Copied brief"
 
 #: src/components/right-panel/components/chat/message-wrapper.tsx:296
-#: src/components/right-panel/views/chat-view.tsx:577
-#: src/components/transcript/actions/TranscriptActionBar.tsx:121
+#: src/components/right-panel/views/chat-view.tsx:588
+#: src/components/transcript/actions/TranscriptActionBar.tsx:123
 #: src/utils/consent-notification.tsx:44
 msgid "Copied!"
 msgstr "Copied!"
 
-#: src/components/right-panel/views/chat-view.tsx:577
+#: src/components/right-panel/views/chat-view.tsx:588
 msgid "Copy"
 msgstr "Copy"
 
@@ -2066,7 +2074,7 @@ msgstr "Copy"
 msgid "Copy AI notes"
 msgstr "Copy AI notes"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:121
+#: src/components/transcript/actions/TranscriptActionBar.tsx:123
 msgid "Copy All"
 msgstr "Copy All"
 
@@ -2290,7 +2298,7 @@ msgstr "Current"
 
 #: src/components/meeting-assistant/floating-assistant.tsx:652
 #: src/components/meeting-assistant/floating-dock-variant.tsx:600
-#: src/components/right-panel/views/chat-view.tsx:519
+#: src/components/right-panel/views/chat-view.tsx:520
 msgid "Current note"
 msgstr "Current note"
 
@@ -2979,7 +2987,7 @@ msgstr "Finalizing"
 msgid "Find"
 msgstr "Find"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:122
+#: src/components/transcript/actions/TranscriptActionBar.tsx:124
 msgid "Find & Replace"
 msgstr "Find & Replace"
 
@@ -3213,7 +3221,7 @@ msgid "Hindi"
 msgstr "Hindi"
 
 #: src/components/ask/ask-conversation-toolbar.tsx:216
-#: src/components/right-panel/views/chat-view.tsx:549
+#: src/components/right-panel/views/chat-view.tsx:555
 msgid "History"
 msgstr "History"
 
@@ -3265,7 +3273,7 @@ msgstr "Include in brief"
 msgid "Indonesian"
 msgstr "Indonesian"
 
-#: src/components/right-panel/views/transcript-view.tsx:550
+#: src/components/right-panel/views/transcript-view.tsx:551
 msgid "Initializing model..."
 msgstr "Initializing model..."
 
@@ -3419,7 +3427,7 @@ msgstr "Line {start}"
 msgid "Lines {start}-{end}"
 msgstr "Lines {start}-{end}"
 
-#: src/components/right-panel/views/transcript-view.tsx:358
+#: src/components/right-panel/views/transcript-view.tsx:359
 msgid "Listening. Text appears after speech pauses."
 msgstr "Listening. Text appears after speech pauses."
 
@@ -3455,7 +3463,7 @@ msgstr "Llama 3.3 70B"
 msgid "Loading"
 msgstr "Loading"
 
-#: src/components/right-panel/views/transcript-view.tsx:584
+#: src/components/right-panel/views/transcript-view.tsx:585
 msgid "Loading AI model into memory... This may take a few seconds on first start"
 msgstr "Loading AI model into memory... This may take a few seconds on first start"
 
@@ -3593,8 +3601,8 @@ msgstr "Microphone Access"
 
 #: src/components/meeting-assistant/floating-assistant.tsx:209
 #: src/components/meeting-assistant/floating-dock-variant.tsx:332
-#: src/components/right-panel/views/chat-view.tsx:605
-#: src/components/transcript/actions/TranscriptActionBar.tsx:240
+#: src/components/right-panel/views/chat-view.tsx:618
+#: src/components/transcript/actions/TranscriptActionBar.tsx:242
 msgid "Minimize"
 msgstr "Minimize"
 
@@ -3640,8 +3648,8 @@ msgstr "More models"
 msgid "More settings"
 msgstr "More settings"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:171
-#: src/components/transcript/actions/TranscriptActionBar.tsx:172
+#: src/components/transcript/actions/TranscriptActionBar.tsx:173
+#: src/components/transcript/actions/TranscriptActionBar.tsx:174
 msgid "More transcript actions"
 msgstr "More transcript actions"
 
@@ -3654,8 +3662,8 @@ msgstr "Most shortcuts work even when typing in text fields"
 msgid "Move chat to sidebar"
 msgstr "Move chat to sidebar"
 
-#: src/components/right-panel/views/chat-view.tsx:593
-#: src/components/transcript/actions/TranscriptActionBar.tsx:229
+#: src/components/right-panel/views/chat-view.tsx:606
+#: src/components/transcript/actions/TranscriptActionBar.tsx:231
 msgid "Move to sidebar"
 msgstr "Move to sidebar"
 
@@ -3717,7 +3725,7 @@ msgstr "New audio device detected"
 
 #: src/components/ask/ask-conversation-toolbar.tsx:162
 #: src/components/ask/ask-conversation-toolbar.tsx:163
-#: src/components/right-panel/views/chat-view.tsx:535
+#: src/components/right-panel/views/chat-view.tsx:541
 #: src/routes/app.ask.tsx:216
 msgid "New chat"
 msgstr "New chat"
@@ -3740,7 +3748,7 @@ msgstr "New Design"
 #: src/components/left-sidebar/search-list.tsx:188
 #: src/components/right-panel/components/chat/chat-input-old.tsx:65
 #: src/components/right-panel/components/chat/chat-input.tsx:106
-#: src/components/right-panel/views/chat-view.tsx:635
+#: src/components/right-panel/views/chat-view.tsx:650
 #: src/components/toolbar/buttons/new-note-button.tsx:53
 #: src/components/toolbar/utils/content-formatter.ts:235
 #: src/components/toolbar/utils/pdf-export.ts:182
@@ -4007,7 +4015,7 @@ msgstr "Official Templates"
 msgid "Older"
 msgstr "Older"
 
-#: src/components/right-panel/views/transcript-view.tsx:465
+#: src/components/right-panel/views/transcript-view.tsx:466
 #: src/components/settings/components/ai/llm-local-view.tsx:174
 #: src/components/settings/components/ai/stt-view.tsx:106
 #: src/components/transcript/actions/STTLanguageSelector.tsx:160
@@ -4671,7 +4679,7 @@ msgid "Reload language list"
 msgstr "Reload language list"
 
 #: src/components/right-panel/components/listening-indicator.tsx:83
-#: src/components/right-panel/views/transcript-view.tsx:403
+#: src/components/right-panel/views/transcript-view.tsx:404
 msgid "remaining"
 msgstr "remaining"
 
@@ -4777,7 +4785,7 @@ msgstr "Resume Recording"
 #: src/components/projects/project-brief-row.tsx:100
 #: src/components/projects/project-files-dropzone.tsx:176
 #: src/components/right-panel/views/transcript-view.tsx:296
-#: src/components/right-panel/views/transcript-view.tsx:568
+#: src/components/right-panel/views/transcript-view.tsx:569
 #: src/components/settings/components/ai/llm-local-view.tsx:189
 #: src/components/settings/components/ai/llm-local-view.tsx:240
 #: src/components/settings/components/ai/llm-local-view.tsx:430
@@ -4861,7 +4869,7 @@ msgstr "Saving..."
 #: src/components/app-shell/primary-rail.tsx:108
 #: src/components/right-panel/components/chat/chat-input.tsx:293
 #: src/components/right-panel/components/chat/chat-input.tsx:378
-#: src/components/right-panel/views/chat-view.tsx:563
+#: src/components/right-panel/views/chat-view.tsx:576
 msgid "Search"
 msgstr "Search"
 
@@ -5326,7 +5334,7 @@ msgstr "Start a conversation"
 msgid "Start a cross-meeting query from the main canvas and your threads will appear in this list."
 msgstr "Start a cross-meeting query from the main canvas and your threads will appear in this list."
 
-#: src/components/right-panel/views/transcript-view.tsx:486
+#: src/components/right-panel/views/transcript-view.tsx:487
 msgid "Start a transcription"
 msgstr "Start a transcription"
 
@@ -5355,8 +5363,8 @@ msgstr "Start Recording"
 msgid "Start taking notes..."
 msgstr "Start taking notes..."
 
-#: src/components/right-panel/views/transcript-view.tsx:536
-#: src/components/right-panel/views/transcript-view.tsx:550
+#: src/components/right-panel/views/transcript-view.tsx:537
+#: src/components/right-panel/views/transcript-view.tsx:551
 msgid "Start transcribing"
 msgstr "Start transcribing"
 
@@ -5365,7 +5373,7 @@ msgstr "Start transcribing"
 msgid "Start transcription"
 msgstr "Start transcription"
 
-#: src/components/right-panel/views/transcript-view.tsx:533
+#: src/components/right-panel/views/transcript-view.tsx:534
 msgid "Starting..."
 msgstr "Starting..."
 
@@ -5778,13 +5786,13 @@ msgstr "Transcribing audio…"
 msgid "Transcribing your speech. Words appear after natural pauses."
 msgstr "Transcribing your speech. Words appear after natural pauses."
 
-#: src/components/right-panel/views/chat-view.tsx:508
+#: src/components/right-panel/views/chat-view.tsx:509
 #: src/components/spaces/space-notes-picker-dialog.tsx:205
-#: src/components/transcript/actions/TranscriptActionBar.tsx:138
+#: src/components/transcript/actions/TranscriptActionBar.tsx:140
 msgid "Transcript"
 msgstr "Transcript"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:160
+#: src/components/transcript/actions/TranscriptActionBar.tsx:162
 msgid "Transcript actions"
 msgstr "Transcript actions"
 
@@ -5820,7 +5828,7 @@ msgid "Transcription languages (optional)"
 msgstr "Transcription languages (optional)"
 
 #: src/components/editor-area/note-header/transcription-bar.tsx:377
-#: src/components/right-panel/views/transcript-view.tsx:502
+#: src/components/right-panel/views/transcript-view.tsx:503
 #: src/components/transcript/constants/languageData.ts:140
 msgid "Transcription model"
 msgstr "Transcription model"
@@ -5884,7 +5892,7 @@ msgstr "Try another search."
 msgid "Try new capabilities currently in development. These features may have occasional issues and are refined based on your feedback."
 msgstr "Try new capabilities currently in development. These features may have occasional issues and are refined based on your feedback."
 
-#: src/components/right-panel/views/transcript-view.tsx:531
+#: src/components/right-panel/views/transcript-view.tsx:532
 msgid "Try the demo video above first!"
 msgstr "Try the demo video above first!"
 
@@ -6058,7 +6066,7 @@ msgstr "Update Available"
 msgid "Update now"
 msgstr "Update now"
 
-#: src/components/right-panel/views/transcript-view.tsx:426
+#: src/components/right-panel/views/transcript-view.tsx:427
 msgid "Upload audio file"
 msgstr "Upload audio file"
 
@@ -6233,7 +6241,7 @@ msgstr "Wait..."
 msgid "Watch live transcription demo (30 secs)"
 msgstr "Watch live transcription demo (30 secs)"
 
-#: src/components/right-panel/views/transcript-view.tsx:580
+#: src/components/right-panel/views/transcript-view.tsx:581
 msgid "Watch the demo video above to see how Typr transcription works!"
 msgstr "Watch the demo video above to see how Typr transcription works!"
 
@@ -6285,7 +6293,8 @@ msgstr "Whisper Model Language Performance (WER)"
 msgid "Whole project"
 msgstr "Whole project"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:225
+#: src/components/right-panel/views/chat-view.tsx:602
+#: src/components/transcript/actions/TranscriptActionBar.tsx:227
 msgid "Window controls"
 msgstr "Window controls"
 
@@ -6340,7 +6349,7 @@ msgid "You have the latest version of Typr"
 msgstr "You have the latest version of Typr"
 
 #: src/components/right-panel/components/search/chat-search-header.tsx:31
-#: src/components/right-panel/views/chat-view.tsx:391
+#: src/components/right-panel/views/chat-view.tsx:392
 msgid "You: "
 msgstr "You: "
 

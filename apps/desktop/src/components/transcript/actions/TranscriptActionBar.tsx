@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@typr/ui/components/ui/dropdown-menu";
+import { floatingToolbarClassNames } from "@typr/ui/lib/floating-toolbar";
 import { cn } from "@typr/ui/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { useCallback, useLayoutEffect, useState } from "react";
@@ -144,8 +145,8 @@ export function TranscriptActionBar({
             />
           </div>
         )}
-        <div className={cn("flex min-w-0 flex-nowrap items-center", isFloating ? "flex-1 gap-4" : "gap-2")}>
-          <div role="group" aria-label={t`Audio setup`} className="flex shrink-0 items-center gap-2">
+        <div className={isFloating ? floatingToolbarClassNames.actions : "flex min-w-0 flex-nowrap items-center gap-2"}>
+          <div role="group" aria-label={t`Audio setup`} className={floatingToolbarClassNames.group}>
             <MicrophoneSelector size="compact" isActive />
             <STTLanguageSelector
               value={selectedLanguage}
@@ -159,7 +160,7 @@ export function TranscriptActionBar({
             <div
               role="group"
               aria-label={t`Transcript actions`}
-              className={cn("flex shrink-0 items-center gap-2", isFloating && "ml-auto")}
+              className={floatingToolbarClassNames.group}
             >
               {showTranscriptActions && (showOverflow
                 ? (
@@ -223,7 +224,7 @@ export function TranscriptActionBar({
             </div>
           )}
           {isFloating && (onMoveToSidebar || onClose) && (
-            <div role="group" aria-label={t`Window controls`} className="ml-auto flex shrink-0 items-center gap-2">
+            <div role="group" aria-label={t`Window controls`} className={floatingToolbarClassNames.group}>
               {onMoveToSidebar && (
                 <ResponsiveIconButton
                   icon={SidebarIcon}
