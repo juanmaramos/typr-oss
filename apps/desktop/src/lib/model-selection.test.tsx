@@ -169,6 +169,7 @@ vi.mock("@/hooks/useModelRegistry", () => ({
     const model = {
       id: "Gemma4E4b",
       name: "Gemma 4",
+      icon: "ri-google-fill",
       isDownloaded: canSelect,
       show_in_selector: true,
       availability: {
@@ -225,7 +226,7 @@ vi.mock("@typr/ui/components/ui/select", () => {
       return <button disabled={disabled} data-option={value} onClick={() => change(value)}>{children}</button>;
     },
     SelectContent: Container,
-    SelectTrigger: Container,
+    SelectTrigger: ({ children }: { children: ReactNode }) => <div data-testid="model-trigger">{children}</div>,
     SelectValue: Container,
   };
 });
@@ -346,6 +347,41 @@ afterEach(async () => {
 });
 
 describe("model selection ownership", () => {
+  it("keeps default picker icons synchronized with Chat selection and distinct from inherited tasks", async () => {
+    await render(<AiTaskDefaultsSettings />);
+    const triggers = () => [...container.querySelectorAll("[data-testid=\"model-trigger\"]")];
+    await settle(() => expect(triggers()[0].textContent).toBe("Auto"));
+    expect(triggers()[0].querySelector(".ri-sparkling-fill[aria-hidden=\"true\"]")).not.toBeNull();
+    for (const trigger of triggers().slice(1, 3)) {
+      expect(trigger.textContent).toBe("Follow Chat and Ask");
+      expect(trigger.querySelector(".ri-chat-ai-line[aria-hidden=\"true\"]")).not.toBeNull();
+      expect(trigger.querySelector(".ri-google-fill")).toBeNull();
+    }
+    const localOption = container.querySelector("[data-option=\"local-Gemma4E4b\"]") as HTMLButtonElement;
+    await act(async () => localOption.click());
+    await settle(() => expect(triggers()[0].textContent).toBe("Gemma 4"));
+    expect(triggers()[0].querySelector(".ri-google-fill[aria-hidden=\"true\"]")).not.toBeNull();
+    expect(triggers()[0].querySelector(".ri-sparkling-fill")).toBeNull();
+    expect(triggers()[3].querySelector("[data-stt-provider=\"OpenAI\"]")).not.toBeNull();
+    const autoOption = container.querySelector("[data-option=\"auto\"]") as HTMLButtonElement;
+    await act(async () => autoOption.click());
+    await settle(() => expect(triggers()[0].textContent).toBe("Auto"));
+    expect(triggers()[0].querySelector(".ri-sparkling-fill")).not.toBeNull();
+    expect(triggers()[0].querySelector(".ri-google-fill")).toBeNull();
+  });
+
+  it("shows semantic icons for Auto task overrides and saved models absent from the catalog", async () => {
+    native.defaults = { project_brief_model_id: "auto", meeting_summary_model_id: "openai-saved-model" };
+    await render(<AiTaskDefaultsSettings />);
+    await settle(() => {
+      const triggers = [...container.querySelectorAll("[data-testid=\"model-trigger\"]")];
+      expect(triggers[1].textContent).toBe("Auto");
+      expect(triggers[1].querySelector(".ri-sparkling-fill")).not.toBeNull();
+      expect(triggers[2].textContent).toBe("saved-model");
+      expect(triggers[2].querySelector(".ri-robot-line")).not.toBeNull();
+    });
+  });
+
   it("keeps local chat downloads unavailable while lifecycle data is checking", async () => {
     native.registryStatus = "checking";
     await render(

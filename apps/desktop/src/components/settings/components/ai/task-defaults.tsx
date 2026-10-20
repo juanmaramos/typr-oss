@@ -145,9 +145,10 @@ export function AiTaskDefaultsSettings() {
   const cloudSttAvailability = getAvailability(ASSEMBLYAI_STT_MODEL);
   const hasSttError = [ASSEMBLYAI_STT_MODEL, ...availableSttModels].some(id => getAvailability(id).canRetry);
   const transcriptionValue = sttModelQuery.data ?? "";
+  const chatModel = selectedModel ?? allModels.find(model => model.id === chatModelValue);
   const chatModelLabel = chatModelValue === AUTO_CLOUD_MODEL_ID
     ? t`Auto`
-    : getModelNameLabel(selectedModel ?? allModels.find(model => model.id === chatModelValue), chatModelValue);
+    : getModelNameLabel(chatModel, chatModelValue);
   const transcriptionLabel = getSttModelLabel(transcriptionValue);
 
   return (
@@ -173,7 +174,12 @@ export function AiTaskDefaultsSettings() {
           <Select value={chatModelValue} onValueChange={(value) => void updateChatDefault(value)}>
             <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
               <SelectValue placeholder={t`Select model`}>
-                <SelectTriggerLabel label={chatModelLabel} />
+                <SelectTriggerLabel
+                  icon={chatModelValue === AUTO_CLOUD_MODEL_ID
+                    ? "ri-sparkling-fill"
+                    : chatModel?.customIcon || "ri-cpu-line"}
+                  label={chatModelLabel}
+                />
               </SelectValue>
             </SelectTrigger>
             <SelectContent className="max-h-72">
@@ -226,7 +232,14 @@ export function AiTaskDefaultsSettings() {
               >
                 <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
                   <SelectValue placeholder={t`Select model`}>
-                    <SelectTriggerLabel label={taskModelLabel} />
+                    <SelectTriggerLabel
+                      icon={value === FOLLOW_CHAT_VALUE
+                        ? "ri-chat-ai-line"
+                        : value === AUTO_CLOUD_MODEL_ID
+                        ? "ri-sparkling-fill"
+                        : selectedCloudModel?.customIcon || "ri-robot-line"}
+                      label={taskModelLabel}
+                    />
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
@@ -279,10 +292,10 @@ export function AiTaskDefaultsSettings() {
           <Select value={transcriptionValue} onValueChange={(value) => void updateTranscriptionDefault(value)}>
             <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
               <SelectValue placeholder={t`Select model`}>
-                <span className="flex items-center gap-2">
-                  <STTProviderIcon model={transcriptionValue} />
-                  <SelectTriggerLabel label={transcriptionLabel} />
-                </span>
+                <SelectTriggerLabel
+                  icon={<STTProviderIcon model={transcriptionValue} />}
+                  label={transcriptionLabel}
+                />
               </SelectValue>
             </SelectTrigger>
             <SelectContent className="max-h-72">
@@ -401,10 +414,11 @@ function ModelSelectLabel({
   );
 }
 
-function SelectTriggerLabel({ label }: { label: ReactNode }) {
+function SelectTriggerLabel({ icon, label }: { icon: ReactNode; label: ReactNode }) {
   return (
-    <span className="block min-w-0 truncate text-left">
-      {label}
+    <span className="flex min-w-0 items-center gap-2 text-left">
+      {typeof icon === "string" ? <i aria-hidden="true" className={cn("shrink-0 text-base", icon)} /> : icon}
+      <span className="min-w-0 truncate">{label}</span>
     </span>
   );
 }
