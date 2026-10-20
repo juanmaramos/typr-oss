@@ -143,9 +143,12 @@
 
     /* Sizing and shape */
     --radius: 0.5rem;
-    --radius-composer: 1.5rem;
-    --radius-floating-pill: 1.875rem;
-    --radius-floating-surface: 2rem;
+    --radius-compact: calc(var(--radius) * 0.5);
+    --radius-control: var(--radius);
+    --radius-surface: calc(var(--radius) * 1.5);
+    --radius-composer: calc(var(--radius) * 3);
+    --radius-floating: calc(var(--radius) * 4);
+    --radius-pill: 9999px;
     --tracking-normal: 0em;
     --spacing: 0.25rem;
 
@@ -302,7 +305,6 @@
     /* Font variables are inherited from @typr/fonts package */
 
     /* Sizing and shape - same as light mode */
-    --radius: 0.5rem;
     --tracking-normal: 0em;
     --spacing: 0.25rem;
 
@@ -396,7 +398,7 @@
 
   /* Button variants */
   .btn {
-    @apply relative h-9 px-[11px] py-[5px] rounded-lg flex items-baseline
+    @apply relative h-9 px-[11px] py-[5px] rounded-control flex items-baseline
       justify-center gap-2 font-medium text-sm leading-6 isolate
       transition-colors;
     transition-duration: var(--transition-base);
@@ -433,8 +435,8 @@
   /* Input variants */
   .input {
     @apply appearance-none h-9 px-[11px] py-[5px] bg-transparent border
-      border-input rounded-lg text-foreground text-sm leading-6 block w-full
-      transition-colors;
+      border-input rounded-control text-foreground text-sm leading-6 block
+      w-full transition-colors;
     transition-duration: var(--transition-base);
   }
 
@@ -515,7 +517,7 @@
   .pushable {
     background: hsl(var(--foreground));
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     padding: 0;
     cursor: pointer;
     outline-offset: 4px;
@@ -529,7 +531,7 @@
   .pushable .front {
     display: block;
     padding: 12px 42px;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     font-size: 1.25rem;
     background: hsl(var(--foreground) / 0.8);
     color: hsl(var(--background));
@@ -543,7 +545,7 @@
     content: "";
     position: absolute;
     inset: 1px;
-    border-radius: 11px;
+    border-radius: calc(var(--radius-control) - 1px);
     border: 1px solid rgba(255, 255, 255, 0.4);
     pointer-events: none;
   }
@@ -718,7 +720,7 @@
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background-color: hsl(var(--border));
-    border-radius: 9999px;
+    border-radius: var(--radius-pill);
   }
 
   /* Text truncation */

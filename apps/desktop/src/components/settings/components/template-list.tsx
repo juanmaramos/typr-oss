@@ -88,7 +88,7 @@ export function TemplateList({
                       <button
                         onClick={() => onTemplateSelect(template)}
                         className={cn(
-                          "flex w-full flex-col gap-1 rounded-lg p-2 text-sm text-muted-foreground",
+                          "flex w-full flex-col gap-1 rounded-control p-2 text-sm text-muted-foreground",
                           selectedTemplate?.id === template.id
                             ? "bg-surface-400 font-medium text-foreground"
                             : "hover:bg-surface-400",
@@ -132,7 +132,7 @@ export function TemplateList({
                     <button
                       onClick={() => onTemplateSelect(template)}
                       className={cn(
-                        "flex w-full flex-col gap-1 rounded-lg p-2 text-sm text-muted-foreground",
+                        "flex w-full flex-col gap-1 rounded-control p-2 text-sm text-muted-foreground",
                         selectedTemplate?.id === template.id
                           ? "bg-surface-400 font-medium text-foreground"
                           : "hover:bg-surface-400",

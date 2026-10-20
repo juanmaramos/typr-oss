@@ -138,3 +138,19 @@ Dark mode is implemented via the `.dark` class applied to a parent element, usua
   </div>
 </div>
 ```
+## Corner radius roles
+
+Use the shared `--radius` base (currently `0.5rem`) to tune the entire shape system, following shadcn's base-token pattern. Shape does not change between light and dark themes.
+
+| Role | Default | Use |
+| --- | --- | --- |
+| `rounded-compact` | 4px | Checkboxes, menu items, search highlights |
+| `rounded-control` | 8px | Buttons, inputs, selects, small interactive controls |
+| `rounded-surface` | 12px | Cards, dialogs, menus, popovers, segmented-control containers |
+| `rounded-composer` | 24px | Prompt composers |
+| `rounded-floating` | 32px | Floating assistant shells and docks |
+| `rounded-pill` / `rounded-full` | Fully rounded | Avatars, indicators, circular actions and capsules |
+
+Values are defined once in `globals.css`. `lib/radii.ts` exposes their CSS references to Tailwind and React styles; the desktop app inherits the shared preset without another radius map. Conventional names remain aliases: `sm`/`xs` → compact, `md` → control, `lg`/`xl`/`2xl` → surface, `3xl` → composer. They introduce no extra sizes. Prefer role names in new code.
+
+Shared primitives own their radius. Do not add numeric radius overrides at call sites. Preserve intentional joined edges with directional utilities such as `rounded-l-none`; use `inherit` or a calculated inset from a role for nested decorative borders. Motion capsules use the pill role while their dimensions animate. The shared `cn` merger recognizes every role, including directional and responsive forms.

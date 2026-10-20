@@ -211,7 +211,7 @@ body {
 
 :where(:not(.scrollbar-native))::-webkit-scrollbar-thumb {
   background: hsl(var(--border));
-  border-radius: 4px;
+  border-radius: var(--radius-compact);
 }
 
 :where(:not(.scrollbar-native))::-webkit-scrollbar-thumb:hover {
@@ -250,7 +250,7 @@ body {
     @apply font-sans;
   }
 
-  /* 
+  /*
     Local overrides should be kept to a minimum to ensure consistency.
     See packages/ui/src/styles/globals.css for the source of truth.
   */

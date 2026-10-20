@@ -1,3 +1,4 @@
+import { radii } from "@typr/ui/lib/radii";
 import { motion } from "motion/react";
 import React, { useEffect, useState } from "react";
 
@@ -14,25 +15,21 @@ const SIZE_CONFIG = {
   compact: {
     container: "w-6 h-4",
     circleSize: "3.5px",
-    capsuleRadius: "1.75px",
     gap: "gap-0.5",
   },
   default: {
     container: "w-8 h-6",
     circleSize: "4.5px",
-    capsuleRadius: "2.25px",
     gap: "gap-0.5",
   },
   large: {
     container: "w-10 h-8",
     circleSize: "6.5px",
-    capsuleRadius: "3.25px",
     gap: "gap-1",
   },
 } as const satisfies Record<WaveformSize, {
   container: string;
   circleSize: string;
-  capsuleRadius: string;
   gap: string;
 }>;
 
@@ -138,7 +135,8 @@ export function GoogleMeetWaveformView({
   const hasAudio = amplitude > SPEAKING_AMPLITUDE_THRESHOLD;
   const barStyle: React.CSSProperties = {
     backgroundColor,
-    willChange: hasAudio ? "height, border-radius" : "auto",
+    borderRadius: radii.pill,
+    willChange: hasAudio ? "height" : "auto",
     transformOrigin: "center",
     width: config.circleSize,
     height: config.circleSize,
@@ -150,14 +148,9 @@ export function GoogleMeetWaveformView({
   const sideBarVariants = {
     muted: {
       height: config.circleSize, // Perfect square
-      borderRadius: "50%", // True circle when height = width
       transition: {
         height: {
           duration: 0.4,
-          ease: [0.25, 0.1, 0.25, 1.0],
-        },
-        borderRadius: {
-          duration: 0.15, // Faster transition to circle shape
           ease: [0.25, 0.1, 0.25, 1.0],
         },
       },
@@ -174,17 +167,12 @@ export function GoogleMeetWaveformView({
         `${parseFloat(config.circleSize) * 1.8}px`,
         `${parseFloat(config.circleSize) * 1.1}px`,
       ],
-      borderRadius: config.capsuleRadius, // Perfect capsule - half the width
       transition: {
         height: {
           duration: 1.6,
           repeat: Infinity,
           ease: [0.4, 0.0, 0.6, 1.0],
           delay: 0,
-        },
-        borderRadius: {
-          duration: 0.1, // Very fast transition to capsule
-          ease: [0.25, 0.1, 0.25, 1.0],
         },
       },
     },
@@ -193,17 +181,11 @@ export function GoogleMeetWaveformView({
   const centerBarVariants = {
     muted: {
       height: config.circleSize, // Perfect square
-      borderRadius: "50%", // True circle when height = width
       transition: {
         height: {
           duration: 0.5, // Slightly longer for center prominence
           ease: [0.25, 0.1, 0.25, 1.0],
           delay: 0.1, // Slight delay for cascading effect
-        },
-        borderRadius: {
-          duration: 0.15, // Faster transition to circle shape
-          ease: [0.25, 0.1, 0.25, 1.0],
-          delay: 0.1, // Same delay as height
         },
       },
     },
@@ -219,17 +201,12 @@ export function GoogleMeetWaveformView({
         `${parseFloat(config.circleSize) * 3.2}px`,
         `${parseFloat(config.circleSize) * 1.8}px`,
       ],
-      borderRadius: config.capsuleRadius, // Perfect capsule - half the width
       transition: {
         height: {
           duration: 1.8,
           repeat: Infinity,
           ease: [0.4, 0.0, 0.6, 1.0],
           delay: 0.2, // Slight independence from sides
-        },
-        borderRadius: {
-          duration: 0.1, // Very fast transition to capsule
-          ease: [0.25, 0.1, 0.25, 1.0],
         },
       },
     },

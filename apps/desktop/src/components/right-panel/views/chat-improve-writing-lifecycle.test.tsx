@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { messages as english } from "@/locales/en/messages.po";
+import { messages as spanish } from "@/locales/es/messages.po";
 import { setupI18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { act } from "react";
@@ -16,29 +18,55 @@ const mocks = vi.hoisted(() => {
     pendingFloatingPrompt: null as string | null,
     chatDrafts,
     getChatDraft: vi.fn((sessionId: string) => chatDrafts[sessionId] ?? ""),
-    setChatDraft: vi.fn((sessionId: string, draft: string) => { chatDrafts[sessionId] = draft; }),
-    clearChatDraft: vi.fn((sessionId: string) => { chatDrafts[sessionId] = ""; }),
+    setChatDraft: vi.fn((sessionId: string, draft: string) => {
+      chatDrafts[sessionId] = draft;
+    }),
+    clearChatDraft: vi.fn((sessionId: string) => {
+      chatDrafts[sessionId] = "";
+    }),
     consumeFloatingPrompt: vi.fn(),
     getChatGroupId: vi.fn(),
+    groups: [] as Array<{ id: string }>,
+    switchView: vi.fn(),
     activeSessionId: "session-1",
     newChatRequest: null as null | { sessionId: string; requestId: number },
     isNewChatRequestedInQuery: false,
     selectionSessionId: "session-1" as string | null,
-    clearSelection: vi.fn(() => { mocks.selectionSessionId = null; }),
+    clearSelection: vi.fn(() => {
+      mocks.selectionSessionId = null;
+    }),
     chatInputValue: "",
     chatInputSubmit: null as null | (() => unknown),
     chatInputChange: null as null | ((event: { target: { value: string } }) => void),
   };
 });
 
-const i18n = setupI18n({ locale: "en", messages: { en: {} } });
+const i18n = setupI18n({ locale: "en", messages: { en: english, es: spanish } });
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => vi.fn(),
-  useMatch: ({ from }: { from: string }) => from === "/app/note/$id" && mocks.activeSessionId
-    ? { params: { id: mocks.activeSessionId } }
-    : null,
+  useMatch: ({ from }: { from: string }) =>
+    from === "/app/note/$id" && mocks.activeSessionId
+      ? { params: { id: mocks.activeSessionId } }
+      : null,
 }));
-vi.mock("@typr/ui", () => ({ ResponsiveIconButton: () => null }));
+vi.mock(
+  "@typr/ui",
+  () => ({
+    ResponsiveIconButton: (
+      { text, disabled, onClick, className, icon: Icon }: {
+        text: string;
+        disabled?: boolean;
+        onClick?: () => void;
+        className?: string;
+        icon: React.ComponentType;
+      },
+    ) => (
+      <button title={text} aria-label={text} className={className} disabled={disabled} onClick={onClick}>
+        <Icon />
+      </button>
+    ),
+  }),
+);
 vi.mock("@typr/ui/lib/utils", () => ({ cn: (...args: unknown[]) => args.filter(Boolean).join(" ") }));
 vi.mock("@/components/ui/ai-setup-indicator", () => ({ AISetupIndicator: () => null }));
 vi.mock("@/components/ui/tab", () => ({ Tab: () => null }));
@@ -51,7 +79,7 @@ vi.mock("@/contexts", () => ({
     currentView: "chat",
     surface: "floating",
     floatingState: "expanded",
-    switchView: vi.fn(),
+    switchView: mocks.switchView,
     openFloating: vi.fn(),
     getChatGroup: () => "group-1",
     setChatGroup: vi.fn(),
@@ -98,17 +126,19 @@ vi.mock("../components/chat", async () => {
 vi.mock("../components/search", () => ({ ChatSearchHeader: () => null }));
 vi.mock("@/hooks/useEditModeModelSwitch.tsx", () => ({ useEditModeModelSwitch: vi.fn() }));
 
-vi.mock("../hooks/useChatQueries", () => ({ useChatQueries: (options: { isNewChatRequested: boolean }) => {
-  mocks.isNewChatRequestedInQuery = options.isNewChatRequested;
-  return ({
-  chatGroupsQuery: { data: [] },
-  sessionData: { data: { title: "Test" }, refetch: async () => ({ data: { title: "Test", words: [] } }) },
-  fetchSessionData: async () => ({ title: "Test", words: [] }),
-  getChatGroupId: mocks.getChatGroupId,
-  chatHistory: [],
-  totalSessionMessagesQuery: { data: 0 },
-  });
-} }));
+vi.mock("../hooks/useChatQueries", () => ({
+  useChatQueries: (options: { isNewChatRequested: boolean }) => {
+    mocks.isNewChatRequestedInQuery = options.isNewChatRequested;
+    return ({
+      chatGroupsQuery: { data: mocks.groups },
+      sessionData: { data: { title: "Test" }, refetch: async () => ({ data: { title: "Test", words: [] } }) },
+      fetchSessionData: async () => ({ title: "Test", words: [] }),
+      getChatGroupId: mocks.getChatGroupId,
+      chatHistory: [],
+      totalSessionMessagesQuery: { data: 0 },
+    });
+  },
+}));
 vi.mock("../utils/chat-utils", () => ({ focusInput: vi.fn(), formatDate: vi.fn() }));
 vi.mock("@/stores/useSelectionContext", () => ({
   useSelectionContext: Object.assign(
@@ -121,7 +151,10 @@ vi.mock("@/stores/useSelectionContext", () => ({
     { getState: () => ({ sessionId: mocks.selectionSessionId }) },
   ),
 }));
-vi.mock("@typr/utils/contexts", () => ({ useSessions: (selector: (state: object) => unknown) => selector({ sessions: {} }) }));
+vi.mock(
+  "@typr/utils/contexts",
+  () => ({ useSessions: (selector: (state: object) => unknown) => selector({ sessions: {} }) }),
+);
 vi.mock("@typr/utils", () => ({
   AUTO_CLOUD_MODEL_ID: "auto",
   AUTO_CLOUD_MODEL_PRIORITY: [],
@@ -137,12 +170,14 @@ vi.mock("@typr/utils/ai", () => ({
   streamText: mocks.streamText,
 }));
 vi.mock("@typr/plugin-connector", () => ({ commands: { getLlmConnection: vi.fn(async () => ({ type: "OpenAI" })) } }));
-vi.mock("@typr/plugin-db", () => ({ commands: {
-  upsertChatMessage: mocks.upsertChatMessage,
-  sessionListParticipants: vi.fn(async () => []),
-  sessionGetEvent: vi.fn(async () => null),
-  getHuman: vi.fn(async () => null),
-} }));
+vi.mock("@typr/plugin-db", () => ({
+  commands: {
+    upsertChatMessage: mocks.upsertChatMessage,
+    sessionListParticipants: vi.fn(async () => []),
+    sessionGetEvent: vi.fn(async () => null),
+    getHuman: vi.fn(async () => null),
+  },
+}));
 vi.mock("@typr/plugin-local-llm", () => ({ commands: {} }));
 vi.mock("@typr/plugin-misc", () => ({ commands: {} }));
 vi.mock("@typr/plugin-template", () => ({ commands: { render: mocks.renderTemplate } }));
@@ -150,8 +185,13 @@ vi.mock("@/utils/inline-diff-preview", () => ({ showInlineDiffPreview: vi.fn() }
 vi.mock("@/utils/analytics-safe", () => ({ safeAnalyticsEvent: vi.fn() }));
 
 import { useChatState } from "@/stores/useChatState";
-import { abortChatGeneration, finishChatGeneration, hasActiveChatGeneration, startChatGeneration } from "../hooks/chat-generation";
 import type { TiptapEditor } from "@typr/tiptap/editor";
+import {
+  abortChatGeneration,
+  finishChatGeneration,
+  hasActiveChatGeneration,
+  startChatGeneration,
+} from "../hooks/chat-generation";
 import { ChatView } from "./chat-view";
 
 let root: Root;
@@ -173,26 +213,50 @@ function views() {
 
 async function sendImproveWritingEvent() {
   await act(async () => {
-    window.dispatchEvent(new CustomEvent("improveWritingRequested", {
-      detail: {
-        selectedText: "words",
-        range: { from: 1, to: 6 },
-        sessionId: "session-1",
-        action: "improve",
-      },
-    }));
+    window.dispatchEvent(
+      new CustomEvent("improveWritingRequested", {
+        detail: {
+          selectedText: "words",
+          range: { from: 1, to: 6 },
+          sessionId: "session-1",
+          action: "improve",
+        },
+      }),
+    );
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
 }
 
 describe("same-session improve-writing requests", () => {
   beforeEach(() => {
+    i18n.activate("en");
+    mocks.groups = [];
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      width: 600,
+      height: 40,
+      top: 0,
+      left: 0,
+      right: 600,
+      bottom: 40,
+      x: 0,
+      y: 0,
+      toJSON() {},
+    });
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        observe() {}
+        disconnect() {}
+        unobserve() {}
+      },
+    );
     vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
       queueMicrotask(() => callback(0));
       return 0;
     });
     container = document.createElement("div");
+    document.body.append(container);
     root = createRoot(container);
     useChatState.getState().clearSession("session-1");
     window.__TYPR_EDITORS__ = {
@@ -203,7 +267,7 @@ describe("same-session improve-writing requests", () => {
     };
     mocks.generateText.mockReset().mockResolvedValue({ text: "<p>improved words</p>" });
     mocks.streamText.mockReset().mockImplementation(({ abortSignal }: { abortSignal: AbortSignal }) => ({
-      fullStream: (async function* () {
+      fullStream: (async function*() {
         await new Promise<never>((_resolve, reject) => {
           abortSignal.addEventListener("abort", () => {
             const error = new Error("aborted");
@@ -242,6 +306,7 @@ describe("same-session improve-writing requests", () => {
 
   afterEach(async () => {
     act(() => root.unmount());
+    container.remove();
     if (queuedPromptController) {
       abortChatGeneration("session-1");
       releaseQueuedGroupId?.("group-1");
@@ -265,8 +330,120 @@ describe("same-session improve-writing requests", () => {
     vi.unstubAllGlobals();
   });
 
+  it("groups floating Chat navigation, text actions and window controls without moving window controls when messages arrive", async () => {
+    const dock = vi.fn(), minimize = vi.fn();
+    const view = () => (
+      <I18nProvider i18n={i18n}>
+        <ChatView layout="floating" onMoveToSidebar={dock} onClose={minimize} />
+      </I18nProvider>
+    );
+    await act(async () => root.render(view()));
+    const windows = container.querySelector("[aria-label=\"Window controls\"]");
+    expect(windows).not.toBeNull();
+    expect([...container.querySelectorAll("[role=\"group\"]")].map(group => group.getAttribute("aria-label"))).toEqual([
+      "Panel view",
+      "Chat navigation",
+      "Window controls",
+    ]);
+    mocks.groups = [{ id: "group-1" }];
+    await act(async () => {
+      useChatState.getState().setMessages("session-1", [{
+        id: "one",
+        content: "Hello",
+        isUser: true,
+        timestamp: new Date(),
+      }]);
+      root.render(view());
+    });
+    expect([...container.querySelectorAll("[role=\"group\"]")].map(group => group.getAttribute("aria-label"))).toEqual([
+      "Panel view",
+      "Chat navigation",
+      "Chat actions",
+      "Window controls",
+    ]);
+    expect(container.querySelector("[aria-label=\"Window controls\"]")).toBe(windows);
+    expect(
+      [...container.querySelectorAll("[aria-label=\"Chat navigation\"] button")].map(button =>
+        button.getAttribute("title")
+      ),
+    ).toEqual(["New chat", "History"]);
+    expect(
+      [...container.querySelectorAll("[aria-label=\"Chat actions\"] button")].map(button =>
+        button.getAttribute("title")
+      ),
+    ).toEqual(["Search", "Copy"]);
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>("button[title=\"Move to sidebar\"]")!.click();
+      container.querySelector<HTMLButtonElement>("button[title=\"Minimize\"]")!.click();
+    });
+    const toggle = container.querySelector("[aria-label=\"Panel view\"]")!;
+    expect(toggle.querySelector("button[aria-pressed=\"true\"]")?.textContent).toBe("Chat");
+    await act(async () => {
+      toggle.querySelector<HTMLButtonElement>("button:last-child")!.click();
+    });
+    expect(mocks.switchView).toHaveBeenCalledWith("transcript");
+    expect(dock).toHaveBeenCalledOnce();
+    expect(minimize).toHaveBeenCalledOnce();
+  });
+
+  it.each(["en", "es"])(
+    "keeps chat history, search and copy accessible in the compact floating menu (%s)",
+    async locale => {
+      i18n.activate(locale);
+      const labels = locale === "es"
+        ? { search: "Buscar", history: "Historial", copy: "Copiar", more: "Más acciones del chat" }
+        : { search: "Search", history: "History", copy: "Copy", more: "More chat actions" };
+      vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+        width: 417,
+        height: 40,
+        top: 0,
+        left: 0,
+        right: 417,
+        bottom: 40,
+        x: 0,
+        y: 0,
+        toJSON() {},
+      });
+      mocks.groups = [{ id: "group-1" }];
+      useChatState.getState().setMessages("session-1", [{
+        id: "one",
+        content: "Hello",
+        isUser: true,
+        timestamp: new Date(),
+      }]);
+      await act(async () =>
+        root.render(
+          <I18nProvider i18n={i18n}>
+            <ChatView layout="floating" onClose={vi.fn()} onMoveToSidebar={vi.fn()} />
+          </I18nProvider>,
+        )
+      );
+      expect(container.querySelector(`button[title="${labels.search}"]`)).toBeNull();
+      expect(container.querySelector(`button[title="${labels.history}"]`)).toBeNull();
+      const more = container.querySelector<HTMLButtonElement>(`button[title="${labels.more}"]`)!;
+      expect(more).not.toBeNull();
+      await act(async () => {
+        more.focus();
+        more.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect([...document.querySelectorAll("[role=\"menuitem\"]")].map(item => item.textContent)).toEqual([
+        labels.history,
+        labels.search,
+        labels.copy,
+      ]);
+      await act(async () => {
+        document.querySelectorAll<HTMLElement>("[role=\"menuitem\"]")[1].click();
+      });
+      expect(document.querySelector("[role=\"menu\"]")).toBeNull();
+      expect(container.querySelector("[role=\"group\"]")).toBeNull();
+    },
+  );
+
   it("starts one AI edit and saves one user/result pair when both surfaces receive the event", async () => {
-    await act(async () => { root.render(views()); });
+    await act(async () => {
+      root.render(views());
+    });
     await sendImproveWritingEvent();
 
     expect(mocks.generateText).toHaveBeenCalledTimes(1);
@@ -278,7 +455,9 @@ describe("same-session improve-writing requests", () => {
   });
 
   it("does not start another edit while a session generation is already active", async () => {
-    await act(async () => { root.render(views()); });
+    await act(async () => {
+      root.render(views());
+    });
     act(() => useChatState.getState().setGenerating("session-1", true));
 
     await sendImproveWritingEvent();
@@ -307,13 +486,15 @@ describe("same-session improve-writing requests", () => {
     expect(mocks.consumeFloatingPrompt).toHaveBeenCalledWith("session-1");
     expect(mocks.setChatDraft).toHaveBeenCalledWith("session-1", "queued prompt");
     expect(mocks.chatInputValue).toBe("queued prompt");
-    expect(container.querySelector<HTMLTextAreaElement>('[data-testid="chat-input"]')?.value).toBe("queued prompt");
+    expect(container.querySelector<HTMLTextAreaElement>("[data-testid=\"chat-input\"]")?.value).toBe("queued prompt");
     expect(mocks.generateText).not.toHaveBeenCalled();
     expect(mocks.getChatGroupId).not.toHaveBeenCalled();
     expect(hasActiveChatGeneration("session-1")).toBe(true);
 
     let releaseGroupId!: (groupId: string) => void;
-    const groupIdPromise = new Promise<string>((resolve) => { releaseGroupId = resolve; });
+    const groupIdPromise = new Promise<string>((resolve) => {
+      releaseGroupId = resolve;
+    });
     releaseQueuedGroupId = releaseGroupId;
     mocks.getChatGroupId.mockReset().mockReturnValueOnce(groupIdPromise);
     act(() => {
@@ -349,7 +530,9 @@ describe("same-session improve-writing requests", () => {
     mocks.selectionSessionId = "session-a";
     mocks.newChatRequest = { sessionId: "session-a", requestId: 1 };
     let resolveGroup!: (groupId: string) => void;
-    const groupPromise = new Promise<string>((resolve) => { resolveGroup = resolve; });
+    const groupPromise = new Promise<string>((resolve) => {
+      resolveGroup = resolve;
+    });
     releaseRouteGroupId = resolveGroup;
     mocks.getChatGroupId.mockReturnValueOnce(groupPromise);
 
@@ -397,11 +580,13 @@ describe("same-session improve-writing requests", () => {
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
     });
-    expect(mocks.upsertChatMessage).toHaveBeenCalledWith(expect.objectContaining({ role: "User", group_id: "group-a" }));
+    expect(mocks.upsertChatMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ role: "User", group_id: "group-a" }),
+    );
     expect(mocks.chatDrafts["session-a"]).toBe("");
     expect(mocks.chatDrafts["session-b"]).toBe("draft for B");
     expect(mocks.chatInputValue).toBe("draft for B");
-    expect(container.querySelector<HTMLTextAreaElement>('[data-testid="chat-input"]')?.value).toBe("draft for B");
+    expect(container.querySelector<HTMLTextAreaElement>("[data-testid=\"chat-input\"]")?.value).toBe("draft for B");
     expect(mocks.selectionSessionId).toBe("session-b");
 
     await act(async () => {
@@ -414,7 +599,9 @@ describe("same-session improve-writing requests", () => {
   });
 
   it("accepts a later edit after the earlier one completes", async () => {
-    await act(async () => { root.render(views()); });
+    await act(async () => {
+      root.render(views());
+    });
 
     await sendImproveWritingEvent();
     expect(useChatState.getState().isGenerating("session-1")).toBe(false);

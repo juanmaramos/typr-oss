@@ -13,6 +13,8 @@ import {
 import { markAndEnqueueProjectBriefRefresh, projectKnowledgeJobQueryKeys } from "@/lib/project-knowledge-jobs";
 import { getProjectActionErrorMessage } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ProjectFile } from "@typr/plugin-db";
 import {
   AlertDialog,
@@ -28,8 +30,6 @@ import { NumberBadge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import { toast } from "@typr/ui/components/ui/toast";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
 
 interface ProjectNotesPanelProps {
@@ -215,7 +215,7 @@ export function ProjectNotesPanel({ children, count, onAddNotes, projectId }: Pr
           }
         }}
       >
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               <Trans>Remove “{fileToRemoveName}”?</Trans>

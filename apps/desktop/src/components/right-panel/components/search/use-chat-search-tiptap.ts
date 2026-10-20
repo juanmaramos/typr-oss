@@ -13,7 +13,7 @@ export function useChatSearchTipTap(content: string, onClose: () => void) {
     style.textContent = `
       .search-highlight {
         background-color: hsla(48, 100%, 50%, 0.3) !important;
-        border-radius: 0.125rem !important;
+        border-radius: var(--radius-compact) !important;
         padding: 0 0.125rem !important;
       }
       .search-highlight-current {

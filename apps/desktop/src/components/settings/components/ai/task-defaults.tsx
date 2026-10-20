@@ -1,17 +1,17 @@
-import { useModelPreferences } from "@/hooks/useModelPreferences";
-import { aiTaskDefaultsQueryOptions, transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { SETTINGS_LOCAL_STT_MODEL_KEYS, sttModelMetadata } from "@/components/transcript/constants/languageData";
-import { useModelState } from "@/hooks/useModelState";
+import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { useAllModels, useCustomModels, useModelSelection, useModelSelectionState } from "@/hooks/useModels";
+import { useModelState } from "@/hooks/useModelState";
 import { usePlatform } from "@/hooks/usePlatform";
-import { ModelType, type ModelOption } from "@/types/models";
+import { aiTaskDefaultsQueryOptions, transcriptionModelQueryOptions } from "@/lib/model-selection";
+import { type ModelOption, ModelType } from "@/types/models";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@typr/ui/components/ui/select";
 import { cn } from "@typr/ui/lib/utils";
-import { AUTO_CLOUD_MODEL_ID, normalizeAiTaskDefaults, type AiTaskDefaults, type AiTextTask } from "@typr/utils";
+import { type AiTaskDefaults, type AiTextTask, AUTO_CLOUD_MODEL_ID, normalizeAiTaskDefaults } from "@typr/utils";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 
@@ -164,7 +164,10 @@ export function AiTaskDefaultsSettings() {
           <Trans>Defaults</Trans>
         </h2>
         <p className="mt-1 max-w-3xl text-base leading-7 text-muted-foreground">
-          <Trans>Typr uses these AI models by default for chat, project briefs, meeting summaries, and transcription. You can override them later by choosing a different model inside each feature.</Trans>
+          <Trans>
+            Typr uses these AI models by default for chat, project briefs, meeting summaries, and transcription. You can
+            override them later by choosing a different model inside each feature.
+          </Trans>
         </p>
       </div>
 
@@ -175,7 +178,7 @@ export function AiTaskDefaultsSettings() {
           description={<Trans>The model used when you ask questions or edit notes from chat.</Trans>}
         >
           <Select value={chatModelValue} onValueChange={(value) => void updateChatDefault(value)}>
-            <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
+            <SelectTrigger className="h-9 w-full sm:w-72">
               <SelectValue placeholder={t`Select model`}>
                 <SelectTriggerLabel label={chatModelLabel} />
               </SelectValue>
@@ -194,7 +197,8 @@ export function AiTaskDefaultsSettings() {
                     textValue={getModelOptionLabel(model)}
                   >
                     <ModelSelectLabel
-                      icon={model.customIcon || (model.type === ModelType.LOCAL ? "ri-hard-drive-3-line" : "ri-robot-line")}
+                      icon={model.customIcon
+                        || (model.type === ModelType.LOCAL ? "ri-hard-drive-3-line" : "ri-robot-line")}
                       label={getModelOptionLabel(model)}
                       description={model.type === ModelType.LOCAL ? t`On-device model` : model.description}
                     />
@@ -223,7 +227,7 @@ export function AiTaskDefaultsSettings() {
                 onValueChange={(nextValue) => updateTextTaskDefault(row.keyName, nextValue)}
                 disabled={defaultsQuery.isLoading || updateDefaultsMutation.isPending}
               >
-                <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
+                <SelectTrigger className="h-9 w-full sm:w-72">
                   <SelectValue placeholder={t`Select model`}>
                     <SelectTriggerLabel label={taskModelLabel} />
                   </SelectValue>
@@ -274,7 +278,7 @@ export function AiTaskDefaultsSettings() {
           description={<Trans>The speech-to-text model used when a recording or upload starts.</Trans>}
         >
           <Select value={transcriptionValue} onValueChange={(value) => void updateTranscriptionDefault(value)}>
-            <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
+            <SelectTrigger className="h-9 w-full sm:w-72">
               <SelectValue placeholder={t`Select model`}>
                 <SelectTriggerLabel label={transcriptionLabel} />
               </SelectValue>
@@ -296,10 +300,10 @@ export function AiTaskDefaultsSettings() {
                 const description = isDownloading
                   ? t`Downloading...`
                   : isUnavailable
-                    ? t`Download in Transcription settings`
-                    : metadata.languageSupport === "english-only"
-                      ? t`On-device English`
-                      : t`On-device multilingual`;
+                  ? t`Download in Transcription settings`
+                  : metadata.languageSupport === "english-only"
+                  ? t`On-device English`
+                  : t`On-device multilingual`;
 
                 return (
                   <SelectItem

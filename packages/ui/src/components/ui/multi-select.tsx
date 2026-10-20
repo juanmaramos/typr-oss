@@ -404,7 +404,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
     >
       <div
         className={cn(
-          "relative min-h-[38px] rounded-md border border-input text-sm outline-none transition-[color,box-shadow]",
+          "relative min-h-[38px] rounded-control border border-input text-sm outline-none transition-[color,box-shadow]",
           "focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50",
           "has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50",
           { "cursor-text": !disabled && selected.length !== 0, "p-1": selected.length !== 0 },
@@ -432,7 +432,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             <div
               key={option.value}
               className={cn(
-                "relative inline-flex h-7 cursor-default items-center rounded-md border bg-background pr-7 pl-2 text-xs font-medium text-secondary-foreground transition-all",
+                "relative inline-flex h-7 cursor-default items-center rounded-control border bg-background pr-7 pl-2 text-xs font-medium text-secondary-foreground transition-all",
                 "hover:bg-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
                 "data-[fixed=true]:pr-2",
                 badgeClassName,
@@ -503,7 +503,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
               onChange?.(retained);
             }}
             className={cn(
-              "absolute top-0 right-0 flex size-9 items-center justify-center rounded-md border border-transparent text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground",
+              "absolute top-0 right-0 flex size-9 items-center justify-center rounded-control border border-transparent text-muted-foreground/80 outline-none transition-[color,box-shadow] hover:text-foreground",
               (
                 hideClearAllButton
                 || disabled
@@ -522,7 +522,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
         <div className="relative">
           <div
             className={cn(
-              "absolute top-1 z-10 w-full overflow-hidden rounded-md border border-input",
+              "absolute top-1 z-10 w-full overflow-hidden rounded-control border border-input",
               "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
             )}
             data-state="open"

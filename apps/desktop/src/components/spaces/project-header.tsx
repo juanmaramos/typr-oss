@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -7,7 +8,6 @@ import {
 } from "@typr/ui/components/ui/dropdown-menu";
 import { Input } from "@typr/ui/components/ui/input";
 import { Textarea } from "@typr/ui/components/ui/textarea";
-import { Trans, useLingui } from "@lingui/react/macro";
 
 interface ProjectHeaderProps {
   description: string;
@@ -72,11 +72,11 @@ export function ProjectHeader({
             <i className="ri-more-2-fill text-lg" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 rounded-xl border bg-background p-1.5">
+        <DropdownMenuContent align="end" className="w-48 border bg-background p-1.5">
           <DropdownMenuItem
             onSelect={onDelete}
             disabled={isDeleting}
-            className="rounded-lg text-sm text-destructive focus:bg-destructive/5 focus:text-destructive"
+            className="text-sm text-destructive focus:bg-destructive/5 focus:text-destructive"
           >
             <i className="ri-delete-bin-line text-[15px]" />
             <Trans>Delete project</Trans>

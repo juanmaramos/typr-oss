@@ -47,7 +47,7 @@ function ActualButton({ disabled }: { disabled: boolean }) {
           size="sm"
           onClick={() => createNewNote("toolbar")}
           aria-label={t`New Note`}
-          className="flex h-8 flex-shrink-0 items-center gap-1 rounded-md px-3 text-xs font-medium text-muted-foreground hover:bg-surface-400 hover:text-foreground"
+          className="flex h-8 flex-shrink-0 items-center gap-1 px-3 text-xs font-medium text-muted-foreground hover:bg-surface-400 hover:text-foreground"
         >
           <Icon name="ri-add-line" className="h-4 w-4" />
           <Trans>New note</Trans>

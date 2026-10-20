@@ -2,7 +2,7 @@
   /* code block */
   pre {
     background: hsl(var(--foreground));
-    border-radius: 0.5rem;
+    border-radius: var(--radius-surface);
     color: hsl(var(--background));
     font-family: var(--font-mono);
     margin: 0 0 0.25rem 0;
@@ -21,7 +21,7 @@
 
   /* inline code */
   code {
-    border-radius: 0.4rem;
+    border-radius: var(--radius-compact);
     color: hsl(var(--foreground));
     font-size: 0.85rem;
     padding: 0.25em 0.3em;

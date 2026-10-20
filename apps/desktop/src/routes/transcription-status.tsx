@@ -114,7 +114,7 @@ function Component() {
       aria-live="polite"
       className="h-screen w-screen select-none bg-transparent"
     >
-      <div className="grid h-full w-full grid-cols-[calc(100vh+8px)_1fr_calc(100vh+8px)] items-center overflow-hidden rounded-b-[10px] rounded-t-none bg-black text-white">
+      <div className="grid h-full w-full grid-cols-[calc(100vh+8px)_1fr_calc(100vh+8px)] items-center overflow-hidden rounded-b-surface rounded-t-none bg-black text-white">
         <span className="sr-only">{view.label}</span>
         <div className="flex h-full items-center justify-center">
           <GoogleMeetWaveformView

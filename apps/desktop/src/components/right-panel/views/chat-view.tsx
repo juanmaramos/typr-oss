@@ -4,7 +4,17 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { ResponsiveIconButton } from "@typr/ui";
+import { Button } from "@typr/ui/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@typr/ui/components/ui/dropdown-menu";
+import { floatingToolbarClassNames } from "@typr/ui/lib/floating-toolbar";
 import { cn } from "@typr/ui/lib/utils";
+import { MoreHorizontal } from "lucide-react";
+import { useFloatingToolbar } from "../components/use-floating-toolbar";
 
 import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { Tab } from "@/components/ui/tab";
@@ -13,6 +23,7 @@ import { useRightPanel, useTypr } from "@/contexts";
 import { useAgentWritingFeature } from "@/hooks/use-agent-writing-feature";
 import { useTranscriptionActive } from "@/hooks/useTranscriptionActive";
 import { ChatHistoryView, ChatInput, ChatMessagesView, EmptyChatState } from "../components/chat";
+import { FloatingViewToggle } from "../components/floating-view-toggle";
 import { ChatSearchHeader } from "../components/search";
 // No longer needed as these are used within the ChatHeader component
 
@@ -105,10 +116,8 @@ export function ChatView({
   const { isRecordingActive } = useTranscriptionActive();
   const { userId } = useTypr();
 
-  // Container ref for measuring width
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Responsive design breakpoints
+  const { toolbarRef, isCompact } = useFloatingToolbar();
+  const showOverflow = layout === "floating" && isCompact;
 
   const [inputValue, setInputValue] = useState("");
   const [showHistory, setShowHistory] = useState(false);
@@ -464,7 +473,7 @@ export function ChatView({
   }, [initialShowHistory, onInitialShowHistoryConsumed]);
 
   return (
-    <div className="w-full h-full flex flex-col" ref={containerRef}>
+    <div className="w-full h-full flex flex-col" ref={toolbarRef}>
       {showHistory && (
         <ChatHistoryView
           chatHistory={chatHistory}
@@ -492,7 +501,7 @@ export function ChatView({
               <div className="relative">
                 <div
                   className={layout === "floating"
-                    ? "flex items-center justify-between gap-2 border-b border-border/60 bg-muted/25 px-6 py-3"
+                    ? floatingToolbarClassNames.header
                     : "flex items-center justify-between gap-2 px-4 py-3 bg-background"}
                 >
                   {layout === "sidebar"
@@ -514,101 +523,153 @@ export function ChatView({
                       </div>
                     )
                     : (
-                      <div className="min-w-0 flex-1 pr-4">
-                        <div className="truncate text-sm font-semibold leading-tight text-foreground">
-                          {title || sessionData.data?.title || t`Current note`}
+                      <>
+                        <FloatingViewToggle />
+                        <div className={cn("min-w-0 flex-1", isCompact && "hidden")}>
+                          <div className="truncate text-sm font-semibold leading-tight text-foreground">
+                            {title || sessionData.data?.title || t`Current note`}
+                          </div>
+                          <div className="truncate pt-0.5 text-ui-label leading-tight text-muted-foreground">
+                            {t`Ask in context of this meeting`}
+                          </div>
                         </div>
-                        <div className="pt-0.5 text-ui-label leading-tight text-muted-foreground">
-                          {t`Ask in context of this meeting`}
-                        </div>
-                      </div>
+                      </>
                     )}
 
                   {/* Right side - Action buttons */}
                   <div
                     className={layout === "floating"
-                      ? "flex items-center gap-2"
+                      ? cn(floatingToolbarClassNames.actions, isCompact && floatingToolbarClassNames.compactActions)
                       : "flex items-center gap-0.5"}
                   >
-                    <ResponsiveIconButton
-                      icon={PlusIcon}
-                      text={t`New chat`}
-                      onClick={handleNewChat}
-                      disabled={!hasMessages}
-                      displayMode="icon"
-                      variant="ghost"
-                      size="icon"
-                      className={layout === "floating"
-                        ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70 disabled:opacity-40"
-                        : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50 disabled:opacity-40"}
-                    />
-
-                    {chatGroupsQuery.data && chatGroupsQuery.data.length > 0 && (
+                    <div
+                      role="group"
+                      aria-label={t`Chat navigation`}
+                      className={layout === "floating" ? floatingToolbarClassNames.group : "flex items-center gap-0.5"}
+                    >
                       <ResponsiveIconButton
-                        icon={ChatHistoryIcon}
-                        text={t`History`}
-                        onClick={handleViewHistory}
+                        icon={PlusIcon}
+                        text={t`New chat`}
+                        onClick={handleNewChat}
+                        disabled={!hasMessages}
                         displayMode="icon"
                         variant="ghost"
                         size="icon"
                         className={layout === "floating"
-                          ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-                          : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
+                          ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70 disabled:opacity-40"
+                          : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50 disabled:opacity-40"}
                       />
-                    )}
 
-                    {hasMessages && (
-                      <ResponsiveIconButton
-                        icon={TextSearchIcon}
-                        text={t`Search`}
-                        onClick={() => setIsSearchActive(true)}
-                        displayMode="icon"
-                        variant="ghost"
-                        size="icon"
+                      {!showOverflow && chatGroupsQuery.data && chatGroupsQuery.data.length > 0 && (
+                        <ResponsiveIconButton
+                          icon={ChatHistoryIcon}
+                          text={t`History`}
+                          onClick={handleViewHistory}
+                          displayMode="icon"
+                          variant="ghost"
+                          size="icon"
+                          className={layout === "floating"
+                            ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
+                            : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
+                        />
+                      )}
+                      {showOverflow && (hasMessages || !!chatGroupsQuery.data?.length) && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              aria-label={t`More chat actions`}
+                              title={t`More chat actions`}
+                            >
+                              <MoreHorizontal aria-hidden="true" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {!!chatGroupsQuery.data?.length && (
+                              <DropdownMenuItem onSelect={handleViewHistory}>
+                                <ChatHistoryIcon />
+                                {t`History`}
+                              </DropdownMenuItem>
+                            )}
+                            {hasMessages && (
+                              <>
+                                <DropdownMenuItem onSelect={() => setIsSearchActive(true)}>
+                                  <TextSearchIcon />
+                                  {t`Search`}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => void handleCopyChat()}>
+                                  <CopyIcon />
+                                  {copied ? t`Copied!` : t`Copy`}
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
+                    {!showOverflow && hasMessages && (
+                      <div
+                        role="group"
+                        aria-label={t`Chat actions`}
                         className={layout === "floating"
-                          ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-                          : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
-                      />
-                    )}
+                          ? floatingToolbarClassNames.group
+                          : "flex items-center gap-0.5"}
+                      >
+                        <ResponsiveIconButton
+                          icon={TextSearchIcon}
+                          text={t`Search`}
+                          onClick={() => setIsSearchActive(true)}
+                          displayMode="icon"
+                          variant="ghost"
+                          size="icon"
+                          className={layout === "floating"
+                            ? "h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
+                            : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
+                        />
 
-                    {hasMessages && (
-                      <ResponsiveIconButton
-                        icon={copied ? CheckIcon : CopyIcon}
-                        text={copied ? t`Copied!` : t`Copy`}
-                        onClick={handleCopyChat}
-                        displayMode="icon"
-                        variant="ghost"
-                        size="icon"
-                        className={cn(
-                          "h-7 w-7 transition-all duration-200",
-                          layout === "floating" ? "hover:bg-surface-400/70" : "hover:bg-background/50",
-                          copied ? "text-success" : "text-foreground hover:text-foreground",
+                        <ResponsiveIconButton
+                          icon={copied ? CheckIcon : CopyIcon}
+                          text={copied ? t`Copied!` : t`Copy`}
+                          onClick={handleCopyChat}
+                          displayMode="icon"
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                            "h-7 w-7 transition-all duration-200",
+                            layout === "floating" ? "hover:bg-surface-400/70" : "hover:bg-background/50",
+                            copied ? "text-success" : "text-foreground hover:text-foreground",
+                          )}
+                        />
+                      </div>
+                    )}
+                    {layout === "floating" && (onMoveToSidebar || onClose) && (
+                      <div role="group" aria-label={t`Window controls`} className={floatingToolbarClassNames.group}>
+                        {onMoveToSidebar && (
+                          <ResponsiveIconButton
+                            icon={SidebarIcon}
+                            text={t`Move to sidebar`}
+                            onClick={onMoveToSidebar}
+                            displayMode="icon"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
+                          />
                         )}
-                      />
-                    )}
 
-                    {layout === "floating" && onMoveToSidebar && (
-                      <ResponsiveIconButton
-                        icon={SidebarIcon}
-                        text={t`Move to sidebar`}
-                        onClick={onMoveToSidebar}
-                        displayMode="icon"
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-                      />
-                    )}
-
-                    {layout === "floating" && onClose && (
-                      <ResponsiveIconButton
-                        icon={MinimizeIcon}
-                        text={t`Minimize`}
-                        onClick={onClose}
-                        displayMode="icon"
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-                      />
+                        {onClose && (
+                          <ResponsiveIconButton
+                            icon={MinimizeIcon}
+                            text={t`Minimize`}
+                            onClick={onClose}
+                            displayMode="icon"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
+                          />
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

@@ -254,7 +254,7 @@ function ShareButtonInNote() {
                   <button
                     type="button"
                     className={cn(
-                      "flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-surface-400/50",
+                      "flex w-full items-center justify-between rounded-control px-2.5 py-2 text-left transition-colors hover:bg-surface-400/50",
                       expanded && "bg-accent text-accent-foreground",
                     )}
                     onClick={() => toggleExpanded(option.id)}

@@ -275,9 +275,9 @@ function IconButton({
       onClick={handleClick}
       disabled={disabled}
       className={`
-        p-2 bg-foreground/50 backdrop-blur-sm rounded-xl text-background shadow-lg 
-        hover:bg-foreground/60 active:bg-foreground/70 transition-all duration-200 
-        flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed 
+        p-2 bg-foreground/50 backdrop-blur-sm rounded-control text-background shadow-lg
+        hover:bg-foreground/60 active:bg-foreground/70 transition-all duration-200
+        flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed
         border border-foreground/30 hover:border-foreground/40 ${className}
       `}
       title={tooltip}

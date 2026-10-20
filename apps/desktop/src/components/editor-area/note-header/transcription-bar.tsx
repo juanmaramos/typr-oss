@@ -195,7 +195,7 @@ export default function TranscriptionBar({
                       size="sm"
                       variant="secondary"
                       className={cn(
-                        "rounded-md rounded-l-none w-9 p-0",
+                        "rounded-l-none w-9 p-0",
                       )}
                       disabled={isSttLoading
                         || (isOnboarding

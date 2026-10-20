@@ -56,7 +56,7 @@ function RailButton({
           size="icon"
           onClick={onClick}
           className={cn(
-            "h-10 w-10 rounded-xl transition-colors",
+            "h-10 w-10 transition-colors",
             active
               ? "bg-accent text-accent-foreground shadow-sm hover:bg-surface-400 hover:text-foreground"
               : "text-muted-foreground hover:bg-surface-400/70 hover:text-foreground",

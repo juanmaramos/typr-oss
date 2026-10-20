@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import { useSession } from "@typr/utils/contexts";
 import { Trans } from "@lingui/react/macro";
+import { useSession } from "@typr/utils/contexts";
 
 interface EditorModeIndicatorProps {
   sessionId: string;
@@ -39,7 +39,7 @@ export function EditorModeIndicator({ sessionId, className }: EditorModeIndicato
         <button
           onClick={() => setShowRaw(true)}
           className={cn(
-            "flex items-center justify-center px-3 py-1 rounded-md",
+            "flex items-center justify-center px-3 py-1 rounded-control",
             "text-xs font-medium transition-all duration-200",
             showRaw
               ? "bg-background text-foreground shadow-sm border border-border/50"
@@ -53,7 +53,7 @@ export function EditorModeIndicator({ sessionId, className }: EditorModeIndicato
         <button
           onClick={() => setShowRaw(false)}
           className={cn(
-            "flex items-center justify-center px-3 py-1 rounded-md",
+            "flex items-center justify-center px-3 py-1 rounded-control",
             "text-xs font-medium transition-all duration-200",
             !showRaw
               ? "bg-background text-foreground shadow-sm border border-border/50"

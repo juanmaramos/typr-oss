@@ -1,6 +1,5 @@
 import { fetchUpdateCheck, installUpdate, resolveLatestUpdate } from "@/components/toast/use-check-for-updates";
 import { useAppInfo } from "@/hooks/use-app-info";
-import { Separator } from "@typr/ui/components/ui/separator";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { getName } from "@tauri-apps/api/app";
@@ -8,6 +7,7 @@ import { join } from "@tauri-apps/api/path";
 import { exists } from "@tauri-apps/plugin-fs";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import type { Update } from "@tauri-apps/plugin-updater";
+import { Separator } from "@typr/ui/components/ui/separator";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
@@ -261,7 +261,7 @@ function AboutResourceRow({
         ? (
           <button
             type="button"
-            className="rounded-md px-2 py-1 text-xs font-medium text-foreground transition-colors hover:bg-surface-400"
+            className="rounded-control px-2 py-1 text-xs font-medium text-foreground transition-colors hover:bg-surface-400"
             onClick={onAction}
           >
             {action}
@@ -281,7 +281,7 @@ function AboutResourceRow({
       {onDismiss && (
         <button
           type="button"
-          className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-surface-400 hover:text-foreground"
+          className="rounded-control p-1 text-muted-foreground transition-colors hover:bg-surface-400 hover:text-foreground"
           aria-label={t`Dismiss update status`}
           onClick={onDismiss}
         >
