@@ -1,17 +1,22 @@
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { openPath } from "@tauri-apps/plugin-opener";
 import { useState } from "react";
 
-import { SETTINGS_LOCAL_STT_MODEL_KEYS, sttModelMetadata } from "@/components/transcript/constants/languageData";
+import { sttModelMetadata } from "@/components/transcript/constants/languageData";
 import { type AISettingsSection, useSettingsDialog } from "@/contexts/settings-dialog";
 import { usePlatform } from "@/hooks/usePlatform";
+import { getAvailableSettingsSttModels, sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { Trans } from "@lingui/react/macro";
 import { commands as localLlmCommands, SupportedModel } from "@typr/plugin-local-llm";
 
-import { commands as localSttCommands, type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
+import {
+  commands as localSttCommands,
+  type ModelCapabilities,
+  type SupportedModel as SupportedSttModel,
+} from "@typr/plugin-local-stt";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@typr/ui/components/ui/tabs";
 import { showLlmModelDownloadToast, showSttModelDownloadToast } from "../../toast/shared";
 
@@ -20,16 +25,22 @@ import { SharedLLMProps, SharedSTTProps, STTModel } from "../components/ai/share
 import { STTView } from "../components/ai/stt-view";
 import { AiTaskDefaultsSettings } from "../components/ai/task-defaults";
 
-const getInitialSttModels = (): STTModel[] => [
-  ...SETTINGS_LOCAL_STT_MODEL_KEYS.map((key) => {
+const getInitialSttModels = (
+  modelKeys: readonly SupportedSttModel[],
+  capabilities?: readonly ModelCapabilities[],
+): STTModel[] => [
+  ...modelKeys.map((key) => {
     const metadata = sttModelMetadata[key];
+    const nativeModel = capabilities?.find(capability => capability.model === key);
 
     return {
       key,
       name: metadata.name,
       accuracy: metadata.intelligence,
       speed: metadata.speed,
-      size: metadata.size,
+      size: nativeModel?.size_bytes
+        ? `${Math.round(nativeModel.size_bytes / 1_000_000)} MB`
+        : metadata.size,
       downloaded: false,
       fileName: "",
     };
@@ -54,7 +65,9 @@ export default function LocalAI() {
 
   // Filter models for Windows
   useLingui();
-  const visibleSttModels = getInitialSttModels().filter(m => supportsLocalModels || m.isCloud);
+  const capabilities = useQuery(sttCapabilitiesQueryOptions());
+  const visibleSttModels = getInitialSttModels(getAvailableSettingsSttModels(capabilities.data), capabilities.data)
+    .filter(m => supportsLocalModels || m.isCloud);
 
   // STT State
   const [isWerModalOpen, setIsWerModalOpen] = useState(false);

@@ -12221,6 +12221,7 @@ dependencies = [
 name = "tauri-plugin-connector"
 version = "0.1.0"
 dependencies = [
+ "language",
  "listener-interface",
  "reqwest 0.12.24",
  "serde",
@@ -12426,6 +12427,7 @@ dependencies = [
  "tcc",
  "thiserror 2.0.17",
  "tokio",
+ "tokio-tungstenite 0.26.2",
  "tracing",
  "url",
  "uuid",
@@ -12478,6 +12480,7 @@ dependencies = [
  "dirs 6.0.0",
  "file",
  "futures-util",
+ "hound",
  "inventory",
  "language",
  "listener-interface",
@@ -12486,6 +12489,7 @@ dependencies = [
  "rodio",
  "serde",
  "serde_json",
+ "sha2",
  "similar",
  "specta",
  "specta-typescript",
@@ -12498,12 +12502,14 @@ dependencies = [
  "tauri-plugin-store2",
  "tauri-plugin-task",
  "tauri-specta",
+ "tempfile",
  "thiserror 2.0.17",
  "tokio",
  "tokio-tungstenite 0.26.2",
  "tokio-util",
  "tower-http 0.6.6",
  "tracing",
+ "typr-nemotron-runtime",
  "whisper",
  "whisper-local",
  "ws-utils",
@@ -13949,6 +13955,16 @@ dependencies = [
  "schemars 1.1.0",
  "serde",
  "tokio",
+]
+
+[[package]]
+name = "typr-nemotron-runtime"
+version = "0.1.0"
+dependencies = [
+ "hound",
+ "libloading 0.8.9",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -31,6 +31,9 @@ async downloadModelBackground(model: SupportedModel) : Promise<null> {
 async listSupportedModels() : Promise<SupportedModel[]> {
     return await TAURI_INVOKE("plugin:local-stt|list_supported_models");
 },
+async listModelCapabilities() : Promise<ModelCapabilities[]> {
+    return await TAURI_INVOKE("plugin:local-stt|list_model_capabilities");
+},
 async getCurrentModel() : Promise<SupportedModel> {
     return await TAURI_INVOKE("plugin:local-stt|get_current_model");
 },
@@ -69,11 +72,13 @@ sttModelStateChanged: "plugin:local-stt:stt-model-state-changed"
 /** user-defined types **/
 
 export type GgmlBackend = { kind: string; name: string; description: string; total_memory_mb: number; free_memory_mb: number }
+export type ModelCapabilities = { model: SupportedModel; backend: SttBackend; size_bytes: number; realtime: boolean; recorded: boolean; available: boolean }
 export type ModelState = "NotDownloaded" | { Downloading: { progress: number } } | "Downloaded" | { Error: { message: string } }
 export type ModelStateEvent = { model_id: string; state: ModelState; timestamp: number }
 export type RecordedProcessingEvent = { Progress: { current: number; total: number; word: Word } }
 export type SpeakerIdentity = { type: "unassigned"; value: { index: number } } | { type: "assigned"; value: { id: string; label: string } }
-export type SupportedModel = "QuantizedTiny" | "QuantizedTinyEn" | "QuantizedBase" | "QuantizedBaseEn" | "QuantizedSmall" | "QuantizedSmallEn" | "QuantizedLargeTurbo" | "DistilLargeV35En"
+export type SttBackend = "Whisper" | "NemotronStreaming"
+export type SupportedModel = "QuantizedTiny" | "QuantizedTinyEn" | "QuantizedBase" | "QuantizedBaseEn" | "QuantizedSmall" | "QuantizedSmallEn" | "QuantizedLargeTurbo" | "DistilLargeV35En" | "Nemotron3p5Streaming"
 export type Word = { text: string; speaker: SpeakerIdentity | null; confidence: number | null; start_ms: number | null; end_ms: number | null }
 
 /** tauri-specta globals **/

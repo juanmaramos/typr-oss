@@ -621,6 +621,12 @@ pub struct Session {
     device_monitor_handle: Option<typr_audio::DeviceMonitorHandle>,
     process_mic_tx: Option<flume::Sender<Vec<f32>>>,
     process_speaker_tx: Option<flume::Sender<Vec<f32>>>,
+    streaming_finishing: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    audio_ingress_stop_tx: Option<tokio::sync::watch::Sender<bool>>,
+    audio_ingress_stopped_rx: Option<tokio::sync::oneshot::Receiver<()>>,
+    audio_timeline: Option<(String, crate::streaming_lifecycle::AudioTimeline)>,
+    streaming_drained_rx: Option<tokio::sync::oneshot::Receiver<()>>,
+    is_streaming_stt: bool,
     is_local_stt: bool,        // Track if using local STT for silence injection
     stt_model: Option<String>, // Effective selection captured for this session startup
     lifecycle_policy: crate::policy::SessionLifecyclePolicy,
@@ -653,6 +659,12 @@ impl Session {
             device_monitor_handle: None,
             process_mic_tx: None,
             process_speaker_tx: None,
+            streaming_finishing: std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false)),
+            audio_ingress_stop_tx: None,
+            audio_ingress_stopped_rx: None,
+            audio_timeline: None,
+            streaming_drained_rx: None,
+            is_streaming_stt: false,
             is_local_stt: false,
             stt_model: None,
             lifecycle_policy: crate::policy::SessionLifecyclePolicy::default(),
@@ -1095,6 +1107,40 @@ impl Session {
             .await?
             .ok_or(crate::Error::NoneSession)?;
 
+        let timeline = match &self.audio_timeline {
+            Some((timeline_session, timeline)) if timeline_session == &session_id => {
+                timeline.clone()
+            }
+            _ => {
+                // Existing recordings append PCM. Read only the WAV header to
+                // initialize a restarted note's durable audio position.
+                let audio_path = self
+                    .app
+                    .path()
+                    .app_data_dir()
+                    .map_err(|error| crate::Error::Custom(error.to_string()))?
+                    .join(&session_id)
+                    .join("audio.wav");
+                let recorded_samples = hound::WavReader::open(audio_path)
+                    .ok()
+                    .filter(|audio| audio.spec() == WAV_SPEC)
+                    .map(|audio| u64::from(audio.duration()));
+                let initial_samples = recorded_samples.unwrap_or_else(|| {
+                    session
+                        .words
+                        .iter()
+                        .filter_map(|word| word.end_ms)
+                        .max()
+                        .unwrap_or(0)
+                        .saturating_mul(16)
+                });
+                let timeline = crate::streaming_lifecycle::AudioTimeline::new(initial_samples);
+                self.audio_timeline = Some((session_id.clone(), timeline.clone()));
+                timeline
+            }
+        };
+        let stream_origin_ms = timeline.origin_ms();
+
         let (mic_muted_tx, mic_muted_rx_main) = tokio::sync::watch::channel(false);
         let (speaker_muted_tx, speaker_muted_rx_main) = tokio::sync::watch::channel(false);
         let (session_state_tx, session_state_rx) =
@@ -1187,7 +1233,6 @@ impl Session {
         self.stt_model = None;
         let selection = self.app.get_stt_selection(Some(&session_id)).await?;
         let selected_model = Some(selection.model_id());
-        self.stt_model = selected_model.clone();
 
         let provider = SttProvider::from_model(selected_model.as_deref());
         let is_local = provider.is_local();
@@ -1218,8 +1263,8 @@ impl Session {
         tracing::info!(
             "⏳ [CONNECTION] Attempting to connect to transcription service (10s timeout)..."
         );
-        let connection_timeout = Duration::from_secs(10);
-        let (listen_client, listen_provider) =
+        let connection_timeout = Duration::from_secs(if is_local { 120 } else { 10 });
+        let (listen_client, listen_provider, resolved_model) =
             match tokio::time::timeout(connection_timeout, async {
                 let user_id = self.app.db_user_id().await.ok().flatten();
                 setup_listen_client(
@@ -1263,8 +1308,20 @@ impl Session {
                     );
                     return Err(err);
                 }
-                Ok(Ok((builder, provider))) => (builder.build_dual(), provider),
+                Ok(Ok((builder, provider, model))) => (builder.build_dual(), provider, model),
             };
+
+        let effective_model = resolved_model.model_id();
+        self.is_streaming_stt = resolved_model.is_streaming();
+        self.stt_model = Some(effective_model.clone());
+        if selected_model.as_deref() != Some(effective_model.as_str()) {
+            let _ = (SessionEvent::ModelFallback {
+                session_id: session_id.clone(),
+                requested_model: selected_model.clone().unwrap_or_default(),
+                effective_model,
+            })
+            .emit(&self.app);
+        }
 
         tracing::info!("🔌 [PHASE 1] Service connection established");
 
@@ -1414,6 +1471,10 @@ impl Session {
         ));
 
         let app_dir = self.app.path().app_data_dir().unwrap();
+        let (audio_stop_tx, mut audio_stop_rx) = tokio::sync::watch::channel(false);
+        let (audio_stopped_tx, audio_stopped_rx) = tokio::sync::oneshot::channel();
+        self.audio_ingress_stop_tx = Some(audio_stop_tx);
+        self.audio_ingress_stopped_rx = Some(audio_stopped_rx);
 
         tasks.spawn({
             let app = self.app.clone();
@@ -1426,6 +1487,7 @@ impl Session {
             let process_mic_tx = channels.process_mic_tx.clone();
             let process_speaker_tx = channels.process_speaker_tx.clone();
             async move {
+                let _stopped = crate::streaming_lifecycle::CompletionSignal(Some(audio_stopped_tx));
                 let mut aec = typr_aec::AEC::new().unwrap();
                 let mut last_broadcast = Instant::now();
 
@@ -1440,6 +1502,8 @@ impl Session {
                 loop {
                     // Non-blocking: process whichever channel has data ready
                     let (mic_chunk_raw, speaker_chunk): (Vec<f32>, Vec<f32>) = tokio::select! {
+                        biased;
+                        _ = audio_stop_rx.changed() => break,
                         mic_result = mic_rx.recv_async() => {
                             match mic_result {
                                 Ok(mic) => {
@@ -1772,6 +1836,21 @@ impl Session {
             })) as std::pin::Pin<Box<dyn futures_util::Stream<Item = bytes::Bytes> + Send>>
         };
 
+        let mic_timeline = timeline.clone();
+        let mic_audio_stream = Box::pin(mic_audio_stream.map(move |bytes| {
+            mic_timeline.submitted(0, bytes.len());
+            bytes
+        }));
+        let speaker_audio_stream = Box::pin(speaker_audio_stream.map(move |bytes| {
+            timeline.submitted(1, bytes.len());
+            bytes
+        }));
+
+        self.streaming_finishing = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+        let intentional_finish = self.streaming_finishing.clone();
+        let (drained_tx, drained_rx) = tokio::sync::oneshot::channel();
+        self.streaming_drained_rx = Some(drained_rx);
+
         let (stream_connected_tx, stream_connected_rx) = tokio::sync::watch::channel(false);
         self.stream_connected_rx = Some(stream_connected_rx);
 
@@ -1807,6 +1886,7 @@ impl Session {
             let pipeline_status = self.pipeline_status.clone();
 
             async move {
+                let _drained = crate::streaming_lifecycle::CompletionSignal(Some(drained_tx));
                 // Wait for WebSocket connection to complete
                 tracing::info!("🔌 [PHASE 3] Waiting for WebSocket connection to transcription service...");
                 let listen_stream = match listen_stream_task.await {
@@ -1856,10 +1936,35 @@ impl Session {
                 loop {
                     tokio::select! {
                         maybe_result = listen_stream.next() => {
-                            let Some(result) = maybe_result else {
+                            let Some(mut result) = maybe_result else {
                                 break;
                             };
+                            crate::streaming_lifecycle::offset_streaming_chunk(&mut result, stream_origin_ms);
 
+                            // Streaming hypotheses are display-only; they never reach update_session.
+                            if let Some(update) = result.update.as_ref() {
+                                match update {
+                                    typr_listener_interface::TranscriptUpdate::Preview { channel } => {
+                                        if !result.words.is_empty() { last_transcript_activity_at = std::time::Instant::now(); }
+                                        let _ = (SessionEvent::Preview { session_id: session.id.clone(), channel: channel.clone(), words: result.words }).emit(&app);
+                                        continue;
+                                    }
+                                    typr_listener_interface::TranscriptUpdate::Final { channel } => {
+                                        let _ = (SessionEvent::Preview { session_id: session.id.clone(), channel: channel.clone(), words: vec![] }).emit(&app);
+                                    }
+                                    typr_listener_interface::TranscriptUpdate::Failed { code } => {
+                                        Self::mark_pipeline_failed(&app, &pipeline_status, code).await;
+                                        for channel in ["mixed", "mic", "speaker"] {
+                                            let _ = (SessionEvent::Preview { session_id: session.id.clone(), channel: channel.into(), words: vec![] }).emit(&app);
+                                        }
+                                        let _ = (SessionEvent::TranscriptError { session_id: session.id.clone(), status: code.clone(), message: code.clone() }).emit(&app);
+                                        // Replaying after committed finals would duplicate or lose words.
+                                        // Never assume recording is enabled: preserve committed text and
+                                        // stop this stream explicitly so the user can select Whisper.
+                                        return;
+                                    }
+                                }
+                            }
                             stream_count += 1;
                             let meta = result.meta.clone();
                             let now = std::time::Instant::now();
@@ -2051,6 +2156,7 @@ impl Session {
                         .as_millis()
                 );
 
+                if intentional_finish.load(std::sync::atomic::Ordering::Acquire) { return; }
                 if auto_stop_triggered {
                     tracing::info!(
                         "[STREAM_END] Auto-stop already handled lifecycle transition; skipping reconnection logic"
@@ -2152,14 +2258,62 @@ impl Session {
         tracing::info!("[FLUSH] Silence injection complete");
     }
 
+    async fn drain_streaming(&mut self) {
+        self.streaming_finishing
+            .store(true, std::sync::atomic::Ordering::Release);
+        self.process_mic_tx = None;
+        self.process_speaker_tx = None;
+        if let Some(stop) = self.audio_ingress_stop_tx.take() {
+            let _ = stop.send(true);
+        }
+        if let Some(stopped) = self.audio_ingress_stopped_rx.take() {
+            if tokio::time::timeout(Duration::from_secs(60), stopped)
+                .await
+                .is_err()
+            {
+                tracing::warn!("streaming_audio_ingress_stop_timed_out");
+                return;
+            }
+        }
+        if let Some(drained) = self.streaming_drained_rx.take() {
+            if tokio::time::timeout(Duration::from_secs(60), drained)
+                .await
+                .is_err()
+            {
+                tracing::warn!("streaming_final_drain_timed_out");
+            }
+        }
+    }
+
+    fn clear_previews(&self) {
+        if let Some(session_id) = &self.session_id {
+            for channel in ["mixed", "mic", "speaker"] {
+                let _ = (SessionEvent::Preview {
+                    session_id: session_id.clone(),
+                    channel: channel.into(),
+                    words: vec![],
+                })
+                .emit(&self.app);
+            }
+        }
+    }
+
     #[tracing::instrument(skip_all)]
     async fn teardown_resources(&mut self, flush_transcript: bool) {
-        // Inject silence before teardown to flush VAD
-        if flush_transcript && (self.process_mic_tx.is_some() || self.process_speaker_tx.is_some())
+        if flush_transcript && self.is_streaming_stt {
+            self.drain_streaming().await;
+        }
+        // Whisper's VAD flush remains unchanged.
+        if flush_transcript
+            && !self.is_streaming_stt
+            && (self.process_mic_tx.is_some() || self.process_speaker_tx.is_some())
         {
             self.inject_silence_for_flush().await;
         }
 
+        self.audio_ingress_stop_tx = None;
+        self.audio_ingress_stopped_rx = None;
+        self.streaming_drained_rx = None;
         self.process_mic_tx = None;
         self.process_speaker_tx = None;
         self.stream_connected_rx = None;
@@ -2293,12 +2447,17 @@ impl Session {
                 MAX_RETRIES + 1
             );
 
+            // Finish the old native stream before rebuilding within the same session.
+            if self.is_streaming_stt {
+                self.drain_streaming().await;
+            }
             // Step 1: Only abort audio processing tasks, keep session metadata
             if let Some(mut tasks) = self.tasks.take() {
                 tracing::info!("[DEVICE_RECOVERY] Stopping audio tasks...");
                 tasks.abort_all();
                 while let Some(_) = tasks.join_next().await {}
             }
+            self.clear_previews();
 
             // Step 1.5: Clear AssemblyAI turn state to allow new WebSocket connection to start fresh
             // The new connection will start at turn_order=0, so we need to reset our tracking
@@ -2362,14 +2521,20 @@ async fn setup_listen_client<R: tauri::Runtime>(
     is_onboarding: bool,
     redemption_time_ms: u32,
     user_id: Option<String>,
-) -> Result<(crate::client::ListenClientBuilder, SttProvider), crate::Error> {
-    let selected_model = Some(selection.model_id());
+) -> Result<
+    (
+        crate::client::ListenClientBuilder,
+        SttProvider,
+        tauri_plugin_connector::ResolvedSttModel,
+    ),
+    crate::Error,
+> {
+    use tauri_plugin_connector::{Connection, ConnectorPluginExt};
+    let resolved = app.connect_stt_selection(selection, &languages).await?;
+    let model = resolved.model;
+    let selected_model = Some(model.model_id());
     let provider = SttProvider::from_model(selected_model.as_deref());
-    let conn = {
-        use tauri_plugin_connector::{Connection, ConnectorPluginExt};
-        let conn: Connection = app.connect_stt_selection(selection).await?.into();
-        conn
-    };
+    let conn: Connection = resolved.connection.into();
     let api_base = conn.api_base;
 
     let api_key = if provider.is_cloud() {
@@ -2424,6 +2589,7 @@ async fn setup_listen_client<R: tauri::Runtime>(
                 ..Default::default()
             }),
         provider,
+        model,
     ))
 }
 
@@ -2599,7 +2765,7 @@ mod tests {
         // Exercise the production snapshot-to-connection/params assembly. A saved
         // model read reintroduced inside setup_listen_client must route this to the
         // wrong URL and fail the assertions below.
-        let (builder, provider) = super::setup_listen_client(
+        let (builder, provider, resolved_model) = super::setup_listen_client(
             app.handle(),
             local_selection,
             vec![],
@@ -2611,6 +2777,8 @@ mod tests {
         .await
         .unwrap();
         assert_eq!(provider, crate::SttProvider::Local);
+        assert_eq!(resolved_model.model_id(), "QuantizedTinyEn");
+        assert!(!resolved_model.is_streaming());
         let uri = builder.build_uri(typr_listener_interface::AudioMode::Dual);
         let uri = url::Url::parse(&uri).unwrap();
         assert_eq!(uri.scheme(), "ws");
@@ -2640,7 +2808,7 @@ mod tests {
             .set(StoreKey::AssemblyaiApiKey, "updated-test-key")
             .unwrap();
         let cloud_connection: Connection = app
-            .connect_stt_selection(other_selection)
+            .connect_stt_selection(other_selection, &[])
             .await
             .unwrap()
             .into();
@@ -2663,6 +2831,78 @@ mod tests {
         app.stop_server().await.unwrap();
         std::fs::remove_file(model_path).unwrap();
         std::fs::remove_dir(models_dir).unwrap();
+    }
+
+    #[tokio::test]
+    async fn nemotron_startup_fallback_reports_whisper_runtime_without_changing_preferences() {
+        use tauri::Manager;
+        use tauri_plugin_connector::{ConnectorPluginExt, StoreKey, SttSelection};
+        use tauri_plugin_local_stt::{LocalSttPluginExt, SupportedModel};
+        let mut context = tauri::test::mock_context(tauri::test::noop_assets());
+        context.config_mut().identifier =
+            format!("com.typr.oss.nemotron-fallback-{}", uuid::Uuid::new_v4());
+        let app = tauri::test::mock_builder()
+            .plugin(tauri_plugin_store::Builder::default().build())
+            .plugin(tauri_plugin_connector::init())
+            .manage(tauri_plugin_local_stt::SharedState::default())
+            .build(context)
+            .unwrap();
+        app.set_current_model(SupportedModel::Nemotron3p5Streaming)
+            .unwrap();
+        app.connector_store()
+            .set(StoreKey::SttModel, "Nemotron3p5Streaming")
+            .unwrap();
+        let directory = app.models_dir();
+        std::fs::create_dir_all(&directory).unwrap();
+        let fallback = SupportedModel::QuantizedLargeTurbo;
+        let path = directory.join(fallback.file_name());
+        std::fs::File::create(&path)
+            .unwrap()
+            .set_len(fallback.model_size())
+            .unwrap();
+        // Nemotron is intentionally absent; no SDK/model fixture is fabricated.
+        let (builder, _, model) = super::setup_listen_client(
+            app.handle(),
+            SttSelection::Local(SupportedModel::Nemotron3p5Streaming),
+            vec![typr_language::ISO639::Es.into()],
+            vec![],
+            false,
+            200,
+            None,
+        )
+        .await
+        .unwrap();
+        assert_eq!(model.model_id(), "QuantizedLargeTurbo");
+        assert!(
+            !model.is_streaming(),
+            "fallback must use Whisper's VAD stop/flush policy"
+        );
+        let uri =
+            url::Url::parse(&builder.build_uri(typr_listener_interface::AudioMode::Dual)).unwrap();
+        assert!(uri
+            .query_pairs()
+            .any(|(key, value)| key == "model" && value == "QuantizedLargeTurbo"));
+        assert_eq!(
+            app.get_current_model().unwrap(),
+            SupportedModel::Nemotron3p5Streaming
+        );
+        assert_eq!(
+            app.connector_store()
+                .get::<String>(StoreKey::SttModel)
+                .unwrap()
+                .as_deref(),
+            Some("Nemotron3p5Streaming")
+        );
+        assert_eq!(
+            app.state::<tauri_plugin_local_stt::SharedState>()
+                .lock()
+                .await
+                .server_model,
+            Some(fallback)
+        );
+        app.stop_server().await.unwrap();
+        std::fs::remove_file(path).unwrap();
+        std::fs::remove_dir(directory).unwrap();
     }
 
     fn word(text: &str, start: u64, end: u64) -> typr_listener_interface::Word {

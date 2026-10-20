@@ -69,9 +69,12 @@ common_event_derives! {
         /// These words are NOT saved to DB.
         #[serde(rename = "preview")]
         Preview {
+            session_id: String,
             channel: String,
             words: Vec<typr_listener_interface::Word>,
         },
+        #[serde(rename = "modelFallback")]
+        ModelFallback { session_id: String, requested_model: String, effective_model: String },
         #[serde(rename = "audioAmplitude")]
         AudioAmplitude { mic: u16, speaker: u16 },
         #[serde(rename = "micMuted")]

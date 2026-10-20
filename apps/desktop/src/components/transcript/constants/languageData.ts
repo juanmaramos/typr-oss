@@ -5,6 +5,22 @@ import type { SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt
 
 export const LANGUAGE_OPTIONS = [
   {
+    key: "nemotron-streaming" as const,
+    iconClass: "ri-voiceprint-line",
+    get label() {
+      return i18n._(msg`Nemotron streaming`);
+    },
+    get description() {
+      return i18n._(msg`Experimental live transcription with Whisper fallback`);
+    },
+    accuracy: 0,
+    speed: 0,
+    modelKey: "Nemotron3p5Streaming",
+    size: "741 MB",
+    hasInfo: false,
+    isLocal: true,
+  },
+  {
     key: "balanced" as const,
     iconClass: "ri-wifi-off-line",
     get label() {
@@ -76,7 +92,7 @@ export const MODEL_CATEGORY_ICONS = {
   local: "ri-cloud-off-line",
 } as const;
 
-export type LocalLanguageOption = "balanced" | "english";
+export type LocalLanguageOption = "balanced" | "english" | "nemotron-streaming";
 export type CloudLanguageOption = "assemblyai-universal";
 export type LanguageOption = LocalLanguageOption | CloudLanguageOption;
 
@@ -92,6 +108,7 @@ if (!defaultLocalSttOption || !("modelKey" in defaultLocalSttOption)) {
 export const DEFAULT_LOCAL_STT_MODEL = defaultLocalSttOption.modelKey as SupportedSttModel;
 
 export const SETTINGS_LOCAL_STT_MODEL_KEYS = [
+  "Nemotron3p5Streaming",
   "QuantizedBase",
   "QuantizedBaseEn",
   "QuantizedSmall",
@@ -116,6 +133,22 @@ export const sttModelMetadata: Record<string, {
   languageSupport: "multilingual" | "english-only";
   huggingface?: string;
 }> = {
+  "Nemotron3p5Streaming": {
+    name: "Nemotron 3.5 ASR",
+    get description() {
+      return i18n._(
+        msg`Experimental live transcription in English and Spanish. Whisper handles recorded audio and recovery.`,
+      );
+    },
+    iconClass: "ri-voiceprint-line",
+    intelligence: 0,
+    speed: 0,
+    size: "741 MB",
+    inputType: ["audio"],
+    outputType: ["text"],
+    languageSupport: "multilingual",
+    huggingface: "https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b",
+  },
   "QuantizedTiny": {
     get name() {
       return i18n._(msg`Tiny`);
@@ -331,10 +364,13 @@ export const SUPPORTED_LANGUAGES_COUNT = Object.values(WER_PERFORMANCE_TIERS)
   .reduce((total, tier) => total + tier.languages.length, 0);
 
 // Export filtered options based on platform
-export function getAvailableLanguageOptions(supportsLocal: boolean) {
+export function getAvailableLanguageOptions(supportsLocal: boolean, availableModels?: readonly SupportedSttModel[]) {
   return LANGUAGE_OPTIONS.filter(option => {
     // Hide local models on Windows
     if (!supportsLocal && option.isLocal) {
+      return false;
+    }
+    if (option.isLocal && option.key === "nemotron-streaming" && !availableModels?.includes(option.modelKey)) {
       return false;
     }
     // Hide explicitly marked hidden options

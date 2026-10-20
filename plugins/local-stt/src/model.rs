@@ -7,6 +7,7 @@ pub static SUPPORTED_MODELS: &[SupportedModel] = &[
     SupportedModel::QuantizedSmallEn,
     SupportedModel::QuantizedLargeTurbo,
     SupportedModel::DistilLargeV35En,
+    SupportedModel::Nemotron3p5Streaming,
 ];
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -19,6 +20,7 @@ pub enum SupportedModel {
     QuantizedSmallEn,
     QuantizedLargeTurbo,
     DistilLargeV35En,
+    Nemotron3p5Streaming,
 }
 
 impl SupportedModel {
@@ -32,6 +34,7 @@ impl SupportedModel {
             SupportedModel::QuantizedSmallEn => "ggml-small.en-q8_0.bin",
             SupportedModel::QuantizedLargeTurbo => "ggml-large-v3-turbo-q5_0.bin",
             SupportedModel::DistilLargeV35En => "ggml-distil-large-v3.5-en-f16.bin",
+            SupportedModel::Nemotron3p5Streaming => "nemotron-3.5-asr-streaming-0.6b.q8_0.gguf",
         }
     }
 
@@ -61,6 +64,7 @@ impl SupportedModel {
             SupportedModel::DistilLargeV35En => {
                 "https://huggingface.co/distil-whisper/distil-large-v3.5-ggml/resolve/main/ggml-model.bin"
             }
+            SupportedModel::Nemotron3p5Streaming => "https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b/resolve/1c8deaecc64b91f034d73e08dd8b64625eb3395d/nemotron-3.5-asr-streaming-0.6b.q8_0.gguf",
         }
     }
 
@@ -73,7 +77,8 @@ impl SupportedModel {
             SupportedModel::QuantizedSmall => 264464607,
             SupportedModel::QuantizedSmallEn => 264477561,
             SupportedModel::QuantizedLargeTurbo => 574000000, // 574 MB Q5_0
-            SupportedModel::DistilLargeV35En => 1500000000,   // 1.5GB F16
+            SupportedModel::Nemotron3p5Streaming => 741548352,
+            SupportedModel::DistilLargeV35En => 1500000000, // 1.5GB F16
         }
     }
 }
@@ -89,7 +94,62 @@ impl std::fmt::Display for SupportedModel {
             SupportedModel::QuantizedSmallEn => "QuantizedSmallEn",
             SupportedModel::QuantizedLargeTurbo => "QuantizedLargeTurbo",
             SupportedModel::DistilLargeV35En => "DistilLargeV35En",
+            SupportedModel::Nemotron3p5Streaming => "Nemotron3p5Streaming",
         };
         write!(f, "{}", name)
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, specta::Type)]
+pub enum SttBackend {
+    Whisper,
+    NemotronStreaming,
+}
+
+#[derive(Debug, Clone, serde::Serialize, specta::Type)]
+pub struct ModelCapabilities {
+    pub model: SupportedModel,
+    pub backend: SttBackend,
+    pub size_bytes: u64,
+    pub realtime: bool,
+    pub recorded: bool,
+    pub available: bool,
+}
+
+impl SupportedModel {
+    pub fn backend(&self) -> SttBackend {
+        match self {
+            Self::Nemotron3p5Streaming => SttBackend::NemotronStreaming,
+            _ => SttBackend::Whisper,
+        }
+    }
+    pub fn is_streaming(&self) -> bool {
+        self.backend() == SttBackend::NemotronStreaming
+    }
+    pub fn supports_languages(&self, languages: &[typr_language::Language]) -> bool {
+        self.backend() == SttBackend::Whisper
+            || languages.iter().all(|language| {
+                matches!(
+                    **language,
+                    typr_language::ISO639::En | typr_language::ISO639::Es
+                )
+            })
+    }
+    pub fn sha256(&self) -> Option<&'static str> {
+        match self {
+            Self::Nemotron3p5Streaming => {
+                Some("a5c435f294eea8f88ce68dd27b8c3bfea7f777cb2fbba04fcd30eaa555f429ae")
+            }
+            _ => None,
+        }
+    }
+}
+
+/// Startup recovery must preserve multilingual transcription. English-only
+/// models remain selectable explicitly, but cannot recover a multilingual model.
+pub const STREAMING_WHISPER_FALLBACKS: &[SupportedModel] = &[
+    SupportedModel::QuantizedLargeTurbo,
+    SupportedModel::QuantizedSmall,
+    SupportedModel::QuantizedBase,
+    SupportedModel::QuantizedTiny,
+];

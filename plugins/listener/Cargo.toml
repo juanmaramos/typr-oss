@@ -11,8 +11,9 @@ description = ""
 tauri-plugin = { workspace = true, features = ["build"] }
 
 [dev-dependencies]
-tauri-plugin-store = { workspace = true }
 tauri-plugin-local-stt = { workspace = true }
+tauri-plugin-store = { workspace = true }
+tokio-tungstenite = { workspace = true }
 
 rodio = { workspace = true, features = ["wav"] }
 serde_json = { workspace = true }

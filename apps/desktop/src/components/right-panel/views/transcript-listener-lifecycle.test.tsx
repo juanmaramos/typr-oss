@@ -3,7 +3,7 @@
 import { setupI18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { notifyManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, createElement, type ComponentType, type ReactNode } from "react";
+import { act, type ComponentType, createElement, type ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => ({
   toastLoading: vi.fn(),
   toastSuccess: vi.fn(),
   toastError: vi.fn(),
+  toastInfo: vi.fn(),
   getSession: vi.fn(),
   upsertSession: vi.fn(),
 }));
@@ -32,12 +33,13 @@ const i18n = setupI18n({ locale: "en", messages: { en: {} } });
 
 vi.mock("@tauri-apps/api/event", () => ({ listen: mocks.listen }));
 vi.mock("sonner", () => ({
-  toast: { loading: mocks.toastLoading, success: mocks.toastSuccess, error: mocks.toastError },
+  toast: { loading: mocks.toastLoading, success: mocks.toastSuccess, error: mocks.toastError, info: mocks.toastInfo },
 }));
 vi.mock("@tanstack/react-router", () => ({
-  useMatch: ({ from }: { from: string }) => from === "/app/note/$id" && testState.route.sessionId
-    ? { params: { id: testState.route.sessionId } }
-    : undefined,
+  useMatch: ({ from }: { from: string }) =>
+    from === "/app/note/$id" && testState.route.sessionId
+      ? { params: { id: testState.route.sessionId } }
+      : undefined,
 }));
 vi.mock("@typr/plugin-windows", () => ({ getCurrentWebviewWindowLabel: () => "main" }));
 vi.mock("@typr/plugin-db", () => ({
@@ -47,12 +49,13 @@ vi.mock("@typr/plugin-listener", () => ({
   events: { sessionEvent: { listen: vi.fn(async () => vi.fn()) } },
 }));
 vi.mock("@typr/utils/contexts", () => ({
-  useOngoingSession: (selector: (state: object) => unknown) => selector({
-    sessionId: null,
-    start: vi.fn(),
-    status: "inactive",
-    loading: false,
-  }),
+  useOngoingSession: (selector: (state: object) => unknown) =>
+    selector({
+      sessionId: null,
+      start: vi.fn(),
+      status: "inactive",
+      loading: false,
+    }),
 }));
 vi.mock("@/contexts", () => ({
   useRightPanel: () => testState.panel,
@@ -60,8 +63,7 @@ vi.mock("@/contexts", () => ({
 }));
 vi.mock("@/contexts/audio-upload", () => ({ useAudioUpload: () => ({ openAudioUpload: vi.fn() }) }));
 vi.mock("@/stores/audio-upload", () => ({
-  useAudioUploadStore: (selector: (state: object) => unknown) =>
-    selector({ progress: { status: "idle" } }),
+  useAudioUploadStore: (selector: (state: object) => unknown) => selector({ progress: { status: "idle" } }),
 }));
 vi.mock("@/hooks/useRecordingTimer", () => ({
   useRecordingTimer: () => ({ remaining: 0, isWarning: false, isDanger: false, shouldShowTimer: false }),
@@ -126,14 +128,17 @@ vi.mock("@typr/ui/components/ui/button", async () => {
 vi.mock("@typr/ui/components/ui/spinner", () => ({ Spinner: () => null }));
 vi.mock("@typr/ui/components/ui/popover", async () => {
   const React = await import("react");
-  const Wrapper = ({ children }: { children?: ReactNode }) =>
-    React.createElement(React.Fragment, null, children);
+  const Wrapper = ({ children }: { children?: ReactNode }) => React.createElement(React.Fragment, null, children);
   return { Popover: Wrapper, PopoverContent: Wrapper, PopoverTrigger: Wrapper };
 });
 vi.mock("motion/react", async () => {
   const React = await import("react");
-  const MotionElement = ({ children, initial: _initial, animate: _animate, whileHover: _whileHover, variants: _variants, ...props }: Record<string, unknown>) =>
-    React.createElement("div", props, children as ReactNode);
+  const MotionElement = (
+    { children, initial: _initial, animate: _animate, whileHover: _whileHover, variants: _variants, ...props }: Record<
+      string,
+      unknown
+    >,
+  ) => React.createElement("div", props, children as ReactNode);
   return { motion: { div: MotionElement, p: MotionElement } };
 });
 
@@ -142,12 +147,14 @@ import { TranscriptView } from "./transcript-view";
 
 const FloatingTranscriptView = TranscriptView as ComponentType<{ showTabs?: boolean; layout?: "sidebar" | "floating" }>;
 
-type Listener = (event: { payload: { type: string; session_id: string } }) => void;
+type Listener = (event: { payload: { type: string; session_id: string; status?: string } }) => void;
 type Deferred<T> = { promise: Promise<T>; resolve: (value: T) => void };
 
 function deferred<T>(): Deferred<T> {
   let resolve!: (value: T) => void;
-  const promise = new Promise<T>((res) => { resolve = res; });
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
   return { promise, resolve };
 }
 
@@ -189,7 +196,9 @@ async function render() {
 }
 
 async function unmount() {
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   await act(async () => root?.unmount());
   root = undefined;
 }
@@ -204,10 +213,13 @@ async function fire(listener: Listener, type: string, sessionId: string) {
 describe("persistent RightPanel transcript session-event listener", () => {
   beforeEach(() => {
     vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
-    vi.stubGlobal("ResizeObserver", class {
-      observe() {}
-      disconnect() {}
-    });
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        observe() {}
+        disconnect() {}
+      },
+    );
     testState.route.sessionId = "session-1";
     testState.floatingExpanded = true;
     testState.floatingCurrentView = "transcript";
@@ -235,7 +247,10 @@ describe("persistent RightPanel transcript session-event listener", () => {
     mocks.toastLoading.mockClear();
     mocks.toastSuccess.mockClear();
     mocks.toastError.mockClear();
-    notifyManager.setNotifyFunction((callback) => { act(() => callback()); });
+    mocks.toastInfo.mockClear();
+    notifyManager.setNotifyFunction((callback) => {
+      act(() => callback());
+    });
   });
 
   afterEach(async () => {
@@ -255,7 +270,7 @@ describe("persistent RightPanel transcript session-event listener", () => {
 
     expect(mocks.listen).toHaveBeenCalledTimes(1);
     expect(activeListeners.size).toBe(1);
-    expect(container.querySelector('[data-surface="floating"]')).not.toHaveProperty("hidden", true);
+    expect(container.querySelector("[data-surface=\"floating\"]")).not.toHaveProperty("hidden", true);
     const listener = [...activeListeners][0];
 
     await fire(listener, "transcriptProcessing", "session-1");
@@ -286,6 +301,31 @@ describe("persistent RightPanel transcript session-event listener", () => {
 
     await fire(listener, "transcriptError", "session-1");
     expect(mocks.toastError).toHaveBeenCalledTimes(1);
+  });
+
+  it("announces native fallback only for the viewed recording", async () => {
+    await render();
+    const listener = [...activeListeners][0];
+    await fire(listener, "modelFallback", "different-session");
+    expect(mocks.toastInfo).not.toHaveBeenCalled();
+    await fire(listener, "modelFallback", "session-1");
+    expect(mocks.toastInfo).toHaveBeenCalledWith("Nemotron could not start. Using Whisper for this recording.", {
+      id: "local-transcription-fallback-session-1",
+      duration: 5000,
+    });
+  });
+
+  it("reports native streaming failure separately from speaker labeling without promising a saved recording", async () => {
+    await render();
+    const listener = [...activeListeners][0];
+    await act(async () =>
+      listener({ payload: { type: "transcriptError", session_id: "session-1", status: "local_stream_failed" } })
+    );
+    expect(mocks.toastError).toHaveBeenCalledWith("Live transcription stopped", {
+      id: "local-transcription-recovery",
+      description: "Committed text is preserved. Stop recording and select Whisper before continuing.",
+      duration: 10000,
+    });
   });
 
   it("rebinds on note navigation and ignores callbacks after leaving the note route", async () => {
@@ -321,7 +361,9 @@ describe("persistent RightPanel transcript session-event listener", () => {
     const registeredListeners: Listener[] = [];
     const unlisten = vi.fn(() => {
       const listener = registeredListeners[0];
-      if (listener) activeListeners.delete(listener);
+      if (listener) {
+        activeListeners.delete(listener);
+      }
     });
     mocks.listen.mockImplementation((_name: string, callback: Listener) => {
       registeredListeners.push(callback);

@@ -19,6 +19,25 @@ pub fn list_ggml_backends<R: tauri::Runtime>(
 
 #[tauri::command]
 #[specta::specta]
+pub fn list_model_capabilities<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Vec<crate::ModelCapabilities> {
+    let nemotron_available = crate::streaming::WorkerPaths::resolve(&app).is_ok();
+    crate::SUPPORTED_MODELS
+        .iter()
+        .map(|model| crate::ModelCapabilities {
+            model: model.clone(),
+            backend: model.backend(),
+            size_bytes: model.model_size(),
+            realtime: model.backend() == crate::SttBackend::NemotronStreaming,
+            recorded: model.backend() == crate::SttBackend::Whisper,
+            available: model.backend() == crate::SttBackend::Whisper || nemotron_available,
+        })
+        .collect()
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn list_supported_models() -> Result<Vec<crate::SupportedModel>, String> {
     Ok(crate::SUPPORTED_MODELS.to_vec())
 }
@@ -119,16 +138,20 @@ pub async fn process_recorded<R: tauri::Runtime>(
     let mut model_path = models_dir.join(current_model.file_name());
 
     // If the selected model isn't downloaded, find any available downloaded model
-    if !model_path.exists() {
+    if current_model.backend() != crate::SttBackend::Whisper || !model_path.exists() {
         tracing::warn!(
             "[PROCESS_RECORDED] Selected model {:?} not found at {:?}, scanning for alternatives",
             current_model,
             model_path
         );
         let mut found = false;
-        for candidate in crate::SUPPORTED_MODELS {
+        for candidate in crate::STREAMING_WHISPER_FALLBACKS {
             let candidate_path = models_dir.join(candidate.file_name());
-            if candidate_path.exists() {
+            if app
+                .is_model_downloaded(candidate)
+                .await
+                .map_err(|error| error.to_string())?
+            {
                 tracing::info!(
                     "[PROCESS_RECORDED] Using fallback model {:?} at {:?}",
                     candidate,

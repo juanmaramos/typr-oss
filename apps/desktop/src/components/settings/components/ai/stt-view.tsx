@@ -141,6 +141,12 @@ export function STTView({
 
   const renderLocalModelDescription = (modelKey: string) => {
     switch (modelKey) {
+      case "Nemotron3p5Streaming":
+        return (
+          <Trans>
+            Experimental live transcription in English and Spanish. Whisper handles recorded audio and recovery.
+          </Trans>
+        );
       case "QuantizedBase":
         return <Trans>Small multilingual model for faster offline transcription</Trans>;
       case "QuantizedBaseEn":
@@ -191,7 +197,7 @@ export function STTView({
           <div className="space-y-2">
             {sttModels.filter(model => !model.hidden && !(model as any).isCloud).map((model) => {
               const isExpanded = expandedModel === model.key;
-              const showLanguages = isMultilingual(model.key);
+              const showLanguages = model.key !== "Nemotron3p5Streaming" && isMultilingual(model.key);
               const modelState = getModel(model.key);
               const isCloud = false;
 
@@ -276,40 +282,42 @@ export function STTView({
                         </div>
 
                         {/* Performance dots */}
-                        <div className="flex flex-col gap-1 items-end">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
-                              <Trans>Accuracy</Trans>
-                            </span>
-                            <div className="flex gap-0.5">
-                              {[1, 2, 3].map((step) => (
-                                <div
-                                  key={step}
-                                  className={cn(
-                                    "w-1.5 h-1.5 rounded-full",
-                                    model.accuracy >= step ? "bg-primary" : "bg-border",
-                                  )}
-                                />
-                              ))}
+                        {model.accuracy > 0 && (
+                          <div className="flex flex-col gap-1 items-end">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
+                                <Trans>Accuracy</Trans>
+                              </span>
+                              <div className="flex gap-0.5">
+                                {[1, 2, 3].map((step) => (
+                                  <div
+                                    key={step}
+                                    className={cn(
+                                      "w-1.5 h-1.5 rounded-full",
+                                      model.accuracy >= step ? "bg-primary" : "bg-border",
+                                    )}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
+                                <Trans>Speed</Trans>
+                              </span>
+                              <div className="flex gap-0.5">
+                                {[1, 2, 3].map((step) => (
+                                  <div
+                                    key={step}
+                                    className={cn(
+                                      "w-1.5 h-1.5 rounded-full",
+                                      model.speed >= step ? "bg-primary" : "bg-border",
+                                    )}
+                                  />
+                                ))}
+                              </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
-                              <Trans>Speed</Trans>
-                            </span>
-                            <div className="flex gap-0.5">
-                              {[1, 2, 3].map((step) => (
-                                <div
-                                  key={step}
-                                  className={cn(
-                                    "w-1.5 h-1.5 rounded-full",
-                                    model.speed >= step ? "bg-primary" : "bg-border",
-                                  )}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     </div>
 

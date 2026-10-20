@@ -1,4 +1,6 @@
+import { getAvailableSettingsSttModels, sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
 // Using remix icons instead of lucide
 import { type ReactNode, useState } from "react";
 
@@ -36,7 +38,11 @@ export function STTLanguageSelector({
   const { supportsLocalModels } = usePlatform();
 
   // Use filtered options based on platform
-  const availableOptions = getAvailableLanguageOptions(supportsLocalModels);
+  const capabilities = useQuery(sttCapabilitiesQueryOptions());
+  const availableOptions = getAvailableLanguageOptions(
+    supportsLocalModels,
+    getAvailableSettingsSttModels(capabilities.data),
+  );
   const selectedOption = availableOptions.find(option => option.key === value);
   const isCompact = size === "compact";
 
@@ -56,6 +62,8 @@ export function STTLanguageSelector({
   // Helper function to get translated model labels and descriptions
   const getTranslatedLabel = (key: string) => {
     switch (key) {
+      case "nemotron-streaming":
+        return t`Nemotron streaming`;
       case "balanced":
         return t`Multilingual`;
       case "english":
@@ -71,6 +79,8 @@ export function STTLanguageSelector({
 
   const getTranslatedDescription = (key: string) => {
     switch (key) {
+      case "nemotron-streaming":
+        return t`Experimental live transcription with Whisper fallback`;
       case "balanced":
         return t`Good for most meetings and calls`;
       case "english":
@@ -263,8 +273,8 @@ export function STTLanguageSelector({
                             ? t`Not downloaded`
                             : getTranslatedDescription(option.key)}
                         </div>
-                        {/* Show accuracy/speed for all models to help users decide whether to download */}
-                        {
+                        {/* Unbenchmarked models do not receive performance ratings. */}
+                        {option.accuracy > 0 && (
                           <div className="flex items-center gap-3 mt-1">
                             <div className="flex items-center gap-1">
                               <span className="text-xs text-muted-foreground/70 font-medium">{t`Accuracy`}</span>
@@ -295,7 +305,7 @@ export function STTLanguageSelector({
                               </div>
                             </div>
                           </div>
-                        }
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 ml-2">
@@ -386,8 +396,8 @@ export function STTLanguageSelector({
                             ? t`Not downloaded`
                             : getTranslatedDescription(option.key)}
                         </div>
-                        {/* Show accuracy/speed for all models to help users decide whether to download */}
-                        {
+                        {/* Unbenchmarked models do not receive performance ratings. */}
+                        {option.accuracy > 0 && (
                           <div className="flex items-center gap-3 mt-1">
                             <div className="flex items-center gap-1">
                               <span className="text-xs text-muted-foreground/70 font-medium">{t`Accuracy`}</span>
@@ -418,7 +428,7 @@ export function STTLanguageSelector({
                               </div>
                             </div>
                           </div>
-                        }
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 ml-2">

@@ -411,6 +411,14 @@ impl WebSocketIO for ListenClient {
             _ => None,
         }
     }
+
+    fn keepalive_message() -> Option<Message> {
+        None
+    }
+
+    fn shutdown_message() -> Option<Message> {
+        Some(Self::to_message(ListenInputChunk::End))
+    }
 }
 
 #[derive(Clone)]
@@ -440,6 +448,14 @@ impl WebSocketIO for ListenClientDual {
             Message::Text(text) => serde_json::from_str::<Self::Output>(&text).ok(),
             _ => None,
         }
+    }
+
+    fn keepalive_message() -> Option<Message> {
+        None
+    }
+
+    fn shutdown_message() -> Option<Message> {
+        Some(Self::to_message(ListenInputChunk::End))
     }
 }
 
@@ -573,7 +589,11 @@ impl WebSocketIO for ListenClientAssemblyAISingleChannel {
                     "end_of_turn": is_final,
                 }));
 
-                Some(ListenOutputChunk { words, meta })
+                Some(ListenOutputChunk {
+                    words,
+                    meta,
+                    update: None,
+                })
             }
             _ => None,
         }
@@ -1074,7 +1094,7 @@ impl ListenClientDual {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use futures_util::StreamExt;
+    use futures_util::{SinkExt, StreamExt};
 
     #[test]
     fn assemblyai_url_includes_json_array_keyterms_when_present() {
@@ -1225,6 +1245,7 @@ mod tests {
     #[test]
     fn assemblyai_rollover_offsets_session_relative_word_timestamps() {
         let mut chunk = ListenOutputChunk {
+            update: None,
             meta: Some(serde_json::json!({ "turn_order": 0, "end_of_turn": true })),
             words: vec![typr_listener_interface::Word {
                 text: "hello".to_string(),
@@ -1249,6 +1270,7 @@ mod tests {
     #[test]
     fn assemblyai_rollover_filters_overlap_by_meeting_timestamp() {
         let chunk = ListenOutputChunk {
+            update: None,
             meta: Some(serde_json::json!({ "turn_order": 0, "end_of_turn": true })),
             words: vec![
                 typr_listener_interface::Word {
@@ -1274,6 +1296,81 @@ mod tests {
 
         assert_eq!(filtered.words.len(), 1);
         assert_eq!(filtered.words[0].text, "new");
+    }
+
+    #[tokio::test]
+    async fn local_websocket_client_sends_typed_end_and_no_cloud_keepalive() {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move {
+            let (socket, _) = listener.accept().await.unwrap();
+            let mut socket = tokio_tungstenite::accept_async(socket).await.unwrap();
+            let mut audio_count = 0;
+            loop {
+                let message = tokio::time::timeout(Duration::from_secs(5), socket.next())
+                    .await
+                    .unwrap()
+                    .unwrap()
+                    .unwrap();
+                let Message::Text(text) = message else {
+                    continue;
+                };
+                match serde_json::from_str::<ListenInputChunk>(&text)
+                    .expect("local controls must use the typed audio protocol")
+                {
+                    ListenInputChunk::DualAudio { mic, speaker } => {
+                        audio_count += 1;
+                        assert_eq!(mic, vec![audio_count, 0]);
+                        assert_eq!(speaker, vec![audio_count, 0]);
+                    }
+                    ListenInputChunk::End => break,
+                    _ => panic!("unexpected local audio mode"),
+                }
+            }
+            assert_eq!(audio_count, 3);
+            // A delayed final must arrive after input has ended, before EOF.
+            tokio::time::sleep(Duration::from_millis(20)).await;
+            let final_chunk = ListenOutputChunk {
+                words: vec![typr_listener_interface::Word {
+                    text: "hola".into(),
+                    ..Default::default()
+                }],
+                meta: None,
+                update: Some(typr_listener_interface::TranscriptUpdate::Final {
+                    channel: "mic".into(),
+                }),
+            };
+            socket
+                .send(Message::Text(
+                    serde_json::to_string(&final_chunk).unwrap().into(),
+                ))
+                .await
+                .unwrap();
+            socket.close(None).await.unwrap();
+        });
+        let client = ListenClient::builder()
+            .api_base(format!("http://{addr}"))
+            .params(typr_listener_interface::ListenParams::default())
+            .build_dual();
+        let (mic_tx, mic_rx) = flume::bounded(3);
+        let (speaker_tx, speaker_rx) = flume::bounded(3);
+        // Stop ingress while all three accepted pairs are still queued. Natural
+        // EOF must drain them in order before sending End to the native backend.
+        for value in 1..=3 {
+            mic_tx.send(bytes::Bytes::from(vec![value, 0])).unwrap();
+            speaker_tx.send(bytes::Bytes::from(vec![value, 0])).unwrap();
+        }
+        drop(mic_tx);
+        drop(speaker_tx);
+        let mic = mic_rx.into_stream();
+        let speaker = speaker_rx.into_stream();
+        let stream = client.from_realtime_audio(mic, speaker).await.unwrap();
+        let chunks: Vec<_> = tokio::time::timeout(Duration::from_secs(5), stream.collect())
+            .await
+            .unwrap();
+        assert_eq!(chunks.len(), 1);
+        assert_eq!(chunks[0].words[0].text, "hola");
+        server.await.unwrap();
     }
 
     #[tokio::test]
