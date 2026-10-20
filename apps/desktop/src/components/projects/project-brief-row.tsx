@@ -1,10 +1,10 @@
 import { ProjectBriefBuildingStatus } from "@/components/projects/project-brief-building-status";
 import type { ProjectBriefView } from "@/components/projects/project-brief-panel";
 import { useRightPanel } from "@/contexts";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
-import { Trans, useLingui } from "@lingui/react/macro";
 
 const PROJECT_BRIEF_ROW_PREVIEW_MAX_CHARS = 240;
 
@@ -104,7 +104,7 @@ export function ProjectBriefRow({
       <button
         type="button"
         onClick={() => showSidebar("project-brief")}
-        className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-60 transition-colors group-hover:text-foreground group-hover:opacity-100"
+        className="flex size-7 shrink-0 items-center justify-center rounded-control text-muted-foreground opacity-60 transition-colors group-hover:text-foreground group-hover:opacity-100"
       >
         <i className="ri-arrow-right-line text-base" />
         <span className="sr-only">

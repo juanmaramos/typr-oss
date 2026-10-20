@@ -1,12 +1,12 @@
 .search-result {
   background-color: hsl(var(--warning) / 0.4);
-  border-radius: 2px;
+  border-radius: var(--radius-compact);
   padding: 1px 0;
 }
 
 .search-result-current {
   background-color: hsl(var(--success) / 0.5) !important;
-  border-radius: 2px;
+  border-radius: var(--radius-compact);
   padding: 1px 0;
 }
 

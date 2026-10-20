@@ -39,7 +39,7 @@ export default function OngoingSession({
     >
       <button
         onClick={handleClick}
-        className="w-full flex items-center justify-between transition-all bg-foreground hover:bg-foreground/70 px-3 py-2.5 rounded-lg hover:scale-95 duration-300"
+        className="w-full flex items-center justify-between transition-all bg-foreground hover:bg-foreground/70 px-3 py-2.5 rounded-control hover:scale-95 duration-300"
       >
         <div className="font-medium text-sm text-background max-w-[180px] truncate">
           {session.title || t`New note`}

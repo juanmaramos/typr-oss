@@ -81,7 +81,7 @@ function MoveToProjectButton() {
           <i className="ri-folder-transfer-line text-sm" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-56 rounded-lg border bg-popover p-1 shadow-float-surface" align="center" side="top">
+      <PopoverContent className="w-56 border bg-popover p-1 shadow-float-surface" align="center" side="top">
         <div className="px-2 py-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
           <Trans>Add to project</Trans>
         </div>
@@ -117,7 +117,7 @@ function MoveToProjectButton() {
                 },
               );
             }}
-            className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-foreground transition-colors hover:bg-surface-400 disabled:pointer-events-none disabled:opacity-50"
+            className="flex w-full items-center gap-2 rounded-control px-2 py-1.5 text-sm text-foreground transition-colors hover:bg-surface-400 disabled:pointer-events-none disabled:opacity-50"
           >
             <ProjectIcon icon={project.icon_value} color={project.icon_color} size="sm" className="ring-0" />
             <span className="truncate">{project.name}</span>
@@ -144,7 +144,7 @@ function TrashMenuButton() {
           <i className="ri-more-fill text-sm" />
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-48 rounded-lg border bg-popover p-1 shadow-float-surface" align="end" side="top">
+      <PopoverContent className="w-48 border bg-popover p-1 shadow-float-surface" align="end" side="top">
         <button
           type="button"
           disabled={isDeleting}
@@ -152,7 +152,7 @@ function TrashMenuButton() {
             setOpen(false);
             handleBulkDelete();
           }}
-          className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-destructive transition-colors hover:bg-destructive/10"
+          className="flex w-full items-center gap-2 rounded-control px-2 py-1.5 text-sm text-destructive transition-colors hover:bg-destructive/10"
         >
           <i className="ri-delete-bin-line text-sm" />
           {count === 1 ? <Trans>Delete note</Trans> : <Trans>Delete {count} notes</Trans>}

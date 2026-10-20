@@ -501,7 +501,7 @@ function ModelSectionHeader({
       type="button"
       aria-expanded={!isCollapsed}
       className={cn(
-        "mb-2 flex h-7 w-full items-center gap-1.5 rounded-md px-1 text-left transition-colors",
+        "mb-2 flex h-7 w-full items-center gap-1.5 rounded-control px-1 text-left transition-colors",
         "text-xs font-medium uppercase tracking-wide text-muted-foreground hover:bg-surface-400/50 hover:text-foreground",
       )}
       onClick={onToggle}
@@ -540,7 +540,7 @@ function CloudProviderHeader({
       type="button"
       aria-expanded={!isCollapsed}
       className={cn(
-        "flex h-8 w-full items-center gap-2 rounded-md px-2 text-left transition-colors",
+        "flex h-8 w-full items-center gap-2 rounded-control px-2 text-left transition-colors",
         "text-muted-foreground hover:bg-surface-400/50 hover:text-foreground",
       )}
       onClick={onToggle}

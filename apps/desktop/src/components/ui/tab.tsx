@@ -43,7 +43,7 @@ export function Tab({
             ? "border-foreground text-foreground"
             : "text-muted-foreground hover:border-border hover:text-foreground"
         ),
-        variant === "solid" && "min-h-[32px] rounded-lg px-3 py-2",
+        variant === "solid" && "min-h-[32px] rounded-control px-3 py-2",
         variant === "solid" && (
           selected
             ? "border border-border bg-background text-foreground shadow-sm"

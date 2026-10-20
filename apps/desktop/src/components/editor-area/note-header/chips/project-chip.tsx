@@ -1,6 +1,6 @@
-import { useSession } from "@typr/utils/contexts";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "@typr/utils/contexts";
 
 import { ProjectIcon } from "@/components/projects/project-icon";
 import { useTypr } from "@/contexts";
@@ -207,7 +207,7 @@ export function ProjectChip({ sessionId }: { sessionId: string }) {
                   type="button"
                   disabled={isMutating}
                   onClick={() => toggleProject(project.id)}
-                  className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-surface-400 disabled:pointer-events-none disabled:opacity-50"
+                  className="flex w-full items-center gap-2 rounded-control px-2 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-surface-400 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <ProjectIcon icon={project.icon_value} color={project.icon_color} size="sm" className="ring-0" />
                   <span className="min-w-0 flex-1 truncate">{project.name}</span>

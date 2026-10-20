@@ -53,7 +53,7 @@ export function TemplatesSidebar({
           <input
             type="text"
             placeholder={t`Search templates...`}
-            className="w-full rounded-md border border bg-background py-1 pl-8 pr-2 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-muted-foreground"
+            className="w-full rounded-control border border bg-background py-1 pl-8 pr-2 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:ring-1 focus:ring-muted-foreground"
             value={searchQuery}
             onChange={onSearchChange}
           />
@@ -71,7 +71,7 @@ export function TemplatesSidebar({
                   <button
                     key={template.id}
                     className={cn(
-                      "flex w-full items-center gap-2 rounded-lg p-2 text-sm text-muted-foreground hover:bg-surface-400",
+                      "flex w-full items-center gap-2 rounded-control p-2 text-sm text-muted-foreground hover:bg-surface-400",
                       selectedTemplate === template.id && "bg-muted font-medium",
                     )}
                     onClick={() => onTemplateSelect(template.id)}
@@ -94,7 +94,7 @@ export function TemplatesSidebar({
                   <button
                     key={template.id}
                     className={cn(
-                      "flex w-full items-center gap-2 rounded-lg p-2 text-sm text-muted-foreground hover:bg-surface-400",
+                      "flex w-full items-center gap-2 rounded-control p-2 text-sm text-muted-foreground hover:bg-surface-400",
                       selectedTemplate === template.id && "bg-muted font-medium",
                     )}
                     onClick={() => onTemplateSelect(template.id)}

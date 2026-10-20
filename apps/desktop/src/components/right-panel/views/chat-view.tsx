@@ -4,8 +4,17 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { ResponsiveIconButton } from "@typr/ui";
+import { Button } from "@typr/ui/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@typr/ui/components/ui/dropdown-menu";
 import { floatingToolbarClassNames } from "@typr/ui/lib/floating-toolbar";
 import { cn } from "@typr/ui/lib/utils";
+import { MoreHorizontal } from "lucide-react";
+import { useFloatingToolbar } from "../components/use-floating-toolbar";
 
 import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { Tab } from "@/components/ui/tab";
@@ -14,6 +23,7 @@ import { useRightPanel, useTypr } from "@/contexts";
 import { useAgentWritingFeature } from "@/hooks/use-agent-writing-feature";
 import { useTranscriptionActive } from "@/hooks/useTranscriptionActive";
 import { ChatHistoryView, ChatInput, ChatMessagesView, EmptyChatState } from "../components/chat";
+import { FloatingViewToggle } from "../components/floating-view-toggle";
 import { ChatSearchHeader } from "../components/search";
 // No longer needed as these are used within the ChatHeader component
 
@@ -106,10 +116,8 @@ export function ChatView({
   const { isRecordingActive } = useTranscriptionActive();
   const { userId } = useTypr();
 
-  // Container ref for measuring width
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Responsive design breakpoints
+  const { toolbarRef, isCompact } = useFloatingToolbar();
+  const showOverflow = layout === "floating" && isCompact;
 
   const [inputValue, setInputValue] = useState("");
   const [showHistory, setShowHistory] = useState(false);
@@ -465,7 +473,7 @@ export function ChatView({
   }, [initialShowHistory, onInitialShowHistoryConsumed]);
 
   return (
-    <div className="w-full h-full flex flex-col" ref={containerRef}>
+    <div className="w-full h-full flex flex-col" ref={toolbarRef}>
       {showHistory && (
         <ChatHistoryView
           chatHistory={chatHistory}
@@ -493,7 +501,7 @@ export function ChatView({
               <div className="relative">
                 <div
                   className={layout === "floating"
-                    ? "flex items-center justify-between gap-2 border-b border-border/60 bg-muted/25 px-6 py-3"
+                    ? floatingToolbarClassNames.header
                     : "flex items-center justify-between gap-2 px-4 py-3 bg-background"}
                 >
                   {layout === "sidebar"
@@ -515,20 +523,23 @@ export function ChatView({
                       </div>
                     )
                     : (
-                      <div className="min-w-0 flex-1 pr-4">
-                        <div className="truncate text-sm font-semibold leading-tight text-foreground">
-                          {title || sessionData.data?.title || t`Current note`}
+                      <>
+                        <FloatingViewToggle />
+                        <div className={cn("min-w-0 flex-1", isCompact && "hidden")}>
+                          <div className="truncate text-sm font-semibold leading-tight text-foreground">
+                            {title || sessionData.data?.title || t`Current note`}
+                          </div>
+                          <div className="truncate pt-0.5 text-ui-label leading-tight text-muted-foreground">
+                            {t`Ask in context of this meeting`}
+                          </div>
                         </div>
-                        <div className="truncate pt-0.5 text-ui-label leading-tight text-muted-foreground">
-                          {t`Ask in context of this meeting`}
-                        </div>
-                      </div>
+                      </>
                     )}
 
                   {/* Right side - Action buttons */}
                   <div
                     className={layout === "floating"
-                      ? floatingToolbarClassNames.actions
+                      ? cn(floatingToolbarClassNames.actions, isCompact && floatingToolbarClassNames.compactActions)
                       : "flex items-center gap-0.5"}
                   >
                     <div
@@ -549,7 +560,7 @@ export function ChatView({
                           : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50 disabled:opacity-40"}
                       />
 
-                      {chatGroupsQuery.data && chatGroupsQuery.data.length > 0 && (
+                      {!showOverflow && chatGroupsQuery.data && chatGroupsQuery.data.length > 0 && (
                         <ResponsiveIconButton
                           icon={ChatHistoryIcon}
                           text={t`History`}
@@ -562,8 +573,43 @@ export function ChatView({
                             : "h-7 w-7 text-foreground hover:text-foreground hover:bg-background/50"}
                         />
                       )}
+                      {showOverflow && (hasMessages || !!chatGroupsQuery.data?.length) && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              aria-label={t`More chat actions`}
+                              title={t`More chat actions`}
+                            >
+                              <MoreHorizontal aria-hidden="true" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {!!chatGroupsQuery.data?.length && (
+                              <DropdownMenuItem onSelect={handleViewHistory}>
+                                <ChatHistoryIcon />
+                                {t`History`}
+                              </DropdownMenuItem>
+                            )}
+                            {hasMessages && (
+                              <>
+                                <DropdownMenuItem onSelect={() => setIsSearchActive(true)}>
+                                  <TextSearchIcon />
+                                  {t`Search`}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => void handleCopyChat()}>
+                                  <CopyIcon />
+                                  {copied ? t`Copied!` : t`Copy`}
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
-                    {hasMessages && (
+                    {!showOverflow && hasMessages && (
                       <div
                         role="group"
                         aria-label={t`Chat actions`}

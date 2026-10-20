@@ -1,4 +1,5 @@
 import { Trans } from "@lingui/react/macro";
+import { radii } from "@typr/ui/lib/radii";
 import { useEffect, useState } from "react";
 
 import { typography } from "@typr/ui/lib/typography";
@@ -61,7 +62,7 @@ export function FontSwitcher() {
           background: "#18181b",
           color: "#fafafa",
           border: "1px solid #3f3f46",
-          borderRadius: 8,
+          borderRadius: radii.control,
           padding: "6px 12px",
           cursor: "pointer",
           boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
@@ -84,7 +85,7 @@ export function FontSwitcher() {
         background: "#18181b",
         color: "#fafafa",
         border: "1px solid #3f3f46",
-        borderRadius: 12,
+        borderRadius: radii.surface,
         padding: 16,
         width: 300,
         boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
@@ -116,7 +117,7 @@ export function FontSwitcher() {
           width: "100%",
           padding: "6px 10px",
           marginBottom: 8,
-          borderRadius: 6,
+          borderRadius: radii.control,
           border: lightWeights ? "1px solid #6366f1" : "1px solid #3f3f46",
           background: lightWeights ? "#1e1b4b" : "transparent",
           color: "#fafafa",
@@ -139,7 +140,7 @@ export function FontSwitcher() {
               alignItems: "flex-start",
               gap: 2,
               padding: "8px 10px",
-              borderRadius: 8,
+              borderRadius: radii.control,
               border: selected === i ? "1px solid #6366f1" : "1px solid transparent",
               background: selected === i ? "#1e1b4b" : "transparent",
               color: "#fafafa",

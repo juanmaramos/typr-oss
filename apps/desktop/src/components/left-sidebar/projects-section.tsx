@@ -3,16 +3,16 @@ import { ProjectIcon } from "@/components/projects/project-icon";
 import { useAddNotesToProject } from "@/hooks/useAddNotesToProject";
 import { isActiveNoteProjectDrag, NOTE_PROJECT_DRAG_END_EVENT, readDroppedNoteId } from "@/lib/note-project-drag";
 import { getRecentProjects, listProjects, listSessionsByProject, projectQueryKeys } from "@/lib/projects";
-import { Button } from "@typr/ui/components/ui/button";
-import { Skeleton } from "@typr/ui/components/ui/skeleton";
-import { cn } from "@typr/ui/lib/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "@tanstack/react-router";
+import type { ProjectSource } from "@typr/plugin-db";
+import { Button } from "@typr/ui/components/ui/button";
+import { Skeleton } from "@typr/ui/components/ui/skeleton";
+import { cn } from "@typr/ui/lib/utils";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { DragEvent } from "react";
-import type { ProjectSource } from "@typr/plugin-db";
 
 const SIDEBAR_PROJECT_PREVIEW_LIMIT = 3;
 
@@ -208,7 +208,7 @@ export function ProjectsSection() {
             <button
               type="button"
               onClick={() => navigate({ to: "/app/projects" })}
-              className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-ui text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              className="flex h-8 w-full items-center gap-2 rounded-control px-2 text-left text-ui text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <i className="ri-arrow-right-line text-sm" />
               <Trans>View all projects</Trans>
@@ -222,7 +222,7 @@ export function ProjectsSection() {
           <button
             type="button"
             onClick={() => setCreateDialogOpen(true)}
-            className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-ui text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            className="flex h-8 w-full items-center gap-2 rounded-control px-2 text-left text-ui text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           >
             <i className="ri-folder-add-line shrink-0 text-sm" />
             <Trans>Create first project</Trans>

@@ -1,7 +1,7 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { subDays } from "date-fns";
 import { SearchIcon, VideoIcon, XIcon } from "lucide-react";
 import { useState } from "react";
@@ -312,7 +312,7 @@ export function EventChip({ sessionId }: EventChipProps) {
                   <button
                     key={linkableEv.id}
                     onClick={() => handleSelectEvent(linkableEv.id)}
-                    className="flex flex-col items-start p-2 hover:bg-surface-400 text-left w-full rounded-md"
+                    className="flex flex-col items-start p-2 hover:bg-surface-400 text-left w-full rounded-control"
                   >
                     <p className="text-sm font-medium overflow-hidden text-ellipsis whitespace-nowrap w-full">
                       {linkableEv.name}

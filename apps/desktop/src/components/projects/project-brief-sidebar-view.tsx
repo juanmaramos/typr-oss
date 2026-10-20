@@ -187,7 +187,7 @@ export function ProjectBriefSidebarView() {
               size="icon"
               variant="ghost"
               disabled={!brief}
-              className="size-7 rounded-md text-muted-foreground hover:text-foreground disabled:opacity-40"
+              className="size-7 text-muted-foreground hover:text-foreground disabled:opacity-40"
               onClick={() => brief && handleCopy(brief)}
             >
               <i className="ri-file-copy-line text-sm" />
@@ -200,7 +200,7 @@ export function ProjectBriefSidebarView() {
               size="icon"
               variant="ghost"
               disabled={sourceCount === 0 || refreshBriefMutation.isRefreshing}
-              className="size-7 rounded-md text-muted-foreground hover:text-foreground disabled:opacity-40"
+              className="size-7 text-muted-foreground hover:text-foreground disabled:opacity-40"
               onClick={() =>
                 refreshBriefMutation.mutate({
                   sourceCount,

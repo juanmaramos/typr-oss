@@ -1,6 +1,7 @@
 import { ProjectIconPicker } from "@/components/projects/project-icon-picker";
 import type { ProjectIconColor, ProjectIconValue } from "@/components/projects/project-icons";
 import { PROJECT_DESCRIPTION_MAX_LENGTH } from "@/lib/projects";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -9,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@typr/ui/components/ui/dropdown-menu";
 import { Textarea } from "@typr/ui/components/ui/textarea";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { type KeyboardEvent, useLayoutEffect, useRef } from "react";
 
 const PROJECT_DESCRIPTION_MAX_HEIGHT_PX = 120;
@@ -106,11 +106,11 @@ export function ProjectHeader({
             <i className="ri-more-2-fill text-lg" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 rounded-xl border bg-background p-1.5">
+        <DropdownMenuContent align="end" className="w-48 border bg-background p-1.5">
           <DropdownMenuItem
             onSelect={onDelete}
             disabled={isDeleting}
-            className="rounded-lg text-sm text-destructive focus:bg-destructive/5 focus:text-destructive"
+            className="text-sm text-destructive focus:bg-destructive/5 focus:text-destructive"
           >
             <i className="ri-delete-bin-line text-sm" />
             <Trans>Delete project</Trans>

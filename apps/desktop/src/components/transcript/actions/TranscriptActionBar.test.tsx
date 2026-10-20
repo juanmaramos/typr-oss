@@ -122,14 +122,18 @@ describe("floating transcript action groups", () => {
     for (const transcriptState of ["empty", "active", "stopped"] as const) {
       await render({ transcriptState, isLanguageChangeable: false });
       expect([...container.querySelectorAll("[role=\"group\"]")].map(group => group.getAttribute("aria-label")))
-        .toEqual(["Audio setup", "Transcript actions", "Window controls"]);
+        .toEqual(
+          transcriptState === "stopped"
+            ? ["Panel view", "Audio setup", "Transcript actions", "Window controls"]
+            : ["Panel view", "Audio setup", "Window controls"],
+        );
       expect(button("Move to sidebar")).toBe(dock);
       expect(button("Minimize")).toBe(minimize);
       expect((container.querySelector("[aria-label=\"Audio setup\"] button:last-child") as HTMLButtonElement).disabled)
         .toBe(transcriptState === "active");
     }
     await act(async () => {
-      button("Ask AI").click();
+      container.querySelector<HTMLButtonElement>("[aria-label=\"Panel view\"] button:first-child")!.click();
       dock.click();
       minimize.click();
     });
@@ -149,7 +153,10 @@ describe("floating transcript action groups", () => {
     expect(button("Find & Replace")).toBeNull();
     expect(button("Copy All")).toBeNull();
     expect(button("More transcript actions")).not.toBeNull();
-    expect(button("Ask AI")).not.toBeNull();
+    expect(button("Ask AI")).toBeNull();
+    const toggle = container.querySelector("[aria-label=\"Panel view\"]")!;
+    expect(toggle.querySelector("button[aria-pressed=\"true\"]")?.textContent).toBe("Transcript");
+    expect(toggle.textContent).toBe("ChatTranscript");
     expect(button("Move to sidebar")).not.toBeNull();
     expect(button("Minimize")).not.toBeNull();
     await act(async () =>

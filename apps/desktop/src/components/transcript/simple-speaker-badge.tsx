@@ -78,7 +78,7 @@ export function SimpleSpeakerBadge({
   return (
     <div className="mt-4 sticky top-0 z-10">
       <button
-        className={`inline-flex items-center px-2 py-1 text-xs font-semibold text-foreground/80 rounded-md transition-colors -ml-1 ${
+        className={`inline-flex items-center px-2 py-1 text-xs font-semibold text-foreground/80 rounded-control transition-colors -ml-1 ${
           isEditable
             ? "hover:text-foreground hover:bg-surface-400/50 cursor-text border border-transparent hover:border-border/30"
             : "cursor-default"

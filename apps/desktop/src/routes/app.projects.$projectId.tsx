@@ -33,6 +33,9 @@ import {
   updateProject,
 } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import type { ProjectSourceStatus, Session } from "@typr/plugin-db";
 import {
   AlertDialog,
@@ -53,9 +56,6 @@ import {
 } from "@typr/ui/components/ui/dropdown-menu";
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
 import { toast } from "@typr/ui/components/ui/toast";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { type KeyboardEvent, useEffect, useMemo, useState } from "react";
@@ -507,7 +507,7 @@ function Component() {
           }
         }}
       >
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               <Trans>Remove “{sourceToRemoveTitle}” from this project?</Trans>
@@ -547,7 +547,7 @@ function Component() {
           }
         }}
       >
-        <AlertDialogContent className="rounded-2xl">
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               <Trans>Delete “{project.name}”?</Trans>
@@ -708,21 +708,21 @@ function ProjectSessionRow({
               <i className="ri-more-2-fill text-base" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 rounded-xl border bg-background p-1.5">
+          <DropdownMenuContent align="end" className="w-48 border bg-background p-1.5">
             {status !== "Included" && (
-              <DropdownMenuItem className="rounded-lg text-sm" onSelect={onInclude}>
+              <DropdownMenuItem className="text-sm" onSelect={onInclude}>
                 <i className="ri-check-line text-sm" />
                 <Trans>Include in brief</Trans>
               </DropdownMenuItem>
             )}
             {status !== "ExcludedFromBrief" && (
-              <DropdownMenuItem className="rounded-lg text-sm" onSelect={onExclude}>
+              <DropdownMenuItem className="text-sm" onSelect={onExclude}>
                 <i className="ri-eye-off-line text-sm" />
                 <Trans>Exclude from brief</Trans>
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
-              className="rounded-lg text-sm text-destructive focus:bg-destructive/5 focus:text-destructive"
+              className="text-sm text-destructive focus:bg-destructive/5 focus:text-destructive"
               onSelect={onRemove}
             >
               <i className="ri-close-line text-sm" />

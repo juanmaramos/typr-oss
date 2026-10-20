@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { messages as english } from "@/locales/en/messages.po";
+import { messages as spanish } from "@/locales/es/messages.po";
 import { setupI18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { act } from "react";
@@ -26,6 +28,7 @@ const mocks = vi.hoisted(() => {
     consumeFloatingPrompt: vi.fn(),
     getChatGroupId: vi.fn(),
     groups: [] as Array<{ id: string }>,
+    switchView: vi.fn(),
     activeSessionId: "session-1",
     newChatRequest: null as null | { sessionId: string; requestId: number },
     isNewChatRequestedInQuery: false,
@@ -39,7 +42,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-const i18n = setupI18n({ locale: "en", messages: { en: {} } });
+const i18n = setupI18n({ locale: "en", messages: { en: english, es: spanish } });
 vi.mock("@tanstack/react-router", () => ({
   useNavigate: () => vi.fn(),
   useMatch: ({ from }: { from: string }) =>
@@ -50,8 +53,18 @@ vi.mock("@tanstack/react-router", () => ({
 vi.mock(
   "@typr/ui",
   () => ({
-    ResponsiveIconButton: ({ text, disabled, onClick }: { text: string; disabled?: boolean; onClick?: () => void }) => (
-      <button title={text} disabled={disabled} onClick={onClick}>{text}</button>
+    ResponsiveIconButton: (
+      { text, disabled, onClick, className, icon: Icon }: {
+        text: string;
+        disabled?: boolean;
+        onClick?: () => void;
+        className?: string;
+        icon: React.ComponentType;
+      },
+    ) => (
+      <button title={text} aria-label={text} className={className} disabled={disabled} onClick={onClick}>
+        <Icon />
+      </button>
     ),
   }),
 );
@@ -67,7 +80,7 @@ vi.mock("@/contexts", () => ({
     currentView: "chat",
     surface: "floating",
     floatingState: "expanded",
-    switchView: vi.fn(),
+    switchView: mocks.switchView,
     openFloating: vi.fn(),
     getChatGroup: () => "group-1",
     setChatGroup: vi.fn(),
@@ -222,13 +235,34 @@ async function sendImproveWritingEvent() {
 describe("same-session improve-writing requests", () => {
   beforeEach(() => {
     mocks.canStart = true;
+    i18n.activate("en");
     mocks.groups = [];
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      width: 600,
+      height: 40,
+      top: 0,
+      left: 0,
+      right: 600,
+      bottom: 40,
+      x: 0,
+      y: 0,
+      toJSON() {},
+    });
+    vi.stubGlobal(
+      "ResizeObserver",
+      class {
+        observe() {}
+        disconnect() {}
+        unobserve() {}
+      },
+    );
     vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
       queueMicrotask(() => callback(0));
       return 0;
     });
     container = document.createElement("div");
+    document.body.append(container);
     root = createRoot(container);
     useChatState.getState().clearSession("session-1");
     window.__TYPR_EDITORS__ = {
@@ -278,6 +312,7 @@ describe("same-session improve-writing requests", () => {
 
   afterEach(async () => {
     act(() => root.unmount());
+    container.remove();
     if (queuedPromptController) {
       abortChatGeneration("session-1");
       releaseQueuedGroupId?.("group-1");
@@ -312,6 +347,7 @@ describe("same-session improve-writing requests", () => {
     const windows = container.querySelector("[aria-label=\"Window controls\"]");
     expect(windows).not.toBeNull();
     expect([...container.querySelectorAll("[role=\"group\"]")].map(group => group.getAttribute("aria-label"))).toEqual([
+      "Panel view",
       "Chat navigation",
       "Window controls",
     ]);
@@ -326,6 +362,7 @@ describe("same-session improve-writing requests", () => {
       root.render(view());
     });
     expect([...container.querySelectorAll("[role=\"group\"]")].map(group => group.getAttribute("aria-label"))).toEqual([
+      "Panel view",
       "Chat navigation",
       "Chat actions",
       "Window controls",
@@ -345,9 +382,69 @@ describe("same-session improve-writing requests", () => {
       container.querySelector<HTMLButtonElement>("button[title=\"Move to sidebar\"]")!.click();
       container.querySelector<HTMLButtonElement>("button[title=\"Minimize\"]")!.click();
     });
+    const toggle = container.querySelector("[aria-label=\"Panel view\"]")!;
+    expect(toggle.querySelector("button[aria-pressed=\"true\"]")?.textContent).toBe("Chat");
+    await act(async () => {
+      toggle.querySelector<HTMLButtonElement>("button:last-child")!.click();
+    });
+    expect(mocks.switchView).toHaveBeenCalledWith("transcript");
     expect(dock).toHaveBeenCalledOnce();
     expect(minimize).toHaveBeenCalledOnce();
   });
+
+  it.each(["en", "es"])(
+    "keeps chat history, search and copy accessible in the compact floating menu (%s)",
+    async locale => {
+      i18n.activate(locale);
+      const labels = locale === "es"
+        ? { search: "Buscar", history: "Historial", copy: "Copiar", more: "Más acciones del chat" }
+        : { search: "Search", history: "History", copy: "Copy", more: "More chat actions" };
+      vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+        width: 417,
+        height: 40,
+        top: 0,
+        left: 0,
+        right: 417,
+        bottom: 40,
+        x: 0,
+        y: 0,
+        toJSON() {},
+      });
+      mocks.groups = [{ id: "group-1" }];
+      useChatState.getState().setMessages("session-1", [{
+        id: "one",
+        content: "Hello",
+        isUser: true,
+        timestamp: new Date(),
+      }]);
+      await act(async () =>
+        root.render(
+          <I18nProvider i18n={i18n}>
+            <ChatView layout="floating" onClose={vi.fn()} onMoveToSidebar={vi.fn()} />
+          </I18nProvider>,
+        )
+      );
+      expect(container.querySelector(`button[title="${labels.search}"]`)).toBeNull();
+      expect(container.querySelector(`button[title="${labels.history}"]`)).toBeNull();
+      const more = container.querySelector<HTMLButtonElement>(`button[title="${labels.more}"]`)!;
+      expect(more).not.toBeNull();
+      await act(async () => {
+        more.focus();
+        more.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      expect([...document.querySelectorAll("[role=\"menuitem\"]")].map(item => item.textContent)).toEqual([
+        labels.history,
+        labels.search,
+        labels.copy,
+      ]);
+      await act(async () => {
+        document.querySelectorAll<HTMLElement>("[role=\"menuitem\"]")[1].click();
+      });
+      expect(document.querySelector("[role=\"menu\"]")).toBeNull();
+      expect(container.querySelector("[role=\"group\"]")).toBeNull();
+    },
+  );
 
   it("does not start editor improvement when the central policy blocks the selected model", async () => {
     mocks.canStart = false;

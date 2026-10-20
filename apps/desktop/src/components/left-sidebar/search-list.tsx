@@ -179,7 +179,7 @@ export function SessionMatch({ match: { item: session }, isSelected, query }: {
       ref={elementRef}
       onClick={handleClick}
       className={cn([
-        "w-full text-left group flex items-start py-2 rounded-lg px-2",
+        "w-full text-left group flex items-start py-2 rounded-control px-2",
         isActive ? "bg-surface-400" : isSelected ? "bg-primary/10" : "hover:bg-surface-400",
       ])}
     >
@@ -213,7 +213,7 @@ function EventMatch({ match, isSelected, query }: {
       ref={elementRef}
       onClick={handleClick}
       className={cn([
-        "w-full text-left group flex items-start py-2 rounded-lg px-2",
+        "w-full text-left group flex items-start py-2 rounded-control px-2",
         isSelected ? "bg-primary/10" : "hover:bg-surface-400",
       ])}
     >
@@ -271,7 +271,7 @@ function HumanMatch({ match: { item }, isSelected, query }: {
           onClick={handleClick}
           disabled={isActive}
           className={cn([
-            "w-full text-left group flex items-start py-2 rounded-lg px-2",
+            "w-full text-left group flex items-start py-2 rounded-control px-2",
             isActive ? "bg-surface-400" : isSelected ? "bg-primary/10" : "hover:bg-surface-400",
             isOpen && "bg-muted",
           ])}
@@ -346,7 +346,7 @@ function OrganizationMatch({ match: { item: organization }, isSelected, query }:
           onClick={handleClick}
           disabled={isActive}
           className={cn([
-            "w-full text-left group flex items-start py-2 rounded-lg px-2",
+            "w-full text-left group flex items-start py-2 rounded-control px-2",
             isActive ? "bg-surface-400" : isSelected ? "bg-primary/10" : "hover:bg-surface-400",
             isOpen && "bg-muted",
           ])}

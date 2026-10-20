@@ -5,15 +5,15 @@ import { AnimatePresence, LayoutGroup } from "motion/react";
 import { useMemo, useState } from "react";
 
 import { debugLog } from "@/components/utils/debug-logger";
-import { useTypr, useTyprSearch, useNewNote } from "@/contexts";
+import { useNewNote, useTypr, useTyprSearch } from "@/contexts";
 import { usePlatform } from "@/hooks/usePlatform";
 import { useMultiSelectNotes } from "@/stores/useMultiSelectNotes";
+import { Trans } from "@lingui/react/macro";
 import { commands as configCommands } from "@typr/plugin-config";
 import { type Calendar, commands as dbCommands } from "@typr/plugin-db";
 import { getCurrentWebviewWindowLabel } from "@typr/plugin-windows";
 import { cn } from "@typr/ui/lib/utils";
 import { useOngoingSession, useSessions } from "@typr/utils/contexts";
-import { Trans } from "@lingui/react/macro";
 import { BulkActionBar } from "./bulk-delete-button";
 import EventsList from "./events-list";
 import NotesList from "./notes-list";
@@ -174,7 +174,7 @@ export default function LeftSidebar() {
           <div className="px-3 pb-1 pt-2">
             <button
               type="button"
-              className="flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-ui font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              className="flex h-8 w-full items-center gap-2 rounded-control px-2 text-left text-ui font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               onClick={() => createNewNote("sidebar")}
             >
               <i className="ri-edit-box-line shrink-0 text-sm text-muted-foreground" />
@@ -183,7 +183,7 @@ export default function LeftSidebar() {
             <button
               type="button"
               className={cn(
-                "relative mt-1 flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-ui font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                "relative mt-1 flex h-8 w-full items-center gap-2 rounded-control px-2 text-left text-ui font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 isAskActive
                   ? "bg-sidebar-accent text-sidebar-accent-foreground before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:rounded-l-md before:bg-primary"
                   : "text-sidebar-foreground",

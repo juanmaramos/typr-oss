@@ -2,7 +2,7 @@
   /* highlight */
   mark {
     background-color: hsl(var(--warning) / 0.25);
-    border-radius: 0.4rem;
+    border-radius: var(--radius-compact);
     box-decoration-break: clone;
     padding: 0.1rem 0.3rem;
     color: hsl(var(--warning-foreground));

@@ -226,7 +226,7 @@ export function ChatInput(
                       variant="secondary"
                       size="sm"
                       onClick={onNoteBadgeClick}
-                      className="h-7 max-w-[240px] justify-start gap-1 rounded-md bg-muted/50 px-2 py-1 text-xs text-muted-foreground hover:bg-surface-400 hover:text-foreground"
+                      className="h-7 max-w-[240px] justify-start gap-1 bg-muted/50 px-2 py-1 text-xs text-muted-foreground hover:bg-surface-400 hover:text-foreground"
                     >
                       {getBadgeIcon()}
                       <span className="truncate max-w-[200px]">{entityTitle}</span>

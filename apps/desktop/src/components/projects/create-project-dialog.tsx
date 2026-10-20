@@ -15,6 +15,9 @@ import {
   PROJECT_DESCRIPTION_MAX_LENGTH,
 } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@typr/ui/components/ui/button";
 import {
   Dialog,
@@ -28,9 +31,6 @@ import {
 import { Input } from "@typr/ui/components/ui/input";
 import { Textarea } from "@typr/ui/components/ui/textarea";
 import { toast } from "@typr/ui/components/ui/toast";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
 import { useId, useState } from "react";
 
 interface CreateProjectDialogProps {
@@ -117,7 +117,7 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
         <DialogClose asChild>
           <button
             type="button"
-            className="absolute right-4 top-4 rounded-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="absolute right-4 top-4 rounded-control text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             aria-label={t`Close`}
           >
             <i className="ri-close-line text-base" />
@@ -140,7 +140,6 @@ export function CreateProjectDialog({ open, onOpenChange }: CreateProjectDialogP
                 icon={iconValue}
                 color={iconColor}
                 triggerSize="md"
-                triggerClassName="rounded-lg"
                 onChange={(next) => {
                   setIconValue(next.icon);
                   setIconColor(next.color);

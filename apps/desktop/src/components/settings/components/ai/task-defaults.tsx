@@ -152,7 +152,7 @@ export function AiTaskDefaultsSettings() {
   const transcriptionLabel = getSttModelLabel(transcriptionValue);
 
   return (
-    <section className="rounded-lg border border-border bg-background p-4">
+    <section className="rounded-surface border border-border bg-background p-4">
       <div className="mb-5 min-w-0">
         <h2 className="text-base font-semibold text-foreground">
           <Trans>Defaults</Trans>
@@ -172,7 +172,7 @@ export function AiTaskDefaultsSettings() {
           description={<Trans>The model used when you ask questions or edit notes from chat.</Trans>}
         >
           <Select value={chatModelValue} onValueChange={(value) => void updateChatDefault(value)}>
-            <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
+            <SelectTrigger className="h-9 w-full sm:w-72">
               <SelectValue placeholder={t`Select model`}>
                 <SelectTriggerLabel
                   icon={chatModelValue === AUTO_CLOUD_MODEL_ID
@@ -230,7 +230,7 @@ export function AiTaskDefaultsSettings() {
                 onValueChange={(nextValue) => updateTextTaskDefault(row.keyName, nextValue)}
                 disabled={defaultsQuery.isLoading || updateDefaultsMutation.isPending}
               >
-                <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
+                <SelectTrigger className="h-9 w-full sm:w-72">
                   <SelectValue placeholder={t`Select model`}>
                     <SelectTriggerLabel
                       icon={value === FOLLOW_CHAT_VALUE
@@ -290,7 +290,7 @@ export function AiTaskDefaultsSettings() {
           description={<Trans>The speech-to-text model used when a recording or upload starts.</Trans>}
         >
           <Select value={transcriptionValue} onValueChange={(value) => void updateTranscriptionDefault(value)}>
-            <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
+            <SelectTrigger className="h-9 w-full sm:w-72">
               <SelectValue placeholder={t`Select model`}>
                 <SelectTriggerLabel
                   icon={<STTProviderIcon model={transcriptionValue} />}
@@ -377,7 +377,7 @@ function DefaultRow({
   return (
     <div className="grid gap-3 py-3 first:pt-0 last:pb-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
       <div className="flex min-w-0 items-start gap-3">
-        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted">
+        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-control bg-muted">
           <i className={cn("text-sm text-foreground", icon)} />
         </span>
         <div className="min-w-0">

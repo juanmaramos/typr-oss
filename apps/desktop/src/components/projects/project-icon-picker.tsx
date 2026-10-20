@@ -1,7 +1,7 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
 
 import { ProjectIcon } from "./project-icon";
 import {
@@ -41,7 +41,7 @@ export function ProjectIconPicker({
         <button
           type="button"
           className={cn(
-            "rounded-2xl transition-colors hover:bg-surface-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "rounded-control transition-colors hover:bg-surface-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             triggerClassName,
           )}
           aria-label={translatedTriggerLabel}
@@ -100,7 +100,7 @@ export function ProjectIconPicker({
                   variant="ghost"
                   size="icon"
                   className={cn(
-                    "h-9 w-9 rounded-lg hover:bg-surface-400",
+                    "h-9 w-9 hover:bg-surface-400",
                     isSelected && "bg-surface-400 ring-1 ring-border",
                   )}
                   onClick={() => onChange({ icon: option.value, color: selectedColor })}

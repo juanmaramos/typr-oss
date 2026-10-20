@@ -78,7 +78,7 @@ export default function EventsList({
       <section className="mb-3 mt-1">
         <button
           type="button"
-          className="inline-flex h-8 items-center gap-2 rounded-md px-1 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          className="inline-flex h-8 items-center gap-2 rounded-control px-1 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           onClick={() => openSettingsWindow("/app/settings?tab=calendar")}
         >
           <CalendarDaysIcon size={12} />
@@ -255,7 +255,7 @@ function EventItem({
         <button
           onClick={handleClick}
           className={cn(
-            "group mb-1 flex h-[40px] w-full items-center rounded-md px-3 text-left transition-colors duration-200",
+            "group mb-1 flex h-[40px] w-full items-center rounded-control px-3 text-left transition-colors duration-200",
             "relative",
             isActive
               ? "bg-sidebar-accent text-sidebar-accent-foreground before:absolute before:top-0 before:left-0 before:bottom-0 before:w-[3px] before:rounded-l-md before:bg-primary"

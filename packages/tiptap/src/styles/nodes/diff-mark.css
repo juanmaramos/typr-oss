@@ -1,4 +1,4 @@
-/* 
+/*
  * Diff Mark Styles
  * Highlights AI-generated changes in the editor
  * Muted green for additions, elegant muted red for deletions
@@ -10,7 +10,7 @@ span[data-diff-type="1"] {
   background-color: hsl(var(--diff-added-bg));
   color: hsl(var(--diff-added));
   padding: 2px 0;
-  border-radius: 2px;
+  border-radius: var(--radius-compact);
   animation: diffFadeIn 0.3s ease-out;
   animation-fill-mode: both;
 
@@ -30,7 +30,7 @@ span[data-diff-type="-1"] {
   text-decoration-thickness: 1px;
   padding: 2px 0;
   opacity: 0.7;
-  border-radius: 2px;
+  border-radius: var(--radius-compact);
 
   /* Linear-style Snap-Transition: Instant removal, smooth fade out (150ms max) */
   transition: opacity 150ms ease-out, background-color 150ms ease-out;

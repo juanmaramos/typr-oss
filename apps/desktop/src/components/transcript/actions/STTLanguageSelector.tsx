@@ -168,11 +168,14 @@ export function STTLanguageSelector({
                       key={option.key}
                       role="group"
                       aria-label={getSttModelLabel(option.key)}
-                      className={cn("flex items-center gap-1 rounded-md", isSelected && "bg-muted/50 border border")}
+                      className={cn(
+                        "flex items-center gap-1 rounded-control",
+                        isSelected && "bg-muted/50 border border",
+                      )}
                     >
                       <Button
                         variant="ghost"
-                        className="flex-1 min-w-0 justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 rounded-md whitespace-normal"
+                        className="flex-1 min-w-0 justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 whitespace-normal"
                         onClick={() => handleSelect(option.key)}
                         disabled={!availability.canSelect}
                       >

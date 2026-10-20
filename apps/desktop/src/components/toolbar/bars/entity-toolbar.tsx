@@ -32,7 +32,7 @@ export function EntityToolbar({
         {canGoBack && (
           <button
             onClick={handleClickBack}
-            className="px-3 py-1 text-sm font-medium rounded-md bg-muted hover:bg-surface-400 transition-colors"
+            className="px-3 py-1 text-sm font-medium rounded-control bg-muted hover:bg-surface-400 transition-colors"
           >
             <Trans>Back</Trans>
           </button>
@@ -46,7 +46,7 @@ export function EntityToolbar({
         {onEditToggle && (
           <button
             onClick={onEditToggle}
-            className="px-3 py-1 text-sm font-medium rounded-md bg-muted hover:bg-surface-400 transition-colors w-14"
+            className="px-3 py-1 text-sm font-medium rounded-control bg-muted hover:bg-surface-400 transition-colors w-14"
           >
             {isEditing ? t`Save` : t`Edit`}
           </button>

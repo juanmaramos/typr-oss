@@ -1,8 +1,8 @@
+import { Trans } from "@lingui/react/macro";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import { Card, CardContent } from "@typr/ui/components/ui/card";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans } from "@lingui/react/macro";
 import type { ReactNode } from "react";
 
 interface ProjectNotesPanelProps {
@@ -15,7 +15,7 @@ export function ProjectNotesPanel({ children, count, onAddNotes }: ProjectNotesP
   const hasNotes = count > 0;
 
   return (
-    <Card className="min-h-0 flex-1 rounded-[24px] border bg-background shadow-sm">
+    <Card className="min-h-0 flex-1 border bg-background shadow-sm">
       <CardContent className="flex h-full min-h-0 flex-col p-0">
         <div className="flex items-center justify-between gap-4 border-b border/50 px-6 py-4">
           <div className="flex items-center gap-2">

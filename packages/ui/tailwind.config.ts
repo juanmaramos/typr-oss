@@ -1,6 +1,7 @@
 import path from "path";
 import type { Config } from "tailwindcss";
 
+import { radiusScale } from "./src/lib/radii";
 import { typography } from "./src/lib/typography";
 
 // https://magicui.design/docs/components/shimmer-button
@@ -204,15 +205,6 @@ const shadcn = {
       600: "hsl(var(--surface-600))",
     },
   },
-  borderRadius: {
-    composer: "var(--radius-composer)",
-    "floating-pill": "var(--radius-floating-pill)",
-    "floating-surface": "var(--radius-floating-surface)",
-    xl: "calc(var(--radius) + 4px)",
-    lg: "var(--radius)",
-    md: "calc(var(--radius) - 2px)",
-    sm: "calc(var(--radius) - 4px)",
-  },
   boxShadow: {
     "2xs": "var(--shadow-2xs)",
     "xs": "var(--shadow-xs)",
@@ -260,6 +252,7 @@ const config = {
     "border-blue-dark",
   ],
   theme: {
+    borderRadius: radiusScale,
     extend: {
       animation: {
         ...shimmerButton.animation,
@@ -275,7 +268,6 @@ const config = {
       },
       ...typography,
       colors: shadcn.colors,
-      borderRadius: shadcn.borderRadius,
       boxShadow: shadcn.boxShadow,
     },
   },

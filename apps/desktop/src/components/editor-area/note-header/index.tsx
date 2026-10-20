@@ -200,7 +200,7 @@ export function NoteHeader(
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 rounded-md hover:bg-accent hover:text-accent-foreground"
+                                className="h-8 w-8 hover:bg-accent hover:text-accent-foreground"
                                 onClick={onRegenerateAiNotes}
                                 disabled={isGeneratingAiNotes}
                                 aria-label={t`Regenerate with Auto`}
@@ -250,7 +250,7 @@ export function NoteHeader(
                                   type="button"
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 rounded-md hover:bg-accent hover:text-accent-foreground"
+                                  className="h-8 w-8 hover:bg-accent hover:text-accent-foreground"
                                   onClick={onRegenerateAiNotes}
                                   disabled={isGeneratingAiNotes}
                                   aria-label={t`Regenerate with ${template.title || t`Untitled template`}`}

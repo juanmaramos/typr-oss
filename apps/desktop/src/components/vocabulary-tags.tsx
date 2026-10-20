@@ -104,7 +104,7 @@ export function VocabularyTags({
                 e.stopPropagation();
                 removeTag(tag);
               }}
-              className="opacity-60 hover:opacity-100 hover:bg-surface-400-foreground/20 rounded-sm p-0.5 transition-all duration-150"
+              className="opacity-60 hover:opacity-100 hover:bg-surface-400-foreground/20 rounded-control p-0.5 transition-all duration-150"
               type="button"
               aria-label={t`Remove ${tag}`}
             >

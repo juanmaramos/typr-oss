@@ -222,21 +222,21 @@ function AskHome() {
               value={search}
               onChange={event => setSearch(event.target.value)}
               placeholder={t`Search conversations`}
-              className="h-9 rounded-xl border bg-background text-sm"
+              className="h-9 border bg-background text-sm"
             />
             <Select
               value={selectedProjectId ?? "all"}
               onValueChange={value => setProjectFilter(value === "all" ? null : value)}
             >
-              <SelectTrigger className="h-9 w-64 rounded-xl border bg-background text-sm">
+              <SelectTrigger className="h-9 w-64 border bg-background text-sm">
                 <SelectValue placeholder={t`All projects`} />
               </SelectTrigger>
-              <SelectContent align="end" className="max-h-72 rounded-xl border bg-background p-1.5">
-                <SelectItem value="all" className="rounded-lg">
+              <SelectContent align="end" className="max-h-72 border bg-background p-1.5">
+                <SelectItem value="all">
                   <Trans>All projects</Trans>
                 </SelectItem>
                 {projectOptions.map(project => (
-                  <SelectItem key={project.id} value={project.id} className="rounded-lg">
+                  <SelectItem key={project.id} value={project.id}>
                     {project.name}
                   </SelectItem>
                 ))}
@@ -312,7 +312,7 @@ function AskHome() {
                     <Button
                       type="button"
                       variant="ghost"
-                      className="h-auto min-w-0 flex-1 justify-start gap-3 rounded-lg px-0 py-0 text-left whitespace-normal hover:bg-transparent"
+                      className="h-auto min-w-0 flex-1 justify-start gap-3 px-0 py-0 text-left whitespace-normal hover:bg-transparent"
                       onClick={() =>
                         navigate({
                           to: "/app/ask/$threadId",

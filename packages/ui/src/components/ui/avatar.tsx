@@ -10,7 +10,7 @@ const avatarVariants = cva(
     variants: {
       variant: {
         default: "rounded-full",
-        rounded: "rounded-lg",
+        rounded: "rounded-surface",
       },
     },
     defaultVariants: {
@@ -49,7 +49,7 @@ const avatarFallbackVariants = cva(
     variants: {
       variant: {
         default: "rounded-full",
-        rounded: "rounded-lg",
+        rounded: "rounded-surface",
       },
     },
     defaultVariants: {

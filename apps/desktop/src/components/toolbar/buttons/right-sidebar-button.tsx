@@ -45,7 +45,7 @@ export function RightSidebarButton() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-8 w-8 flex-shrink-0 rounded-md text-muted-foreground hover:bg-surface-400 hover:text-foreground data-[state=open]:bg-transparent data-[state=open]:shadow-none"
+          className="relative h-8 w-8 flex-shrink-0 text-muted-foreground hover:bg-surface-400 hover:text-foreground data-[state=open]:bg-transparent data-[state=open]:shadow-none"
         >
           {isSidebarActive
             ? <Icon name="ri-layout-right-2-line" className="h-[18px] w-[18px] text-muted-foreground" />
