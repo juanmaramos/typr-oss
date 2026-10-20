@@ -1,17 +1,20 @@
 import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
 import { useModelPreferences } from "@/hooks/useModelPreferences";
+import { useTranscriptionSetup } from "@/hooks/useTranscriptionSetup";
+import { formatModelSize } from "@/lib/model-metadata";
+import { getModelSelectionController } from "@/lib/model-selection";
 import { Trans } from "@lingui/react/macro";
 import { QueryClient, useQuery } from "@tanstack/react-query";
 import { Channel } from "@tauri-apps/api/core";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
-import { getSttModelLabel, sttModelMetadata } from "@/components/transcript/constants/languageData";
+import { getSttModelLabel } from "@/components/transcript/constants/languageData";
 import { DEFAULT_ONBOARDING_LLM_MODEL } from "@/components/welcome-modal/model-setup";
 import { useModelState } from "@/hooks/useModelState";
 import { openSettingsWindow } from "@/utils/open-settings-window";
 import { commands as localLlmCommands, SupportedModel as SupportedModelLLM } from "@typr/plugin-local-llm";
-import { commands as localSttCommands, SupportedModel } from "@typr/plugin-local-stt";
+import { type SupportedModel } from "@typr/plugin-local-stt";
 import { Button } from "@typr/ui/components/ui/button";
 import { Progress } from "@typr/ui/components/ui/progress";
 import { sonnerToast, toast } from "@typr/ui/components/ui/toast";
@@ -136,18 +139,14 @@ function SttModelDownloadToastContent({
   queryClient?: QueryClient;
   toastId: string;
 }) {
-  const { getModel } = useModelState();
   const modelPreferences = useModelPreferences();
   const completedRef = useRef(false);
-  const modelState = getModel(model);
-  const progress = modelState?.isDownloaded ? 100 : modelState?.progress || 0;
-  const error = modelState?.error;
-  const metadata = sttModelMetadata[model];
+  const { completed, progress, error, sizeBytes } = useTranscriptionSetup(model);
   const modelName = getSttModelLabel(model);
-  const modelSize = metadata?.size;
+  const modelSize = formatModelSize(sizeBytes);
 
   useEffect(() => {
-    if (!modelState?.isDownloaded || completedRef.current) {
+    if (!completed || completedRef.current) {
       return;
     }
 
@@ -164,7 +163,7 @@ function SttModelDownloadToastContent({
 
       onComplete?.();
     })().catch(console.error);
-  }, [model, modelState?.isDownloaded, modelPreferences, onComplete, queryClient, toastId]);
+  }, [model, completed, modelPreferences, onComplete, queryClient, toastId]);
 
   if (error) {
     return (
@@ -175,7 +174,7 @@ function SttModelDownloadToastContent({
         <Button
           variant="default"
           onClick={() => {
-            localSttCommands.downloadModelBackground(model).catch(console.error);
+            modelPreferences.downloadTranscription(model).catch(console.error);
           }}
         >
           <Trans>Retry</Trans>
@@ -331,8 +330,12 @@ export const DownloadProgress = ({
   );
 };
 
-export function showSttModelDownloadToast(model: SupportedModel, onComplete?: () => void, queryClient?: QueryClient) {
-  localSttCommands.downloadModelBackground(model).catch(console.error);
+export function showSttModelDownloadToast(
+  model: SupportedModel,
+  onComplete: (() => void) | undefined,
+  queryClient: QueryClient,
+) {
+  getModelSelectionController(queryClient).downloadTranscription(model).catch(console.error);
 
   // Invalidate React Query caches to prevent duplicate download toasts
   if (queryClient) {

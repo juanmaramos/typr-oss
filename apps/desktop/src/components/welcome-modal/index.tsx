@@ -1,4 +1,5 @@
 import { useModelPreferences } from "@/hooks/useModelPreferences";
+import { localTranscriptionModelQueryOptions } from "@/lib/model-selection";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -11,10 +12,10 @@ import { SupportedModel } from "@typr/plugin-local-stt";
 
 import { Dialog, DialogContent, DialogTitle } from "@typr/ui/components/ui/dialog";
 
+import { type as getOsType } from "@tauri-apps/plugin-os";
 import { commands as configCommands } from "@typr/plugin-config";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { AUTO_CLOUD_MODEL_ID } from "@typr/utils";
-import { type as getOsType } from "@tauri-apps/plugin-os";
 import { AudioPermissionsView } from "./audio-permissions-view";
 import { DownloadProgressView } from "./download-progress-view";
 import {
@@ -54,9 +55,10 @@ export function WelcomeModal({ isOpen, onClose, onBackgroundSetupStart }: Welcom
     const loadOnboardingState = async () => {
       try {
         // Load stored step
-        const [storedStep, modelSetup] = await Promise.all([
+        const [storedStep, modelSetup, nativeModel] = await Promise.all([
           commands.getOnboardingStep(),
           commands.getOnboardingModelSetup(),
+          queryClient.fetchQuery(localTranscriptionModelQueryOptions()),
         ]);
         if (storedStep === "model-selection") {
           await commands.setOnboardingStep("welcome");
@@ -68,7 +70,7 @@ export function WelcomeModal({ isOpen, onClose, onBackgroundSetupStart }: Welcom
           setCurrentStep(storedStep as OnboardingStep);
         }
 
-        const restoredModels = restoreOnboardingModelSetup(modelSetup);
+        const restoredModels = restoreOnboardingModelSetup(modelSetup, nativeModel);
         setSelectedSttModel(restoredModels.sttModel);
         setSelectedLlmModel(restoredModels.llmModel);
 
@@ -101,7 +103,7 @@ export function WelcomeModal({ isOpen, onClose, onBackgroundSetupStart }: Welcom
     };
 
     loadOnboardingState();
-  }, [isOpen, userId]);
+  }, [isOpen, userId, queryClient]);
 
   // Removed background music/sound effects for cleaner onboarding
 
@@ -193,10 +195,11 @@ export function WelcomeModal({ isOpen, onClose, onBackgroundSetupStart }: Welcom
     }
 
     // macOS: local models are required for the free first-run experience.
-    setSelectedSttModel(DEFAULT_ONBOARDING_STT_MODEL);
+    const sttModel = await queryClient.fetchQuery(localTranscriptionModelQueryOptions());
+    setSelectedSttModel(sttModel);
     setSelectedLlmModel(DEFAULT_ONBOARDING_LLM_MODEL);
     await commands.setOnboardingModelSetup(createOnboardingModelSetup("pending", null, {
-      sttModel: DEFAULT_ONBOARDING_STT_MODEL,
+      sttModel,
       llmModel: DEFAULT_ONBOARDING_LLM_MODEL,
     }));
     await commands.setOnboardingStep("download-progress");

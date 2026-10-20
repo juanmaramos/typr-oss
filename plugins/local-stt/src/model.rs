@@ -196,3 +196,23 @@ pub const STREAMING_WHISPER_FALLBACKS: &[SupportedModel] = &[
     SupportedModel::QuantizedBase,
     SupportedModel::QuantizedTiny,
 ];
+
+/// First-run recommendation only. Saved connector and legacy preferences take precedence.
+pub(crate) fn default_model(nemotron_available: bool) -> SupportedModel {
+    if nemotron_available {
+        SupportedModel::Nemotron3p5Streaming
+    } else {
+        SupportedModel::QuantizedLargeTurbo
+    }
+}
+
+#[cfg(test)]
+mod default_tests {
+    use super::*;
+
+    #[test]
+    fn first_run_uses_streaming_only_when_the_bundled_runtime_is_available() {
+        assert_eq!(default_model(true), SupportedModel::Nemotron3p5Streaming);
+        assert_eq!(default_model(false), SupportedModel::QuantizedLargeTurbo);
+    }
+}

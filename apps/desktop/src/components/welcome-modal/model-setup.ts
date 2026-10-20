@@ -15,6 +15,7 @@ const SUPPORTED_ONBOARDING_STT_MODELS: readonly SupportedSttModel[] = [
   "QuantizedSmallEn",
   "QuantizedLargeTurbo",
   "DistilLargeV35En",
+  "Nemotron3p5Streaming",
 ];
 const SUPPORTED_ONBOARDING_LLM_MODELS: readonly SupportedLlmModel[] = [
   "Llama3p2_3bQ4",
@@ -49,10 +50,11 @@ export function createOnboardingModelSetup(
 
 export function restoreOnboardingModelSetup(
   setup: { stt_model?: string | null; llm_model?: string | null } | null | undefined,
+  defaultSttModel: SupportedSttModel = DEFAULT_ONBOARDING_STT_MODEL,
 ) {
   const sttModel = SUPPORTED_ONBOARDING_STT_MODELS.includes(setup?.stt_model as SupportedSttModel)
     ? setup!.stt_model as SupportedSttModel
-    : DEFAULT_ONBOARDING_STT_MODEL;
+    : defaultSttModel;
   const llmModel = SUPPORTED_ONBOARDING_LLM_MODELS.includes(setup?.llm_model as SupportedLlmModel)
     ? setup!.llm_model as SupportedLlmModel
     : DEFAULT_ONBOARDING_LLM_MODEL;

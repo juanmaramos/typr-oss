@@ -1,12 +1,16 @@
-import { cloudChatModelQueryOptions, customEndpointEnabledQueryOptions, transcriptionModelQueryOptions } from "@/lib/model-selection";
-import { sonnerToast, toast } from "@typr/ui/components/ui/toast";
+import {
+  cloudChatModelQueryOptions,
+  customEndpointEnabledQueryOptions,
+  localTranscriptionModelQueryOptions,
+  transcriptionModelQueryOptions,
+} from "@/lib/model-selection";
 import { useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
+import { sonnerToast, toast } from "@typr/ui/components/ui/toast";
 import { useEffect, useState } from "react";
 import { useModelState } from "../../hooks/useModelState";
 import { usePlatform } from "../../hooks/usePlatform";
-import { DEFAULT_LOCAL_STT_MODEL } from "../transcript/constants/languageData";
 import { showLlmModelDownloadToast, showSttModelDownloadToast } from "./shared";
 
 const TOAST_DISMISSAL_KEY = "model-download-toast-dismissed";
@@ -26,44 +30,19 @@ export default function ModelDownloadNotification() {
   const selectedCloudModelQuery = useQuery(cloudChatModelQueryOptions());
   const customEndpointQuery = useQuery(customEndpointEnabledQueryOptions());
 
-  const { getModel } = useModelState();
+  const { stt, llm, models, isLoading: isInventoryLoading } = useModelState();
+  const localSttModelQuery = useQuery(localTranscriptionModelQueryOptions());
 
-  const hasSttModel = [
-    "QuantizedTiny",
-    "QuantizedTinyEn",
-    "QuantizedBase",
-    "QuantizedBaseEn",
-    "QuantizedSmall",
-    "QuantizedSmallEn",
-    "QuantizedLargeTurbo",
-    "DistilLargeV35En",
-  ].some(modelId => getModel(modelId)?.isDownloaded);
-
-  const hasLlmModel = ["Gemma4E4b", "Qwen3_4bThinkingQ4Km", "Phi4MiniQ4Km", "Llama3p2_3bQ4"].some(modelId =>
-    getModel(modelId)?.isDownloaded
-  );
-
-  const isDownloading = [
-    "QuantizedTiny",
-    "QuantizedTinyEn",
-    "QuantizedBase",
-    "QuantizedBaseEn",
-    "QuantizedSmall",
-    "QuantizedSmallEn",
-    "QuantizedLargeTurbo",
-    "DistilLargeV35En",
-    "Gemma4E4b",
-    "Qwen3_4bThinkingQ4Km",
-    "Phi4MiniQ4Km",
-    "Llama3p2_3bQ4",
-  ].some(modelId => getModel(modelId)?.isDownloading);
+  const hasSttModel = stt.models?.some(model => model.isDownloaded) ?? false;
+  const hasLlmModel = llm.models?.some(model => model.isDownloaded) ?? false;
+  const isDownloading = models.some(model => model.isDownloading);
 
   const selectedSttModel = selectedSttModelQuery.data || "";
   const selectedCloudModel = selectedCloudModelQuery.data || "";
   const isUsingCloudStt = selectedSttModel.includes("assemblyai");
   const isUsingCloudLlm = selectedCloudModel.length > 0 || customEndpointQuery.data === true;
   const isSelectionLoading = selectedSttModelQuery.isLoading || selectedCloudModelQuery.isLoading
-    || customEndpointQuery.isLoading;
+    || customEndpointQuery.isLoading || localSttModelQuery.isLoading || isInventoryLoading;
 
   useEffect(() => {
     // On Windows, cloud models are always available - don't show download prompt
@@ -133,7 +112,9 @@ export default function ModelDownloadNotification() {
             sonnerToast.dismiss("model-download-needed");
 
             if (needsSttModel) {
-              showSttModelDownloadToast(DEFAULT_LOCAL_STT_MODEL, undefined, queryClient);
+              if (localSttModelQuery.data) {
+                showSttModelDownloadToast(localSttModelQuery.data, undefined, queryClient);
+              }
             }
 
             if (needsLlmModel) {
@@ -151,6 +132,7 @@ export default function ModelDownloadNotification() {
       dismissible: false,
     });
   }, [
+    localSttModelQuery.data,
     hasSttModel,
     hasLlmModel,
     isDownloading,

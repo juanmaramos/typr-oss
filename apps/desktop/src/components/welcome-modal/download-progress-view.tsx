@@ -1,14 +1,16 @@
 import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
 import { useModelPreferences } from "@/hooks/useModelPreferences";
+import { useTranscriptionSetup } from "@/hooks/useTranscriptionSetup";
+import { formatModelSize } from "@/lib/model-metadata";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { showModelDownloadStateToast } from "@/components/toast/shared";
-import { getSttModelLabel, sttModelMetadata } from "@/components/transcript/constants/languageData";
+import { getSttModelLabel } from "@/components/transcript/constants/languageData";
 import { useModelState } from "@/hooks/useModelState";
 import { commands } from "@/types";
 import { commands as localLlmCommands, type SupportedModel as SupportedLlmModel } from "@typr/plugin-local-llm";
-import { commands as localSttCommands, SupportedModel } from "@typr/plugin-local-stt";
+import { type SupportedModel } from "@typr/plugin-local-stt";
 import { sonnerToast } from "@typr/ui/components/ui/toast";
 import { createOnboardingModelSetup } from "./model-setup";
 
@@ -30,6 +32,7 @@ export const DownloadProgressView = ({
   const { t } = useLingui();
   const modelPreferences = useModelPreferences();
   const { getModel } = useModelState();
+  const sttSetup = useTranscriptionSetup(selectedSttModel);
   const didStartDownloads = useRef(false);
   const didSetupStt = useRef(false);
   const didSetupLlm = useRef(false);
@@ -50,16 +53,12 @@ export const DownloadProgressView = ({
           llmModel: selectedLlmModel,
         }));
 
-        const [isSttDownloaded, isLlmDownloaded, isSttDownloading, isLlmDownloading] = await Promise.all([
-          localSttCommands.isModelDownloaded(selectedSttModel),
+        const [isLlmDownloaded, isLlmDownloading] = await Promise.all([
           localLlmCommands.isModelDownloaded(selectedLlmModel),
-          localSttCommands.isModelDownloading(selectedSttModel),
           localLlmCommands.isModelDownloading(selectedLlmModel),
         ]);
 
-        if (!isSttDownloaded && !isSttDownloading) {
-          await localSttCommands.downloadModelBackground(selectedSttModel);
-        }
+        await modelPreferences.downloadTranscription(selectedSttModel);
 
         if (!isLlmDownloaded && !isLlmDownloading) {
           await localLlmCommands.downloadModelBackground(selectedLlmModel);
@@ -74,19 +73,18 @@ export const DownloadProgressView = ({
     };
 
     startDownloads();
-  }, [selectedLlmModel, selectedSttModel, retryAttempt]);
+  }, [selectedLlmModel, selectedSttModel, retryAttempt, modelPreferences]);
 
-  const sttModelState = getModel(selectedSttModel);
   const llmModelState = getModel(selectedLlmModel);
-  const sttCompleted = sttModelState?.isDownloaded || false;
+  const sttCompleted = sttSetup.completed;
   const llmCompleted = llmModelState?.isDownloaded || false;
-  const sttError = sttModelState?.error;
+  const sttError = sttSetup.error;
   const llmError = llmModelState?.error;
-  const sttProgress = sttCompleted ? 100 : sttModelState?.progress || 0;
+  const sttProgress = sttSetup.progress;
   const llmProgress = llmCompleted ? 100 : llmModelState?.progress || 0;
   const bothCompleted = sttCompleted && llmCompleted;
   const hasErrors = !!sttError || !!llmError;
-  const sttMetadata = sttModelMetadata[selectedSttModel];
+  const sttSize = formatModelSize(sttSetup.sizeBytes);
 
   useEffect(() => {
     const handleSttCompletion = async () => {
@@ -146,7 +144,9 @@ export const DownloadProgressView = ({
       ? t`Ready`
       : sttError
       ? t`Check your connection and retry.`
-      : t`One-time download, ${sttMetadata?.size || "250 MB"}`;
+      : sttSetup.sizeBytes > 0
+      ? t`One-time download, ${sttSize}`
+      : t`Preparing transcription`;
 
     if (sttError) {
       showModelDownloadStateToast({
@@ -191,7 +191,8 @@ export const DownloadProgressView = ({
     sttCompleted,
     sttError,
     sttProgress,
-    sttMetadata?.size,
+    sttSize,
+    sttSetup.sizeBytes,
     t,
   ]);
 

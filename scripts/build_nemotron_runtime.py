@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Prepare the opt-in native STT resources; Python is build tooling only.
+"""Prepare the private native STT resources; Python is build tooling only.
 
 Builds pinned upstream sources instead of invoking an installed ASR executable.
-The normal application/release build does not download or enable this prototype.
+The Apple Silicon release bundles this runtime; model weights download during setup.
 """
 
 import argparse
@@ -61,6 +61,9 @@ def main():
         parser.error(
             "This prototype build helper supports native macOS/Linux builds only"
         )
+    platform_options = (
+        ["-DCMAKE_OSX_DEPLOYMENT_TARGET=14.2"] if platform.system() == "Darwin" else []
+    )
     work = args.work_dir.resolve()
     work.mkdir(parents=True, exist_ok=True)
     source = args.source.resolve() if args.source else work / "source"
@@ -86,6 +89,7 @@ def main():
         "-B",
         sp_build,
         "-DCMAKE_BUILD_TYPE=Release",
+        *platform_options,
         "-DSPM_BUILD_TEST=OFF",
         "-DSPM_ENABLE_SHARED=OFF",
         "-DSPM_ENABLE_TCMALLOC=OFF",
@@ -123,6 +127,7 @@ def main():
         "-B",
         native_build,
         "-DCMAKE_BUILD_TYPE=Release",
+        *platform_options,
         f"-DNEMO_SPEECH_DEPENDENCY_PREFIX={dependency.parent}",
         "-DNEMO_SPEECH_BUILD_ASR=ON",
         "-DNEMO_SPEECH_BUILD_DIAR=OFF",
@@ -136,6 +141,7 @@ def main():
         "-DBUILD_TESTING=OFF",
         "-DNEMO_SPEECH_BUILD_EXAMPLES=OFF",
         "-DGGML_OPENMP=OFF",
+        "-DGGML_NATIVE=OFF",
         f"-DGGML_METAL={'ON' if platform.system() == 'Darwin' else 'OFF'}",
     )
     run(
@@ -162,7 +168,9 @@ def main():
     cargo_target = Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "target")).resolve()
     runtime = ROOT / "target/nemotron/runtime"
     runtime.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(sdk / "lib", runtime / "lib", dirs_exist_ok=True, symlinks=True)
+    if (runtime / "lib").exists():
+        shutil.rmtree(runtime / "lib")
+    shutil.copytree(sdk / "lib", runtime / "lib", symlinks=True)
     shutil.copytree(sdk / "share/licenses", runtime / "licenses", dirs_exist_ok=True)
     shutil.copy2(cargo_target / "release/typr-nemotron-worker", runtime)
     (runtime / "runtime.json").write_text(
@@ -194,12 +202,10 @@ def main():
         )
     # Tauri dev resolves resource_dir beside the executable; bundles use the overlay map.
     for profile in ("debug", "release"):
-        shutil.copytree(
-            runtime,
-            cargo_target / profile / "stt/nemotron",
-            dirs_exist_ok=True,
-            symlinks=True,
-        )
+        destination = cargo_target / profile / "stt/nemotron"
+        if destination.exists():
+            shutil.rmtree(destination)
+        shutil.copytree(runtime, destination, symlinks=True)
     print(f"Prepared private runtime: {runtime}")
     print(
         "Use apps/desktop/src-tauri/tauri.nemotron.conf.json and Cargo feature nemotron."
