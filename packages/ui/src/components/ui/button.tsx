@@ -15,7 +15,7 @@ const buttonVariants = cva(
         warning: "bg-warning text-warning-foreground hover:bg-warning/90",
         info: "bg-info text-info-foreground hover:bg-info/90",
         outline: "border border-input bg-background hover:bg-surface-400 hover:text-foreground",
-        secondary: "bg-surface-400 text-foreground hover:text-primary",
+        secondary: "bg-surface-400 text-foreground hover:bg-surface-500 hover:text-foreground",
         ghost: "hover:bg-surface-400 hover:text-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
