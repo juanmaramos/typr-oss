@@ -26,6 +26,7 @@ pub fn parse(url: String) -> Vec<Destination> {
     let dests = match parsed_url.path() {
         // Specified in notification related codebase
         "/notification" => parse_notification_query(&parsed_url),
+        "/call-end" => parse_call_end_query(&parsed_url),
         // Optional local provider setup link.
         "/register" => parse_register_query(&parsed_url),
         "/license" => parse_license_query(&parsed_url),
@@ -34,6 +35,21 @@ pub fn parse(url: String) -> Vec<Destination> {
 
     tracing::info!("deeplink: {:?}", dests);
     dests
+}
+
+fn parse_call_end_query(parsed_url: &url::Url) -> Vec<Destination> {
+    let session_id = parsed_url
+        .query_pairs()
+        .find(|(key, _)| key == "session_id")
+        .and_then(|(_, value)| uuid::Uuid::parse_str(&value).ok());
+
+    vec![match session_id {
+        Some(id) => Destination {
+            window: TyprWindow::Main,
+            url: format!("/app/note/{id}"),
+        },
+        None => Destination::default(),
+    }]
 }
 
 fn parse_notification_query(parsed_url: &url::Url) -> Vec<Destination> {
@@ -99,6 +115,23 @@ struct RegisterQuery {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn call_end_opens_existing_note_without_starting_recording() {
+        let id = "f260b58a-d46e-41f8-83c8-69ba29244cf2";
+        let dests = parse(format!("typross://typr.com/call-end?session_id={id}"));
+        assert_eq!(dests.len(), 1);
+        assert_eq!(dests[0].window, TyprWindow::Main);
+        assert_eq!(dests[0].url, format!("/app/note/{id}"));
+    }
+
+    #[test]
+    fn invalid_call_end_links_never_start_recording() {
+        for query in ["", "?session_id=invalid", "?session_id=..%2Fnew%3Frecord%3Dtrue"] {
+            let dests = parse(format!("typross://typr.com/call-end{query}"));
+            assert_eq!(dests[0].url, "/app/new?record=false");
+        }
+    }
 
     #[test]
     fn test_parse_register_query() {

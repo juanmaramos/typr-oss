@@ -996,6 +996,10 @@ msgstr "Accede a múltiples modelos de IA a través de OpenRouter con tu clave A
 msgid "Access your meeting notes directly from ChatGPT."
 msgstr "Accede a tus notas de reunión directamente desde ChatGPT."
 
+#: src/components/call-end-bridge.tsx:52
+msgid "Accessibility permission needed"
+msgstr "Se necesita permiso de Accesibilidad"
+
 #: src/components/settings-dialog/sidebar.tsx:134
 msgid "Account"
 msgstr "Cuenta"
@@ -1493,13 +1497,9 @@ msgstr "Auto - Mejor modelo configurado disponible"
 msgid "Auto-detect"
 msgstr "Auto-detectar"
 
-#: src/components/settings/views/notifications.tsx:102
+#: src/components/settings/views/notifications.tsx:126
 msgid "Auto-detect meetings"
 msgstr "Detectar reuniones automáticamente"
-
-#: src/components/settings/views/notifications.tsx:108
-msgid "Automatically starts, pauses, and stops transcription when meetings are detected."
-msgstr "Inicia, pausa y detiene la transcripción automáticamente cuando se detectan reuniones."
 
 #: src/lib/language-labels.ts:6
 msgid "Azerbaijani"
@@ -1548,7 +1548,7 @@ msgstr "Mejor calidad para trabajo complejo"
 #: src/components/settings/views/lab.tsx:45
 #: src/components/settings/views/lab.tsx:61
 #: src/components/settings/views/lab.tsx:77
-#: src/components/settings/views/notifications.tsx:104
+#: src/components/settings/views/notifications.tsx:128
 msgid "Beta"
 msgstr "Beta"
 
@@ -1625,6 +1625,11 @@ msgstr "Calendario"
 #: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:100
 msgid "Calendar access"
 msgstr "Acceso al calendario"
+
+#: src/components/call-end-bridge.tsx:39
+#: src/components/call-end-bridge.tsx:78
+msgid "Call ended"
+msgstr "Llamada finalizada"
 
 #: src/components/audio-upload-dialog.tsx:354
 #: src/components/audio-upload-toast.tsx:142
@@ -1756,6 +1761,10 @@ msgstr "Buscando una versión más reciente..."
 #: src/hooks/useModelAvailabilityLabel.ts:10
 msgid "Checking model availability…"
 msgstr "Comprobando la disponibilidad del modelo…"
+
+#: src/components/call-end-bridge.tsx:82
+msgid "Choose a call to stop recording two minutes after it ends."
+msgstr "Elige una llamada para detener la grabación dos minutos después de que termine."
 
 #: src/lib/validation-messages.ts:48
 msgid "Choose a date after {date}."
@@ -2124,6 +2133,10 @@ msgstr "No se pudo añadir el proyecto"
 msgid "Couldn’t answer"
 msgstr "No se pudo responder"
 
+#: src/components/settings/views/notifications.tsx:165
+msgid "Couldn’t change this setting. Try again."
+msgstr "No se pudo cambiar este ajuste. Vuelve a intentarlo."
+
 #: src/components/projects/project-brief-sidebar-view.tsx:143
 msgid "Couldn’t copy brief"
 msgstr "No se pudo copiar el resumen"
@@ -2145,6 +2158,10 @@ msgstr "No se pudo eliminar el proyecto"
 #: src/routes/app.ask.$threadId.tsx:232
 msgid "Couldn’t open file source"
 msgstr "No se pudo abrir la fuente del archivo"
+
+#: src/components/call-end-permission.tsx:35
+msgid "Couldn’t open permission settings. Open System Settings and allow Typr to control your Mac."
+msgstr "No se han podido abrir los ajustes de permisos. Abre Ajustes del Sistema y permite que Typr controle tu Mac."
 
 #: src/hooks/useProjectBriefRefresh.ts:122
 msgid "Couldn’t refresh brief"
@@ -2186,6 +2203,10 @@ msgstr "No se pudo iniciar Ask"
 #: src/routes/app.ask.tsx:97
 msgid "Couldn’t start new chat"
 msgstr "No se pudo iniciar un nuevo chat"
+
+#: src/components/call-end-bridge.tsx:120
+msgid "Couldn’t update call controls. Try again."
+msgstr "No se pudieron actualizar los controles de la llamada. Vuelve a intentarlo."
 
 #: src/routes/app.projects.$projectId.tsx:170
 msgid "Couldn’t update project"
@@ -2490,8 +2511,8 @@ msgstr "No transcribir"
 msgid "Download"
 msgstr "Descargar"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:197
-#: src/components/transcript/actions/STTLanguageSelector.tsx:198
+#: src/components/transcript/actions/STTLanguageSelector.tsx:200
+#: src/components/transcript/actions/STTLanguageSelector.tsx:201
 msgid "Download {size}"
 msgstr "Descargar {size}"
 
@@ -3002,6 +3023,10 @@ msgstr "Busca notas y acciones..."
 msgid "Finish setup"
 msgstr "Finalizar configuración"
 
+#: src/components/call-end-bridge.tsx:77
+msgid "Finishing recording…"
+msgstr "Finalizando la grabación…"
+
 #: src/lib/language-labels.ts:17
 msgid "Finnish"
 msgstr "Finés"
@@ -3310,6 +3335,11 @@ msgstr "Invitar miembros"
 msgid "Invited Only"
 msgstr "Solo invitados"
 
+#: src/components/call-end-bridge.tsx:38
+#: src/components/call-end-bridge.tsx:75
+msgid "Is your call still going?"
+msgstr "¿Sigues en la llamada?"
+
 #: src/lib/language-labels.ts:25
 msgid "Italian"
 msgstr "Italiano"
@@ -3339,6 +3369,10 @@ msgstr "Juan Pérez"
 #: src/components/editor-area/note-header/chips/event-chip.tsx:231
 msgid "Join meeting"
 msgstr "Unirse a la reunión"
+
+#: src/components/call-end-bridge.tsx:111
+msgid "Keep recording"
+msgstr "Seguir grabando"
 
 #: src/components/settings/components/ai/llm-local-view.tsx:334
 msgid "Key configured"
@@ -3426,6 +3460,15 @@ msgstr "Línea {start}"
 #: src/components/ui/inline-citation.tsx:28
 msgid "Lines {start}-{end}"
 msgstr "Líneas {start}-{end}"
+
+#: src/components/settings/views/notifications.tsx:155
+msgid "Link a recording to Zoom, Teams, or Google Meet. Recording stops two minutes after the call ends, unless you rejoin. If we’re unsure the call ended, we’ll ask before stopping."
+msgstr "Vincula una grabación a Zoom, Teams o Google Meet. La grabación se detiene dos minutos después de que termine la llamada, a menos que vuelvas a unirte. Si no estamos seguros de que haya terminado, te preguntaremos antes de detener la grabación."
+
+#: src/components/call-end-bridge.tsx:36
+#: src/components/call-end-bridge.tsx:73
+msgid "Link this recording to a call?"
+msgstr "¿Vincular esta grabación a una llamada?"
 
 #: src/components/right-panel/views/transcript-view.tsx:359
 msgid "Listening. Text appears after speech pauses."
@@ -3652,6 +3695,10 @@ msgstr "Más modelos"
 #: src/components/editor-area/note-header/transcription-bar.tsx:192
 msgid "More settings"
 msgstr "Más ajustes"
+
+#: src/components/call-end-bridge.tsx:97
+msgid "More than one call is open in the same app. Keep only the call you want to link open, or keep recording independently."
+msgstr "Hay más de una llamada abierta en la misma app. Deja abierta solo la llamada que quieres vincular o sigue grabando de forma independiente."
 
 #: src/components/transcript/actions/TranscriptActionBar.tsx:158
 #: src/components/transcript/actions/TranscriptActionBar.tsx:159
@@ -4094,6 +4141,10 @@ msgstr "Abrir en nueva ventana"
 msgid "Open note actions menu"
 msgstr "Abrir el menú de acciones de la nota"
 
+#: src/components/call-end-permission.tsx:31
+msgid "Open permission settings"
+msgstr "Abrir ajustes de permisos"
+
 #: src/components/ask/ask-conversation-toolbar.tsx:176
 #: src/components/ask/ask-conversation-toolbar.tsx:177
 msgid "Open project"
@@ -4126,9 +4177,9 @@ msgstr "Abrir ajustes"
 #: src/components/settings/views/sound.tsx:134
 #: src/components/toast/shared.tsx:413
 #: src/components/toast/shared.tsx:463
-#: src/components/transcript/actions/STTLanguageSelector.tsx:222
-#: src/components/transcript/actions/STTLanguageSelector.tsx:223
-#: src/components/transcript/actions/STTLanguageSelector.tsx:241
+#: src/components/transcript/actions/STTLanguageSelector.tsx:225
+#: src/components/transcript/actions/STTLanguageSelector.tsx:226
+#: src/components/transcript/actions/STTLanguageSelector.tsx:244
 #: src/components/welcome-modal/audio-permissions-view.tsx:137
 msgid "Open Settings"
 msgstr "Abrir configuración"
@@ -4144,6 +4195,10 @@ msgstr "Abrir transcripción"
 #: src/data/shortcuts.ts:46
 msgid "Open transcript panel"
 msgstr "Abrir panel de transcripción"
+
+#: src/components/call-end-bridge.tsx:42
+msgid "Open Typr to choose what happens to this recording."
+msgstr "Abre Typr para decidir qué hacer con esta grabación."
 
 #: src/components/settings/components/ai/llm-custom-view.tsx:175
 msgid "OpenAI"
@@ -4633,6 +4688,14 @@ msgstr "No se pudo iniciar la grabación. Verifica tu configuración de audio."
 msgid "Recording too short"
 msgstr "Grabación demasiado corta"
 
+#: src/components/call-end-bridge.tsx:41
+msgid "Recording will stop soon. Open Typr to keep recording."
+msgstr "La grabación se detendrá pronto. Abre Typr para seguir grabando."
+
+#: src/components/call-end-bridge.tsx:87
+msgid "Recording will stop when the countdown ends. Rejoining the call cancels it."
+msgstr "La grabación se detendrá cuando termine la cuenta atrás. Si vuelves a unirte a la llamada, se cancela."
+
 #: src/components/transcript/actions/MicrophoneSelector.tsx:184
 msgid "Refresh"
 msgstr "Actualizar"
@@ -4803,8 +4866,8 @@ msgstr "Reanudar grabación"
 #: src/components/settings/components/ai/task-defaults.tsx:349
 #: src/components/toast/shared.tsx:181
 #: src/components/toast/shared.tsx:262
-#: src/components/transcript/actions/STTLanguageSelector.tsx:209
-#: src/components/transcript/actions/STTLanguageSelector.tsx:210
+#: src/components/transcript/actions/STTLanguageSelector.tsx:212
+#: src/components/transcript/actions/STTLanguageSelector.tsx:213
 #: src/components/ui/ai-setup-indicator.tsx:32
 #: src/components/ui/model-selector.tsx:347
 #: src/components/welcome-modal/download-progress-view.tsx:166
@@ -4868,6 +4931,10 @@ msgstr "Modelo guardado"
 #: src/components/projects/project-files-dropzone.tsx:124
 msgid "Saving"
 msgstr "Guardando"
+
+#: src/components/call-end-bridge.tsx:86
+msgid "Saving the rest of your transcript."
+msgstr "Guardando el resto de la transcripción."
 
 #: src/components/projects/project-files-dropzone.tsx:112
 #: src/components/settings/views/profile.tsx:298
@@ -5246,6 +5313,10 @@ msgstr "Mostrar recordatorio de consentimiento de transcripción"
 msgid "Show upcoming events in sidebar"
 msgstr "Mostrar próximos eventos en la barra lateral"
 
+#: src/components/settings/views/notifications.tsx:132
+msgid "Shows a notification when a call is detected."
+msgstr "Muestra una notificación cuando se detecta una llamada."
+
 #: src/components/toolbar/buttons/right-sidebar-button.tsx:66
 msgid "Sidebar"
 msgstr "Barra lateral"
@@ -5401,6 +5472,10 @@ msgstr "Detener y resumir la transcripción"
 msgid "Stop generating"
 msgstr "Detener generación"
 
+#: src/components/call-end-bridge.tsx:116
+msgid "Stop now"
+msgstr "Detener ahora"
+
 #: src/components/transcript/actions/STTLanguageSelector.tsx:136
 msgid "Stop or pause recording to change transcription model"
 msgstr "Detener o pausar la grabación para cambiar modelo de transcripción"
@@ -5408,6 +5483,10 @@ msgstr "Detener o pausar la grabación para cambiar modelo de transcripción"
 #: src/routes/app.control.tsx:208
 msgid "Stop Recording"
 msgstr "Detener grabación"
+
+#: src/components/settings/views/notifications.tsx:153
+msgid "Stop recording after a call"
+msgstr "Detener la grabación tras una llamada"
 
 #: src/components/meeting-assistant/floating-assistant.tsx:361
 #: src/components/meeting-assistant/floating-dock-variant.tsx:170
@@ -5699,6 +5778,10 @@ msgstr "Esta configuración solo afecta a los modelos de transcripción sin cone
 msgid "This video doesn't have captions available"
 msgstr "Este vídeo no tiene subtítulos disponibles"
 
+#: src/components/call-end-bridge.tsx:90
+msgid "Time until recording stops"
+msgstr "Tiempo hasta que se detenga la grabación"
+
 #. placeholder {0}: startDate.toLocaleTimeString(i18n.locale || undefined, { hour: "numeric", minute: "2-digit", hour12: undefined, })
 #: src/components/toolbar/utils/content-formatter.ts:202
 #: src/components/toolbar/utils/pdf-export.ts:251
@@ -5938,6 +6021,10 @@ msgstr "Typr: notas con IA"
 #: src/components/settings/views/integrations.tsx:138
 msgid "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
 msgstr "Typr aparece en tus conectores de Claude. Pregunta cosas como <0>\"¿Tengo notas de reunión sobre actualizaciones del proyecto?\"</0>"
+
+#: src/components/call-end-permission.tsx:27
+msgid "Typr needs Accessibility access to detect when calls end. Without access, recordings continue until you stop them."
+msgstr "Typr necesita permiso de Accesibilidad para detectar cuándo terminan las llamadas. Sin este permiso, las grabaciones continúan hasta que las detengas."
 
 #: src/components/editor-area/index.tsx:889
 msgid "Typr needs at least {wordsThreshold} words to enhance your note"
@@ -6255,6 +6342,11 @@ msgstr "Ver demostración de transcripción en directo (30 segundos)"
 #: src/components/right-panel/views/transcript-view.tsx:581
 msgid "Watch the demo video above to see how Typr transcription works!"
 msgstr "¡Mira el video de demostración arriba para ver cómo funciona la transcripción de Typr!"
+
+#. placeholder {0}: prompt.source.label
+#: src/components/call-end-bridge.tsx:84
+msgid "We can’t confirm whether {0} ended. Recording will continue until you choose."
+msgstr "No podemos confirmar si {0} ha terminado. La grabación continuará hasta que decidas."
 
 #: src/components/error-modal.tsx:44
 msgid "We encountered an unexpected error. The error has been automatically reported to our team."

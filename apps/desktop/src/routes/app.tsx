@@ -8,6 +8,7 @@ import { commands as dbCommands } from "@typr/plugin-db";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { ContextPane } from "@/components/app-shell/context-pane";
+import { CallEndBridge } from "@/components/call-end-bridge";
 import { PrimaryRail } from "@/components/app-shell/primary-rail";
 import { SHELL_CHROME_MAC_LEADING_INSET_CLASS } from "@/components/app-shell/titlebar-layout";
 import { PANEL_HANDLE_TRANSITION } from "@/components/app-shell/transitions";
@@ -120,6 +121,7 @@ function Component() {
           <LayoutProvider>
             <InitializeDefaultModels />
             {isMain && <TranscriptionFallbackBridge />}
+            {isMain && <CallEndBridge />}
             <MainWindowStateEventSupport />
             <ShortcutsProvider>
               <SettingsDialogProvider>
