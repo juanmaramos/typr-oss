@@ -1,87 +1,111 @@
-import { customEndpointEnabledQueryOptions } from "@/lib/model-selection";
-import { useMemo } from "react";
-
+import { useQuery } from "@tanstack/react-query";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { AUTO_CLOUD_MODEL_ID } from "@typr/utils";
-import { useQuery } from "@tanstack/react-query";
 
+import { cloudModelAvailability, localModelAvailability, modelAvailability } from "@/lib/model-availability";
+import {
+  cloudChatModelQueryOptions,
+  customEndpointEnabledQueryOptions,
+  localChatModelQueryOptions,
+} from "@/lib/model-selection";
 import {
   getCloudProviderIdFromModelId,
   hasAnyCloudApiKey,
   hasCloudApiKey,
   useCloudApiKeys,
 } from "./cloud-model-catalog";
-import { useCloudModelSelection } from "./useCloudModelSelection";
-import { useModelRegistry } from "./useModelRegistry";
+import { useModelLifecycle } from "./useModelState";
+import { usePlatform } from "./usePlatform";
 
-function hasText(value: string | null | undefined): boolean {
-  return typeof value === "string" && value.trim().length > 0;
-}
-
-/**
- * Single source of truth for AI model availability across UI surfaces.
- *
- * A model is considered usable if any of these are true:
- * - a local LLM model is downloaded
- * - a cloud model is selected and the matching provider API key exists
- * - Auto mode can resolve to at least one configured provider API key
- * - custom endpoint mode is enabled and has connection + model configured
- */
+/** Mirrors connector routing: selected cloud, Auto's configured cloud, custom endpoint, selected local. */
 export function useAIAvailability() {
-  const { downloadedModels, downloadingModels, isLoading: localModelsLoading } = useModelRegistry();
-  const { hasCloudSelection, isLoading: cloudSelectionLoading, selectedCloudModelId } = useCloudModelSelection();
-  const cloudApiKeysQuery = useCloudApiKeys();
-
-  const customEnabledQuery = useQuery(customEndpointEnabledQueryOptions());
-
-  const customConnectionQuery = useQuery({
+  const lifecycle = useModelLifecycle("llm");
+  const platform = usePlatform();
+  const localSelection = useQuery(localChatModelQueryOptions());
+  const cloudSelection = useQuery(cloudChatModelQueryOptions());
+  const keys = useCloudApiKeys();
+  const customEnabled = useQuery(customEndpointEnabledQueryOptions());
+  const customConnection = useQuery({
     queryKey: ["custom-llm-connection"],
     queryFn: () => connectorCommands.getCustomLlmConnection(),
-    staleTime: 30 * 1000,
+    staleTime: 30_000,
   });
-
-  const customModelQuery = useQuery({
+  const customModel = useQuery({
     queryKey: ["custom-llm-model"],
     queryFn: () => connectorCommands.getCustomLlmModel(),
-    staleTime: 30 * 1000,
+    staleTime: 30_000,
   });
-
-  const hasLocalModel = downloadedModels.length > 0;
-  const isLocalModelDownloading = downloadingModels.length > 0;
-  const isPro = true;
-
-  const hasCustomEndpoint = useMemo(() => {
-    const customEnabled = customEnabledQuery.data === true;
-    const hasCustomApiBase = hasText(customConnectionQuery.data?.api_base);
-    const hasCustomModel = hasText(customModelQuery.data);
-
-    return customEnabled && hasCustomApiBase && hasCustomModel;
-  }, [customConnectionQuery.data?.api_base, customEnabledQuery.data, customModelQuery.data]);
-
-  const selectedProvider = getCloudProviderIdFromModelId(selectedCloudModelId);
-  const hasSelectedProviderKey = selectedProvider
-    ? hasCloudApiKey(cloudApiKeysQuery.data, selectedProvider)
-    : false;
-  const hasAutoCloudModel = selectedCloudModelId === AUTO_CLOUD_MODEL_ID
-    && hasAnyCloudApiKey(cloudApiKeysQuery.data);
-  const hasCloudModel = (hasCloudSelection && hasSelectedProviderKey) || hasAutoCloudModel;
-
-  const isCheckingAvailability = localModelsLoading
-    || cloudSelectionLoading
-    || cloudApiKeysQuery.isLoading
-    || customEnabledQuery.isLoading
-    || customConnectionQuery.isLoading
-    || customModelQuery.isLoading;
-
-  const hasUsableModel = hasLocalModel || hasCloudModel || hasCustomEndpoint;
-
+  const selectedCloud = cloudSelection.data ?? "";
+  const provider = getCloudProviderIdFromModelId(selectedCloud);
+  const hasCloudModel = selectedCloud === AUTO_CLOUD_MODEL_ID
+    ? hasAnyCloudApiKey(keys.data)
+    : !!provider && hasCloudApiKey(keys.data, provider);
+  const hasCustomEndpoint = customEnabled.data === true && !!customConnection.data?.api_base.trim()
+    && !!customModel.data?.trim();
+  const availability = (() => {
+    if (cloudSelection.isError) {
+      return modelAvailability("error", "selection-read-failed");
+    }
+    if (cloudSelection.isPending) {
+      return modelAvailability("checking");
+    }
+    if (selectedCloud && selectedCloud !== AUTO_CLOUD_MODEL_ID) {
+      return provider ? cloudModelAvailability(keys, hasCloudModel) : modelAvailability("unavailable", "unknown-model");
+    }
+    if (selectedCloud === AUTO_CLOUD_MODEL_ID) {
+      const cloud = cloudModelAvailability(keys, hasCloudModel);
+      if (cloud.status !== "needs-api-key") {
+        return cloud;
+      }
+    }
+    if (customEnabled.isError) {
+      return modelAvailability("error", "configuration-read-failed");
+    }
+    if (customEnabled.isPending) {
+      return modelAvailability("checking");
+    }
+    if (customEnabled.data) {
+      if (customConnection.isError || customModel.isError) {
+        return modelAvailability("error", "configuration-read-failed");
+      }
+      if (customConnection.isPending || customModel.isPending) {
+        return modelAvailability("checking");
+      }
+      return modelAvailability(
+        hasCustomEndpoint ? "ready" : "unavailable",
+        hasCustomEndpoint ? "custom-endpoint" : "endpoint-configuration-required",
+      );
+    }
+    if (platform.isError) {
+      return modelAvailability("error", "platform-read-failed");
+    }
+    if (platform.isLoading) {
+      return modelAvailability("checking");
+    }
+    if (!platform.supportsLocalModels) {
+      return modelAvailability("needs-api-key");
+    }
+    if (localSelection.isError) {
+      return modelAvailability("error", "selection-read-failed");
+    }
+    if (localSelection.isPending) {
+      return modelAvailability("checking");
+    }
+    return localModelAvailability(lifecycle, lifecycle.getModel(localSelection.data));
+  })();
+  const retry = () =>
+    Promise.all([
+      platform.refetch(),
+      lifecycle.refetch(),
+      localSelection.refetch(),
+      cloudSelection.refetch(),
+      keys.refetch(),
+      customEnabled.refetch(),
+      customConnection.refetch(),
+      customModel.refetch(),
+    ]);
   return {
-    hasLocalModel,
-    isLocalModelDownloading,
-    hasCloudModel,
-    hasCustomEndpoint,
-    isPro,
-    hasUsableModel,
-    isCheckingAvailability,
+    availability,
+    retry,
   };
 }

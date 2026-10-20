@@ -7,9 +7,10 @@ import { motion } from "motion/react";
 import { useCallback, useState } from "react";
 
 import { MODEL_CATEGORY_ICONS } from "@/components/transcript/constants/languageData";
-import { useTypr, useRightPanel } from "@/contexts";
+import { useRightPanel, useTypr } from "@/contexts";
 import { useSettingsDialog } from "@/contexts/settings-dialog";
-import { useModelState } from "@/hooks/useModelState";
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
+import { useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
 import { AUDIO_EXTENSIONS, useUploadAudio } from "@/hooks/useUploadAudio";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { Button } from "@typr/ui/components/ui/button";
@@ -30,10 +31,9 @@ export function AudioUploadDialog({ open, onOpenChange, sessionId: externalSessi
   const { userId } = useTypr();
   const { showFloatingDock } = useRightPanel();
   const { openDialog } = useSettingsDialog();
-  const { isSttModelAvailable, isSttLoading, selectedCloudModel, models } = useModelState();
-  const anyLocalModelDownloaded = models.some(m => m.isDownloaded);
-  // Cloud model users don't need a local model downloaded
-  const needsLocalModel = !isSttLoading && !anyLocalModelDownloaded && !selectedCloudModel;
+  const { selectedModel, availability, retry } = useTranscriptionAvailability("recorded");
+  const statusLabel = useModelAvailabilityLabel();
+  const isCloudModel = selectedModel?.toLowerCase().includes("assemblyai") ?? false;
 
   const [resolvedSessionId, setResolvedSessionId] = useState<string | null>(externalSessionId ?? null);
   const [selectedFile, setSelectedFile] = useState<{ path: string; name: string } | null>(null);
@@ -146,15 +146,7 @@ export function AudioUploadDialog({ open, onOpenChange, sessionId: externalSessi
       return;
     }
 
-    // Gate 1: No model at all
-    if (!isSttLoading && !isSttModelAvailable) {
-      toast({
-        id: "audio-upload-no-model",
-        title: t`No transcription model available`,
-        content: t`Download a speech-to-text model to transcribe audio files.`,
-        buttons: [{ label: t`Open Settings`, onClick: () => openDialog("ai", null, "transcription") }],
-        dismissible: true,
-      });
+    if (!availability.canStart || isProcessing) {
       return;
     }
 
@@ -296,9 +288,9 @@ export function AudioUploadDialog({ open, onOpenChange, sessionId: externalSessi
           </motion.div>
 
           {/* Active model info */}
-          {isSttModelAvailable && !isSttLoading && !needsLocalModel && (
+          {availability.canStart && (
             <div className="flex flex-col gap-1 px-1 text-xs text-muted-foreground/70">
-              {selectedCloudModel
+              {isCloudModel
                 ? (
                   <>
                     <div className="flex items-center gap-2">
@@ -334,24 +326,17 @@ export function AudioUploadDialog({ open, onOpenChange, sessionId: externalSessi
             </div>
           )}
 
-          {/* No local model warning */}
-          {needsLocalModel && (
-            <div className="flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2.5 text-xs text-destructive">
-              <i className="ri-error-warning-line text-sm mt-0.5 shrink-0" />
-              <div>
-                <Trans>
-                  Audio upload requires a downloaded local model.{" "}
-                  <button
-                    type="button"
-                    className="underline underline-offset-2 font-medium"
-                    onClick={() => openDialog("ai", null, "transcription")}
-                  >
-                    Download one in Settings
-                  </button>
-                </Trans>
-              </div>
-            </div>
-          )}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground" role="status">
+            <span>{statusLabel(availability)}</span>
+            {availability.canRetry && (
+              <Button variant="ghost" size="sm" onClick={() => void retry()}>
+                <Trans>Retry</Trans>
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={() => openDialog("ai", null, "transcription")}>
+              <Trans>Open Settings</Trans>
+            </Button>
+          </div>
 
           {/* Already processing warning */}
           {isProcessing && (
@@ -368,7 +353,7 @@ export function AudioUploadDialog({ open, onOpenChange, sessionId: externalSessi
             <Button variant="outline" onClick={handleCancel}>
               <Trans>Cancel</Trans>
             </Button>
-            <Button onClick={handleProcess} disabled={!selectedFile || isProcessing || needsLocalModel}>
+            <Button onClick={handleProcess} disabled={!selectedFile || isProcessing || !availability.canStart}>
               <Trans>Transcribe</Trans>
             </Button>
           </div>

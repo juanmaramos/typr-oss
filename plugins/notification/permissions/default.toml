@@ -1,6 +1,14 @@
 [default]
 description = "Default permissions for the plugin"
 permissions = [
+  "allow-open-call-detection-settings",
+  "allow-show-call-end-notification",
+  "allow-get-call-end-enabled",
+  "allow-set-call-end-enabled",
+  "allow-get-call-end-status",
+  "allow-associate-call",
+  "allow-keep-recording",
+  "allow-stop-associated-recording",
   "allow-get-event-notification",
   "allow-set-event-notification",
   "allow-get-detect-notification",

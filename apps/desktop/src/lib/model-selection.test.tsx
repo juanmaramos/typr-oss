@@ -16,6 +16,9 @@ const native = vi.hoisted(() => ({
   runningStt: false,
   unavailableStt: new Set<string>(),
   noDownloadedModels: false,
+  lifecycleStatus: "ready" as "ready" | "checking" | "error",
+  lifecycleRetries: 0,
+  registryStatus: "ready" as "ready" | "checking" | "read-error" | "download-error" | "runtime-error",
   defaults: { project_brief_model_id: null, meeting_summary_model_id: null } as {
     project_brief_model_id: string | null;
     meeting_summary_model_id: string | null;
@@ -43,10 +46,37 @@ vi.mock("@typr/plugin-connector", () => ({
       native.defaults = defaults;
     }),
     getAssemblyaiApiKey: vi.fn(async () => "configured-key"),
+    getOpenaiApiKey: vi.fn(async () => ""),
+    getGroqApiKey: vi.fn(async () => ""),
+    getOpenrouterApiKey: vi.fn(async () => ""),
   },
 }));
 vi.mock("@typr/plugin-local-stt", () => ({
   commands: {
+    listModelCapabilities: vi.fn(async () =>
+      [
+        "QuantizedTiny",
+        "QuantizedTinyEn",
+        "QuantizedBase",
+        "QuantizedBaseEn",
+        "QuantizedSmall",
+        "QuantizedSmallEn",
+        "QuantizedLargeTurbo",
+        "DistilLargeV35En",
+        "Nemotron3p5Streaming",
+      ].map(model => ({
+        model,
+        backend: model === "Nemotron3p5Streaming" ? "NemotronStreaming" : "Whisper",
+        available: true,
+        realtime: model === "Nemotron3p5Streaming",
+        recorded: model !== "Nemotron3p5Streaming",
+        size_bytes: 1,
+        supported_languages: null,
+        supported_locales: null,
+        live_fallback_models: [],
+        recorded_fallback_models: [],
+      }))
+    ),
     getCurrentModel: vi.fn(async () =>
       native.stt === "assemblyai-universal" ? "QuantizedLargeTurbo" : native.stt || "QuantizedBaseEn"
     ),
@@ -89,8 +119,42 @@ vi.mock("@/contexts", () => ({ useTypr: () => ({ userId: null }) }));
 vi.mock("@/utils/analytics-safe", () => ({ safeAnalyticsEvent: vi.fn() }));
 vi.mock("@/utils/open-settings-window", () => ({ openSettingsWindow: vi.fn() }));
 vi.mock("@/components/utils/debug-logger", () => ({ debugLogFor: vi.fn() }));
-vi.mock("@/hooks/usePlatform", () => ({ usePlatform: () => ({ supportsLocalModels: true }) }));
+vi.mock("@/hooks/usePlatform", () => ({ usePlatform: () => ({ supportsLocalModels: true, refetch: vi.fn() }) }));
 vi.mock("@/hooks/useModelState", () => ({
+  useModelLifecycle: (domain: "stt" | "llm") => {
+    const ids = domain === "stt"
+      ? [
+        "QuantizedTiny",
+        "QuantizedTinyEn",
+        "QuantizedBase",
+        "QuantizedBaseEn",
+        "QuantizedSmall",
+        "QuantizedSmallEn",
+        "QuantizedLargeTurbo",
+        "DistilLargeV35En",
+        "Nemotron3p5Streaming",
+      ]
+      : ["Gemma4E4b"];
+    const data = Object.fromEntries(ids.map(id => [id, {
+      id,
+      isDownloaded: !native.noDownloadedModels && !native.unavailableStt.has(id),
+      isDownloading: false,
+      isLoading: false,
+      isReady: false,
+      progress: 0,
+      lastUpdated: 0,
+    }]));
+    return {
+      data: native.lifecycleStatus === "checking" ? undefined : data,
+      getModel: (id: string) => data[id],
+      isPending: native.lifecycleStatus === "checking",
+      isError: native.lifecycleStatus === "error",
+      error: native.lifecycleStatus === "error" ? new Error("native read failed") : null,
+      refetch: async () => {
+        native.lifecycleRetries++;
+      },
+    };
+  },
   useModelState: () => ({
     isLoading: false,
     getModel: (id: string) => ({
@@ -100,10 +164,39 @@ vi.mock("@/hooks/useModelState", () => ({
   }),
 }));
 vi.mock("@/hooks/useModelRegistry", () => ({
-  useModelRegistry: () => ({
-    selectableModels: [{ id: "Gemma4E4b", name: "Gemma 4", isDownloaded: true }],
-    isLoading: false,
-  }),
+  useModelRegistry: () => {
+    const canSelect = native.registryStatus === "ready" || native.registryStatus === "runtime-error";
+    const model = {
+      id: "Gemma4E4b",
+      name: "Gemma 4",
+      icon: "ri-google-fill",
+      isDownloaded: canSelect,
+      show_in_selector: true,
+      availability: {
+        status: native.registryStatus === "checking"
+          ? "checking"
+          : native.registryStatus === "ready"
+          ? "ready"
+          : "error",
+        reason: native.registryStatus,
+        canStart: canSelect,
+        canSelect,
+        canDownload: native.registryStatus === "download-error",
+        canConfigure: true,
+        canRetry: native.registryStatus.endsWith("error"),
+        progress: 0,
+      },
+    };
+    return {
+      models: [model],
+      selectableModels: [model],
+      isLoading: native.registryStatus === "checking",
+      error: native.registryStatus === "read-error" ? new Error("metadata read failed") : null,
+      refetch: () => {
+        native.lifecycleRetries++;
+      },
+    };
+  },
 }));
 vi.mock("@/hooks/useOpenAIModels", () => ({ useOpenAIModels: () => ({ models: [], isLoading: false }) }));
 vi.mock("@/hooks/useGroqModels", () => ({ useGroqModels: () => ({ models: [], isLoading: false }) }));
@@ -133,11 +226,12 @@ vi.mock("@typr/ui/components/ui/select", () => {
       return <button disabled={disabled} data-option={value} onClick={() => change(value)}>{children}</button>;
     },
     SelectContent: Container,
-    SelectTrigger: Container,
+    SelectTrigger: ({ children }: { children: ReactNode }) => <div data-testid="model-trigger">{children}</div>,
     SelectValue: Container,
   };
 });
 
+import { LLMLocalView } from "@/components/settings/components/ai/llm-local-view";
 import { STTView } from "@/components/settings/components/ai/stt-view";
 import { AiTaskDefaultsSettings } from "@/components/settings/components/ai/task-defaults";
 import ModelDownloadNotification from "@/components/toast/model-download";
@@ -151,6 +245,7 @@ import { commands as connector } from "@typr/plugin-connector";
 import { commands as llm } from "@typr/plugin-local-llm";
 import { commands as stt } from "@typr/plugin-local-stt";
 import { sonnerToast, toast } from "@typr/ui/components/ui/toast";
+import { modelLifecycleKey } from "./model-lifecycle";
 import {
   cloudChatModelQueryOptions,
   getModelSelectionController,
@@ -174,8 +269,7 @@ function Pickers() {
             {
               key: "QuantizedLargeTurbo",
               name: "Turbo",
-              accuracy: 3,
-              speed: 3,
+
               size: "574 MB",
               downloaded: true,
               fileName: "",
@@ -183,14 +277,12 @@ function Pickers() {
             {
               key: "DistilLargeV35En",
               name: "English",
-              accuracy: 3,
-              speed: 3,
+
               size: "1.5 GB",
               downloaded: true,
               fileName: "",
             },
           ]}
-          downloadingModels={new Set()}
           handleModelDownload={async () => {}}
           handleShowFileLocation={async () => {}}
           supportsLocalModels
@@ -234,6 +326,9 @@ beforeEach(() => {
   native.runningStt = false;
   native.unavailableStt.clear();
   native.noDownloadedModels = false;
+  native.lifecycleStatus = "ready";
+  native.lifecycleRetries = 0;
+  native.registryStatus = "ready";
   native.defaults = { project_brief_model_id: null, meeting_summary_model_id: null };
   native.listeners.clear();
   queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -252,6 +347,101 @@ afterEach(async () => {
 });
 
 describe("model selection ownership", () => {
+  it("keeps default picker icons synchronized with Chat selection and distinct from inherited tasks", async () => {
+    await render(<AiTaskDefaultsSettings />);
+    const triggers = () => [...container.querySelectorAll("[data-testid=\"model-trigger\"]")];
+    await settle(() => expect(triggers()[0].textContent).toBe("Auto"));
+    expect(triggers()[0].querySelector(".ri-sparkling-fill[aria-hidden=\"true\"]")).not.toBeNull();
+    for (const trigger of triggers().slice(1, 3)) {
+      expect(trigger.textContent).toBe("Follow Chat and Ask");
+      expect(trigger.querySelector(".ri-chat-ai-line[aria-hidden=\"true\"]")).not.toBeNull();
+      expect(trigger.querySelector(".ri-google-fill")).toBeNull();
+    }
+    const localOption = container.querySelector("[data-option=\"local-Gemma4E4b\"]") as HTMLButtonElement;
+    await act(async () => localOption.click());
+    await settle(() => expect(triggers()[0].textContent).toBe("Gemma 4"));
+    expect(triggers()[0].querySelector(".ri-google-fill[aria-hidden=\"true\"]")).not.toBeNull();
+    expect(triggers()[0].querySelector(".ri-sparkling-fill")).toBeNull();
+    expect(triggers()[3].querySelector("[data-stt-provider=\"OpenAI\"]")).not.toBeNull();
+    const autoOption = container.querySelector("[data-option=\"auto\"]") as HTMLButtonElement;
+    await act(async () => autoOption.click());
+    await settle(() => expect(triggers()[0].textContent).toBe("Auto"));
+    expect(triggers()[0].querySelector(".ri-sparkling-fill")).not.toBeNull();
+    expect(triggers()[0].querySelector(".ri-google-fill")).toBeNull();
+  });
+
+  it("shows semantic icons for Auto task overrides and saved models absent from the catalog", async () => {
+    native.defaults = { project_brief_model_id: "auto", meeting_summary_model_id: "openai-saved-model" };
+    await render(<AiTaskDefaultsSettings />);
+    await settle(() => {
+      const triggers = [...container.querySelectorAll("[data-testid=\"model-trigger\"]")];
+      expect(triggers[1].textContent).toBe("Auto");
+      expect(triggers[1].querySelector(".ri-sparkling-fill")).not.toBeNull();
+      expect(triggers[2].textContent).toBe("saved-model");
+      expect(triggers[2].querySelector(".ri-robot-line")).not.toBeNull();
+    });
+  });
+
+  it("keeps local chat downloads unavailable while lifecycle data is checking", async () => {
+    native.registryStatus = "checking";
+    await render(
+      <LLMLocalView handleModelDownload={async () => {}} handleShowFileLocation={async () => {}} supportsLocalModels />,
+    );
+    expect(container.querySelector(".ri-download-line")).toBeNull();
+    expect(container.textContent).toContain("Loading models");
+  });
+
+  it.each(["read-error", "download-error", "runtime-error"] as const)(
+    "retries local chat %s through the appropriate central action",
+    async status => {
+      native.registryStatus = status;
+      const download = vi.fn(async () => {});
+      await render(
+        <LLMLocalView handleModelDownload={download} handleShowFileLocation={async () => {}} supportsLocalModels />,
+      );
+      const retry = [...container.querySelectorAll("button")].find(button =>
+        button.textContent === "Retry"
+      ) as HTMLButtonElement;
+      expect(retry).toBeDefined();
+      await act(async () => retry.click());
+      if (status === "download-error") {
+        expect(download).toHaveBeenCalledWith("Gemma4E4b");
+      } else if (status === "runtime-error") {
+        expect(llm.setCurrentModel).toHaveBeenCalledWith("Gemma4E4b");
+      } else {
+        expect(native.lifecycleRetries).toBeGreaterThan(0);
+      }
+    },
+  );
+
+  it("shows checking state rather than missing downloads and prevents unknown defaults selection", async () => {
+    native.lifecycleStatus = "checking";
+    await render(<Pickers />);
+    await settle(() => expect(container.querySelector("[data-option=\"DistilLargeV35En\"]")).not.toBeNull());
+    const option = container.querySelector("[data-option=\"DistilLargeV35En\"]") as HTMLButtonElement;
+    expect(option.disabled).toBe(true);
+    expect(option.textContent).not.toContain("Not downloaded");
+    const cards = container.querySelector("[data-testid=\"stt-cards\"]")!;
+    expect([...cards.querySelectorAll("button")].some(button => button.textContent === "Use")).toBe(false);
+    expect(cards.querySelector(".ri-download-line")).toBeNull();
+    expect(cards.querySelector(".ri-loader-4-line")).not.toBeNull();
+  });
+
+  it("offers a read retry instead of Download or Use when the native lifecycle snapshot fails", async () => {
+    native.lifecycleStatus = "error";
+    await render(<Pickers />);
+    await settle(() => expect(container.querySelector("[data-option=\"DistilLargeV35En\"]")).not.toBeNull());
+    const cards = container.querySelector("[data-testid=\"stt-cards\"]")!;
+    const retry = [...cards.querySelectorAll("button")].find(button =>
+      button.textContent === "Retry"
+    ) as HTMLButtonElement;
+    expect(retry).toBeDefined();
+    expect(cards.querySelector(".ri-download-line")).toBeNull();
+    expect((container.querySelector("[data-option=\"DistilLargeV35En\"]") as HTMLButtonElement).disabled).toBe(true);
+    await act(async () => retry.click());
+    expect(native.lifecycleRetries).toBeGreaterThan(0);
+  });
+
   it("keeps the real transcription Use card and Defaults picker synchronized in both directions", async () => {
     await render(<Pickers />);
     await settle(() => expect(container.querySelector("[data-option=\"DistilLargeV35En\"]")).not.toBeNull());
@@ -266,7 +456,7 @@ describe("model selection ownership", () => {
     );
     await settle(() => expect(container.querySelector("[data-selection=\"QuantizedLargeTurbo\"]")).not.toBeNull());
     const cards = container.querySelector("[data-testid=\"stt-cards\"]")!;
-    const turbo = [...cards.querySelectorAll("span")].find(span => span.textContent === "Large")!;
+    const turbo = [...cards.querySelectorAll("span")].find(span => span.textContent === "Whisper Large v3 Turbo")!;
     expect(turbo.parentElement?.parentElement?.parentElement?.textContent).toContain("Current");
     expect(stt.setCurrentModel).toHaveBeenLastCalledWith("QuantizedLargeTurbo");
   });
@@ -321,7 +511,7 @@ describe("model selection ownership", () => {
     expect(queryClient.getQueryData(modelSelectionKeys.customEndpointEnabled)).toBe(false);
   });
 
-  it("derives the correct quick-pick category and still changes a different model in the same category", async () => {
+  it("keeps the actual English model identity and still selects a different English model", async () => {
     native.stt = "QuantizedSmallEn";
     let model: ReturnType<typeof useSTTModel>;
     function LanguageSelector() {
@@ -329,7 +519,7 @@ describe("model selection ownership", () => {
       return <output>{model.selectedLanguage}</output>;
     }
     await render(<LanguageSelector />);
-    await settle(() => expect(container.textContent).toBe("english"));
+    await settle(() => expect(container.textContent).toBe("QuantizedSmallEn"));
     await act(async () => {
       model.handleLanguageChange("english");
     });
@@ -435,6 +625,27 @@ describe("model selection ownership", () => {
     native.cloud = "openai-gpt-4o";
     await controller.initializePlatformDefaults("windows");
     expect(native.cloud).toBe("openai-gpt-4o");
+  });
+
+  it.each([true, false])("retries initialization of the same failed chat model when running=%s", async running => {
+    native.runningChat = running;
+    queryClient.setQueryData(modelLifecycleKey("llm"), {
+      Gemma4E4b: {
+        id: "Gemma4E4b",
+        isDownloaded: true,
+        isDownloading: false,
+        isLoading: false,
+        isReady: false,
+        progress: 0,
+        lastUpdated: Date.now(),
+        error: "runtime initialization failed",
+      },
+    });
+    await getModelSelectionController(queryClient).selectLocalChat("Gemma4E4b");
+    expect(native.chat).toBe("Gemma4E4b");
+    expect(running ? llm.restartServer : llm.startServer).toHaveBeenCalledOnce();
+    expect(running ? llm.startServer : llm.restartServer).not.toHaveBeenCalled();
+    expect(native.cloud).toBe("");
   });
 
   it("restarts changed running models, without restarting for the same model", async () => {

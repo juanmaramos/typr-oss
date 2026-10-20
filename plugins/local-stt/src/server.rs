@@ -28,6 +28,7 @@ use crate::manager::{ConnectionGuard, ConnectionManager};
 pub struct ServerStateBuilder {
     pub model_type: Option<crate::SupportedModel>,
     pub model_cache_dir: Option<PathBuf>,
+    pub(crate) worker_paths: Option<crate::streaming::WorkerPaths>,
 }
 
 impl ServerStateBuilder {
@@ -42,16 +43,14 @@ impl ServerStateBuilder {
     }
 
     pub fn build(self) -> ServerState {
-        let model_path = self
-            .model_cache_dir
-            .unwrap()
-            .join(self.model_type.unwrap().file_name());
-
-        // Initialize manager with empty languages - actual languages come from connection params
-        let whisper_manager = crate::WhisperModelManager::new(model_path, vec![]);
+        let model = self.model_type.unwrap();
+        let model_path = self.model_cache_dir.unwrap().join(model.file_name());
 
         ServerState {
-            whisper_manager,
+            model,
+            worker_paths: self.worker_paths,
+            prepared_worker: std::sync::Arc::new(tokio::sync::Mutex::new(None)),
+            model_path,
             connection_manager: ConnectionManager::default(),
         }
     }
@@ -59,7 +58,10 @@ impl ServerStateBuilder {
 
 #[derive(Clone)]
 pub struct ServerState {
-    whisper_manager: crate::WhisperModelManager,
+    model: crate::SupportedModel,
+    pub(crate) worker_paths: Option<crate::streaming::WorkerPaths>,
+    prepared_worker: std::sync::Arc<tokio::sync::Mutex<Option<crate::streaming::WorkerClient>>>,
+    pub(crate) model_path: PathBuf,
     connection_manager: ConnectionManager,
 }
 
@@ -70,6 +72,16 @@ pub struct ServerHandle {
 }
 
 pub async fn run_server(state: ServerState) -> Result<ServerHandle, crate::Error> {
+    // Prove the model and native backend can load before audio devices open. The
+    // connector can safely fall back to Whisper here without dropping any audio.
+    if state.model.backend() == crate::SttBackend::NemotronStreaming {
+        let paths = state
+            .worker_paths
+            .as_ref()
+            .ok_or_else(|| crate::Error::NotSupported("Nemotron runtime is unavailable".into()))?;
+        let worker = crate::streaming::WorkerClient::start(paths, state.model_path.clone()).await?;
+        *state.prepared_worker.lock().await = Some(worker);
+    }
     let router = Router::new()
         .route("/health", get(health))
         .route("/api/desktop/listen/realtime", get(listen))
@@ -79,7 +91,7 @@ pub async fn run_server(state: ServerState) -> Result<ServerHandle, crate::Error
                 .allow_methods(cors::Any)
                 .allow_headers(cors::Any),
         )
-        .with_state(state);
+        .with_state(state.clone());
 
     let listener =
         tokio::net::TcpListener::bind(SocketAddr::from((Ipv4Addr::LOCALHOST, 0))).await?;
@@ -93,10 +105,12 @@ pub async fn run_server(state: ServerState) -> Result<ServerHandle, crate::Error
         shutdown: shutdown_tx,
     };
 
+    let connections = state.connection_manager.clone();
     tokio::spawn(async move {
         axum::serve(listener, router)
             .with_graceful_shutdown(async move {
                 shutdown_rx.changed().await.ok();
+                connections.cancel();
             })
             .await
             .unwrap();
@@ -128,6 +142,24 @@ async fn websocket_with_model(
     state: ServerState,
     guard: ConnectionGuard,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    if state.model.backend() == crate::SttBackend::NemotronStreaming {
+        let prepared = state.prepared_worker.lock().await.take();
+        let worker = match prepared {
+            Some(worker) => worker,
+            None => {
+                crate::streaming::WorkerClient::start(
+                    state
+                        .worker_paths
+                        .as_ref()
+                        .ok_or("Nemotron runtime is unavailable")?,
+                    state.model_path.clone(),
+                )
+                .await?
+            }
+        };
+        crate::streaming::serve(socket, worker, guard, params).await;
+        return Ok(());
+    }
     #[cfg(any(
         feature = "coreml",
         feature = "metal",
@@ -138,7 +170,7 @@ async fn websocket_with_model(
         feature = "openmp"
     ))]
     {
-        let model_path = state.whisper_manager.model_path.clone();
+        let model_path = state.model_path.clone();
         let static_prompt = params.static_prompt.clone();
         let dynamic_prompt = params.dynamic_prompt.clone();
         let static_prompt_enabled = !static_prompt.trim().is_empty();
@@ -335,6 +367,7 @@ async fn process_transcription_stream(
                 };
 
                 let data = ListenOutputChunk {
+                    update: None,
                     meta: None,
                     words: text
                         .split_whitespace()

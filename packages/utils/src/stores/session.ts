@@ -1,7 +1,7 @@
 import { create as mutate } from "mutative";
 import { createStore } from "zustand";
 
-import { commands as dbCommands, type Session } from "@typr/plugin-db";
+import { commands as dbCommands, type Session, type SessionNoteUpdate } from "@typr/plugin-db";
 import pDebounce from "p-debounce";
 
 type State = {
@@ -30,10 +30,8 @@ export type SessionStoreOptions = {
 export type SessionStore = ReturnType<typeof createSessionStore>;
 
 export const createSessionStore = (session: Session, options: SessionStoreOptions = {}) => {
-  const debouncedUpsert = pDebounce(
-    (v: Session) => dbCommands.upsertSession(v),
-    50,
-  );
+  const pendingUpdates = new Map<SessionNoteUpdate["field"], SessionNoteUpdate>();
+  let writes = Promise.resolve();
 
   const notifySessionPersisted = (session: Session) => {
     if (!options.onSessionPersisted) {
@@ -44,6 +42,33 @@ export const createSessionStore = (session: Session, options: SessionStoreOption
       console.warn("[session-store] onSessionPersisted failed", error);
     });
   };
+
+  const flushUpdates = () => {
+    const queuedUpdates = [...pendingUpdates.values()];
+    if (queuedUpdates.length === 0) {
+      return writes;
+    }
+
+    const write = writes.then(async () => {
+      // Earlier serialized writes may already have acknowledged this snapshot.
+      const updates = queuedUpdates.filter((update) => pendingUpdates.get(update.field) === update);
+      if (updates.length === 0) return;
+      const persisted = await dbCommands.updateSessionNoteFields(session.id, updates);
+      for (const update of updates) {
+        // An earlier acknowledgement must not clear a newer edit to this field.
+        if (pendingUpdates.get(update.field) === update) {
+          pendingUpdates.delete(update.field);
+        }
+      }
+      if (persisted) {
+        notifySessionPersisted(persisted);
+      }
+    });
+    // A failed write must not block subsequent edits.
+    writes = write.catch(() => {});
+    return write;
+  };
+  const debouncedFlush = pDebounce(flushUpdates, 50);
 
   return createStore<State & Actions>((set, get) => ({
     session,
@@ -105,15 +130,15 @@ export const createSessionStore = (session: Session, options: SessionStoreOption
       });
     },
     restoreEnhancedNote: async (note: string | null, showRaw?: boolean) => {
-      set((state) =>
-        mutate(state, (draft) => {
-          draft.session.enhanced_memo_html = note;
-          if (showRaw !== undefined) {
-            draft.showRaw = showRaw;
-          }
-        })
-      );
-      await get().persistSession(get().session, true);
+      const next = mutate(get(), (draft) => {
+        draft.session.enhanced_memo_html = note;
+        if (showRaw !== undefined) {
+          draft.showRaw = showRaw;
+        }
+      });
+      const persistence = get().persistSession(next.session, true);
+      set(next);
+      await persistence;
     },
     snapshotAutoEnhanced: (note: string) => {
       set((state) => {
@@ -128,22 +153,23 @@ export const createSessionStore = (session: Session, options: SessionStoreOption
       return get().session.auto_enhanced_memo_html ?? null;
     },
     persistSession: async (session?: Session, force?: boolean) => {
-      const { session: { id } } = get();
-      const sessionFromDB = await dbCommands.getSession({ id });
-      const { record_start, record_end, ...rest } = session ?? get().session;
+      // Note actions pass their next snapshot before updating local state.
+      // An omitted snapshot only flushes edits already queued by those actions.
+      if (session) {
+        const current = get().session;
+        for (const field of ["title", "raw_memo_html"] as const) {
+          if (session[field] !== current[field]) {
+            pendingUpdates.set(field, { field, value: session[field] });
+          }
+        }
+        for (const field of ["enhanced_memo_html", "auto_enhanced_memo_html", "pre_meeting_memo_html"] as const) {
+          if (session[field] !== current[field]) {
+            pendingUpdates.set(field, { field, value: session[field] });
+          }
+        }
+      }
 
-      // TODO: This is still a bit hacky - the purpose is to not overwrite the record_start/end part.
-      const item: Session = {
-        record_start: null,
-        record_end: null,
-        ...(sessionFromDB || {}),
-        ...rest,
-        words: sessionFromDB?.words ?? [],
-        needs_enhance: sessionFromDB?.needs_enhance ?? rest.needs_enhance,
-      };
-
-      const persistedSession = await (force ? dbCommands.upsertSession : debouncedUpsert)(item);
-      notifySessionPersisted(persistedSession);
+      await (force ? flushUpdates() : debouncedFlush());
     },
   }));
 };

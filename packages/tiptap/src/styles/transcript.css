@@ -20,23 +20,15 @@
 }
 
 .transcript-speaker-label {
-  font-weight: 600;
-  color: hsl(var(--foreground));
-  margin-bottom: 4px;
-  font-size: 12px;
+  @apply block text-ui-label font-medium leading-4 text-foreground mb-1;
 }
 
 .transcript-speaker-content {
-  display: inline;
-  font-size: 14px;
-  line-height: 1.5rem;
-  white-space: normal;
+  @apply block text-ui-control font-normal leading-6 whitespace-normal;
 }
 
 .tiptap-transcript {
-  font-size: 14px;
-  line-height: 1.5rem;
-  white-space: normal;
+  @apply text-ui-control leading-6 whitespace-normal;
   word-wrap: break-word;
   color: hsl(var(--foreground) / 0.9);
   text-align: left;
@@ -57,4 +49,13 @@
 
 .ProseMirror-selectednode {
   outline: 2px solid hsl(var(--primary));
+}
+
+/* Presentation-only hypotheses inherit the transcript's type scale. */
+.transcript-preview {
+  color: hsl(var(--muted-foreground));
+}
+
+.transcript-preview-empty {
+  display: none;
 }

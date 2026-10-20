@@ -7,6 +7,30 @@
 
 
 export const commands = {
+async openCallDetectionSettings() : Promise<null> {
+    return await TAURI_INVOKE("plugin:notification|open_call_detection_settings");
+},
+async showCallEndNotification(sessionId: string, title: string, message: string) : Promise<null> {
+    return await TAURI_INVOKE("plugin:notification|show_call_end_notification", { sessionId, title, message });
+},
+async getCallEndEnabled() : Promise<boolean> {
+    return await TAURI_INVOKE("plugin:notification|get_call_end_enabled");
+},
+async setCallEndEnabled(enabled: boolean) : Promise<null> {
+    return await TAURI_INVOKE("plugin:notification|set_call_end_enabled", { enabled });
+},
+async getCallEndStatus() : Promise<CallEndStatus> {
+    return await TAURI_INVOKE("plugin:notification|get_call_end_status");
+},
+async associateCall(sessionId: string, sourceId: string | null) : Promise<null> {
+    return await TAURI_INVOKE("plugin:notification|associate_call", { sessionId, sourceId });
+},
+async keepRecording(sessionId: string) : Promise<null> {
+    return await TAURI_INVOKE("plugin:notification|keep_recording", { sessionId });
+},
+async stopAssociatedRecording(sessionId: string) : Promise<null> {
+    return await TAURI_INVOKE("plugin:notification|stop_associated_recording", { sessionId });
+},
 async getEventNotification() : Promise<boolean> {
     return await TAURI_INVOKE("plugin:notification|get_event_notification");
 },
@@ -52,6 +76,8 @@ async stopEventNotification() : Promise<null> {
 
 /** user-defined types **/
 
+export type CallCandidate = { id: string; label: string }
+export type CallEndStatus = { type: "off" } | { type: "permission_required" } | { type: "idle" } | { type: "association_required"; session_id: string; candidates: CallCandidate[] } | { type: "monitoring"; session_id: string; source: CallCandidate } | { type: "uncertain"; session_id: string; source: CallCandidate } | { type: "countdown"; session_id: string; source: CallCandidate; remaining_seconds: number }
 export type NotificationPermission = "Granted" | "NotGrantedAndShouldRequest" | "NotGrantedAndShouldAskManual"
 
 /** tauri-specta globals **/

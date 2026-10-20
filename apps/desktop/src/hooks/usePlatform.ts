@@ -12,6 +12,9 @@ export function usePlatform() {
   const isLoaded = osType.data !== null && osType.data !== undefined;
 
   return {
+    refetch: osType.refetch,
+    isError: osType.isError,
+    error: osType.error,
     isWindows: osType.data === "windows",
     isMac: osType.data === "macos",
     // Default to FALSE until loaded to prevent showing local models prematurely

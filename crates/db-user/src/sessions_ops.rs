@@ -276,14 +276,14 @@ impl UserDatabase {
             }
             Some(ListSessionFilter {
                 common: ListSessionFilterCommon { user_id, limit },
-                specific: ListSessionFilterSpecific::NeedsEnhance {},
+                specific: ListSessionFilterSpecific::NeedsEnhance { exclude_ids },
             }) => {
                 conn.query(
                     &format!(
-                        "{} WHERE user_id = ? AND needs_enhance = 1 ORDER BY created_at ASC LIMIT ?",
+                        "{} WHERE user_id = ? AND needs_enhance = 1 AND (record_start IS NULL OR (record_end IS NOT NULL AND json_array_length(words) >= 5)) AND id NOT IN (SELECT value FROM json_each(?)) ORDER BY created_at ASC LIMIT ?",
                         select_columns
                     ),
-                    vec![user_id, limit.unwrap_or(10).to_string()],
+                    vec![user_id, serde_json::to_string(&exclude_ids.unwrap_or_default()).unwrap(), limit.unwrap_or(10).to_string()],
                 )
                 .await?
             }

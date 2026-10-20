@@ -1,3 +1,4 @@
+import type { ModelAvailability } from "@/lib/model-availability";
 import { Connection } from "@typr/plugin-connector";
 import { SupportedModel } from "@typr/plugin-local-llm";
 
@@ -5,6 +6,7 @@ import { SupportedModel } from "@typr/plugin-local-llm";
  * Unified model interface that represents all model types in the app
  */
 export interface ModelOption {
+  availability?: ModelAvailability;
   id: string;
   name: string;
   provider: ModelProvider;

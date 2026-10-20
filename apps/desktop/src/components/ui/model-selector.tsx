@@ -20,6 +20,7 @@ import {
   getCloudProviderLabel,
 } from "@/hooks/cloud-model-catalog";
 import { useAIAvailability } from "@/hooks/useAIAvailability";
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
 import { useAllModels, useModelSelection, useModelSelectionState } from "@/hooks/useModels";
 import { ModelOption, ModelType } from "@/types/models";
 
@@ -44,8 +45,10 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
   const [modelSearch, setModelSearch] = useState("");
   const queryClient = useQueryClient();
 
-  const { allModels, selectedModel, isAutoMode, isLoading, error } = useAllModels();
-  const { hasUsableModel, isCheckingAvailability, isLocalModelDownloading } = useAIAvailability();
+  const { allModels, selectedModel, isAutoMode, error } = useAllModels();
+  const { availability, retry } = useAIAvailability();
+  const statusLabel = useModelAvailabilityLabel();
+  const isChecking = availability.status === "checking";
 
   // Removed debug logging - even in development mode it causes performance issues
   // If needed for debugging, uncomment temporarily
@@ -112,18 +115,9 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
       .filter(section => section.totalCount > 0);
   }, [collapsedCloudProviders, customModels, expandedCloudProvider, modelSearch]);
 
-  const showNoModelState = !hasUsableModel && !isCheckingAvailability;
+  const showNoModelState = !availability.canStart && availability.status !== "checking";
 
-  // Check if only one model available (Windows cloud-only case)
-  const availableModelsCount = downloadedModels.length + undownloadedModels.length + customModels.length;
-  const isSingleModelAvailable = availableModelsCount === 1;
-
-  // If only one model available, use it regardless of selection state
-  const displayModel = isSingleModelAvailable && availableModelsCount > 0
-    ? (downloadedModels[0] || customModels[0])
-    : isAutoMode
-    ? null // Auto mode has its own display
-    : selectedModel;
+  const displayModel = isAutoMode ? null : selectedModel;
 
   const { selectModel } = useModelSelection();
   const { setAutoMode, setManualMode } = useModelSelectionState();
@@ -162,8 +156,11 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
   };
 
   const handleModelSelect = async (model: ModelOption) => {
-    if (model.type === ModelType.CLOUD && !model.isAvailable) {
+    if (model.type === ModelType.CLOUD && model.availability?.status === "needs-api-key") {
       await handleAddModels();
+      return;
+    }
+    if (model.availability && !model.availability.canSelect) {
       return;
     }
 
@@ -186,6 +183,9 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
   };
 
   const handleModelDownload = (model: ModelOption) => {
+    if (!model.availability?.canDownload) {
+      return;
+    }
     // Extract the local model key from the model id
     const modelKey = model.id.replace("local-", "");
     showLlmModelDownloadToast(
@@ -211,10 +211,10 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
 
   return (
     <TooltipProvider delayDuration={300}>
-      <Popover open={isSingleModelAvailable || isLoading ? false : isOpen} onOpenChange={handleIsOpenChange}>
+      <Popover open={isOpen} onOpenChange={handleIsOpenChange}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <PopoverTrigger asChild disabled={isSingleModelAvailable || isLoading}>
+            <PopoverTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
@@ -226,7 +226,7 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                   className,
                 )}
               >
-                {isLoading
+                {isChecking
                   ? (
                     <>
                       <Spinner className="size-4" />
@@ -279,7 +279,7 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                   ? (
                     <>
                       {/* Show downloading state if any LLM is downloading */}
-                      {isLocalModelDownloading || allModels.some(m => m.isDownloading && m.type === ModelType.LOCAL)
+                      {availability.status === "downloading"
                         ? (
                           <>
                             <Spinner className="size-4" />
@@ -313,16 +313,12 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                       )}
                     </>
                   )}
-                {!isLoading && !isSingleModelAvailable && (
-                  <ChevronDownIcon className={cn(compact ? "h-3 w-3" : "h-3 w-3")} />
-                )}
+                {!isChecking && <ChevronDownIcon className={cn(compact ? "h-3 w-3" : "h-3 w-3")} />}
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>
           <TooltipContent side="top" className="text-xs">
-            {isSingleModelAvailable
-              ? displayModel?.name || t`AI model`
-              : isAutoMode
+            {isAutoMode
               ? autoTooltip
               : displayModel
               ? t`${displayModel.name} - Click to change`
@@ -339,6 +335,20 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
           sideOffset={8}
         >
           <div className="space-y-3 max-w-full">
+            {availability.status !== "ready" && (
+              <div role="status" className="text-xs text-foreground flex items-center justify-between gap-2">
+                <span>{statusLabel(availability)}</span>
+                {availability.canRetry && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => void retry()}
+                  >
+                    {t`Retry`}
+                  </Button>
+                )}
+              </div>
+            )}
             {/* Auto Mode */}
             <AutomaticOption
               description={autoDescription}
@@ -605,7 +615,8 @@ interface ModelItemProps {
 function ModelItem(
   { model, isSelected, onSelect }: ModelItemProps,
 ) {
-  const isUnavailableCloud = model.type === ModelType.CLOUD && !model.isAvailable;
+  const statusLabel = useModelAvailabilityLabel();
+  const isUnavailableCloud = model.type === ModelType.CLOUD && !model.availability?.canSelect;
 
   return (
     <div
@@ -646,7 +657,7 @@ function ModelItem(
         )}
         {isUnavailableCloud && (
           <span className="text-muted-foreground text-ui-caption leading-tight">
-            <Trans>Connect API key</Trans>
+            {model.availability ? statusLabel(model.availability) : <Trans>Connect API key</Trans>}
           </span>
         )}
       </div>
@@ -672,7 +683,7 @@ interface ModelItemWithDownloadProps {
 }
 
 function ModelItemWithDownload({ model, onDownload }: ModelItemWithDownloadProps) {
-  const { t } = useLingui();
+  const statusLabel = useModelAvailabilityLabel();
   return (
     <div className="flex items-start px-2.5 py-2 rounded-lg hover:bg-surface-400/50 transition-colors opacity-75">
       {/* Column 1: Provider Icon */}
@@ -698,7 +709,9 @@ function ModelItemWithDownload({ model, onDownload }: ModelItemWithDownloadProps
           )}
         </div>
         <span className="text-muted-foreground text-ui-caption leading-tight">
-          {model.isDownloading ? t`Downloading...` : model.description}
+          {model.availability && model.availability.status !== "needs-download"
+            ? statusLabel(model.availability)
+            : model.description}
         </span>
       </div>
 
@@ -712,7 +725,7 @@ function ModelItemWithDownload({ model, onDownload }: ModelItemWithDownloadProps
             e.stopPropagation();
             onDownload();
           }}
-          disabled={model.isDownloading}
+          disabled={!model.availability?.canDownload}
         >
           {model.isDownloading
             ? <i className="ri-loader-line text-xs animate-spin" />

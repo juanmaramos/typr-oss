@@ -4,12 +4,14 @@ use tokio::sync::Mutex;
 
 mod client;
 mod commands;
+mod completion;
 mod error;
 mod events;
 mod ext;
 mod fsm;
 mod policy;
 mod provider;
+mod streaming_lifecycle;
 
 pub use client::*;
 pub use error::*;

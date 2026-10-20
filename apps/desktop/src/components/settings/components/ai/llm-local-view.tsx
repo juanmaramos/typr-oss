@@ -1,14 +1,19 @@
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
+import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { useModelRegistry } from "@/hooks/useModelRegistry";
 import { useCustomModels, useModelSelection } from "@/hooks/useModels";
+import { cloudModelAvailability, modelAvailability } from "@/lib/model-availability";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useId, useMemo, useState } from "react";
 
 import {
+  type CloudApiKeys,
   CloudProviderId,
   getCloudProviderIcon,
   getCloudProviderIdFromModelId,
   getCloudProviderLabel,
+  useCloudApiKeys,
 } from "@/hooks/cloud-model-catalog";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { Button } from "@typr/ui/components/ui/button";
@@ -16,23 +21,21 @@ import { Input } from "@typr/ui/components/ui/input";
 import { cn } from "@typr/ui/lib/utils";
 import { SharedLLMProps } from "./shared";
 
-type CloudApiKeys = {
-  openai: string;
-  groq: string;
-  openrouter: string;
-};
+const failedRead = modelAvailability("error");
 
 export function LLMLocalView({
-  downloadingModels,
   handleModelDownload,
   handleShowFileLocation,
   supportsLocalModels,
 }: SharedLLMProps) {
   const { t } = useLingui();
+  const statusLabel = useModelAvailabilityLabel();
+  const localErrorLabel = statusLabel(failedRead);
   const queryClient = useQueryClient();
-  const { models, isLoading } = useModelRegistry();
+  const { models, isLoading, error: localModelsError, refetch } = useModelRegistry();
   const { models: cloudModels, isLoading: cloudModelsLoading } = useCustomModels();
   const { selectModel } = useModelSelection();
+  const { selectLocalChat } = useModelPreferences();
   const cloudApiKeyInputId = useId();
   const [cloudApiKeys, setCloudApiKeys] = useState<CloudApiKeys>({
     openai: "",
@@ -42,14 +45,7 @@ export function LLMLocalView({
   const [expandedCloudProvider, setExpandedCloudProvider] = useState<CloudProviderId | null>(null);
   const [modelSearch, setModelSearch] = useState("");
 
-  const cloudApiKeysQuery = useQuery({
-    queryKey: ["cloud-api-keys"],
-    queryFn: async (): Promise<CloudApiKeys> => ({
-      openai: await connectorCommands.getOpenaiApiKey(),
-      groq: await connectorCommands.getGroqApiKey(),
-      openrouter: await connectorCommands.getOpenrouterApiKey(),
-    }),
-  });
+  const cloudApiKeysQuery = useCloudApiKeys();
 
   useEffect(() => {
     if (cloudApiKeysQuery.data) {
@@ -139,7 +135,7 @@ export function LLMLocalView({
   }, [expandedCloudProvider, modelSearch, visibleCloudModels]);
 
   const handleSelectCloudModel = async (model: typeof visibleCloudModels[number]) => {
-    if (!model.isAvailable) {
+    if (!model.availability?.canSelect) {
       return;
     }
 
@@ -180,6 +176,20 @@ export function LLMLocalView({
           <p className="mb-2 text-xs text-muted-foreground">
             <Trans>Only GGUF chat models are supported locally.</Trans>
           </p>
+          {localModelsError && (
+            <div className="mb-2 flex items-center justify-between gap-2 text-xs text-muted-foreground" role="alert">
+              <span>{localErrorLabel}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  void refetch()}
+                className="h-7 text-xs"
+              >
+                <Trans>Retry</Trans>
+              </Button>
+            </div>
+          )}
           <div className="space-y-2">
             {isLoading
               ? (
@@ -189,7 +199,7 @@ export function LLMLocalView({
                 </div>
               )
               : visibleModels.map((model) => {
-                const isDownloading = downloadingModels.has(model.id);
+                const availability = model.availability;
 
                 return (
                   <div
@@ -211,21 +221,41 @@ export function LLMLocalView({
                     </div>
 
                     <div className="shrink-0">
-                      {model.isDownloaded
+                      {availability.canRetry
+                        ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              if (availability.canDownload) {
+                                void handleModelDownload(model.id);
+                              } else if (availability.canSelect) {
+                                void selectLocalChat(model.id);
+                              } else {
+                                void refetch();
+                              }
+                            }}
+                            className="text-xs h-7"
+                          >
+                            <Trans>Retry</Trans>
+                          </Button>
+                        )
+                        : availability.canSelect
                         ? (
                           <span className="inline-flex items-center gap-1.5 text-ui-caption text-success">
                             <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
                             <Trans>Ready</Trans>
                           </span>
                         )
-                        : isDownloading
+                        : availability.status === "downloading"
                         ? (
                           <span className="inline-flex items-center gap-1.5 text-ui-caption text-muted-foreground">
                             <i className="ri-loader-4-line animate-spin text-sm" />
                             <Trans>Downloading…</Trans>
                           </span>
                         )
-                        : (
+                        : availability.canDownload
+                        ? (
                           <Button
                             size="sm"
                             variant="outline"
@@ -238,6 +268,14 @@ export function LLMLocalView({
                             <i className="ri-download-line text-sm" />
                             {model.size}
                           </Button>
+                        )
+                        : (
+                          <span className="inline-flex items-center gap-1.5 text-ui-caption text-muted-foreground">
+                            {(availability.status === "checking" || availability.status === "loading") && (
+                              <i className="ri-loader-4-line animate-spin text-sm" />
+                            )}
+                            {statusLabel(availability)}
+                          </span>
                         )}
                     </div>
                   </div>
@@ -264,7 +302,8 @@ export function LLMLocalView({
               )
               : cloudProviderSections.map((section) => {
                 const providerApiKey = cloudApiKeys[section.provider];
-                const hasProviderApiKey = providerApiKey.trim().length > 0;
+                const hasProviderApiKey = (cloudApiKeysQuery.data?.[section.provider] ?? "").trim().length > 0;
+                const providerAvailability = cloudModelAvailability(cloudApiKeysQuery, hasProviderApiKey);
                 const providerApiKeyInputId = `${cloudApiKeyInputId}-${section.provider}`;
 
                 return (
@@ -286,12 +325,14 @@ export function LLMLocalView({
                       <span
                         className={cn(
                           "inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-ui-caption font-medium",
-                          hasProviderApiKey
+                          providerAvailability.canSelect
                             ? "border-success/20 bg-success/5 text-success"
                             : "border-primary/20 bg-primary/5 text-primary",
                         )}
                       >
-                        {hasProviderApiKey ? <Trans>Key configured</Trans> : <Trans>API key required</Trans>}
+                        {providerAvailability.canSelect
+                          ? <Trans>Key configured</Trans>
+                          : statusLabel(providerAvailability)}
                       </span>
                     </div>
 
@@ -311,7 +352,9 @@ export function LLMLocalView({
                         onBlur={(event) => void saveCloudApiKey(section.provider, event.target.value)}
                       />
                       <p className="text-xs text-muted-foreground">
-                        {hasProviderApiKey
+                        {cloudApiKeysQuery.isPending || cloudApiKeysQuery.isError
+                          ? statusLabel(providerAvailability)
+                          : hasProviderApiKey
                           ? <Trans>Key stored locally and used directly with this provider.</Trans>
                           : <Trans>Add a key to use this provider.</Trans>}
                       </p>
@@ -333,7 +376,8 @@ export function LLMLocalView({
 
                     <div className="space-y-2">
                       {section.models.map((model) => {
-                        const isReady = model.isAvailable;
+                        const availability = model.availability ?? modelAvailability("checking");
+                        const isReady = availability.canSelect;
 
                         return (
                           <div
@@ -375,9 +419,20 @@ export function LLMLocalView({
                                     {model.isSelected ? <Trans>Selected</Trans> : <Trans>Use</Trans>}
                                   </Button>
                                 )
+                                : availability.canRetry
+                                ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => void cloudApiKeysQuery.refetch()}
+                                    className="h-7 text-xs"
+                                  >
+                                    <Trans>Retry</Trans>
+                                  </Button>
+                                )
                                 : (
                                   <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-ui-caption font-medium text-primary">
-                                    <Trans>API key required</Trans>
+                                    {statusLabel(availability)}
                                   </span>
                                 )}
                             </div>

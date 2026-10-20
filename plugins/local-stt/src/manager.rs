@@ -15,6 +15,12 @@ impl Default for ConnectionManager {
 }
 
 impl ConnectionManager {
+    pub fn cancel(&self) {
+        if let Some(token) = self.inner.lock().unwrap().take() {
+            token.cancel();
+        }
+    }
+
     pub fn acquire_connection(&self) -> ConnectionGuard {
         let mut slot = self.inner.lock().unwrap();
 

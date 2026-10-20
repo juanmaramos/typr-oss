@@ -1,3 +1,4 @@
+import { cloudModelAvailability } from "@/lib/model-availability";
 import { useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { isTauri } from "@tauri-apps/api/core";
@@ -293,9 +294,9 @@ async function fetchProviderModels(provider: CloudProviderId, apiKey: string): P
 
 export async function getCloudApiKeys(): Promise<CloudApiKeys> {
   const [openai, groq, openrouter] = await Promise.all([
-    connectorCommands.getOpenaiApiKey().catch(() => ""),
-    connectorCommands.getGroqApiKey().catch(() => ""),
-    connectorCommands.getOpenrouterApiKey().catch(() => ""),
+    connectorCommands.getOpenaiApiKey(),
+    connectorCommands.getGroqApiKey(),
+    connectorCommands.getOpenrouterApiKey(),
   ]);
 
   return {
@@ -471,16 +472,18 @@ export function useCloudProviderModels(provider: CloudProviderId) {
   });
 
   const models = useMemo((): ModelOption[] => {
-    const recommended = RECOMMENDED_MODELS[provider].map((model) => createModelOption(provider, model.id, {
-      name: getRecommendedName(model.slug),
-      description: getRecommendedDescription(model.slug),
-      vendor: model.vendor,
-      icon: model.icon,
-      hasApiKey,
-      selectedCloudModelId,
-      isRecommended: true,
-      source: "recommended",
-    }));
+    const recommended = RECOMMENDED_MODELS[provider].map((model) =>
+      createModelOption(provider, model.id, {
+        name: getRecommendedName(model.slug),
+        description: getRecommendedDescription(model.slug),
+        vendor: model.vendor,
+        icon: model.icon,
+        hasApiKey,
+        selectedCloudModelId,
+        isRecommended: true,
+        source: "recommended",
+      })
+    );
 
     const byId = new Map(recommended.map((model) => [model.providerModelId, model]));
 
@@ -490,15 +493,18 @@ export function useCloudProviderModels(provider: CloudProviderId) {
       }
 
       const vendor = vendorFromModelId(provider, liveModel.id, liveModel.owned_by);
-      byId.set(liveModel.id, createModelOption(provider, liveModel.id, {
-        name: liveModel.name || titleCaseModelId(liveModel.id),
-        description: liveModel.description,
-        vendor,
-        icon: iconForVendor(provider, vendor),
-        hasApiKey,
-        selectedCloudModelId,
-        source: "provider",
-      }));
+      byId.set(
+        liveModel.id,
+        createModelOption(provider, liveModel.id, {
+          name: liveModel.name || titleCaseModelId(liveModel.id),
+          description: liveModel.description,
+          vendor,
+          icon: iconForVendor(provider, vendor),
+          hasApiKey,
+          selectedCloudModelId,
+          source: "provider",
+        }),
+      );
     }
 
     const selectedProvider = getCloudProviderIdFromModelId(selectedCloudModelId);
@@ -509,17 +515,23 @@ export function useCloudProviderModels(provider: CloudProviderId) {
       && !byId.has(selectedProviderModelId)
     ) {
       const vendor = vendorFromModelId(provider, selectedProviderModelId);
-      byId.set(selectedProviderModelId, createModelOption(provider, selectedProviderModelId, {
-        name: titleCaseModelId(selectedProviderModelId),
-        vendor,
-        icon: iconForVendor(provider, vendor),
-        hasApiKey,
-        selectedCloudModelId,
-        source: "manual",
-      }));
+      byId.set(
+        selectedProviderModelId,
+        createModelOption(provider, selectedProviderModelId, {
+          name: titleCaseModelId(selectedProviderModelId),
+          vendor,
+          icon: iconForVendor(provider, vendor),
+          hasApiKey,
+          selectedCloudModelId,
+          source: "manual",
+        }),
+      );
     }
 
-    return Array.from(byId.values()).sort((a, b) => {
+    return Array.from(byId.values()).map(model => ({
+      ...model,
+      availability: cloudModelAvailability(cloudApiKeysQuery, hasApiKey),
+    })).sort((a, b) => {
       if (a.isSelected && !b.isSelected) {
         return -1;
       }
@@ -539,14 +551,22 @@ export function useCloudProviderModels(provider: CloudProviderId) {
 
       return a.name.localeCompare(b.name);
     });
-  }, [hasApiKey, provider, providerModelsQuery.data, selectedCloudModelId, t]);
+  }, [
+    hasApiKey,
+    provider,
+    providerModelsQuery.data,
+    selectedCloudModelId,
+    t,
+    cloudApiKeysQuery.isPending,
+    cloudApiKeysQuery.isError,
+  ]);
 
   return {
     models,
     hasApiKey,
     apiKey,
     isLoading: cloudApiKeysQuery.isLoading || providerModelsQuery.isLoading,
-    error: providerModelsQuery.error,
+    error: cloudApiKeysQuery.error ?? providerModelsQuery.error,
     refetch: providerModelsQuery.refetch,
   };
 }

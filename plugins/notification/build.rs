@@ -1,4 +1,12 @@
 const COMMANDS: &[&str] = &[
+    "open_call_detection_settings",
+    "show_call_end_notification",
+    "get_call_end_enabled",
+    "set_call_end_enabled",
+    "get_call_end_status",
+    "associate_call",
+    "keep_recording",
+    "stop_associated_recording",
     "get_event_notification",
     "set_event_notification",
     "get_detect_notification",

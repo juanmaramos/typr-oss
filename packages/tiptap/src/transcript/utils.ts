@@ -1,6 +1,6 @@
-import type { SpeakerIdentity, Word } from "@typr/plugin-db";
 import { i18n } from "@lingui/core";
 import { JSONContent } from "@tiptap/react";
+import type { SpeakerIdentity, Word } from "@typr/plugin-db";
 
 export type { Word };
 
@@ -120,12 +120,15 @@ export const fromEditorToWords = (content: DocContent | JSONContent): Word[] => 
   return words;
 };
 
-export const getSpeakerLabel = (attrs: Partial<SpeakerAttributes>): string => {
+export const getSpeakerLabel = (attrs: Partial<SpeakerAttributes>, unknownLabel?: string): string => {
   if (attrs[SPEAKER_LABEL_ATTR]) {
     return attrs[SPEAKER_LABEL_ATTR];
   }
-  if (typeof attrs[SPEAKER_INDEX_ATTR] === "number" && attrs[SPEAKER_INDEX_ATTR] === 0) {
+  if (attrs[SPEAKER_INDEX_ATTR] === 0 || attrs[SPEAKER_ID_ATTR] === "you") {
     return i18n._("You");
   }
-  return i18n._("Them");
+  if (attrs[SPEAKER_INDEX_ATTR] != null || attrs[SPEAKER_ID_ATTR]) {
+    return i18n._("Them");
+  }
+  return unknownLabel ?? i18n._("Them");
 };

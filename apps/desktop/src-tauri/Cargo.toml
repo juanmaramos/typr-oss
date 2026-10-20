@@ -82,8 +82,8 @@ serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_qs = { workspace = true }
 
-dotenvy = "0.15"
 dirs = { workspace = true }
+dotenvy = "0.15"
 
 bytes = { workspace = true }
 chrono = { workspace = true }
@@ -104,6 +104,7 @@ regex = "1.10"
 zip = { version = "4.6.1", default-features = false, features = ["deflate-flate2"] }
 
 [features]
+nemotron = ["tauri-plugin-local-stt/nemotron"]
 # Platform-specific defaults - configured via tauri.{platform}.conf.json
 default = []
 

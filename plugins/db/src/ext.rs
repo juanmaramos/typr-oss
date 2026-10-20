@@ -26,10 +26,77 @@ pub trait DatabasePluginExt<R: tauri::Runtime> {
         session: typr_db_user::Session,
     ) -> impl Future<Output = Result<(), crate::Error>>;
 
+    fn db_complete_recording(
+        &self,
+        session_id: &str,
+        transcript_finalized: bool,
+    ) -> impl Future<Output = Result<(), crate::Error>>;
+
+    fn db_append_session_words(
+        &self,
+        session_id: &str,
+        words: Vec<typr_listener_interface::Word>,
+    ) -> impl Future<Output = Result<Vec<typr_listener_interface::Word>, crate::Error>>;
+
+    fn db_begin_recording(
+        &self,
+        session_id: &str,
+        template_id: Option<String>,
+    ) -> impl Future<Output = Result<(), crate::Error>>;
+
+    fn db_mark_recording_started(
+        &self,
+        session_id: &str,
+    ) -> impl Future<Output = Result<(), crate::Error>>;
+
     fn db_onboarding_session_id(&self) -> impl Future<Output = Result<String, crate::Error>>;
 }
 
 impl<R: tauri::Runtime, T: tauri::Manager<R>> DatabasePluginExt<R> for T {
+    async fn db_mark_recording_started(&self, session_id: &str) -> Result<(), crate::Error> {
+        let state = self.state::<crate::ManagedState>();
+        let guard = state.lock().await;
+        let db = guard.db.as_ref().ok_or(crate::Error::NoneDatabase)?;
+        db.mark_recording_started(session_id).await?;
+        Ok(())
+    }
+
+    async fn db_begin_recording(
+        &self,
+        session_id: &str,
+        template_id: Option<String>,
+    ) -> Result<(), crate::Error> {
+        let state = self.state::<crate::ManagedState>();
+        let guard = state.lock().await;
+        let db = guard.db.as_ref().ok_or(crate::Error::NoneDatabase)?;
+        db.begin_recording(session_id, template_id).await?;
+        Ok(())
+    }
+
+    async fn db_complete_recording(
+        &self,
+        session_id: &str,
+        transcript_finalized: bool,
+    ) -> Result<(), crate::Error> {
+        let state = self.state::<crate::ManagedState>();
+        let guard = state.lock().await;
+        let db = guard.db.as_ref().ok_or(crate::Error::NoneDatabase)?;
+        db.complete_recording(session_id, transcript_finalized)
+            .await?;
+        Ok(())
+    }
+
+    async fn db_append_session_words(
+        &self,
+        session_id: &str,
+        words: Vec<typr_listener_interface::Word>,
+    ) -> Result<Vec<typr_listener_interface::Word>, crate::Error> {
+        let state = self.state::<crate::ManagedState>();
+        let guard = state.lock().await;
+        let db = guard.db.as_ref().ok_or(crate::Error::NoneDatabase)?;
+        Ok(db.append_session_words(session_id, words).await?)
+    }
+
     async fn db_user_id(&self) -> Result<Option<String>, crate::Error> {
         let state = self.state::<crate::ManagedState>();
         let guard = state.lock().await;

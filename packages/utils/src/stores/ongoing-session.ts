@@ -2,6 +2,7 @@ import { create as mutate } from "mutative";
 import { createStore } from "zustand";
 
 import { commands as listenerCommands, events as listenerEvents } from "@typr/plugin-listener";
+import { commands as dbCommands } from "@typr/plugin-db";
 import { createSessionsStore } from "./sessions";
 
 type State = {
@@ -47,6 +48,7 @@ export const createOngoingSessionStore = (
   sessionsStore: ReturnType<typeof createSessionsStore>,
   callbacks?: OngoingSessionCallbacks,
 ) => {
+  let templateWrite: Promise<unknown> = Promise.resolve();
   const store = createStore<State & Actions>((set, get) => ({
     ...initialState,
     get: () => get(),
@@ -64,6 +66,11 @@ export const createOngoingSessionStore = (
           draft.autoEnhanceTemplate = templateId;
         })
       );
+      const sessionId = get().sessionId;
+      if (sessionId) {
+        templateWrite = templateWrite.then(() => dbCommands.setSummaryTemplate(sessionId, templateId))
+          .catch((error) => console.error("Failed to persist summary template:", error));
+      }
     },
 
     start: (sessionId: string) => {
@@ -137,8 +144,6 @@ export const createOngoingSessionStore = (
             const currentUnlisten = get().sessionEventUnlisten;
             // Full cleanup: this is the single source of truth for stop transitions.
             // sessionId must be nulled here so the timer resets immediately.
-            // Note: autoEnhanceTemplate is NOT cleared here — the useAutoEnhance
-            // hook reads it during this same render cycle and clears it after use.
             set((state) =>
               mutate(state, (draft) => {
                 draft.status = "inactive";
@@ -146,6 +151,7 @@ export const createOngoingSessionStore = (
                 draft.sessionId = null;
                 draft.amplitude = { mic: 0, speaker: 0 };
                 draft.enhanceController = null;
+                draft.autoEnhanceTemplate = null;
                 draft.sessionEventUnlisten = undefined;
               })
             );
@@ -224,7 +230,7 @@ export const createOngoingSessionStore = (
       // Do NOT call set(initialState) here — it races with the event
       // and causes intermediate states where sessionId is still set
       // but status is already "inactive" (triggering timer/enhance bugs).
-      listenerCommands.stopSession().catch((error) => {
+      templateWrite.then(() => listenerCommands.stopSession()).catch((error) => {
         console.error("Failed to stop session:", error);
         set((state) =>
           mutate(state, (draft) => {

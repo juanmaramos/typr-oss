@@ -1,14 +1,22 @@
-import { SETTINGS_LOCAL_STT_MODEL_KEYS, sttModelMetadata } from "@/components/transcript/constants/languageData";
+import {
+  getSttModelDescription,
+  getSttModelLabel,
+  SETTINGS_LOCAL_STT_MODEL_KEYS,
+  sttModelMetadata,
+} from "@/components/transcript/constants/languageData";
+import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
 import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { useAllModels, useCustomModels, useModelSelection, useModelSelectionState } from "@/hooks/useModels";
-import { useModelState } from "@/hooks/useModelState";
 import { usePlatform } from "@/hooks/usePlatform";
+import { useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
 import { aiTaskDefaultsQueryOptions, transcriptionModelQueryOptions } from "@/lib/model-selection";
+import { getAvailableSettingsSttModels, sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { type ModelOption, ModelType } from "@/types/models";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { commands as connectorCommands } from "@typr/plugin-connector";
 import { type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
+import { Button } from "@typr/ui/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@typr/ui/components/ui/select";
 import { cn } from "@typr/ui/lib/utils";
 import { type AiTaskDefaults, type AiTextTask, AUTO_CLOUD_MODEL_ID, normalizeAiTaskDefaults } from "@typr/utils";
@@ -25,8 +33,6 @@ type TextTaskRow = {
   label: ReactNode;
   task: Exclude<AiTextTask, "chat">;
 };
-
-const cloudSttApiKeysQueryKey = ["cloud-stt-api-keys"] as const;
 
 function getModelOptionLabel(model: ModelOption | null | undefined, fallback = "") {
   return model ? `${model.name}${model.vendor ? ` · ${model.vendor}` : ""}` : fallback;
@@ -62,14 +68,6 @@ function getTextTaskDefaultLabel({
   return getModelNameLabel(model, compactModelId(value));
 }
 
-function getTranscriptionModelLabel(modelId: string) {
-  if (modelId === ASSEMBLYAI_STT_MODEL) {
-    return "AssemblyAI";
-  }
-
-  return sttModelMetadata[modelId as keyof typeof sttModelMetadata]?.name ?? modelId;
-}
-
 function isSettingsLocalSttModel(modelId: string): modelId is SupportedSttModel {
   return SETTINGS_LOCAL_STT_MODEL_KEYS.some(modelKey => modelKey === modelId);
 }
@@ -78,20 +76,17 @@ export function AiTaskDefaultsSettings() {
   const { t } = useLingui();
   const { selectTranscription, setTaskDefault } = useModelPreferences();
   const { supportsLocalModels } = usePlatform();
-  const { getModel: getModelState, isLoading: modelStateLoading } = useModelState();
+  const { getAvailability, retry: retryTranscription } = useTranscriptionAvailability();
+  const statusLabel = useModelAvailabilityLabel();
   const { allModels, selectedModel, isAutoMode, isLoading: allModelsLoading } = useAllModels();
   const { models: cloudModels, isLoading: cloudModelsLoading } = useCustomModels();
   const { selectModel } = useModelSelection();
   const { setAutoMode } = useModelSelectionState();
 
+  const sttCapabilities = useQuery(sttCapabilitiesQueryOptions());
+  const availableSttModels = getAvailableSettingsSttModels(sttCapabilities.data);
   const defaultsQuery = useQuery(aiTaskDefaultsQueryOptions());
   const sttModelQuery = useQuery(transcriptionModelQueryOptions());
-  const cloudSttApiKeysQuery = useQuery({
-    queryKey: cloudSttApiKeysQueryKey,
-    queryFn: async () => ({
-      assemblyai: await connectorCommands.getAssemblyaiApiKey(),
-    }),
-  });
 
   const defaults = normalizeAiTaskDefaults(defaultsQuery.data);
   const cloudModelsById = useMemo(() => new Map(cloudModels.map((model) => [model.id, model])), [cloudModels]);
@@ -137,28 +132,27 @@ export function AiTaskDefaultsSettings() {
   };
 
   const updateTranscriptionDefault = async (value: string) => {
-    if (value === ASSEMBLYAI_STT_MODEL && !hasAssemblyAiApiKey) {
+    if (!getAvailability(value).canSelect) {
       return;
     }
-
-    if (value !== ASSEMBLYAI_STT_MODEL) {
-      if (!isSettingsLocalSttModel(value) || !getModelState(value)?.isDownloaded) {
-        return;
-      }
+    if (value !== ASSEMBLYAI_STT_MODEL && !isSettingsLocalSttModel(value)) {
+      return;
     }
 
     await selectTranscription(value as SupportedSttModel | "assemblyai-universal");
   };
 
-  const hasAssemblyAiApiKey = (cloudSttApiKeysQuery.data?.assemblyai ?? "").trim().length > 0;
+  const cloudSttAvailability = getAvailability(ASSEMBLYAI_STT_MODEL);
+  const hasSttError = [ASSEMBLYAI_STT_MODEL, ...availableSttModels].some(id => getAvailability(id).canRetry);
   const transcriptionValue = sttModelQuery.data ?? "";
+  const chatModel = selectedModel ?? allModels.find(model => model.id === chatModelValue);
   const chatModelLabel = chatModelValue === AUTO_CLOUD_MODEL_ID
     ? t`Auto`
-    : getModelNameLabel(selectedModel ?? allModels.find(model => model.id === chatModelValue), chatModelValue);
-  const transcriptionLabel = getTranscriptionModelLabel(transcriptionValue);
+    : getModelNameLabel(chatModel, chatModelValue);
+  const transcriptionLabel = getSttModelLabel(transcriptionValue);
 
   return (
-    <section className="rounded-lg border border-border bg-background p-4">
+    <section className="rounded-surface border border-border bg-background p-4">
       <div className="mb-5 min-w-0">
         <h2 className="text-base font-semibold text-foreground">
           <Trans>Defaults</Trans>
@@ -180,7 +174,12 @@ export function AiTaskDefaultsSettings() {
           <Select value={chatModelValue} onValueChange={(value) => void updateChatDefault(value)}>
             <SelectTrigger className="h-9 w-full sm:w-72">
               <SelectValue placeholder={t`Select model`}>
-                <SelectTriggerLabel label={chatModelLabel} />
+                <SelectTriggerLabel
+                  icon={chatModelValue === AUTO_CLOUD_MODEL_ID
+                    ? "ri-sparkling-fill"
+                    : chatModel?.customIcon || "ri-cpu-line"}
+                  label={chatModelLabel}
+                />
               </SelectValue>
             </SelectTrigger>
             <SelectContent className="max-h-72">
@@ -200,7 +199,11 @@ export function AiTaskDefaultsSettings() {
                       icon={model.customIcon
                         || (model.type === ModelType.LOCAL ? "ri-hard-drive-3-line" : "ri-robot-line")}
                       label={getModelOptionLabel(model)}
-                      description={model.type === ModelType.LOCAL ? t`On-device model` : model.description}
+                      description={model.availability && model.availability.status !== "ready"
+                        ? statusLabel(model.availability)
+                        : model.type === ModelType.LOCAL
+                        ? t`On-device model`
+                        : model.description}
                     />
                   </SelectItem>
                 ))}
@@ -229,7 +232,14 @@ export function AiTaskDefaultsSettings() {
               >
                 <SelectTrigger className="h-9 w-full sm:w-72">
                   <SelectValue placeholder={t`Select model`}>
-                    <SelectTriggerLabel label={taskModelLabel} />
+                    <SelectTriggerLabel
+                      icon={value === FOLLOW_CHAT_VALUE
+                        ? "ri-chat-ai-line"
+                        : value === AUTO_CLOUD_MODEL_ID
+                        ? "ri-sparkling-fill"
+                        : selectedCloudModel?.customIcon || "ri-robot-line"}
+                      label={taskModelLabel}
+                    />
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
@@ -247,13 +257,15 @@ export function AiTaskDefaultsSettings() {
                     <SelectItem
                       key={model.id}
                       value={model.id}
-                      disabled={!model.isAvailable}
+                      disabled={!isSelectableModel(model)}
                       textValue={getModelOptionLabel(model)}
                     >
                       <ModelSelectLabel
                         icon={model.customIcon || "ri-robot-line"}
                         label={getModelOptionLabel(model)}
-                        description={model.isAvailable ? model.description : t`API key required`}
+                        description={model.availability && !model.availability.canSelect
+                          ? statusLabel(model.availability)
+                          : model.description}
                       />
                     </SelectItem>
                   ))}
@@ -280,40 +292,42 @@ export function AiTaskDefaultsSettings() {
           <Select value={transcriptionValue} onValueChange={(value) => void updateTranscriptionDefault(value)}>
             <SelectTrigger className="h-9 w-full sm:w-72">
               <SelectValue placeholder={t`Select model`}>
-                <SelectTriggerLabel label={transcriptionLabel} />
+                <SelectTriggerLabel
+                  icon={<STTProviderIcon model={transcriptionValue} />}
+                  label={transcriptionLabel}
+                />
               </SelectValue>
             </SelectTrigger>
             <SelectContent className="max-h-72">
-              <SelectItem value={ASSEMBLYAI_STT_MODEL} textValue={t`AssemblyAI`} disabled={!hasAssemblyAiApiKey}>
+              <SelectItem
+                value={ASSEMBLYAI_STT_MODEL}
+                textValue={getSttModelLabel(ASSEMBLYAI_STT_MODEL)}
+                disabled={!cloudSttAvailability.canSelect}
+              >
                 <ModelSelectLabel
-                  icon="ri-flashlight-fill"
-                  label={t`AssemblyAI`}
-                  description={hasAssemblyAiApiKey ? t`Cloud transcription` : t`API key required`}
+                  icon={<STTProviderIcon model={ASSEMBLYAI_STT_MODEL} />}
+                  label={getSttModelLabel(ASSEMBLYAI_STT_MODEL)}
+                  description={cloudSttAvailability.canSelect
+                    ? getSttModelDescription(ASSEMBLYAI_STT_MODEL)
+                    : statusLabel(cloudSttAvailability)}
                 />
               </SelectItem>
-              {supportsLocalModels && SETTINGS_LOCAL_STT_MODEL_KEYS.map((modelKey) => {
+              {supportsLocalModels && availableSttModels.map((modelKey) => {
                 const metadata = sttModelMetadata[modelKey];
-                const modelState = getModelState(modelKey);
-                const isDownloading = Boolean(modelState?.isDownloading);
-                const isDownloaded = Boolean(modelState?.isDownloaded);
-                const isUnavailable = !modelStateLoading && !isDownloaded;
-                const description = isDownloading
-                  ? t`Downloading...`
-                  : isUnavailable
-                  ? t`Download in Transcription settings`
-                  : metadata.languageSupport === "english-only"
-                  ? t`On-device English`
-                  : t`On-device multilingual`;
+                const availability = getAvailability(modelKey);
+                const description = availability.canSelect && !availability.canRetry
+                  ? getSttModelDescription(modelKey, sttCapabilities.data)
+                  : statusLabel(availability);
 
                 return (
                   <SelectItem
                     key={modelKey}
                     value={modelKey}
                     textValue={metadata.name}
-                    disabled={isDownloading || isUnavailable}
+                    disabled={!availability.canSelect}
                   >
                     <ModelSelectLabel
-                      icon={metadata.iconClass}
+                      icon={<STTProviderIcon model={modelKey} />}
                       label={metadata.name}
                       description={description}
                     />
@@ -325,6 +339,17 @@ export function AiTaskDefaultsSettings() {
         </DefaultRow>
       </div>
 
+      {hasSttError && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => void retryTranscription()}
+          className="mt-3 h-7 text-xs"
+        >
+          <Trans>Retry</Trans>
+        </Button>
+      )}
+
       {(allModelsLoading || cloudModelsLoading) && (
         <p className="mt-3 text-xs text-muted-foreground">
           <Trans>Loading available models...</Trans>
@@ -335,11 +360,7 @@ export function AiTaskDefaultsSettings() {
 }
 
 function isSelectableModel(model: ModelOption) {
-  if (model.type === ModelType.CLOUD) {
-    return model.isAvailable;
-  }
-
-  return Boolean(model.isDownloaded);
+  return model.availability?.canSelect ?? false;
 }
 
 function DefaultRow({
@@ -356,7 +377,7 @@ function DefaultRow({
   return (
     <div className="grid gap-3 py-3 first:pt-0 last:pb-0 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
       <div className="flex min-w-0 items-start gap-3">
-        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted">
+        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-control bg-muted">
           <i className={cn("text-sm text-foreground", icon)} />
         </span>
         <div className="min-w-0">
@@ -375,12 +396,12 @@ function ModelSelectLabel({
   label,
 }: {
   description?: ReactNode;
-  icon: string;
+  icon: ReactNode;
   label: ReactNode;
 }) {
   return (
     <span className="flex min-w-0 items-center gap-2">
-      <i className={cn("shrink-0 text-sm text-muted-foreground", icon)} />
+      {typeof icon === "string" ? <i className={cn("shrink-0 text-sm text-muted-foreground", icon)} /> : icon}
       <span className="min-w-0">
         <span className="block truncate">{label}</span>
         {description && (
@@ -393,10 +414,11 @@ function ModelSelectLabel({
   );
 }
 
-function SelectTriggerLabel({ label }: { label: ReactNode }) {
+function SelectTriggerLabel({ icon, label }: { icon: ReactNode; label: ReactNode }) {
   return (
-    <span className="block min-w-0 truncate text-left">
-      {label}
+    <span className="flex min-w-0 items-center gap-2 text-left">
+      {typeof icon === "string" ? <i aria-hidden="true" className={cn("shrink-0 text-base", icon)} /> : icon}
+      <span className="min-w-0 truncate">{label}</span>
     </span>
   );
 }

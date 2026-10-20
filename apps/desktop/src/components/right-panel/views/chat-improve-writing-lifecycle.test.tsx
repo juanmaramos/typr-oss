@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => {
   const chatDrafts: Record<string, string> = {};
   return {
+    canStart: true,
     generateText: vi.fn(),
     streamText: vi.fn(),
     renderTemplate: vi.fn(),
@@ -103,6 +104,10 @@ vi.mock("@/contexts", () => ({
     completeNewChat: vi.fn(),
   }),
 }));
+vi.mock(
+  "@/hooks/useAIAvailability",
+  () => ({ useAIAvailability: () => ({ availability: { canStart: mocks.canStart } }) }),
+);
 vi.mock("@/hooks/useTranscriptionActive", () => ({ useTranscriptionActive: () => ({ isRecordingActive: false }) }));
 vi.mock("@/hooks/use-agent-writing-feature", () => ({ useAgentWritingFeature: () => false }));
 vi.mock("../components/chat", async () => {
@@ -229,6 +234,7 @@ async function sendImproveWritingEvent() {
 
 describe("same-session improve-writing requests", () => {
   beforeEach(() => {
+    mocks.canStart = true;
     i18n.activate("en");
     mocks.groups = [];
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
@@ -439,6 +445,14 @@ describe("same-session improve-writing requests", () => {
       expect(container.querySelector("[role=\"group\"]")).toBeNull();
     },
   );
+
+  it("does not start editor improvement when the central policy blocks the selected model", async () => {
+    mocks.canStart = false;
+    await act(async () => root.render(views()));
+    await sendImproveWritingEvent();
+    expect(mocks.generateText).not.toHaveBeenCalled();
+    expect(mocks.upsertChatMessage).not.toHaveBeenCalled();
+  });
 
   it("starts one AI edit and saves one user/result pair when both surfaces receive the event", async () => {
     await act(async () => {
