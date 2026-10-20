@@ -9,7 +9,7 @@ import { cn } from "@typr/ui/lib/utils";
 import { AISetupIndicator } from "@/components/ui/ai-setup-indicator";
 import { Tab } from "@/components/ui/tab";
 import { debugLogFor } from "@/components/utils/debug-logger";
-import { useTypr, useRightPanel } from "@/contexts";
+import { useRightPanel, useTypr } from "@/contexts";
 import { useAgentWritingFeature } from "@/hooks/use-agent-writing-feature";
 import { useTranscriptionActive } from "@/hooks/useTranscriptionActive";
 import { ChatHistoryView, ChatInput, ChatMessagesView, EmptyChatState } from "../components/chat";
@@ -206,23 +206,24 @@ export function ChatView({
   // Auto-switch to cloud model when entering Edit mode
   useEditModeModelSwitch(effectiveEditMode);
 
-  const { chatGroupsQuery, sessionData, fetchSessionData, getChatGroupId, chatHistory, totalSessionMessagesQuery } = useChatQueries({
-    sessionId,
-    userId,
-    currentChatGroupId,
-    setCurrentChatGroupId,
-    setHasChatStarted: setHasChatStartedForSession,
-    isNewChatRequested,
-    setIsNewChatRequested: setIsNewChatRequestedForSession,
-    isNewChatPending: isNewChatPendingForSession,
-    completeNewChat,
-    isActiveSurface: isActiveChatSurface,
-    allowAutoSelectLatest: isActiveChatSurface
-      && !isNewChatRequested
-      && !isNewChatPendingForSession
-      && (layout !== "floating" || !pendingFloatingPrompt),
-    selectionSource: layout === "floating" ? "floating" : "sidebar",
-  });
+  const { chatGroupsQuery, sessionData, fetchSessionData, getChatGroupId, chatHistory, totalSessionMessagesQuery } =
+    useChatQueries({
+      sessionId,
+      userId,
+      currentChatGroupId,
+      setCurrentChatGroupId,
+      setHasChatStarted: setHasChatStartedForSession,
+      isNewChatRequested,
+      setIsNewChatRequested: setIsNewChatRequestedForSession,
+      isNewChatPending: isNewChatPendingForSession,
+      completeNewChat,
+      isActiveSurface: isActiveChatSurface,
+      allowAutoSelectLatest: isActiveChatSurface
+        && !isNewChatRequested
+        && !isNewChatPendingForSession
+        && (layout !== "floating" || !pendingFloatingPrompt),
+      selectionSource: layout === "floating" ? "floating" : "sidebar",
+    });
 
   const {
     messages,
@@ -387,7 +388,7 @@ export function ChatView({
   const handleCopyChat = async () => {
     if (messages.length > 0) {
       const text = messages.map(msg => {
-        const prefix = msg.isUser ? "You: " : "Assistant: ";
+        const prefix = msg.isUser ? t`You: ` : t`Assistant: `;
         return `${prefix}${msg.content}`;
       }).join("\n\n");
 

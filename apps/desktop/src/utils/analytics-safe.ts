@@ -53,6 +53,8 @@ export async function safeAnalyticsEvent(
     // Race between analytics call and timeout
     await Promise.race([
       analyticsCommands.event(sanitizedEvent),
+      // Internal timeout is logged and intentionally swallowed without a user notification.
+      // eslint-disable-next-line typr-i18n/ui-strings
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Analytics timeout")), timeoutMs)),
     ]);
   } catch (error) {

@@ -1,5 +1,7 @@
-import { commands as dbCommands, type Word } from "@typr/plugin-db";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { invoke } from "@tauri-apps/api/core";
+import { commands as dbCommands, type Word } from "@typr/plugin-db";
 
 // Types
 export interface YouTubeVideoInfo {
@@ -34,6 +36,22 @@ export enum YouTubeImportError {
   VIDEO_TOO_LONG = "Video is too long (max 3 hours)",
   NETWORK_ERROR = "Network error, please check your connection",
   UNKNOWN_ERROR = "An unexpected error occurred",
+}
+
+const youtubeErrorMessages = {
+  [YouTubeImportError.INVALID_URL]: msg`Please enter a valid YouTube URL`,
+  [YouTubeImportError.NO_TRANSCRIPT]: msg`This video doesn't have captions available`,
+  [YouTubeImportError.PRIVATE_VIDEO]: msg`Cannot access this video`,
+  [YouTubeImportError.RATE_LIMITED]: msg`Too many requests, please try again later`,
+  [YouTubeImportError.VIDEO_TOO_LONG]: msg`Video is too long (max 3 hours)`,
+  [YouTubeImportError.NETWORK_ERROR]: msg`Network error, please check your connection`,
+  [YouTubeImportError.UNKNOWN_ERROR]: msg`An unexpected error occurred`,
+  "Please enter a YouTube URL": msg`Please enter a YouTube URL`,
+};
+
+export function getYouTubeImportErrorMessage(error: string): string {
+  const descriptor = youtubeErrorMessages[error as keyof typeof youtubeErrorMessages];
+  return descriptor ? i18n._(descriptor) : error;
 }
 
 export class YouTubeImportService {
@@ -97,7 +115,7 @@ export class YouTubeImportService {
 
       const result = {
         videoId,
-        title: videoInfo.title || "YouTube video",
+        title: videoInfo.title || i18n._(msg`YouTube video`),
         duration: videoInfo.duration,
         words: this.transformTranscriptToWords(videoInfo.transcript, "temp-session-id"),
       };
@@ -195,7 +213,7 @@ export class YouTubeImportService {
       return session.id;
     } catch (error) {
       console.error("❌ [YouTube] Failed to create session:", error);
-      throw new Error("Failed to create session from transcript");
+      throw new Error(i18n._(msg`Failed to create session from transcript`));
     }
   }
 

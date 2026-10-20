@@ -1,3 +1,4 @@
+import { localizeDefaultTemplate } from "@/utils/default-templates";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMatch } from "@tanstack/react-router";
 import { type ChangeEvent } from "react";
@@ -72,7 +73,7 @@ export function NoteHeader(
   const windowLabel = getCurrentWebviewWindowLabel();
   const isInNoteMain = windowLabel === "main" && noteMatch;
 
-  const selectedTemplate = templates.find((template) => template.id === pendingTemplateId);
+  const selectedTemplate = templates.map(localizeDefaultTemplate).find((template) => template.id === pendingTemplateId);
   const templateLabel = getTemplateDisplayName(
     selectedTemplate?.title || (pendingTemplateId ? t`Selected template` : t`Auto`),
     t`Auto`,
@@ -216,7 +217,7 @@ export function NoteHeader(
                             )}
                           </div>
 
-                          {templates.map((template) => (
+                          {templates.map(localizeDefaultTemplate).map((template) => (
                             <div
                               key={template.id}
                               className={cn(

@@ -1,5 +1,7 @@
-import { cn } from "@typr/ui/lib/utils";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
+import { cn } from "@typr/ui/lib/utils";
 
 export const RatingDisplay = (
   { label, rating, maxRating = 3, iconClassName }: {
@@ -41,7 +43,7 @@ export const LanguageDisplay = ({ support }: { support: "multilingual" | "englis
         )}
       />
       <span className="text-xs ml-1">
-        {support === "multilingual" ? <Trans>All</Trans> : "EN"}
+        {support === "multilingual" ? <Trans>All</Trans> : i18n._(msg`EN`)}
       </span>
     </div>
   </div>

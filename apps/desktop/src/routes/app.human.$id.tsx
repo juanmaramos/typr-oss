@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { RiCornerDownLeftLine, RiLinkedinBoxFill, RiMailLine } from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate, useRouter } from "@tanstack/react-router";
@@ -140,6 +140,7 @@ function HumanView({
   value: Human;
   organization: Organization | null;
 }) {
+  const { t } = useLingui();
   const navigate = useNavigate();
 
   const handleClickOrganization = () => {
@@ -172,12 +173,12 @@ function HumanView({
           </AvatarFallback>
         </Avatar>
         <h1 className="text-2xl font-semibold text-center">
-          {value.full_name || "Unnamed Contact"}
+          {value.full_name || t`Unnamed Contact`}
         </h1>
         {(value.job_title || organization) && (
           <p className="text-muted-foreground mt-1 text-center">
             {value.job_title || ""}
-            {value.job_title && organization && " at "}
+            {value.job_title && organization && t` at `}
             {organization && (
               <span
                 className="text-primary hover:underline cursor-pointer"
@@ -203,7 +204,9 @@ function HumanView({
               <div className="mb-2">
                 <RiMailLine className="size-6 text-foreground/80 hover:text-foreground transition-colors" />
               </div>
-              <span className="text-xs text-muted-foreground">Email</span>
+              <span className="text-xs text-muted-foreground">
+                <Trans>Email</Trans>
+              </span>
             </a>
           )}
 
@@ -228,6 +231,7 @@ function HumanView({
 }
 
 function HumanEdit({ form }: { form: ReturnType<typeof useForm<FormSchema>> }) {
+  const { t } = useLingui();
   const getInitials = (name: string) => {
     if (!name) {
       return "?";
@@ -262,10 +266,12 @@ function HumanEdit({ form }: { form: ReturnType<typeof useForm<FormSchema>> }) {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <div className="flex items-center">
-                      <div className="w-28 text-sm text-muted-foreground">Name</div>
+                      <div className="w-28 text-sm text-muted-foreground">
+                        <Trans>Name</Trans>
+                      </div>
                       <FormControl className="flex-1">
                         <Input
-                          placeholder="John Doe"
+                          placeholder={t`John Doe`}
                           {...field}
                           className="border-none p-0 h-7 text-base focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
@@ -285,11 +291,11 @@ function HumanEdit({ form }: { form: ReturnType<typeof useForm<FormSchema>> }) {
                   <FormItem className="flex-1">
                     <div className="flex items-center">
                       <div className="w-28 text-sm text-muted-foreground">
-                        Job Title
+                        <Trans>Job Title</Trans>
                       </div>
                       <FormControl className="flex-1">
                         <Input
-                          placeholder="Software Engineer"
+                          placeholder={t`Software Engineer`}
                           {...field}
                           className="border-none p-0 h-7 text-base focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
@@ -302,7 +308,9 @@ function HumanEdit({ form }: { form: ReturnType<typeof useForm<FormSchema>> }) {
             </div>
 
             <div className="flex items-center px-4 py-3 border-b border">
-              <div className="w-28 text-sm text-muted-foreground">Company</div>
+              <div className="w-28 text-sm text-muted-foreground">
+                <Trans>Company</Trans>
+              </div>
               <div className="flex-1">
                 <OrganizationSelector form={form} />
               </div>
@@ -315,7 +323,9 @@ function HumanEdit({ form }: { form: ReturnType<typeof useForm<FormSchema>> }) {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <div className="flex items-center">
-                      <div className="w-28 text-sm text-muted-foreground">Email</div>
+                      <div className="w-28 text-sm text-muted-foreground">
+                        <Trans>Email</Trans>
+                      </div>
                       <FormControl className="flex-1">
                         <Input
                           type="email"
@@ -396,7 +406,11 @@ function OrganizationSelector({
                 </span>
               </div>
             )
-            : <span className="text-muted-foreground">Select organization</span>}
+            : (
+              <span className="text-muted-foreground">
+                <Trans>Select organization</Trans>
+              </span>
+            )}
         </div>
       </PopoverTrigger>
 
@@ -414,6 +428,7 @@ function OrganizationControl({
   form: ReturnType<typeof useForm<FormSchema>>;
   closePopover: () => void;
 }) {
+  const { t } = useLingui();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -479,7 +494,9 @@ function OrganizationControl({
 
   return (
     <div className="flex flex-col gap-3 max-w-[450px]">
-      <div className="text-sm font-medium text-foreground/80">Organization</div>
+      <div className="text-sm font-medium text-foreground/80">
+        <Trans>Organization</Trans>
+      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-2">
@@ -492,14 +509,14 @@ function OrganizationControl({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Search or add company"
+              placeholder={t`Search or add company`}
               className="w-full bg-transparent text-sm focus:outline-none placeholder:text-muted-foreground/70 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             {searchTerm.trim() && (
               <button
                 type="submit"
                 className="text-muted-foreground hover:text-foreground/80 transition-colors flex-shrink-0"
-                aria-label="Add organization"
+                aria-label={t`Add organization`}
               >
                 <RiCornerDownLeftLine className="size-4" />
               </button>

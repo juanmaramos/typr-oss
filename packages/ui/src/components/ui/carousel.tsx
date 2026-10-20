@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import * as React from "react";
@@ -54,6 +55,7 @@ const Carousel = React.forwardRef<
     },
     ref,
   ) => {
+    const { t } = useLingui();
     const [carouselRef, api] = useEmblaCarousel(
       {
         ...opts,
@@ -135,7 +137,7 @@ const Carousel = React.forwardRef<
           onKeyDownCapture={handleKeyDown}
           className={cn("relative", className)}
           role="region"
-          aria-roledescription="carousel"
+          aria-roledescription={t`carousel`}
           {...props}
         >
           {children}
@@ -172,13 +174,14 @@ const CarouselItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
+  const { t } = useLingui();
   const { orientation } = useCarousel();
 
   return (
     <div
       ref={ref}
       role="group"
-      aria-roledescription="slide"
+      aria-roledescription={t`slide`}
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
         orientation === "horizontal" ? "pl-4" : "pt-4",
@@ -217,7 +220,9 @@ const CarouselPrevious = React.forwardRef<
       {...props}
     >
       <ArrowLeft className="h-4 w-4" />
-      <span className="sr-only">Previous slide</span>
+      <span className="sr-only">
+        <Trans>Previous slide</Trans>
+      </span>
     </Button>
   );
 });
@@ -250,7 +255,9 @@ const CarouselNext = React.forwardRef<
       {...props}
     >
       <ArrowRight className="h-4 w-4" />
-      <span className="sr-only">Next slide</span>
+      <span className="sr-only">
+        <Trans>Next slide</Trans>
+      </span>
     </Button>
   );
 });

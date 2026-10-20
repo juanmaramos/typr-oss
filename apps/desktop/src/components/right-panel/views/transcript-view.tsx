@@ -1,10 +1,10 @@
-import { transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { useAudioUpload } from "@/contexts/audio-upload";
+import { transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { useAudioUploadStore } from "@/stores/audio-upload";
-import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMatch } from "@tanstack/react-router";
+import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
@@ -23,8 +23,8 @@ import { AnimatedIconDisplay, BUTTON_VARIANTS, CONTENT_VARIANTS } from "@/compon
 import { Loader } from "@/components/ui/loader";
 import { debugLogFor } from "@/components/utils/debug-logger";
 import { useRecordingTimer } from "@/hooks/useRecordingTimer";
-import { cn } from "@/lib/utils";
 import { sessionQueryOptions } from "@/lib/session-query";
+import { cn } from "@/lib/utils";
 import { Button } from "@typr/ui/components/ui/button";
 import { Spinner } from "@typr/ui/components/ui/spinner";
 import { useOngoingSession } from "@typr/utils/contexts";
@@ -307,7 +307,7 @@ export function TranscriptView({
     return (
       <div className="flex items-center justify-center h-full p-4">
         <p className="text-muted-foreground text-center">
-          Session not found. Please try refreshing the app.
+          <Trans>Session not found. Please try refreshing the app.</Trans>
         </p>
       </div>
     );
@@ -412,7 +412,6 @@ export function TranscriptView({
                       {formatTime(remaining)} <Trans>remaining</Trans>
                     </span>
                   </div>
-
                 </div>
               )}
             </>

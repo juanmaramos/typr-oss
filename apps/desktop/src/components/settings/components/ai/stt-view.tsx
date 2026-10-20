@@ -1,6 +1,7 @@
 import { useModelPreferences } from "@/hooks/useModelPreferences";
+import { getLanguageLabel } from "@/lib/language-labels";
 import { transcriptionModelQueryOptions } from "@/lib/model-selection";
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 
@@ -22,8 +23,6 @@ interface STTViewProps extends SharedSTTProps {
 // AssemblyAI U3 Pro supported languages (real-time cloud transcription)
 const ASSEMBLYAI_LANGUAGES = {
   multilingualSupport: {
-    label: "Multilingual code-switching",
-    description: "Dynamically switches between these languages in a single conversation",
     languages: [
       "English",
       "Spanish",
@@ -34,8 +33,6 @@ const ASSEMBLYAI_LANGUAGES = {
     ],
   },
   highAccuracy: {
-    label: "High accuracy (≤10% error)",
-    description: "Best performance languages",
     languages: [
       "English",
       "Spanish",
@@ -54,8 +51,6 @@ const ASSEMBLYAI_LANGUAGES = {
     ],
   },
   goodAccuracy: {
-    label: "Good accuracy (10-25% error)",
-    description: "Reliable transcription quality",
     languages: [
       "Arabic",
       "Azerbaijani",
@@ -99,6 +94,7 @@ export function STTView({
   setIsWerModalOpen,
   supportsLocalModels,
 }: STTViewProps) {
+  const { t } = useLingui();
   const [expandedModel, setExpandedModel] = React.useState<string | null>(null);
   const [cloudSttApiKeys, setCloudSttApiKeys] = React.useState<CloudSttApiKeys>({
     assemblyai: "",
@@ -215,7 +211,9 @@ export function STTView({
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-foreground">{model.name}</span>
+                          <span className="text-sm font-medium text-foreground">
+                            {sttModelMetadata[model.key]?.name ?? t`Real-time multilingual`}
+                          </span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5 truncate">
                           {renderLocalModelDescription(model.key)}
@@ -392,7 +390,7 @@ export function STTView({
                                             : <Trans>Reliable transcription quality</Trans>}
                                         </span>
                                         <p className="text-xs text-muted-foreground leading-relaxed">
-                                          {data.languages.join(", ")}
+                                          {data.languages.map(getLanguageLabel).join(", ")}
                                         </p>
                                       </div>
                                     </div>
@@ -441,7 +439,7 @@ export function STTView({
                                   </span>
                                 </div>
                                 <p className="text-xs text-muted-foreground pl-4 leading-relaxed">
-                                  {data.languages.join(", ")}
+                                  {data.languages.map(getLanguageLabel).join(", ")}
                                 </p>
                               </div>
                             ))}
@@ -581,7 +579,7 @@ export function STTView({
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-xs font-medium text-foreground">
-                          {model.name}
+                          {sttModelMetadata[model.key]?.name ?? t`Real-time multilingual`}
                         </p>
                         <p className="mt-0.5 text-xs text-muted-foreground truncate">
                           {model.key === "AssemblyAIUniversal"
@@ -669,7 +667,7 @@ export function STTView({
                                           : <Trans>Reliable transcription quality</Trans>}
                                       </span>
                                       <p className="text-xs text-muted-foreground leading-relaxed">
-                                        {data.languages.join(", ")}
+                                        {data.languages.map(getLanguageLabel).join(", ")}
                                       </p>
                                     </div>
                                   </div>

@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 // Note: These strings need to be translated where they are used since this is a constants file
 import type { SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
 
@@ -5,8 +7,12 @@ export const LANGUAGE_OPTIONS = [
   {
     key: "balanced" as const,
     iconClass: "ri-wifi-off-line",
-    label: "Multilingual",
-    description: "High accuracy across 50+ languages",
+    get label() {
+      return i18n._(msg`Multilingual`);
+    },
+    get description() {
+      return i18n._(msg`High accuracy across 50+ languages`);
+    },
     accuracy: 3, // Large Turbo - high accuracy
     speed: 2, // Large Turbo - moderate speed
     modelKey: "QuantizedLargeTurbo", // AUTO-DOWNLOADED MODEL
@@ -17,8 +23,12 @@ export const LANGUAGE_OPTIONS = [
   {
     key: "english" as const,
     iconClass: "ri-english-input",
-    label: "English",
-    description: "Best accuracy for English-only content",
+    get label() {
+      return i18n._(msg`English`);
+    },
+    get description() {
+      return i18n._(msg`Best accuracy for English-only content`);
+    },
     accuracy: 3, // Distil Large - highest accuracy
     speed: 3, // Distil model - optimized for speed
     modelKey: "DistilLargeV35En", // HIGH-QUALITY ENGLISH MODEL
@@ -44,8 +54,12 @@ export const LANGUAGE_OPTIONS = [
   {
     key: "assemblyai-universal" as const,
     iconClass: "ri-flashlight-fill",
-    label: "Multilingual",
-    description: "Works with any language automatically",
+    get label() {
+      return i18n._(msg`Multilingual`);
+    },
+    get description() {
+      return i18n._(msg`Works with any language automatically`);
+    },
     accuracy: 3, // High accuracy
     speed: 3, // Fast (real-time streaming)
     modelKey: "AssemblyAIUniversal",
@@ -70,6 +84,8 @@ export const DEFAULT_LOCAL_STT_LANGUAGE: LocalLanguageOption = "balanced";
 const defaultLocalSttOption = LANGUAGE_OPTIONS.find((option) => option.key === DEFAULT_LOCAL_STT_LANGUAGE);
 
 if (!defaultLocalSttOption || !("modelKey" in defaultLocalSttOption)) {
+  // Developer configuration invariant; this message is never part of normal model selection.
+  // eslint-disable-next-line typr-i18n/ui-strings
   throw new Error(`Default local STT language is not backed by a local model: ${DEFAULT_LOCAL_STT_LANGUAGE}`);
 }
 
@@ -101,8 +117,12 @@ export const sttModelMetadata: Record<string, {
   huggingface?: string;
 }> = {
   "QuantizedTiny": {
-    name: "Tiny",
-    description: "Fastest, lowest accuracy. Good for offline, low-resource use.",
+    get name() {
+      return i18n._(msg`Tiny`);
+    },
+    get description() {
+      return i18n._(msg`Fastest, lowest accuracy. Good for offline, low-resource use.`);
+    },
     iconClass: "ri-wifi-off-line",
     intelligence: 1,
     speed: 3,
@@ -113,8 +133,12 @@ export const sttModelMetadata: Record<string, {
     huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-tiny-q8_0.bin",
   },
   "QuantizedTinyEn": {
-    name: "Tiny - English",
-    description: "Fastest, English-only. Optimized for speed on English audio.",
+    get name() {
+      return i18n._(msg`Tiny - English`);
+    },
+    get description() {
+      return i18n._(msg`Fastest, English-only. Optimized for speed on English audio.`);
+    },
     iconClass: "ri-wifi-off-line",
     intelligence: 1,
     speed: 3,
@@ -125,8 +149,12 @@ export const sttModelMetadata: Record<string, {
     huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-tiny.en-q8_0.bin",
   },
   "QuantizedBase": {
-    name: "Base",
-    description: "Good balance of speed and accuracy for multilingual use.",
+    get name() {
+      return i18n._(msg`Base`);
+    },
+    get description() {
+      return i18n._(msg`Good balance of speed and accuracy for multilingual use.`);
+    },
     iconClass: "ri-wifi-off-line",
     intelligence: 2,
     speed: 2,
@@ -137,8 +165,12 @@ export const sttModelMetadata: Record<string, {
     huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-base-q8_0.bin",
   },
   "QuantizedBaseEn": {
-    name: "Base - English",
-    description: "Balanced speed and accuracy, optimized for English audio.",
+    get name() {
+      return i18n._(msg`Base - English`);
+    },
+    get description() {
+      return i18n._(msg`Balanced speed and accuracy, optimized for English audio.`);
+    },
     iconClass: "ri-wifi-off-line",
     intelligence: 2,
     speed: 2,
@@ -149,8 +181,12 @@ export const sttModelMetadata: Record<string, {
     huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-base.en-q8_0.bin",
   },
   "QuantizedSmall": {
-    name: "Small",
-    description: "Higher accuracy, moderate speed for multilingual transcription.",
+    get name() {
+      return i18n._(msg`Small`);
+    },
+    get description() {
+      return i18n._(msg`Higher accuracy, moderate speed for multilingual transcription.`);
+    },
     iconClass: "ri-wifi-off-line",
     intelligence: 2,
     speed: 2,
@@ -161,8 +197,12 @@ export const sttModelMetadata: Record<string, {
     huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-small-q8_0.bin",
   },
   "QuantizedSmallEn": {
-    name: "Small - English",
-    description: "Higher accuracy, moderate speed, optimized for English audio.",
+    get name() {
+      return i18n._(msg`Small - English`);
+    },
+    get description() {
+      return i18n._(msg`Higher accuracy, moderate speed, optimized for English audio.`);
+    },
     iconClass: "ri-wifi-off-line",
     intelligence: 3,
     speed: 2,
@@ -173,8 +213,12 @@ export const sttModelMetadata: Record<string, {
     huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-small.en-q8_0.bin",
   },
   "QuantizedLargeTurbo": {
-    name: "Large",
-    description: "Best accuracy across 50+ languages. Recommended for most users.",
+    get name() {
+      return i18n._(msg`Large`);
+    },
+    get description() {
+      return i18n._(msg`Best accuracy across 50+ languages. Recommended for most users.`);
+    },
     iconClass: "ri-wifi-off-line",
     intelligence: 3,
     speed: 2,
@@ -185,8 +229,12 @@ export const sttModelMetadata: Record<string, {
     huggingface: "https://huggingface.co/ggerganov/whisper.cpp/blob/main/ggml-large-v3-turbo-q5_0.bin",
   },
   "DistilLargeV35En": {
-    name: "Distil v3.5 - English",
-    description: "Highest quality English transcription. Optimized for meetings and conversations.",
+    get name() {
+      return i18n._(msg`Distil v3.5 - English`);
+    },
+    get description() {
+      return i18n._(msg`Highest quality English transcription. Optimized for meetings and conversations.`);
+    },
     iconClass: "ri-english-input",
     intelligence: 3,
     speed: 3,
@@ -201,7 +249,9 @@ export const sttModelMetadata: Record<string, {
 // WER Performance data from existing werPerformanceData
 export const WER_PERFORMANCE_TIERS = {
   excellent: {
-    range: "2.8-5.0% error",
+    get range() {
+      return i18n._(msg`2.8-5.0% error`);
+    },
     languages: [
       "Spanish",
       "Italian",
@@ -216,7 +266,9 @@ export const WER_PERFORMANCE_TIERS = {
     ],
   },
   good: {
-    range: "5.2-7.8% error",
+    get range() {
+      return i18n._(msg`5.2-7.8% error`);
+    },
     languages: [
       "Dutch",
       "French",
@@ -231,7 +283,9 @@ export const WER_PERFORMANCE_TIERS = {
     ],
   },
   moderate: {
-    range: "8.2-10.9% error",
+    get range() {
+      return i18n._(msg`8.2-10.9% error`);
+    },
     languages: [
       "Romanian",
       "Thai",
@@ -244,7 +298,9 @@ export const WER_PERFORMANCE_TIERS = {
     ],
   },
   weak: {
-    range: "11.6-14.8% error",
+    get range() {
+      return i18n._(msg`11.6-14.8% error`);
+    },
     languages: [
       "Serbian",
       "Danish",
@@ -257,7 +313,9 @@ export const WER_PERFORMANCE_TIERS = {
     ],
   },
   poor: {
-    range: "17.0-19.7% error",
+    get range() {
+      return i18n._(msg`17.0-19.7% error`);
+    },
     languages: [
       "Hindi",
       "Estonian",

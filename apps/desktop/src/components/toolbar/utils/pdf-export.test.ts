@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { messages as enMessages } from "@/locales/en/messages.po";
+import { i18n } from "@lingui/core";
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -19,6 +21,8 @@ import { exportToPDF, type SessionData } from "./pdf-export";
 
 describe("exportToPDF", () => {
   beforeEach(() => {
+    i18n.load("en", enMessages);
+    i18n.activate("en");
     vi.clearAllMocks();
     appDataDir.mockResolvedValue("/app/data/");
     writeFile.mockResolvedValue(undefined);

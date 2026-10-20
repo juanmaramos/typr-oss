@@ -15,8 +15,9 @@ import {
   shouldRetryProjectKnowledgeJob,
 } from "@/lib/project-knowledge-jobs";
 import { projectQueryKeys } from "@/lib/projects";
-import { commands as dbCommands, type ProjectKnowledgeJob } from "@typr/plugin-db";
+import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
+import { commands as dbCommands, type ProjectKnowledgeJob } from "@typr/plugin-db";
 import { useEffect, useRef } from "react";
 
 const PROJECT_KNOWLEDGE_JOB_POLL_MS = 2_000;
@@ -29,6 +30,7 @@ function getErrorMessage(error: unknown) {
 }
 
 export function ProjectKnowledgeJobRunner() {
+  const { t } = useLingui();
   const queryClient = useQueryClient();
   const runningJobIdsRef = useRef(new Set<string>());
   const runningSourceJobCountRef = useRef(0);
@@ -108,7 +110,7 @@ export function ProjectKnowledgeJobRunner() {
       try {
         if (isSourceDigestJob(job)) {
           if ((job.source_type !== "note" && job.source_type !== "file") || !job.source_id) {
-            throw new Error("Source digest job is missing a valid source.");
+            throw new Error(t`Source digest job is missing a valid source.`);
           }
           await ensureProjectSourceDigestForSource({
             projectId: job.project_id,
@@ -147,7 +149,7 @@ export function ProjectKnowledgeJobRunner() {
             modelId: job.model_id ?? "auto",
           });
         } else {
-          throw new Error(`Unsupported project knowledge job type: ${job.job_type}`);
+          throw new Error(t`Unsupported project knowledge job type: ${job.job_type}`);
         }
         await dbCommands.completeProjectKnowledgeJob(job.id);
         console.info("[project-knowledge-job] complete", {

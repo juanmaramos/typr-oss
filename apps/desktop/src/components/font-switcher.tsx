@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { useEffect, useState } from "react";
 
 import { typography } from "@typr/ui/lib/typography";
@@ -90,7 +91,9 @@ export function FontSwitcher() {
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span className="font-bold text-ui-control">Sans Font Switcher</span>
+        <span className="font-bold text-ui-control">
+          <Trans>Sans Font Switcher</Trans>
+        </span>
         <button
           onClick={() => setCollapsed(true)}
           className="text-ui-heading"
@@ -121,7 +124,8 @@ export function FontSwitcher() {
           textAlign: "left",
         }}
       >
-        {lightWeights ? "✓ " : ""}Lighter weights (medium→400, semibold→500)
+        {lightWeights ? "✓ " : ""}
+        <Trans>Lighter weights (medium→400, semibold→500)</Trans>
       </button>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -148,7 +152,7 @@ export function FontSwitcher() {
               {font.name}
               {i === 0 && (
                 <span className="font-system text-ui-caption" style={{ color: "#6366f1", marginLeft: 6 }}>
-                  current
+                  <Trans>current</Trans>
                 </span>
               )}
             </span>

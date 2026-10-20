@@ -1,6 +1,9 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { openPath } from "@tauri-apps/plugin-opener";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { SETTINGS_LOCAL_STT_MODEL_KEYS, sttModelMetadata } from "@/components/transcript/constants/languageData";
 import { type AISettingsSection, useSettingsDialog } from "@/contexts/settings-dialog";
@@ -17,7 +20,7 @@ import { SharedLLMProps, SharedSTTProps, STTModel } from "../components/ai/share
 import { STTView } from "../components/ai/stt-view";
 import { AiTaskDefaultsSettings } from "../components/ai/task-defaults";
 
-const initialSttModels: STTModel[] = [
+const getInitialSttModels = (): STTModel[] => [
   ...SETTINGS_LOCAL_STT_MODEL_KEYS.map((key) => {
     const metadata = sttModelMetadata[key];
 
@@ -33,7 +36,7 @@ const initialSttModels: STTModel[] = [
   }),
   {
     key: "AssemblyAIUniversal",
-    name: "Real-time multilingual",
+    name: i18n._(msg`Real-time multilingual`),
     accuracy: 3,
     speed: 3,
     size: "0 MB",
@@ -50,9 +53,8 @@ export default function LocalAI() {
   const { activeAiSection, setActiveAiSection } = useSettingsDialog();
 
   // Filter models for Windows
-  const visibleSttModels = useMemo(() => initialSttModels.filter(m => supportsLocalModels || m.isCloud), [
-    supportsLocalModels,
-  ]);
+  useLingui();
+  const visibleSttModels = getInitialSttModels().filter(m => supportsLocalModels || m.isCloud);
 
   // STT State
   const [isWerModalOpen, setIsWerModalOpen] = useState(false);

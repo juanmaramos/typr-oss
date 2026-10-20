@@ -1,5 +1,7 @@
 import { listProjectFileExtractions, listProjectFiles } from "@/lib/project-files";
 import { listIncludedSessionsByProject } from "@/lib/projects";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import type { Session } from "@typr/plugin-db";
 
 export type ProjectContextSource = {
@@ -59,7 +61,7 @@ export async function buildProjectContextSourceResult(
     sources.push({
       sourceType: "note",
       sourceId: session.id,
-      title: session.title?.trim() || "Untitled note",
+      title: session.title?.trim() || i18n._(msg`Untitled note`),
       visitedAt: session.visited_at,
       contentHash: await hashText(text),
       contentLength: text.length,

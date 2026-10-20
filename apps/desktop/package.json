@@ -10,13 +10,14 @@
     "tauri": "tauri",
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile --typescript",
-    "test": "vitest run src/components/right-panel/hooks/transcript-state.test.ts src/components/right-panel/hooks/chat-query-lifecycle.test.tsx src/components/right-panel/hooks/chat-operation-lifecycle.test.tsx src/components/right-panel/views/transcript-persistence.test.ts src/components/right-panel/panel-lifecycle.test.tsx src/components/right-panel/views/transcript-listener-lifecycle.test.tsx src/components/right-panel/views/chat-improve-writing-lifecycle.test.tsx src/contexts/layout-focus.test.tsx src/lib/session-query.test.tsx src/lib/project-knowledge.test.ts src/lib/project-briefs.test.ts src/lib/ask.test.ts src/components/left-sidebar/note-project-drag.test.tsx src/lib/note-title.test.ts src/components/toolbar/utils/pdf-export.test.ts src/lib/model-selection.test.tsx src/hooks/useTranscriptionFallback.test.tsx src/lib/typography.test.ts",
+    "test": "vitest run src/components/right-panel/hooks/transcript-state.test.ts src/components/right-panel/hooks/chat-query-lifecycle.test.tsx src/components/right-panel/hooks/chat-operation-lifecycle.test.tsx src/components/right-panel/views/transcript-persistence.test.ts src/components/right-panel/panel-lifecycle.test.tsx src/components/right-panel/views/transcript-listener-lifecycle.test.tsx src/components/right-panel/views/chat-improve-writing-lifecycle.test.tsx src/contexts/layout-focus.test.tsx src/lib/session-query.test.tsx src/lib/project-knowledge.test.ts src/lib/project-briefs.test.ts src/lib/ask.test.ts src/components/left-sidebar/note-project-drag.test.tsx src/lib/note-title.test.ts src/components/toolbar/utils/pdf-export.test.ts src/lib/model-selection.test.tsx src/hooks/useTranscriptionFallback.test.tsx src/lib/typography.test.ts src/lib/localization.test.tsx src/utils/default-templates.test.ts src/lib/validation-messages.test.ts src/components/right-panel/hooks/chat-errors.test.ts",
     "typecheck": "tsc --noEmit",
     "perf:assert-pdf-export-lazy": "node scripts/assert-pdf-export-lazy.mjs",
     "tauri:dev": "pnpm tauri dev",
     "tauri:build": "pnpm tauri build",
     "tauri:dev:local": ". \"$HOME/.cargo/env\" && tauri dev",
-    "tauri:build:local": ". \"$HOME/.cargo/env\" && tauri build"
+    "tauri:build:local": ". \"$HOME/.cargo/env\" && tauri build",
+    "i18n:check": "node scripts/check-translations.mjs"
   },
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
@@ -151,6 +152,9 @@
     "typescript-eslint": "^8.33.0",
     "vite": "^5.4.19",
     "vite-multiple-assets": "^2.2.5",
-    "vitest": "^3.1.4"
+    "vitest": "^3.1.4",
+    "@lingui/conf": "^5.3.2",
+    "@babel/parser": "^7.22.0",
+    "@messageformat/parser": "^5.1.1"
   }
 }

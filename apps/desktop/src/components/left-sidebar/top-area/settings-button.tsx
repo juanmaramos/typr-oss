@@ -126,10 +126,10 @@ function DropdownHeader({
         <CodeIcon className="size-8" />
         <div>
           <div className="font-medium">
-            OSS Edition
+            <Trans>OSS Edition</Trans>
           </div>
           <div className="text-xs text-background/80 mt-0.5">
-            Local and BYOK
+            <Trans>Local and BYOK</Trans>
           </div>
         </div>
       </div>

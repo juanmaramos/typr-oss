@@ -1,16 +1,48 @@
 import type { ProjectBriefView } from "@/components/projects/project-brief-panel";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 
 export const PROJECT_BRIEF_PREVIEW_ENABLED = import.meta.env.DEV;
 
 export type ProjectBriefPreviewMode = "no-notes" | "not-generated" | "generating" | "current" | "stale" | "failed";
 
 export const PROJECT_BRIEF_PREVIEW_MODES: Array<{ value: ProjectBriefPreviewMode; label: string }> = [
-  { value: "no-notes", label: "No notes" },
-  { value: "not-generated", label: "Not generated" },
-  { value: "generating", label: "Generating" },
-  { value: "current", label: "Current" },
-  { value: "stale", label: "Stale" },
-  { value: "failed", label: "Failed" },
+  {
+    value: "no-notes",
+    get label() {
+      return i18n._(msg`No notes`);
+    },
+  },
+  {
+    value: "not-generated",
+    get label() {
+      return i18n._(msg`Not generated`);
+    },
+  },
+  {
+    value: "generating",
+    get label() {
+      return i18n._(msg`Generating`);
+    },
+  },
+  {
+    value: "current",
+    get label() {
+      return i18n._(msg`Current`);
+    },
+  },
+  {
+    value: "stale",
+    get label() {
+      return i18n._(msg`Stale`);
+    },
+  },
+  {
+    value: "failed",
+    get label() {
+      return i18n._(msg`Failed`);
+    },
+  },
 ];
 
 export function getMockProjectBrief(
@@ -22,7 +54,7 @@ export function getMockProjectBrief(
     return null;
   }
 
-  const noteLabel = sourceCount === 1 ? "note" : "notes";
+  const noteLabel = sourceCount === 1 ? i18n._(msg`note`) : i18n._(msg`notes`);
 
   return {
     sourceCount,
@@ -31,39 +63,57 @@ export function getMockProjectBrief(
     sections: [
       {
         id: "current-state",
-        title: "Current understanding",
-        markdown:
-          `${projectName} has enough source material to maintain a working project brief from ${sourceCount} ${noteLabel}. The current direction is to keep project context scoped, readable, and grounded before expanding into workspace-wide Ask.`,
+        get title() {
+          return i18n._(msg`Current understanding`);
+        },
+        markdown: i18n._(
+          msg`${projectName} has enough source material to maintain a working project brief from ${sourceCount} ${noteLabel}. The current direction is to keep project context scoped, readable, and grounded before expanding into workspace-wide Ask.`,
+        ),
       },
       {
         id: "recent-updates",
-        title: "Recent updates",
-        markdown:
-          "- Project Ask now starts from the project page and continues in durable Ask threads.\n- Files are visible as a project resource surface, but storage and extraction are intentionally not connected yet.\n- The brief is moving out of resource tabs and into the right-side reference panel.",
+        get title() {
+          return i18n._(msg`Recent updates`);
+        },
+        markdown: i18n._(msg`- Project Ask now starts from the project page and continues in durable Ask threads.
+- Files are visible as a project resource surface, but storage and extraction are intentionally not connected yet.
+- The brief is moving out of resource tabs and into the right-side reference panel.`),
       },
       {
         id: "important-facts",
-        title: "Important facts",
-        markdown:
-          "- Notes remain the real persisted project sources today.\n- The generated brief is display synthesis, not editable source content.\n- Files must become project-scoped records before they can participate in Ask or brief generation.",
+        get title() {
+          return i18n._(msg`Important facts`);
+        },
+        markdown: i18n._(msg`- Notes remain the real persisted project sources today.
+- The generated brief is display synthesis, not editable source content.
+- Files must become project-scoped records before they can participate in Ask or brief generation.`),
       },
       {
         id: "open-questions",
-        title: "Open questions",
-        markdown:
-          "- What source coverage should trigger the first automatic brief?\n- How should stale summaries behave when notes are moved between projects?\n- Which document types should enter the file pipeline first?",
+        get title() {
+          return i18n._(msg`Open questions`);
+        },
+        markdown: i18n._(msg`- What source coverage should trigger the first automatic brief?
+- How should stale summaries behave when notes are moved between projects?
+- Which document types should enter the file pipeline first?`),
       },
       {
         id: "follow-ups",
-        title: "Follow-ups",
-        markdown:
-          "- Wire the real project brief status query and generated markdown.\n- Add context snapshots for Project Ask answers.\n- Define document ingestion states before files become first-class project sources.",
+        get title() {
+          return i18n._(msg`Follow-ups`);
+        },
+        markdown: i18n._(msg`- Wire the real project brief status query and generated markdown.
+- Add context snapshots for Project Ask answers.
+- Define document ingestion states before files become first-class project sources.`),
       },
       {
         id: "contradictions",
-        title: "Contradictions / changes",
-        markdown:
-          "No contradictions are visible in the current mock brief. In the real pipeline, this section should appear only when newer sources change or challenge older guidance.",
+        get title() {
+          return i18n._(msg`Contradictions / changes`);
+        },
+        markdown: i18n._(
+          msg`No contradictions are visible in the current mock brief. In the real pipeline, this section should appear only when newer sources change or challenge older guidance.`,
+        ),
       },
     ],
   };

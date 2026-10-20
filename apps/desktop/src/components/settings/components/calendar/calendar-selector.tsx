@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CalendarCogIcon, RefreshCwIcon } from "lucide-react";
 
@@ -9,6 +9,7 @@ import { Checkbox } from "@typr/ui/components/ui/checkbox";
 import { cn } from "@typr/ui/lib/utils";
 
 export function CalendarSelector() {
+  const { t } = useLingui();
   const { userId } = useTypr();
 
   const calendarsQuery = useQuery({
@@ -151,7 +152,9 @@ export function CalendarSelector() {
               return sourceA.localeCompare(sourceB);
             }).map(([source, sourceCalendars]) => (
               <div key={source} className="mb-5">
-                <div className="text-sm font-semibold text-foreground/90 mb-2">{source}</div>
+                <div className="text-sm font-semibold text-foreground/90 mb-2">
+                  {source === "Other" ? t`Other` : source}
+                </div>
                 <div className="pl-2 space-y-2.5">
                   {sourceCalendars
                     .sort((a, b) => {

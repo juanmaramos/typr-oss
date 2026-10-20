@@ -1,4 +1,5 @@
 import { i18n } from "@lingui/core";
+import { useLingui } from "@lingui/react/macro";
 import { addDays, eachDayOfInterval, format, getDay, isSameMonth, startOfMonth, subDays } from "date-fns";
 import { es } from "date-fns/locale";
 import { useEffect, useRef, useState } from "react";
@@ -25,6 +26,7 @@ export default function WorkspaceCalendar({
   events,
   month,
 }: WorkspaceCalendarProps) {
+  const { t } = useLingui();
   const today = new Date();
 
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -244,7 +246,7 @@ export default function WorkspaceCalendar({
                     <Popover>
                       <PopoverTrigger asChild>
                         <div className="text-xs text-muted-foreground rounded py-0.5 cursor-pointer hover:bg-surface-400 mx-1 h-5">
-                          {`+${hiddenCount} more`}
+                          {t`+${hiddenCount} more`}
                         </div>
                       </PopoverTrigger>
                       <PopoverContent

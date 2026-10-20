@@ -1,5 +1,5 @@
-import { useLingui } from "@lingui/react/macro";
-import { Trans } from "@lingui/react/macro";
+import { localizeDefaultTemplate } from "@/utils/default-templates";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -327,14 +327,16 @@ export function FloatingButton({
               onClick={() => handleTemplateSelect("auto")}
             >
               <Icon name="ri-sparkling-line" className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-              <span className="truncate">Auto</span>
+              <span className="truncate">
+                <Trans>Auto</Trans>
+              </span>
             </button>
 
             {/* Show separator and custom templates only if custom templates exist */}
             {templates.length > 0 && (
               <>
                 <div className={templateMenuSeparatorClass} />
-                {templates.map((template) => {
+                {templates.map(localizeDefaultTemplate).map((template) => {
                   const translatedTitle = getTemplateTitle(template);
                   const name = getTemplateDisplayName(translatedTitle, t`Untitled Template`);
 
@@ -361,17 +363,17 @@ export function FloatingButton({
   // Get current selected template info for display
   const getCurrentTemplateInfo = () => {
     if (!currentTemplateId || currentTemplateId === "auto") {
-      return { name: "Auto" };
+      return { name: t`Auto` };
     }
 
-    const selectedTemplate = templates.find(t => t.id === currentTemplateId);
+    const selectedTemplate = templates.map(localizeDefaultTemplate).find(t => t.id === currentTemplateId);
     if (selectedTemplate) {
       return {
         name: truncateTemplateName(getTemplateDisplayName(selectedTemplate.title, t`Untitled Template`)),
       };
     }
 
-    return { name: "Auto" };
+    return { name: t`Auto` };
   };
 
   // Helper function to truncate template names for display in the floating dock
@@ -557,7 +559,9 @@ export function FloatingButton({
                         onClick={() => handleTemplateSelect("auto")}
                       >
                         <Icon name="ri-sparkling-line" className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-                        <span className="truncate">Auto</span>
+                        <span className="truncate">
+                          <Trans>Auto</Trans>
+                        </span>
                         {(currentTemplateId === null || currentTemplateId === "auto") && (
                           <i className="ri-check-line ml-auto text-base text-muted-foreground" />
                         )}
@@ -567,7 +571,7 @@ export function FloatingButton({
                       {templates.length > 0 && (
                         <>
                           <div className={templateMenuSeparatorClass} />
-                          {templates.map((template) => {
+                          {templates.map(localizeDefaultTemplate).map((template) => {
                             const translatedTitle = getTemplateTitle(template);
                             const name = getTemplateDisplayName(translatedTitle, t`Untitled Template`);
                             const isSelected = currentTemplateId === template.id;

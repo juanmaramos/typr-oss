@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { appDataDir, join } from "@tauri-apps/api/path";
 import { exists, mkdir, remove, writeFile } from "@tauri-apps/plugin-fs";
 
@@ -88,7 +90,7 @@ export async function deleteProjectFile(file: ProjectFile) {
 
 export async function retryProjectFileExtraction(file: ProjectFile) {
   if (file.status !== "Done") {
-    throw new Error("This file was not saved. Remove it and add it again.");
+    throw new Error(i18n._(msg`This file was not saved. Remove it and add it again.`));
   }
 
   return saveProjectFileExtraction(file);
@@ -166,16 +168,16 @@ async function saveProjectFileExtraction(file: ProjectFile) {
 function getUnsupportedExtractionMessage(name: string) {
   const normalizedName = name.toLowerCase();
   if (normalizedName.endsWith(".pdf")) {
-    return "No readable PDF text found. Scanned/image-only PDFs need OCR, which is not available yet.";
+    return i18n._(msg`No readable PDF text found. Scanned/image-only PDFs need OCR, which is not available yet.`);
   }
   if (normalizedName.endsWith(".doc")) {
-    return "Legacy .doc extraction is not available yet. Save the document as DOCX and add it again.";
+    return i18n._(msg`Legacy .doc extraction is not available yet. Save the document as DOCX and add it again.`);
   }
   if (normalizedName.endsWith(".docx")) {
-    return "No readable DOCX text found.";
+    return i18n._(msg`No readable DOCX text found.`);
   }
 
-  return "This file is saved to the project, but text extraction is not available for this file type yet.";
+  return i18n._(msg`This file is saved to the project, but text extraction is not available for this file type yet.`);
 }
 
 function sanitizeFileName(name: string) {

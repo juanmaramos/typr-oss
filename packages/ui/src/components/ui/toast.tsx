@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
 import { useTheme } from "next-themes";
 import React from "react";
@@ -24,6 +25,7 @@ export interface CustomToastProps {
 }
 
 export function CustomToast(props: CustomToastProps) {
+  const { t } = useLingui();
   const { id, title, content, buttons = [], dismissible, children } = props;
 
   return (
@@ -32,7 +34,7 @@ export function CustomToast(props: CustomToastProps) {
         <button
           onClick={() => sonnerToast.dismiss(id)}
           className="cursor-pointer absolute top-2 right-2 p-1 rounded-full opacity-0 group-hover:opacity-100 hover:bg-muted transition-opacity"
-          aria-label="Dismiss"
+          aria-label={t`Dismiss`}
         >
           <X size={16} />
         </button>
@@ -90,11 +92,13 @@ export function toast(props: CustomToastProps) {
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  const { t } = useLingui();
   const { theme = "system" } = useTheme();
 
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
+      containerAriaLabel={t`Notifications`}
       className="toaster group z-[1000]"
       toastOptions={{
         classNames: {

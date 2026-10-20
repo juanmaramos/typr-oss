@@ -8,6 +8,8 @@ import {
   type ProjectIconValue,
 } from "@/components/projects/project-icons";
 import { deleteProjectFile, listProjectFiles } from "@/lib/project-files";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import {
   commands as dbCommands,
   type ProjectSource,
@@ -68,7 +70,7 @@ export function getProjectActionErrorMessage(error: unknown): string {
     return error;
   }
 
-  return "Try again in a moment.";
+  return i18n._(msg`Try again in a moment.`);
 }
 
 export function getLastSelectedProjectId(userId?: string | null): string | null {

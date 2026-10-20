@@ -1,17 +1,20 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+
 export interface ShortcutItem {
   id: string;
-  category: string;
-  description: string;
+  category: MessageDescriptor;
+  description: MessageDescriptor;
   macKey: string;
   windowsKey: string;
 }
 
 // Define categories
-const NAVIGATION = "Navigation";
-const NOTES = "Notes";
-const TRANSCRIPTION = "Transcription";
-const SYSTEM = "System";
-const EDITING = "Editing";
+const NAVIGATION = msg`Navigation`;
+const NOTES = msg`Notes`;
+const TRANSCRIPTION = msg`Transcription`;
+const SYSTEM = msg`System`;
+const EDITING = msg`Editing`;
 
 // Create shortcut data dynamically with translations
 export const shortcutsData: ShortcutItem[] = [
@@ -19,70 +22,70 @@ export const shortcutsData: ShortcutItem[] = [
   {
     id: "toggle-left-sidebar",
     category: NAVIGATION,
-    description: "Toggle left sidebar",
+    description: msg`Toggle left sidebar`,
     macKey: "⌘.",
     windowsKey: "Ctrl+.",
   },
   {
     id: "toggle-assistant",
     category: NAVIGATION,
-    description: "Toggle assistant panel",
+    description: msg`Toggle assistant panel`,
     macKey: "⌥⌘.",
     windowsKey: "Ctrl+Alt+.",
   },
   {
     id: "new-chat",
     category: NAVIGATION,
-    description: "Create new chat conversation",
+    description: msg`Create new chat conversation`,
     macKey: "⌘⇧N",
     windowsKey: "Ctrl+Shift+N",
   },
   {
     id: "toggle-transcript",
     category: NAVIGATION,
-    description: "Open transcript panel",
+    description: msg`Open transcript panel`,
     macKey: "⌘T",
     windowsKey: "Ctrl+T",
   },
   {
     id: "add-text-to-chat",
     category: EDITING,
-    description: "Add selected text to chat",
+    description: msg`Add selected text to chat`,
     macKey: "⌘L",
     windowsKey: "Ctrl+L",
   },
   {
     id: "improve-writing",
     category: EDITING,
-    description: "Improve selected text",
+    description: msg`Improve selected text`,
     macKey: "⌘⇧I",
     windowsKey: "Ctrl+Shift+I",
   },
   {
     id: "accept-changes",
     category: EDITING,
-    description: "Accept AI changes",
+    description: msg`Accept AI changes`,
     macKey: "⌘↩",
     windowsKey: "Ctrl+Enter",
   },
   {
     id: "reject-changes",
     category: EDITING,
-    description: "Reject AI changes",
+    description: msg`Reject AI changes`,
     macKey: "⌘⌫",
     windowsKey: "Ctrl+Backspace",
   },
   {
     id: "open-search",
     category: NAVIGATION,
-    description: "Open search/command palette",
+    description: msg`Open search/command palette`,
     macKey: "⌘K",
     windowsKey: "Ctrl+K",
   },
   {
     id: "show-shortcuts",
     category: NAVIGATION,
-    description: "Show keyboard shortcuts",
+    description: msg`Show keyboard shortcuts`,
     macKey: "⌘0",
     windowsKey: "Ctrl+0",
   },
@@ -91,14 +94,14 @@ export const shortcutsData: ShortcutItem[] = [
   {
     id: "new-note",
     category: NOTES,
-    description: "Create new note",
+    description: msg`Create new note`,
     macKey: "⌘N",
     windowsKey: "Ctrl+N",
   },
   {
     id: "note-actions",
     category: NOTES,
-    description: "Open note actions menu",
+    description: msg`Open note actions menu`,
     macKey: "⌘⇧.",
     windowsKey: "Ctrl+Shift+.",
   },
@@ -107,35 +110,35 @@ export const shortcutsData: ShortcutItem[] = [
   {
     id: "start-transcript",
     category: TRANSCRIPTION,
-    description: "Start new transcript",
+    description: msg`Start new transcript`,
     macKey: "⌘⇧T",
     windowsKey: "Ctrl+Shift+T",
   },
   {
     id: "pause-transcript",
     category: TRANSCRIPTION,
-    description: "Pause/resume transcript",
+    description: msg`Pause/resume transcript`,
     macKey: "⌘⇧P",
     windowsKey: "Ctrl+Shift+P",
   },
   {
     id: "stop-summarize-transcript",
     category: TRANSCRIPTION,
-    description: "Stop and summarize transcript",
+    description: msg`Stop and summarize transcript`,
     macKey: "⌘⇧S",
     windowsKey: "Ctrl+Shift+S",
   },
   {
     id: "import-youtube-video",
     category: TRANSCRIPTION,
-    description: "Transcribe YouTube video",
+    description: msg`Transcribe YouTube video`,
     macKey: "⌘⇧Y",
     windowsKey: "Ctrl+Shift+Y",
   },
   {
     id: "upload-audio",
     category: TRANSCRIPTION,
-    description: "Upload audio for transcription",
+    description: msg`Upload audio for transcription`,
     macKey: "⌘⇧U",
     windowsKey: "Ctrl+Shift+U",
   },
@@ -144,14 +147,14 @@ export const shortcutsData: ShortcutItem[] = [
   {
     id: "open-settings",
     category: SYSTEM,
-    description: "Open settings",
+    description: msg`Open settings`,
     macKey: "⌘,",
     windowsKey: "Ctrl+,",
   },
   {
     id: "close-modal",
     category: SYSTEM,
-    description: "Close modal/dialog",
+    description: msg`Close modal/dialog`,
     macKey: "Esc",
     windowsKey: "Esc",
   },
@@ -160,28 +163,28 @@ export const shortcutsData: ShortcutItem[] = [
   {
     id: "find-in-note",
     category: EDITING,
-    description: "Find in current note",
+    description: msg`Find in current note`,
     macKey: "⌘F",
     windowsKey: "Ctrl+F",
   },
   {
     id: "bold-text",
     category: EDITING,
-    description: "Bold selected text",
+    description: msg`Bold selected text`,
     macKey: "⌘B",
     windowsKey: "Ctrl+B",
   },
   {
     id: "italic-text",
     category: EDITING,
-    description: "Italic selected text",
+    description: msg`Italic selected text`,
     macKey: "⌘I",
     windowsKey: "Ctrl+I",
   },
   {
     id: "underline-text",
     category: EDITING,
-    description: "Underline selected text",
+    description: msg`Underline selected text`,
     macKey: "⌘U",
     windowsKey: "Ctrl+U",
   },
@@ -189,10 +192,10 @@ export const shortcutsData: ShortcutItem[] = [
 
 export const getShortcutsByCategory = () => {
   const categories = Array.from(new Set(shortcutsData.map(item => item.category)));
-  return categories.reduce((acc, category) => {
-    acc[category] = shortcutsData.filter(item => item.category === category);
-    return acc;
-  }, {} as Record<string, ShortcutItem[]>);
+  return categories.map(category => ({
+    category,
+    shortcuts: shortcutsData.filter(item => item.category === category),
+  }));
 };
 
 // Utility function to get a shortcut by ID

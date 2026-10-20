@@ -1,4 +1,5 @@
 import pluginJs from "@eslint/js";
+import pluginLingui from "eslint-plugin-lingui";
 import pluginReact from "eslint-plugin-react";
 import globals from "globals";
 import tseslint from "typescript-eslint";

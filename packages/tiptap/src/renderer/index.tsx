@@ -1,5 +1,6 @@
 import "../styles/tiptap.css";
 
+import { useLingui } from "@lingui/react/macro";
 import { type Editor as TiptapEditor, EditorContent, type HTMLContent, useEditor } from "@tiptap/react";
 import { forwardRef, useEffect } from "react";
 import * as shared from "../shared";
@@ -10,8 +11,9 @@ interface RendererProps {
 
 const Renderer = forwardRef<{ editor: TiptapEditor | null }, RendererProps>(
   ({ initialContent }, ref) => {
+    const { t } = useLingui();
     const editor = useEditor({
-      extensions: shared.getExtensions("Start reading...").map(ext => {
+      extensions: shared.getExtensions(t`Start reading...`).map(ext => {
         // Create unique instance for renderer to avoid duplicate extension warnings
         if (ext.name === "clipboardTextSerializer-default") {
           return shared.createClipboardTextSerializer("renderer");

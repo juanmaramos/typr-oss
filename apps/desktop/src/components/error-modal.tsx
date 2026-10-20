@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { open } from "@tauri-apps/plugin-shell";
 import { MessageSquareIcon, RefreshCwIcon } from "lucide-react";
@@ -13,6 +14,7 @@ interface ErrorModalProps {
 }
 
 export function ErrorModal({ isOpen, onClose, error }: ErrorModalProps) {
+  const { t } = useLingui();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
@@ -35,18 +37,22 @@ export function ErrorModal({ isOpen, onClose, error }: ErrorModalProps) {
   return (
     <Modal open={isOpen} onClose={onClose} size="md" preventClose>
       <ModalHeader className="px-6 pt-6">
-        <ModalTitle>Something went wrong</ModalTitle>
+        <ModalTitle>
+          <Trans>Something went wrong</Trans>
+        </ModalTitle>
         <ModalDescription className="mt-2">
-          We encountered an unexpected error. The error has been automatically reported to our team.
+          <Trans>We encountered an unexpected error. The error has been automatically reported to our team.</Trans>
         </ModalDescription>
       </ModalHeader>
 
       <ModalBody className="py-4">
         {error && (
           <div className="bg-muted/50 rounded-lg p-4 text-sm">
-            <p className="font-medium text-foreground mb-2">Error details:</p>
+            <p className="font-medium text-foreground mb-2">
+              <Trans>Error details:</Trans>
+            </p>
             <code className="text-muted-foreground break-words">
-              {error.message || "Unknown error occurred"}
+              {error.message || t`Unknown error occurred`}
             </code>
           </div>
         )}
@@ -60,7 +66,7 @@ export function ErrorModal({ isOpen, onClose, error }: ErrorModalProps) {
           className="flex-1"
         >
           <RefreshCwIcon className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
-          {isRefreshing ? "Refreshing..." : "Refresh App"}
+          {isRefreshing ? t`Refreshing...` : t`Refresh App`}
         </Button>
 
         <Button
@@ -69,7 +75,7 @@ export function ErrorModal({ isOpen, onClose, error }: ErrorModalProps) {
           className="flex-1"
         >
           <MessageSquareIcon className="h-4 w-4 mr-2" />
-          Report Issue
+          <Trans>Report Issue</Trans>
         </Button>
       </ModalFooter>
     </Modal>

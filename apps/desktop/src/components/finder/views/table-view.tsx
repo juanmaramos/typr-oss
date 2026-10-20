@@ -1,4 +1,6 @@
-import { useLingui } from "@lingui/react/macro";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { LinkProps } from "@tanstack/react-router";
 import { format, isToday } from "date-fns";
 import { Archive, Calendar, ChevronDown, ChevronUp, FileText, Search } from "lucide-react";
@@ -45,7 +47,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
     sessions.forEach(session => {
       items.push({
         id: session.id,
-        title: session.title || "New note",
+        title: session.title || t`New note`,
         date: new Date(session.created_at),
         type: "session",
         original: session,
@@ -61,7 +63,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
 
       items.push({
         id: event.id,
-        title: event.name || "Untitled Event",
+        title: event.name || t`Untitled Event`,
         date: startDate,
         type: "event",
         original: event,
@@ -70,7 +72,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
     });
 
     return items;
-  }, [sessions, events]);
+  }, [sessions, events, t]);
 
   const filteredItems = useMemo(() => {
     return tableItems
@@ -161,19 +163,19 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
     } else {
       const hours = Math.floor(minutes / 60);
       const remainingMinutes = minutes % 60;
-      return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+      return remainingMinutes > 0 ? t`${hours}h ${remainingMinutes}m` : `${hours}h`;
     }
   };
 
   const formatDisplayDate = (dateObj: Date): string => {
-    const timeStr = dateObj.toLocaleTimeString([], {
+    const timeStr = dateObj.toLocaleTimeString(i18n.locale || undefined, {
       hour: "numeric",
       minute: "2-digit",
       hour12: undefined, // Respect user's locale preferences
     });
 
     if (isToday(dateObj)) {
-      return `Today, ${timeStr}`;
+      return i18n._(msg`Today, ${timeStr}`);
     }
     return `${format(dateObj, "MMM d, yyyy")}, ${timeStr}`;
   };
@@ -199,9 +201,15 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
           className="w-full"
         >
           <TabsList className="grid grid-cols-3 mb-2">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="session">Notes</TabsTrigger>
-            <TabsTrigger value="event">Events</TabsTrigger>
+            <TabsTrigger value="all">
+              <Trans>All</Trans>
+            </TabsTrigger>
+            <TabsTrigger value="session">
+              <Trans>Notes</Trans>
+            </TabsTrigger>
+            <TabsTrigger value="event">
+              <Trans>Events</Trans>
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -218,7 +226,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
                     onClick={() => handleSortClick("type")}
                   >
                     <div className="flex items-center">
-                      Type
+                      <Trans>Type</Trans>
                       {sortField === "type" && (
                         sortOrder === "asc"
                           ? <ChevronUp className="h-3 w-3 ml-1" />
@@ -232,7 +240,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
                     onClick={() => handleSortClick("title")}
                   >
                     <div className="flex items-center">
-                      Title
+                      <Trans>Title</Trans>
                       {sortField === "title" && (
                         sortOrder === "asc"
                           ? <ChevronUp className="h-3 w-3 ml-1" />
@@ -246,7 +254,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
                     onClick={() => handleSortClick("date")}
                   >
                     <div className="flex items-center">
-                      Date
+                      <Trans>Date</Trans>
                       {sortField === "date" && (
                         sortOrder === "asc"
                           ? <ChevronUp className="h-3 w-3 ml-1" />
@@ -255,8 +263,12 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
                       {sortField !== "date" && <ChevronDown className="h-3 w-3 ml-1 opacity-30" />}
                     </div>
                   </th>
-                  <th className="px-4 py-2 text-left">Duration</th>
-                  <th className="px-4 py-2 text-left">Tags</th>
+                  <th className="px-4 py-2 text-left">
+                    <Trans>Duration</Trans>
+                  </th>
+                  <th className="px-4 py-2 text-left">
+                    <Trans>Tags</Trans>
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-background">
@@ -274,7 +286,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
                             : <Calendar className="h-3.5 w-3.5 text-info" />}
                         </div>
                         <span className="text-xs text-muted-foreground font-medium">
-                          {item.type === "session" ? "Note" : "Event"}
+                          {item.type === "session" ? t`Note` : t`Event`}
                         </span>
                       </div>
                     </td>
@@ -303,7 +315,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
                             ))}
                             {item.tags.length > 2 && (
                               <span className="text-xs text-muted-foreground">
-                                +{item.tags.length - 2} more
+                                +{item.tags.length - 2} <Trans>more</Trans>
                               </span>
                             )}
                           </div>
@@ -318,9 +330,11 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
           : (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground/70 pt-12">
               <Archive className="h-12 w-12 mb-3 text-muted-foreground/50" />
-              <p className="text-muted-foreground font-medium">No items found</p>
+              <p className="text-muted-foreground font-medium">
+                <Trans>No items found</Trans>
+              </p>
               <p className="text-sm text-muted-foreground/70 mt-1">
-                {searchTerm ? "Try a different search term" : "Create notes or events to see them here"}
+                {searchTerm ? t`Try a different search term` : t`Create notes or events to see them here`}
               </p>
 
               {searchTerm && (
@@ -330,7 +344,7 @@ export function TableView({ date, sessions, events, onNavigate }: TableViewProps
                   onClick={() => setSearchTerm("")}
                   className="mt-4"
                 >
-                  Clear search
+                  <Trans>Clear search</Trans>
                 </Button>
               )}
             </div>

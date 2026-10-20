@@ -1,12 +1,12 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
+import { type as getOsType } from "@tauri-apps/plugin-os";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@typr/ui/components/ui/dialog";
 import { Kbd, KbdKey } from "@typr/ui/components/ui/kbd";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@typr/ui/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@typr/ui/components/ui/tabs";
-import { Trans } from "@lingui/react/macro";
-import { useQuery } from "@tanstack/react-query";
-import { type as getOsType } from "@tauri-apps/plugin-os";
 import { KeyboardIcon, XIcon } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -70,6 +70,7 @@ interface ShortcutsWindowProps {
 }
 
 function ShortcutsWindow({ open, onOpenChange }: ShortcutsWindowProps) {
+  const { i18n } = useLingui();
   const osType = useQuery({
     queryKey: ["osType"],
     queryFn: () => getOsType(),
@@ -77,7 +78,7 @@ function ShortcutsWindow({ open, onOpenChange }: ShortcutsWindowProps) {
   });
 
   const shortcutsByCategory = getShortcutsByCategory();
-  const categories = Object.keys(shortcutsByCategory);
+  const categories = shortcutsByCategory.map(({ category }) => category);
   const totalCount = shortcutsData.length;
 
   const getShortcutDisplay = (shortcut: ShortcutItem) => {
@@ -108,17 +109,17 @@ function ShortcutsWindow({ open, onOpenChange }: ShortcutsWindowProps) {
         </DialogHeader>
 
         <div className="overflow-y-auto">
-          <Tabs defaultValue={categories[0]} className="w-full">
+          <Tabs defaultValue={categories[0]?.id} className="w-full">
             <TabsList className="grid w-full grid-cols-5 mb-4">
               {categories.map((category) => (
-                <TabsTrigger key={category} value={category} className="text-xs">
-                  <Trans id={category}>{category}</Trans>
+                <TabsTrigger key={category.id} value={category.id} className="text-xs">
+                  {i18n._(category)}
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            {categories.map((category) => (
-              <TabsContent key={category} value={category}>
+            {shortcutsByCategory.map(({ category, shortcuts }) => (
+              <TabsContent key={category.id} value={category.id}>
                 <div className="border rounded-lg">
                   <Table>
                     <TableHeader>
@@ -132,10 +133,10 @@ function ShortcutsWindow({ open, onOpenChange }: ShortcutsWindowProps) {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {shortcutsByCategory[category].map((shortcut) => (
+                      {shortcuts.map((shortcut) => (
                         <TableRow key={shortcut.id}>
                           <TableCell className="font-medium">
-                            <Trans id={shortcut.description}>{shortcut.description}</Trans>
+                            {i18n._(shortcut.description)}
                           </TableCell>
                           <TableCell>
                             <ShortcutBadge shortcut={getShortcutDisplay(shortcut)} />

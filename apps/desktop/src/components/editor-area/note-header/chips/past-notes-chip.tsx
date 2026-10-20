@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { FileClock } from "lucide-react";
 import { noteHeaderChipClassName } from "../styles";
 
@@ -14,7 +15,7 @@ export function PastNotesChip({ sessionId }: PastNotesChipProps) {
     <button className={noteHeaderChipClassName}>
       <FileClock size={14} className="flex-shrink-0" />
       <span className="truncate">
-        Past Notes
+        <Trans>Past Notes</Trans>
       </span>
     </button>
   );

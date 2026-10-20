@@ -1,6 +1,7 @@
+import { Trans, useLingui } from "@lingui/react/macro";
+import { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import { Connection } from "@typr/plugin-connector";
 import { cn } from "@typr/ui/lib/utils";
-import { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import { UseFormReturn } from "react-hook-form";
 
 export const RatingDisplay = (
@@ -29,13 +30,14 @@ export const RatingDisplay = (
 );
 
 export const LanguageDisplay = ({ support }: { support: "multilingual" | "english-only" }) => {
+  const { t } = useLingui();
   return (
     <div className="flex flex-col items-center px-2">
       <span className="text-ui-tiny text-muted-foreground uppercase font-medium tracking-wider mb-1.5">
-        Language
+        <Trans>Language</Trans>
       </span>
       <div className="text-xs font-medium">
-        {support === "multilingual" ? "Multilingual" : "English Only"}
+        {support === "multilingual" ? t`Multilingual` : t`English Only`}
       </div>
     </div>
   );

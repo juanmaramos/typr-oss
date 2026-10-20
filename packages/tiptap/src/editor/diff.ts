@@ -317,6 +317,8 @@ export const computeChildEqualityFactor = (
 
 export const assertNodeTypeEqual = (node1: ProsemirrorNode, node2: ProsemirrorNode): void => {
   if (node1.type.name !== node2.type.name) {
+    // ProseMirror schema invariant: preserve node names in developer diagnostics.
+    // eslint-disable-next-line typr-i18n/ui-strings
     throw new Error(`node type not equal: ${node1.type.name} !== ${node2.type.name}`);
   }
 };
@@ -475,6 +477,8 @@ export const createNewNode = (
   children: ProsemirrorNode[],
 ): ProsemirrorNode => {
   if (!oldNode.type) {
+    // Programmer diagnostic for a missing ProseMirror node type.
+    // eslint-disable-next-line typr-i18n/ui-strings
     throw new Error("oldNode.type is undefined");
   }
   return oldNode.type.create(

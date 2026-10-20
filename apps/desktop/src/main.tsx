@@ -1,3 +1,4 @@
+import { configureValidationMessages } from "@/lib/validation-messages";
 import "@typr/ui/globals.css";
 import "remixicon/fonts/remixicon.css";
 import "./styles/globals.css";
@@ -20,8 +21,8 @@ import type { Context } from "@/types";
 import {
   addTelemetryBreadcrumb,
   captureTelemetryMessage,
-  setUsageAnalyticsEnabled,
   setTelemetryUser,
+  setUsageAnalyticsEnabled,
 } from "@/utils/telemetry";
 import { commands as analyticsCommands } from "@typr/plugin-analytics";
 import { commands as authCommands } from "@typr/plugin-auth";
@@ -99,6 +100,7 @@ const detectSystemLanguage = async (): Promise<string> => {
 
 // Load language from user settings or default to system language
 const loadUserLanguage = async () => {
+  configureValidationMessages();
   try {
     const general = await configCommands.getGeneralConfig();
     const telemetryConsent = general?.telemetry_consent ?? true;
@@ -308,11 +310,11 @@ function App() {
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <CatchBoundary getResetKey={() => "error"} errorComponent={ErrorComponent}>
-      <TooltipProvider delayDuration={700} skipDelayDuration={300}>
-        <ThemeProvider defaultTheme="light">
-          <QueryClientProvider client={queryClient}>
-            <I18nProvider i18n={i18n}>
+    <I18nProvider i18n={i18n}>
+      <CatchBoundary getResetKey={() => "error"} errorComponent={ErrorComponent}>
+        <TooltipProvider delayDuration={700} skipDelayDuration={300}>
+          <ThemeProvider defaultTheme="light">
+            <QueryClientProvider client={queryClient}>
               <App />
               <Toaster
                 position="bottom-left"
@@ -320,10 +322,10 @@ if (!rootElement.innerHTML) {
                 duration={Infinity}
                 swipeDirections={[]}
               />
-            </I18nProvider>
-          </QueryClientProvider>
-        </ThemeProvider>
-      </TooltipProvider>
-    </CatchBoundary>,
+            </QueryClientProvider>
+          </ThemeProvider>
+        </TooltipProvider>
+      </CatchBoundary>
+    </I18nProvider>,
   );
 }

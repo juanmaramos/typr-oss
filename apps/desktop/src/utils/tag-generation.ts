@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { z } from "zod";
 
 import { commands as configCommands } from "@typr/plugin-config";
@@ -14,7 +16,7 @@ export async function generateTagsForSession(sessionId: string): Promise<string[
     const config = { general };
     const session = await dbCommands.getSession({ id: sessionId });
     if (!session) {
-      throw new Error("Session not found");
+      throw new Error(i18n._(msg`Session not found`));
     }
 
     const historicalTags = await dbCommands.listAllTags();

@@ -12,6 +12,9 @@ import {
   projectQueryKeys,
 } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,10 +35,7 @@ import {
 import { Input } from "@typr/ui/components/ui/input";
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
 import { toast } from "@typr/ui/components/ui/toast";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "@typr/utils/datetime";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/app/projects")({

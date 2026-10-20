@@ -1,10 +1,10 @@
 import { useModelPreferences } from "@/hooks/useModelPreferences";
-import { commands as connectorCommands } from "@typr/plugin-connector";
-import { commands as dbCommands } from "@typr/plugin-db";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Outlet, useMatch, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { type as getOsType } from "@tauri-apps/plugin-os";
+import { commands as connectorCommands } from "@typr/plugin-connector";
+import { commands as dbCommands } from "@typr/plugin-db";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { ContextPane } from "@/components/app-shell/context-pane";
@@ -30,9 +30,9 @@ import {
   NewChatProvider,
   NewNoteProvider,
   SearchProvider,
-  useTypr,
   useLeftSidebar,
   useRightPanel,
+  useTypr,
   YouTubeImportProvider,
 } from "@/contexts";
 import { AudioUploadProvider } from "@/contexts/audio-upload";
@@ -44,11 +44,11 @@ import { TranscriptionControlProvider } from "@/contexts/transcription-control";
 import { useTranscriptionFallback } from "@/hooks/useTranscriptionFallback";
 import { FEATURES } from "@/lib/features";
 import { commands } from "@/types";
+import { zodValidator } from "@tanstack/zod-adapter";
 import { events as windowsEvents, getCurrentWebviewWindowLabel } from "@typr/plugin-windows";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@typr/ui/components/ui/resizable";
 import { cn } from "@typr/ui/lib/utils";
 import { OngoingSessionProvider, SessionsProvider } from "@typr/utils/contexts";
-import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 
 // Schema for deep link query parameters
@@ -352,7 +352,6 @@ function DeepLinkHandler() {
     };
 
     handleDeepLinkParams();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run once on mount only
 
   return null;

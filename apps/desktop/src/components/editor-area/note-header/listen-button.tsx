@@ -1,11 +1,12 @@
 import { localTranscriptionModelQueryOptions } from "@/lib/model-selection";
+import { localizeDefaultTemplate } from "@/utils/default-templates";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronDownIcon, ChevronUpIcon, PauseIcon, PlayIcon, StopCircleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import SoundIndicator from "@/components/sound-indicator";
-import { useTypr, useRightPanel } from "@/contexts";
+import { useRightPanel, useTypr } from "@/contexts";
 import { useEnhancePendingState } from "@/hooks/enhance-pending";
 // import { useConsentNotification } from "@/utils/consent-notification";
 import { useMicrophoneDevice } from "@/components/transcript/hooks/useMicrophoneDevice";
@@ -208,6 +209,7 @@ function WhenInactiveAndMeetingNotEnded({ disabled, onClick }: { disabled: boole
 }
 
 function WhenInactiveAndMeetingEnded({ disabled, onClick }: { disabled: boolean; onClick: () => void }) {
+  const { t } = useLingui();
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -227,12 +229,13 @@ function WhenInactiveAndMeetingEnded({ disabled, onClick }: { disabled: boolean;
           : "bg-background text-foreground hover:bg-surface-400 hover:text-foreground",
       )}
     >
-      <Trans>{disabled ? "Processing..." : isHovered ? "Resume" : "Stopped"}</Trans>
+      {disabled ? t`Processing...` : isHovered ? t`Resume` : t`Stopped`}
     </Button>
   );
 }
 
 function WhenInactiveAndMeetingNotEndedOnboarding({ disabled, onClick }: { disabled: boolean; onClick: () => void }) {
+  const { t } = useLingui();
   return (
     <ShinyButton
       disabled={disabled}
@@ -249,12 +252,13 @@ function WhenInactiveAndMeetingNotEndedOnboarding({ disabled, onClick }: { disab
       }}
     >
       <PlayIcon size={14} />
-      <Trans>{disabled ? "Wait..." : "Play video"}</Trans>
+      {disabled ? t`Wait...` : t`Play video`}
     </ShinyButton>
   );
 }
 
 function WhenInactiveAndMeetingEndedOnboarding({ disabled, onClick }: { disabled: boolean; onClick: () => void }) {
+  const { t } = useLingui();
   return (
     <Button
       disabled={disabled}
@@ -268,7 +272,7 @@ function WhenInactiveAndMeetingEndedOnboarding({ disabled, onClick }: { disabled
       )}
     >
       <PlayIcon size={14} />
-      <Trans>{disabled ? "Processing..." : "Play again"}</Trans>
+      {disabled ? t`Processing...` : t`Play again`}
     </Button>
   );
 }
@@ -314,7 +318,9 @@ function WhenActive({ sessionId }: { sessionId: string }) {
     <div className="p-1.5 space-y-4">
       {/* Original Controls */}
       <div>
-        <div className="text-xs text-muted-foreground mb-2 font-medium">Original</div>
+        <div className="text-xs text-muted-foreground mb-2 font-medium">
+          <Trans>Original</Trans>
+        </div>
         <div className="flex items-center gap-2">
           {/* Non-clickable dancing bars as status indicator */}
           <div className="flex items-center justify-center px-3 py-1.5 rounded-full bg-background border border-border shadow-sm">
@@ -406,7 +412,9 @@ function WhenActive({ sessionId }: { sessionId: string }) {
 
       {/* New PlayerControls */}
       <div>
-        <div className="text-xs text-muted-foreground mb-2 font-medium">New Design</div>
+        <div className="text-xs text-muted-foreground mb-2 font-medium">
+          <Trans>New Design</Trans>
+        </div>
         <PlayerControls
           sessionId={sessionId}
           onPause={async () => await handleDirectPause()}
@@ -494,7 +502,7 @@ function AdvancedRecordingControls({
                   disabled={sessionId === onboardingSessionId}
                 />
                 <span className="text-sm text-muted-foreground">
-                  <Trans>{!ongoingSessionMuted.micMuted ? "Transcribe" : "Don't transcribe"}</Trans>
+                  {!ongoingSessionMuted.micMuted ? t`Transcribe` : t`Don't transcribe`}
                 </span>
               </div>
             </div>
@@ -512,7 +520,7 @@ function AdvancedRecordingControls({
                   onCheckedChange={(checked) => toggleSpeakerMuted.mutate()}
                 />
                 <span className="text-sm text-muted-foreground">
-                  <Trans>{!ongoingSessionMuted.speakerMuted ? "Transcribe" : "Don't transcribe"}</Trans>
+                  {!ongoingSessionMuted.speakerMuted ? t`Transcribe` : t`Don't transcribe`}
                 </span>
               </div>
             </div>
@@ -541,7 +549,7 @@ function AdvancedRecordingControls({
                 {selectedTemplate === "auto" || !selectedTemplate
                   ? t`Auto`
                   : getTemplateDisplayName(
-                    templatesQuery.data?.find(tmpl => tmpl.id === selectedTemplate)?.title,
+                    templatesQuery.data?.map(localizeDefaultTemplate).find(tmpl => tmpl.id === selectedTemplate)?.title,
                     t`Auto`,
                   )}
               </span>
@@ -554,8 +562,8 @@ function AdvancedRecordingControls({
                 <Trans>Auto</Trans>
               </div>
             </SelectItem>
-            {templatesQuery.data?.map((template) => {
-              const title = getTemplateDisplayName(template.title, "Untitled");
+            {templatesQuery.data?.map(localizeDefaultTemplate).map((template) => {
+              const title = getTemplateDisplayName(template.title, t`Untitled`);
               const truncatedTitle = title.length > 20 ? title.substring(0, 20) + "..." : title;
 
               return (
@@ -623,13 +631,17 @@ function MicrophoneDropdown({
           ? (
             <div className="p-4 text-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-foreground/50 mx-auto"></div>
-              <p className="text-sm text-muted-foreground mt-2">Loading devices...</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                <Trans>Loading devices...</Trans>
+              </p>
             </div>
           )
           : allDevices.length === 0
           ? (
             <div className="p-4 text-center">
-              <p className="text-sm text-muted-foreground">No microphones found</p>
+              <p className="text-sm text-muted-foreground">
+                <Trans>No microphones found</Trans>
+              </p>
             </div>
           )
           : (

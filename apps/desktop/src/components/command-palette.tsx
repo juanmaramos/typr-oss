@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import {
   CommandDialog,
   CommandGroup,
@@ -105,8 +107,10 @@ const extractParticipantSnippet = async (sessionId: string, query: string) => {
       const extraCount = matchingParticipants.length - names.length;
 
       return extraCount > 0
-        ? `Meeting with ${nameText} and ${extraCount} other${extraCount > 1 ? "s" : ""}`
-        : `Meeting with ${nameText}`;
+        ? extraCount === 1
+          ? i18n._(msg`Meeting with ${nameText} and 1 other`)
+          : i18n._(msg`Meeting with ${nameText} and ${extraCount} others`)
+        : i18n._(msg`Meeting with ${nameText}`);
     }
   } catch (error) {
     console.error("Error fetching participants:", error);
@@ -120,6 +124,7 @@ function SessionItem({ match, query, onSelect }: {
   query: string;
   onSelect: () => void;
 }) {
+  const { t } = useLingui();
   const [participantSnippet, setParticipantSnippet] = useState<string | null>(null);
   const titleMatches = (match.item.title || "").toLowerCase().includes(query.toLowerCase());
 
@@ -157,7 +162,7 @@ function SessionItem({ match, query, onSelect }: {
     : null;
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString).toLocaleDateString(i18n.locale || undefined);
   };
 
   return (
@@ -171,7 +176,7 @@ function SessionItem({ match, query, onSelect }: {
       <div className="flex flex-col items-start flex-1">
         <div className="flex items-center gap-2">
           <span className="font-medium">
-            {highlightText(match.item.title || "New note", query)}
+            {highlightText(match.item.title || t`New note`, query)}
           </span>
         </div>
         <span className="text-xs text-muted-foreground mt-1">
@@ -368,7 +373,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   // const organizationMatches = matches.filter(match => match.type === "organization");
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString).toLocaleDateString(i18n.locale || undefined);
   };
 
   useEffect(() => {
@@ -548,7 +553,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                     <UserIcon className="h-4 w-4 text-muted-foreground" />
                     <div className="flex flex-col items-start">
                       <span className="font-medium">
-                        {highlightText(match.item.full_name || "Unknown Person", query)}
+                        {highlightText(match.item.full_name || t`Unknown Person`, query)}
                       </span>
                       {match.item.email && (
                         <span className="text-xs text-muted-foreground">
@@ -608,7 +613,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   className="flex items-center gap-3"
                 >
                   <PlusIcon className="h-4 w-4 text-muted-foreground" />
-                  <span className="flex-1">Create new note</span>
+                  <span className="flex-1">
+                    <Trans>Create new note</Trans>
+                  </span>
                   <ShortcutById shortcutId="new-note" />
                 </CommandItem>
 
@@ -618,7 +625,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   className="flex items-center gap-3"
                 >
                   <MicIcon className="h-4 w-4 text-muted-foreground" />
-                  <span className="flex-1">Start new transcription</span>
+                  <span className="flex-1">
+                    <Trans>Start new transcription</Trans>
+                  </span>
                   <ShortcutById shortcutId="start-transcript" />
                 </CommandItem>
               </CommandGroup>

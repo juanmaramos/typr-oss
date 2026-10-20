@@ -3,7 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { type ReactNode } from "react";
 
 import { TemplateIcon } from "@/components/ui/template-icon";
-import { isDefaultTemplate } from "@/utils/default-templates";
+import { getTemplateTagLabel, isDefaultTemplate, localizeDefaultTemplate } from "@/utils/default-templates";
 import { getTemplateDisplayName } from "@/utils/template-presentation";
 import { type Template } from "@typr/plugin-db";
 import { cn } from "@typr/ui/lib/utils";
@@ -50,10 +50,11 @@ export function TemplateList({
 
   const filterTemplate = (template: Template, query: string) => {
     const searchLower = query.toLowerCase();
+    const displayTemplate = localizeDefaultTemplate(template);
     return (
-      template.title?.toLowerCase().includes(searchLower)
-      || template.description?.toLowerCase().includes(searchLower)
-      || template.tags?.some((tag) => tag.toLowerCase().includes(searchLower))
+      displayTemplate.title?.toLowerCase().includes(searchLower)
+      || displayTemplate.description?.toLowerCase().includes(searchLower)
+      || template.tags?.some((tag) => getTemplateTagLabel(template, tag).toLowerCase().includes(searchLower))
     );
   };
 
@@ -106,7 +107,7 @@ export function TemplateList({
                         {template.tags && template.tags.length > 0 && (
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <i className="ri-price-tag-3-line h-3 w-3" />
-                            <span>{template.tags.join(", ")}</span>
+                            <span>{template.tags.map(tag => getTemplateTagLabel(template, tag)).join(", ")}</span>
                           </div>
                         )}
                       </button>
@@ -150,7 +151,7 @@ export function TemplateList({
                       {template.tags && template.tags.length > 0 && (
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <i className="ri-price-tag-3-line h-3 w-3" />
-                          <span>{template.tags.join(", ")}</span>
+                          <span>{template.tags.map(tag => getTemplateTagLabel(template, tag)).join(", ")}</span>
                         </div>
                       )}
                     </button>

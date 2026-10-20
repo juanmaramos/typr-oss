@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useEffect } from "react";
 
 import {
@@ -53,6 +53,7 @@ export function LLMCustomView({
   customForm,
   isLocalEndpoint,
 }: SharedCustomEndpointProps) {
+  const { t } = useLingui();
   // Watch forms and submit when complete and valid
   useEffect(() => {
     const subscription = openaiForm.watch((values) => {
@@ -223,7 +224,7 @@ export function LLMCustomView({
                               onValueChange={field.onChange}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select OpenAI model" />
+                                <SelectValue placeholder={t`Select OpenAI model`} />
                               </SelectTrigger>
                               <SelectContent>
                                 {openaiModels.map((model) => (
@@ -297,7 +298,7 @@ export function LLMCustomView({
                             <Input
                               {...field}
                               type="password"
-                              placeholder="AIza..."
+                              placeholder={t`AIza...`}
                             />
                           </FormControl>
                           <FormMessage />
@@ -319,7 +320,7 @@ export function LLMCustomView({
                               onValueChange={field.onChange}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select Gemini model" />
+                                <SelectValue placeholder={t`Select Gemini model`} />
                               </SelectTrigger>
                               <SelectContent>
                                 {geminiModels.map((model) => (
@@ -425,7 +426,7 @@ export function LLMCustomView({
                               onValueChange={field.onChange}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select OpenRouter model" />
+                                <SelectValue placeholder={t`Select OpenRouter model`} />
                               </SelectTrigger>
                               <SelectContent>
                                 {openrouterModels.map((model) => (
@@ -556,7 +557,7 @@ export function LLMCustomView({
                                   onValueChange={field.onChange}
                                 >
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select model" />
+                                    <SelectValue placeholder={t`Select model`} />
                                   </SelectTrigger>
                                   <SelectContent>
                                     {availableLLMModels.data.map((model) => (
@@ -570,7 +571,7 @@ export function LLMCustomView({
                               : (
                                 <Input
                                   {...field}
-                                  placeholder="Enter model name (e.g., gpt-4, llama3.2:3b)"
+                                  placeholder={t`Enter model name (e.g., gpt-4, llama3.2:3b)`}
                                 />
                               )}
                           </FormControl>

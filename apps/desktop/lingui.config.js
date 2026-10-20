@@ -6,8 +6,13 @@ export default defineConfig({
   catalogs: [
     {
       path: "<rootDir>/src/locales/{locale}/messages",
-      include: ["<rootDir>/src", "../../packages/utils/src", "../../packages/tiptap/src"],
-      exclude: ["**/node_modules/**", "<rootDir>/src/locales/**"],
+      include: [
+        "<rootDir>/src",
+        "<rootDir>/../../packages/ui/src",
+        "<rootDir>/../../packages/utils/src",
+        "<rootDir>/../../packages/tiptap/src",
+      ],
+      exclude: ["**/node_modules/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "<rootDir>/src/locales/**"],
     },
   ],
 });

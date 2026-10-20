@@ -1,7 +1,8 @@
+import { getLanguageLabel } from "@/lib/language-labels";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import { Modal, ModalBody, ModalDescription, ModalFooter, ModalHeader, ModalTitle } from "@typr/ui/components/ui/modal";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 
 export const werPerformanceData = {
@@ -60,6 +61,14 @@ export const werPerformanceData = {
 };
 
 export function WERPerformanceModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { t } = useLingui();
+  const categoryLabels = {
+    Excellent: t`Excellent`,
+    Good: t`Good`,
+    Moderate: t`Moderate`,
+    Weak: t`Weak`,
+    Poor: t`Poor`,
+  };
   const [selectedCategory, setSelectedCategory] = useState<keyof typeof werPerformanceData>("Excellent");
 
   return (
@@ -100,7 +109,7 @@ export function WERPerformanceModal({ isOpen, onClose }: { isOpen: boolean; onCl
                     : "text-background hover:bg-background/30",
                 )}
               >
-                <Trans>{category}</Trans>
+                {categoryLabels[category]}
               </button>
             ))}
           </div>
@@ -113,7 +122,7 @@ export function WERPerformanceModal({ isOpen, onClose }: { isOpen: boolean; onCl
               className="flex justify-between items-center p-2.5 rounded-md bg-muted/50 hover:bg-surface-400 transition-colors"
             >
               <span className="text-sm font-medium">
-                <Trans>{lang.language}</Trans>
+                {getLanguageLabel(lang.language)}
               </span>
               <span className="font-mono text-muted-foreground">{lang.WER.toFixed(1)}%</span>
             </div>

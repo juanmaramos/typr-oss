@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
@@ -482,7 +484,7 @@ async function fetchObsidianFolders(): Promise<ObsidianFolder[]> {
       })) || [];
 
     return [
-      { value: "default", label: "default" },
+      { value: "default", label: i18n._(msg`Default`) },
       ...folders,
     ];
   } catch (error) {
@@ -494,6 +496,6 @@ async function fetchObsidianFolders(): Promise<ObsidianFolder[]> {
       console.error("Failed to open Obsidian:", error);
     });
 
-    return [{ value: "default", label: "default" }];
+    return [{ value: "default", label: i18n._(msg`Default`) }];
   }
 }

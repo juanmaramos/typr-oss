@@ -1,8 +1,9 @@
 import type { ProjectBriefView } from "@/components/projects/project-brief-panel";
 import { Markdown } from "@/components/ui/markdown";
+import { i18n } from "@lingui/core";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { type ReactNode, useMemo } from "react";
 
 interface ProjectSummaryTabProps {
@@ -17,7 +18,7 @@ function formatBriefUpdatedAt(updatedAt: string) {
     return null;
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(i18n.locale || undefined, {
     month: "short",
     day: "numeric",
     hour: "numeric",

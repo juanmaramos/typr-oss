@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useLingui } from "@lingui/react/macro";
 
 export type LoaderProps = {
   variant?: "circular" | "classic" | "pulse" | "pulse-dot" | "dots" | "typing" | "wave" | "bars" | "text-shimmer";
@@ -13,6 +14,7 @@ export function Loader({
   text,
   className,
 }: LoaderProps) {
+  const { t } = useLingui();
   // Size mappings for different variants
   const sizes = {
     sm: {
@@ -187,7 +189,7 @@ export function Loader({
           className,
         )}
       >
-        {text || "Loading..."}
+        {text || t`Loading...`}
       </div>
     );
   }

@@ -1,6 +1,8 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { useCallback, useMemo } from "react";
 
 import { useSession } from "@typr/utils/contexts";
@@ -43,7 +45,7 @@ function isYouTubeSession(title: string | null, rawMemoHtml: string | null): boo
  */
 function getOriginalYouTubeTitle(title: string | null): string {
   if (!title) {
-    return "YouTube Video";
+    return i18n._(msg`YouTube Video`);
   }
   return title;
 }

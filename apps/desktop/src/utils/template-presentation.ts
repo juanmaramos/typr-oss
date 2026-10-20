@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import type { Template } from "@typr/plugin-db";
 
 type TemplateLike = Pick<Template, "id" | "title"> | null | undefined;
@@ -25,7 +27,7 @@ export function getTemplateEditableName(title?: string | null): string {
   return (title || "").replace(LEADING_EMOJI_REGEX, "");
 }
 
-export function getTemplateDisplayName(title?: string | null, fallback = "Untitled Template"): string {
+export function getTemplateDisplayName(title?: string | null, fallback = i18n._(msg`Untitled Template`)): string {
   const stripped = stripTemplateLeadingEmoji(title);
   return stripped || fallback;
 }

@@ -4,14 +4,15 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
 import { ProjectIcon } from "@/components/projects/project-icon";
-import { useBulkDelete } from "@/hooks/useBulkDelete";
 import { useAddNotesToProject } from "@/hooks/useAddNotesToProject";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
 import { listProjects, projectQueryKeys } from "@/lib/projects";
 import { useMultiSelectNotes } from "@/stores/useMultiSelectNotes";
 import { NumberBadge } from "@typr/ui/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 
 export function BulkActionBar() {
+  const { t } = useLingui();
   const {
     getSelectedCount,
     clearSelection,
@@ -42,7 +43,7 @@ export function BulkActionBar() {
             <i className="ri-close-line text-sm" />
           </button>
 
-          <NumberBadge value={selectedCount} aria-label={`${selectedCount} selected`} />
+          <NumberBadge value={selectedCount} aria-label={t`${selectedCount} selected`} />
 
           <MoveToProjectButton />
           <TrashMenuButton />

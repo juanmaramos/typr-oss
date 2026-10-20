@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import { cn } from "@typr/ui/lib/utils";
 import { Calendar, Folder, Table, Users } from "lucide-react";
@@ -10,6 +11,7 @@ interface ViewSelectorProps {
 }
 
 export function ViewSelector({ currentView, onViewChange }: ViewSelectorProps) {
+  const { t } = useLingui();
   return (
     <div className="flex items-center gap-1 bg-muted rounded-md">
       <Button
@@ -22,7 +24,7 @@ export function ViewSelector({ currentView, onViewChange }: ViewSelectorProps) {
         onClick={() => onViewChange("folder")}
       >
         <Folder size={14} />
-        {currentView === "folder" && "Folder"}
+        {currentView === "folder" && t`Folder`}
       </Button>
 
       <Button
@@ -35,7 +37,7 @@ export function ViewSelector({ currentView, onViewChange }: ViewSelectorProps) {
         onClick={() => onViewChange("calendar")}
       >
         <Calendar size={14} />
-        {currentView === "calendar" && "Calendar"}
+        {currentView === "calendar" && t`Calendar`}
       </Button>
 
       <Button
@@ -48,7 +50,7 @@ export function ViewSelector({ currentView, onViewChange }: ViewSelectorProps) {
         onClick={() => onViewChange("table")}
       >
         <Table size={14} />
-        {currentView === "table" && "Table"}
+        {currentView === "table" && t`Table`}
       </Button>
 
       <Button
@@ -61,7 +63,7 @@ export function ViewSelector({ currentView, onViewChange }: ViewSelectorProps) {
         onClick={() => onViewChange("contact")}
       >
         <Users size={14} />
-        {currentView === "contact" && "Contacts"}
+        {currentView === "contact" && t`Contacts`}
       </Button>
     </div>
   );

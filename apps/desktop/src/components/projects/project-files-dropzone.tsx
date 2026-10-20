@@ -1,8 +1,9 @@
+import { i18n } from "@lingui/core";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { ProjectFile, ProjectFileExtraction } from "@typr/plugin-db";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { type ChangeEvent, type DragEvent, type KeyboardEvent, useId, useRef, useState } from "react";
 
 const FILE_PREVIEW_LIMIT = 8;
@@ -256,7 +257,9 @@ function getDisplayStatus(
     case "Done":
       return {
         className: "bg-success/10 text-success",
-        detail: extraction.char_count > 0 ? t`${extraction.char_count.toLocaleString()} chars indexed` : null,
+        detail: extraction.char_count > 0
+          ? t`${extraction.char_count.toLocaleString(i18n.locale || undefined)} chars indexed`
+          : null,
         iconClassName: "ri-check-line",
         label: t`Indexed`,
         tone: "success" as const,

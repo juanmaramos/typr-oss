@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
 
 interface EntityToolbarProps {
@@ -9,6 +10,7 @@ export function EntityToolbar({
   isEditing = false,
   onEditToggle,
 }: EntityToolbarProps) {
+  const { t } = useLingui();
   const router = useRouter();
   const canGoBack = useCanGoBack();
 
@@ -32,7 +34,7 @@ export function EntityToolbar({
             onClick={handleClickBack}
             className="px-3 py-1 text-sm font-medium rounded-md bg-muted hover:bg-surface-400 transition-colors"
           >
-            Back
+            <Trans>Back</Trans>
           </button>
         )}
       </div>
@@ -46,7 +48,7 @@ export function EntityToolbar({
             onClick={onEditToggle}
             className="px-3 py-1 text-sm font-medium rounded-md bg-muted hover:bg-surface-400 transition-colors w-14"
           >
-            {isEditing ? "Save" : "Edit"}
+            {isEditing ? t`Save` : t`Edit`}
           </button>
         )}
       </div>

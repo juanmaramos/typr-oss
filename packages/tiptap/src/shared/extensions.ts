@@ -1,3 +1,4 @@
+import { i18n } from "@lingui/core";
 import { SearchAndReplace } from "@sereneinserenade/tiptap-search-and-replace";
 import Highlight from "@tiptap/extension-highlight";
 import Image from "@tiptap/extension-image";
@@ -31,7 +32,7 @@ declare module "@tiptap/core" {
   }
 }
 
-export const getExtensions = (placeholderText: string = "Start taking notes...") => [
+export const getExtensions = (placeholderText?: string) => [
   StarterKit.configure({
     heading: {
       levels: [2, 3],
@@ -42,23 +43,23 @@ export const getExtensions = (placeholderText: string = "Start taking notes...")
   Placeholder.configure({
     placeholder: ({ node }) => {
       if (node.type.name === "paragraph") {
-        return placeholderText;
+        return placeholderText ?? i18n._("Start taking notes...");
       }
 
       if (node.type.name === "heading") {
-        return "Heading";
+        return i18n._("Heading");
       }
 
       if (node.type.name === "orderedList" || node.type.name === "bulletList" || node.type.name === "listItem") {
-        return "List";
+        return i18n._("List");
       }
 
       if (node.type.name === "taskList" || node.type.name === "taskItem") {
-        return "To-do";
+        return i18n._("To-do");
       }
 
       if (node.type.name === "blockquote") {
-        return "Empty quote";
+        return i18n._("Empty quote");
       }
 
       return "";

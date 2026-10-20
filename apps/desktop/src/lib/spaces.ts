@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 const LAST_SELECTED_SPACE_KEY_PREFIX = "spaces:last-selected:";
 
 export function normalizeSpaceName(name: string): string {
@@ -13,7 +15,7 @@ export function getSpaceActionErrorMessage(error: unknown): string {
     return error.message;
   }
 
-  return "Please try again.";
+  return i18n._(msg`Please try again.`);
 }
 
 export function getLastSelectedSpaceId(userId?: string | null): string | null {

@@ -29,6 +29,7 @@ export default function TemplatesView({
   onPendingActionConsumed,
 }: TemplatesViewProps) {
   const { userId } = useTypr();
+  const { t } = useLingui();
 
   const [viewState, setViewState] = useState<ViewState>("list");
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
@@ -177,7 +178,7 @@ export default function TemplatesView({
       const clonedTemplate: Template = {
         ...template,
         id: crypto.randomUUID(),
-        title: `${template.title} Copy`,
+        title: t`${template.title} Copy`,
         user_id: userId,
       };
       await dbCommands.upsertTemplate(clonedTemplate);

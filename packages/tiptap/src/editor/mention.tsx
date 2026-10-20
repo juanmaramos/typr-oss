@@ -1,4 +1,5 @@
 import { autoUpdate, computePosition, flip, limitShift, offset, shift, type VirtualElement } from "@floating-ui/dom";
+import { i18n } from "@lingui/core";
 import Mention from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactRenderer } from "@tiptap/react";
@@ -158,7 +159,7 @@ const suggestion = (config: MentionConfig): Omit<SuggestionOptions, "editor"> =>
           });
       }, 0);
 
-      return loading ? [{ id: "loading", type: "loading", label: "Loading..." }] : [];
+      return loading ? [{ id: "loading", type: "loading", label: i18n._("Loading...") }] : [];
     },
     render: () => {
       let renderer: ReactRenderer;

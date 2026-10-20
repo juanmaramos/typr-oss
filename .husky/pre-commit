@@ -3,7 +3,11 @@
 
 echo "🔍 Running pre-commit checks..."
 
-# 1. Health check (database, build, error handlers)
+# 1. Validate exactly what will be committed, including shared UI and Spanish.
+echo "🌍 Checking staged translations..."
+pnpm i18n:check:staged || exit 1
+
+# 2. Health check (database, build, error handlers)
 echo "🏥 Running health check..."
 npm run test:health
 if [ $? -ne 0 ]; then
@@ -11,10 +15,10 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# 2. Code formatting check (matches fmt.yaml workflow)
+# 3. Format only changed staged paths; unrelated baseline formatting is preserved.
 echo "🎨 Checking code formatting..."
 if command -v dprint >/dev/null 2>&1; then
-  dprint check
+  dprint check --staged --allow-no-files
   if [ $? -ne 0 ]; then
     echo "❌ Code formatting failed. Run 'dprint fmt' to fix."
     exit 1
@@ -22,11 +26,6 @@ if command -v dprint >/dev/null 2>&1; then
 else
   echo "⚠️  dprint not found, skipping formatting check"
 fi
-
-# 3. i18n synchronization check - REMOVED from pre-commit
-# Lingui extract has non-deterministic ordering that causes false positives
-# i18n is still validated in CI via .github/workflows/i18n.yaml
-# echo "🌍 Checking i18n synchronization..."
 
 # 4. Platform-specific compilation check - DISABLED
 # This check was catching whisper-rs build issues but has false positives

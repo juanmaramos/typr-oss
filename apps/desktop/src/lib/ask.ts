@@ -1,5 +1,7 @@
 import { ensureProjectSourceDigests } from "@/lib/project-knowledge";
 import { getProject } from "@/lib/projects";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import {
   type AskContextSnapshot,
   type AskMessage,
@@ -180,14 +182,14 @@ export async function generateAssistantAnswerForThread({
 }) {
   const thread = await dbCommands.getAskThread(threadId);
   if (!thread) {
-    throw new Error("Ask thread not found");
+    throw new Error(i18n._(msg`Ask thread not found`));
   }
 
   const messages = await dbCommands.listAskMessages(threadId);
   const latestUserMessage = [...messages].reverse().find(message => message.role === "User");
 
   if (!latestUserMessage) {
-    throw new Error("Ask generation requires at least one user message");
+    throw new Error(i18n._(msg`Ask generation requires at least one user message`));
   }
 
   const now = new Date().toISOString();
@@ -243,7 +245,7 @@ export async function generateAssistantAnswerForThread({
 
     answer = answer.trim();
     if (!answer) {
-      throw new Error("The AI model returned an empty response.");
+      throw new Error(i18n._(msg`The AI model returned an empty response.`));
     }
 
     return dbCommands.upsertAskMessage({
@@ -256,7 +258,7 @@ export async function generateAssistantAnswerForThread({
 
     await dbCommands.upsertAskMessage({
       ...assistantMessage,
-      content: `I couldn’t answer this project question: ${message}`,
+      content: i18n._(msg`I couldn’t answer this project question: ${message}`),
       status: "Failed",
     });
 
@@ -284,12 +286,12 @@ async function buildAskContextSnapshot({
   thread: AskThread;
 }) {
   if (thread.scope_type !== "Project" || !thread.scope_id) {
-    throw new Error("Only project-scoped Ask generation is implemented.");
+    throw new Error(i18n._(msg`Only project-scoped Ask generation is implemented.`));
   }
 
   const project = await getProject(thread.scope_id);
   if (!project) {
-    throw new Error("Project not found");
+    throw new Error(i18n._(msg`Project not found`));
   }
 
   const [digests, projectBrief, projectFiles] = await Promise.all([

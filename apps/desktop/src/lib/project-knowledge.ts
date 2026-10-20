@@ -1,6 +1,8 @@
 import { getSessionProjectContextText, hashText, htmlToPlainText } from "@/lib/project-context-sources";
 import { listProjectFileExtractions, listProjectFiles } from "@/lib/project-files";
 import { listIncludedSessionsByProject } from "@/lib/projects";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import {
   commands as dbCommands,
   type ProjectBrief,
@@ -194,7 +196,7 @@ export async function ensureProjectSourceDigestForSource({
   const materials = await listProjectKnowledgeSourceMaterials(projectId);
   const material = materials.find(item => item.sourceType === sourceType && item.sourceId === sourceId);
   if (!material) {
-    throw new Error("Project source is no longer readable or included.");
+    throw new Error(i18n._(msg`Project source is no longer readable or included.`));
   }
 
   const result = await ensureProjectSourceDigest(projectId, material, modelId);
@@ -284,14 +286,14 @@ export async function buildAndUpsertProjectKnowledgeSynthesis(projectId: string,
     dbCommands.listProjectSourceDigests(projectId),
   ]);
   if (materials.length === 0) {
-    throw new Error("Project synthesis requires at least one readable source.");
+    throw new Error(i18n._(msg`Project synthesis requires at least one readable source.`));
   }
 
   const digestBySource = new Map(digests.map(digest => [digestKey(digest.source_type, digest.source_id), digest]));
   const orderedDigests = materials.map(material => {
     const digest = digestBySource.get(digestKey(material.sourceType, material.sourceId));
     if (digest?.source_hash !== material.sourceHash) {
-      throw new Error("Project source digests are still building.");
+      throw new Error(i18n._(msg`Project source digests are still building.`));
     }
     return digest;
   });
@@ -428,7 +430,9 @@ export function evaluateProjectKnowledgeHealth(input: ProjectKnowledgeHealthInpu
     if (!digest) {
       issues.push({
         code: "SourceMissingDigest",
-        message: "Readable source has no compiled digest yet.",
+        get message() {
+          return i18n._(msg`Readable source has no compiled digest yet.`);
+        },
         severity: "warning",
         sourceId: material.sourceId,
         sourceType: material.sourceType,
@@ -440,7 +444,9 @@ export function evaluateProjectKnowledgeHealth(input: ProjectKnowledgeHealthInpu
     if (digest.source_hash !== material.sourceHash) {
       issues.push({
         code: "SourceDigestStale",
-        message: "Readable source changed after its compiled digest was generated.",
+        get message() {
+          return i18n._(msg`Readable source changed after its compiled digest was generated.`);
+        },
         severity: "warning",
         sourceId: material.sourceId,
         sourceType: material.sourceType,
@@ -454,7 +460,7 @@ export function evaluateProjectKnowledgeHealth(input: ProjectKnowledgeHealthInpu
     if (file.status === "Failed") {
       issues.push({
         code: "FileSaveFailed",
-        message: file.error_message ?? "Project file failed to save.",
+        message: file.error_message ?? i18n._(msg`Project file failed to save.`),
         severity: "error",
         sourceId: file.id,
         sourceType: "file",
@@ -467,7 +473,9 @@ export function evaluateProjectKnowledgeHealth(input: ProjectKnowledgeHealthInpu
     if (!extraction) {
       issues.push({
         code: "FileExtractionPending",
-        message: "Project file has no extraction row yet.",
+        get message() {
+          return i18n._(msg`Project file has no extraction row yet.`);
+        },
         severity: "info",
         sourceId: file.id,
         sourceType: "file",
@@ -479,7 +487,7 @@ export function evaluateProjectKnowledgeHealth(input: ProjectKnowledgeHealthInpu
     if (extraction.status === "Failed") {
       issues.push({
         code: "FileExtractionFailed",
-        message: extraction.error_message ?? "Project file text extraction failed.",
+        message: extraction.error_message ?? i18n._(msg`Project file text extraction failed.`),
         severity: "error",
         sourceId: file.id,
         sourceType: "file",
@@ -488,7 +496,7 @@ export function evaluateProjectKnowledgeHealth(input: ProjectKnowledgeHealthInpu
     } else if (extraction.status === "Unsupported") {
       issues.push({
         code: "FileExtractionUnsupported",
-        message: extraction.error_message ?? "Project file text extraction is unsupported.",
+        message: extraction.error_message ?? i18n._(msg`Project file text extraction is unsupported.`),
         severity: "warning",
         sourceId: file.id,
         sourceType: "file",
@@ -497,7 +505,9 @@ export function evaluateProjectKnowledgeHealth(input: ProjectKnowledgeHealthInpu
     } else if (extraction.status === "Pending") {
       issues.push({
         code: "FileExtractionPending",
-        message: "Project file text extraction is still pending.",
+        get message() {
+          return i18n._(msg`Project file text extraction is still pending.`);
+        },
         severity: "info",
         sourceId: file.id,
         sourceType: "file",
@@ -559,6 +569,8 @@ export async function listProjectKnowledgeSourceMaterials(
 
 export async function sessionToKnowledgeMaterial(session: Session): Promise<ProjectKnowledgeSourceMaterial | null> {
   const aiNotes = getSessionAiNotesText(session);
+  // Preserve canonical source titles across interface language changes.
+  // eslint-disable-next-line typr-i18n/ui-strings
   const title = session.title?.trim() || "Untitled note";
   if (aiNotes) {
     return {
@@ -811,13 +823,13 @@ function validateGeneratedDigest(
   value: unknown,
 ): { success: true; value: GeneratedDigest } | { success: false; error: Error } {
   if (!value || typeof value !== "object") {
-    return { success: false, error: new Error("Generated digest must be an object.") };
+    return { success: false, error: new Error(i18n._(msg`Generated digest must be an object.`)) };
   }
 
   const record = value as Record<string, unknown>;
   const summary = typeof record.summary === "string" ? record.summary.trim() : "";
   if (!summary) {
-    return { success: false, error: new Error("Generated digest must include a summary.") };
+    return { success: false, error: new Error(i18n._(msg`Generated digest must include a summary.`)) };
   }
 
   return {
@@ -846,10 +858,14 @@ export function buildExtractiveDigest(
   const summary = toDigestSummary(excerptText);
   const excerpts = chunks.length > 0
     ? chunks.slice(0, SOURCE_DIGEST_CHUNK_LIMIT).map((chunk, index) => ({
+      // Canonical source locators are persisted provenance, not translated interface copy.
+      // eslint-disable-next-line typr-i18n/ui-strings
       label: chunk.source_locator ?? `Chunk ${index + 1}`,
       text: truncateText(normalizeSourceText(chunk.text_content), 900),
     }))
     : [{
+      // Canonical digest labels are persisted with AI context.
+      // eslint-disable-next-line typr-i18n/ui-strings
       label: "Source text",
       text: truncateText(normalizeSourceText(material.text), 1800),
     }];
@@ -907,6 +923,8 @@ function digestToMarkdown(digest: GeneratedDigest) {
     formatDigestList("Decisions", digest.decisions),
     formatDigestList("Risks", digest.risks),
     formatDigestList("Contradictions / changes", digest.contradictionsOrChanges),
+    // Persisted canonical knowledge headings also serve as stable model context markers.
+    // eslint-disable-next-line typr-i18n/ui-strings
     formatDigestList("Open questions", digest.openQuestions),
   ].filter(Boolean).join("\n\n");
 }
@@ -968,7 +986,7 @@ async function generateProjectSynthesis(
 
 function validateGeneratedSynthesis(value: unknown, validKeys: Set<string>): GeneratedProjectSynthesis {
   if (!value || typeof value !== "object") {
-    throw new Error("Generated synthesis must be an object.");
+    throw new Error(i18n._(msg`Generated synthesis must be an object.`));
   }
 
   const record = value as Record<string, unknown>;
@@ -1030,8 +1048,12 @@ function extractDigestSectionItems(card: SynthesisSourceCard, label: string): Ge
 
 function projectSynthesisToMarkdown(synthesis: GeneratedProjectSynthesis) {
   return [
+    // Persisted canonical knowledge headings also serve as stable model context markers.
+    // eslint-disable-next-line typr-i18n/ui-strings
     formatSynthesisList("Key claims", synthesis.keyClaims),
     formatSynthesisList("Contradictions / changes", [...synthesis.contradictions, ...synthesis.changes]),
+    // Persisted canonical knowledge headings also serve as stable model context markers.
+    // eslint-disable-next-line typr-i18n/ui-strings
     formatSynthesisList("Open questions", synthesis.openQuestions),
   ].filter(Boolean).join("\n\n");
 }
@@ -1087,7 +1109,9 @@ function getBriefCitationHealthIssues(
     if (!source) {
       issues.push({
         code: "BriefCitationUnknownKey",
-        message: "Project brief cites a key that is not in persisted brief sources.",
+        get message() {
+          return i18n._(msg`Project brief cites a key that is not in persisted brief sources.`);
+        },
         severity: "error",
         sourceKey,
       });
@@ -1098,7 +1122,9 @@ function getBriefCitationHealthIssues(
     if (!materialKeys.has(digestKey(sourceType, source.source_id))) {
       issues.push({
         code: "BriefCitationMissingSource",
-        message: "Project brief cites a source that is no longer readable or included.",
+        get message() {
+          return i18n._(msg`Project brief cites a source that is no longer readable or included.`);
+        },
         severity: "warning",
         sourceId: source.source_id,
         sourceKey,

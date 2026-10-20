@@ -2,6 +2,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { debugLogFor } from "@/components/utils/debug-logger";
 import { cn } from "@/lib/utils";
 import { logAskLayoutDebug } from "@/utils/ask-layout-debug";
+import { useLingui } from "@lingui/react/macro";
 import React, { createContext, useContext, useLayoutEffect, useRef, useState } from "react";
 import { promptInputClassNames } from "./prompt-input-contracts";
 
@@ -28,9 +29,10 @@ const PromptInputContext = createContext<PromptInputContextType>({
 });
 
 function usePromptInput() {
+  const { t } = useLingui();
   const context = useContext(PromptInputContext);
   if (!context) {
-    throw new Error("usePromptInput must be used within a PromptInput");
+    throw new Error(t`usePromptInput must be used within a PromptInput`);
   }
   return context;
 }

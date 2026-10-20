@@ -1,6 +1,8 @@
 import { TemplateIcon } from "@/components/ui/template-icon";
+import { localizeDefaultTemplate } from "@/utils/default-templates";
 import { getTemplateEditableName, getTemplateLeadingEmoji } from "@/utils/template-presentation";
 import { TemplateService } from "@/utils/template-service";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { type Template } from "@typr/plugin-db";
 import { Button } from "@typr/ui/components/ui/button";
 import {
@@ -14,7 +16,6 @@ import { Input } from "@typr/ui/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 import { Textarea } from "@typr/ui/components/ui/textarea";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
 import { useCallback, useState } from "react";
 import { SectionsList } from "../components/template-sections";
 
@@ -81,6 +82,7 @@ export default function TemplateEditor({
   // Check if this is a built-in template
   const isBuiltinTemplate = !TemplateService.canEditTemplate(template.id);
   const isReadOnly = disabled || isBuiltinTemplate;
+  const displayTemplate = localizeDefaultTemplate(template);
 
   const [selectedEmoji, setSelectedEmoji] = useState(
     () => getTemplateLeadingEmoji(template.title) || "📄",
@@ -178,7 +180,7 @@ export default function TemplateEditor({
             {/* Title Input */}
             <Input
               readOnly={isReadOnly}
-              value={isBuiltinTemplate ? (template.title || "") : getTemplateEditableName(template.title)}
+              value={isBuiltinTemplate ? (displayTemplate.title || "") : getTemplateEditableName(template.title)}
               onChange={handleChangeTitle}
               className={cn(
                 "rounded-none border-0 p-0 !text-lg font-semibold focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 flex-1",
@@ -234,7 +236,7 @@ export default function TemplateEditor({
         </h2>
         <Textarea
           readOnly={isReadOnly}
-          value={template.description}
+          value={displayTemplate.description}
           onChange={handleChangeDescription}
           placeholder={t`Add a description...`}
           className={cn(
@@ -250,7 +252,7 @@ export default function TemplateEditor({
         </h2>
         <SectionsList
           disabled={isReadOnly}
-          items={template.sections}
+          items={displayTemplate.sections}
           onChange={handleChangeSections}
         />
       </div>

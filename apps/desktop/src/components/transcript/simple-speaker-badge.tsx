@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 
 interface SimpleSpeakerBadgeProps {
@@ -13,6 +14,7 @@ export function SimpleSpeakerBadge({
   onNameChange,
   isEditable,
 }: SimpleSpeakerBadgeProps) {
+  const { t } = useLingui();
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(currentName);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -82,7 +84,7 @@ export function SimpleSpeakerBadge({
             : "cursor-default"
         }`}
         onClick={handleClick}
-        title={isEditable ? "Click to edit speaker name inline" : undefined}
+        title={isEditable ? t`Click to edit speaker name inline` : undefined}
       >
         {currentName}
       </button>

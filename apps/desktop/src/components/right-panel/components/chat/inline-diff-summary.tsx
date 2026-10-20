@@ -6,8 +6,8 @@
 
 import { ShortcutById } from "@/components/shortcut-by-id";
 import { useDiffActions } from "@/contexts/diff-actions";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
-import { useLingui } from "@lingui/react/macro";
 import { memo, useEffect, useState } from "react";
 
 interface InlineDiffSummaryProps {
@@ -93,7 +93,9 @@ export const InlineDiffSummary = memo(({
         </div>
         <div className="flex items-center gap-1.5 mt-2 text-xs text-foreground/45">
           <i className="ri-lightbulb-ai-fill text-xs" />
-          <span>Changes highlighted in editor</span>
+          <span>
+            <Trans>Changes highlighted in editor</Trans>
+          </span>
         </div>
       </div>
 

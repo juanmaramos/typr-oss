@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { memo, useEffect, useState } from "react";
 
 import { useRightPanel } from "@/contexts";
@@ -8,6 +8,7 @@ import { cn } from "@typr/ui/lib/utils";
 import { ShortcutById } from "../../shortcut-by-id";
 
 function ChatPanelButtonBase() {
+  const { t } = useLingui();
   const { isViewVisible, togglePanel } = useRightPanel();
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -41,7 +42,7 @@ function ChatPanelButtonBase() {
           <div className="relative w-6 aspect-square flex items-center justify-center">
             <img
               src={isAnimating ? "/assets/dynamic.gif" : "/assets/static.png"}
-              alt="Chat Assistant"
+              alt={t`Chat Assistant`}
               className="w-full h-full"
             />
           </div>
