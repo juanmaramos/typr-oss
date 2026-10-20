@@ -3,6 +3,8 @@ mod errors;
 mod events;
 mod ext;
 mod overlay;
+#[cfg(target_os = "macos")]
+mod traffic_lights;
 
 pub use errors::*;
 pub use events::*;

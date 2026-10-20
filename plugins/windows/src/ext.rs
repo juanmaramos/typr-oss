@@ -537,6 +537,11 @@ impl TyprWindow {
         window.show()?;
 
         #[cfg(target_os = "macos")]
+        if !matches!(self, Self::Control | Self::TranscriptionStatus) {
+            crate::traffic_lights::install(&window)?;
+        }
+
+        #[cfg(target_os = "macos")]
         if matches!(self, Self::TranscriptionStatus) {
             Self::configure_transcription_status_window(app, &window, true);
             Self::reset_transcription_status_window_frame(app, &window)?;
@@ -853,7 +858,7 @@ impl TyprWindow {
                 .decorations(true)
                 .hidden_title(true)
                 .theme(Some(tauri::Theme::Light))
-                .traffic_light_position(tauri::LogicalPosition::new(18.0, 29.0))
+                .traffic_light_position(crate::traffic_lights::INSET)
                 .title_bar_style(tauri::TitleBarStyle::Overlay);
         }
 
