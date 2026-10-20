@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Trans } from "@lingui/react/macro";
 import { useState } from "react";
 import { Loader } from "./loader";
 
@@ -20,7 +21,9 @@ export function ProcessingSteps({ steps, className }: ProcessingStepsProps) {
     <div className={cn("space-y-2 p-3 bg-muted/20 rounded-lg border", className)}>
       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
         <i className="ri-cpu-line text-base" />
-        <span>AI Processing</span>
+        <span>
+          <Trans>AI Processing</Trans>
+        </span>
         <span className="text-xs">
           ({completedCount}/{steps.length})
         </span>

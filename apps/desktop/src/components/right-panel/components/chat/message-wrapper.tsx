@@ -8,8 +8,8 @@ import { Tool } from "@/components/ui/tool";
 import { useChatState } from "@/stores/useChatState";
 import { useSelectionContext } from "@/stores/useSelectionContext";
 import { acceptInlineDiff, rejectInlineDiff } from "@/utils/inline-diff-preview";
-import { commands as dbCommands } from "@typr/plugin-db";
 import { useLingui } from "@lingui/react/macro";
+import { commands as dbCommands } from "@typr/plugin-db";
 import { useState } from "react";
 import { DiffPreview } from "./diff-preview";
 import { InlineDiffSummary } from "./inline-diff-summary";
@@ -293,7 +293,7 @@ export function MessageWrapper({
               </MessageAction>
             )}
 
-            <MessageAction tooltip={copied ? "Copied!" : "Copy to clipboard"}>
+            <MessageAction tooltip={copied ? t`Copied!` : t`Copy to clipboard`}>
               <Button
                 variant="ghost"
                 size="icon"

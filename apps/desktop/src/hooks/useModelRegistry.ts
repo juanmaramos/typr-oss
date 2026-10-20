@@ -1,3 +1,5 @@
+import { getLocalChatModelDescription } from "@/lib/model-metadata";
+import { useLingui } from "@lingui/react";
 import { useQuery } from "@tanstack/react-query";
 
 import { commands as localLlmCommands, type SupportedModel } from "@typr/plugin-local-llm";
@@ -12,6 +14,7 @@ import { useModelState } from "./useModelState";
  * - Simple, predictable behavior
  */
 export function useModelRegistry() {
+  useLingui();
   // Fetch model metadata directly from backend (static data)
   const modelsQuery = useQuery({
     queryKey: ["models"],
@@ -25,6 +28,7 @@ export function useModelRegistry() {
   // Enhanced models with status (no transformations, clean types)
   const modelsWithStatus = (modelsQuery.data || []).map(model => ({
     ...model,
+    description: getLocalChatModelDescription(model.id),
     isDownloaded: getModel(model.id.toString())?.isDownloaded || false,
     isDownloading: getModel(model.id.toString())?.isDownloading || false,
   }));

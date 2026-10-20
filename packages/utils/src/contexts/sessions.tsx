@@ -67,6 +67,8 @@ export const useSession = <T,>(
   }
 
   if (typeof sessionLocator === "string") {
+    // Programmer diagnostic for an invalid store selector argument.
+    // eslint-disable-next-line typr-i18n/ui-strings
     throw new Error(`session(id=${sessionId}) not exists in sessions store. Consider passing Session object instead.`);
   }
 

@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import type { Query, QueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-adapter";
@@ -208,7 +210,7 @@ export const Route = createFileRoute("/app/new")({
       }
 
       if (!targetSessionId) {
-        throw new Error("Failed to resolve target session for /app/new");
+        throw new Error(i18n._(msg`Failed to resolve target session for /app/new`));
       }
 
       if (record) {

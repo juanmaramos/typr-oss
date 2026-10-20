@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { X } from "lucide-react";
 
 import { Avatar, AvatarImage } from "@typr/ui/components/ui/avatar";
@@ -15,24 +16,27 @@ export const InvitedUser = ({
   email,
   avatarUrl,
   onRemove,
-}: InvitedUserProps) => (
-  <div className="flex items-center justify-between">
-    <div className="flex items-center gap-3">
-      <Avatar className="h-8 w-8 bg-muted">
-        <AvatarImage src={avatarUrl} alt={`${name}'s avatar`} />
-      </Avatar>
-      <div>
-        <div className="text-sm font-medium">{name}</div>
-        <div className="text-xs text-muted-foreground">{email}</div>
+}: InvitedUserProps) => {
+  const { t } = useLingui();
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Avatar className="h-8 w-8 bg-muted">
+          <AvatarImage src={avatarUrl} alt={t`${name}'s avatar`} />
+        </Avatar>
+        <div>
+          <div className="text-sm font-medium">{name}</div>
+          <div className="text-xs text-muted-foreground">{email}</div>
+        </div>
       </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="hover:bg-surface-400"
+        onClick={onRemove}
+      >
+        <X className="size-4 text-muted-foreground" />
+      </Button>
     </div>
-    <Button
-      variant="ghost"
-      size="icon"
-      className="hover:bg-surface-400"
-      onClick={onRemove}
-    >
-      <X className="size-4 text-muted-foreground" />
-    </Button>
-  </div>
-);
+  );
+};

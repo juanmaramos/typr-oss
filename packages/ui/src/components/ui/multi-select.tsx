@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import * as React from "react";
 import { useEffect } from "react";
 
@@ -143,6 +144,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
   leadingIcon,
   createLabel,
 }, ref) => {
+  const { t } = useLingui();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
   const [onScrollbar, setOnScrollbar] = React.useState(false);
@@ -324,7 +326,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
           onChange?.(newOptions);
         }}
       >
-        {createLabel ? createLabel(normalizedInputValue) : `Create "${normalizedInputValue}"`}
+        {createLabel ? createLabel(normalizedInputValue) : t`Create "${normalizedInputValue}"`}
       </CommandItem>
     );
 
@@ -451,7 +453,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                   e.stopPropagation();
                 }}
                 onClick={() => handleUnselect(option)}
-                aria-label="Remove"
+                aria-label={t`Remove`}
               >
                 <XIcon size={14} aria-hidden="true" />
               </button>
@@ -509,7 +511,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 || selected.filter(s => s.fixed).length === selected.length
               ) && "hidden",
             )}
-            aria-label="Clear all"
+            aria-label={t`Clear all`}
           >
             <XIcon size={16} aria-hidden="true" />
           </button>

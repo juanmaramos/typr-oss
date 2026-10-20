@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { cn } from "@typr/ui/lib/utils";
 import { X } from "lucide-react";
@@ -13,9 +14,11 @@ interface VocabularyTagsProps {
 export function VocabularyTags({
   value,
   onChange,
-  placeholder = "e.g., Project Phoenix, OKR cadence",
+  placeholder,
   className,
 }: VocabularyTagsProps) {
+  const { t } = useLingui();
+  const translatedPlaceholder = placeholder ?? t`e.g., Project Phoenix, OKR cadence`;
   const [inputValue, setInputValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -103,7 +106,7 @@ export function VocabularyTags({
               }}
               className="opacity-60 hover:opacity-100 hover:bg-surface-400-foreground/20 rounded-sm p-0.5 transition-all duration-150"
               type="button"
-              aria-label={`Remove ${tag}`}
+              aria-label={t`Remove ${tag}`}
             >
               <X size={10} />
             </button>
@@ -118,14 +121,14 @@ export function VocabularyTags({
           onKeyDown={handleKeyDown}
           onBlur={handleInputBlur}
           onFocus={handleInputFocus}
-          placeholder={value.length === 0 ? placeholder : ""}
+          placeholder={value.length === 0 ? translatedPlaceholder : ""}
           className="flex-1 outline-none bg-transparent text-sm placeholder:text-muted-foreground min-w-[100px]"
         />
       </div>
 
       {/* Helper text */}
       <p className="text-xs text-muted-foreground">
-        Press Enter, Tab, or use commas to add multiple terms
+        <Trans>Press Enter, Tab, or use commas to add multiple terms</Trans>
       </p>
     </div>
   );

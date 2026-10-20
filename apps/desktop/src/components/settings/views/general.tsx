@@ -1,3 +1,4 @@
+import { getLanguageName } from "@/lib/language-labels";
 import { transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LANGUAGES_ISO_639_1 } from "@huggingface/languages";
@@ -251,7 +252,7 @@ export default function General() {
                   >
                     <SelectTrigger className="w-[200px]">
                       <SelectValue>
-                        {LANGUAGES_ISO_639_1[field.value as ISO_639_1_CODE]?.name || field.value}
+                        {getLanguageName(field.value)}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -298,7 +299,7 @@ export default function General() {
                                 variant="secondary"
                                 className="flex items-center gap-1 px-2 py-0.5 text-xs bg-muted"
                               >
-                                {LANGUAGES_ISO_639_1[langCode as ISO_639_1_CODE]?.name || langCode}
+                                {getLanguageName(langCode)}
                                 <Button
                                   type="button"
                                   variant="ghost"
@@ -346,7 +347,7 @@ export default function General() {
                                     }
                                   }}
                                 >
-                                  {LANGUAGES_ISO_639_1[lang].name}
+                                  {getLanguageName(lang)}
                                 </CommandItem>
                               ))}
                             </CommandGroup>
@@ -371,8 +372,7 @@ export default function General() {
                               : field.value.length === 1
                               ? (
                                 <Trans>
-                                  Prefers <strong>{LANGUAGES_ISO_639_1[field.value[0] as ISO_639_1_CODE]?.name}</strong>
-                                  {" "}
+                                  Prefers <strong>{getLanguageName(field.value[0])}</strong>{" "}
                                   but falls back to auto-detection if needed.
                                 </Trans>
                               )
@@ -414,13 +414,13 @@ export default function General() {
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger className="w-[200px]">
                       <SelectValue>
-                        {LANGUAGES_ISO_639_1[field.value as ISO_639_1_CODE]?.name || "English"}
+                        {getLanguageName(field.value || "en")}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="max-h-[250px] overflow-auto">
                       {SUPPORTED_LANGUAGES.map((lang) => (
                         <SelectItem key={lang} value={lang}>
-                          {LANGUAGES_ISO_639_1[lang].name}
+                          {getLanguageName(lang)}
                         </SelectItem>
                       ))}
                     </SelectContent>

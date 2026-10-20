@@ -55,7 +55,7 @@ export function useBulkDelete() {
       if (dbFailures.length > 0) {
         console.error("Failed to delete some sessions:", dbFailures);
         debugLog("[BulkDelete] DB delete failures", { dbFailures });
-        throw new Error(`Failed to delete ${dbFailures.length} notes`);
+        throw new Error(t`Failed to delete ${dbFailures.length} notes`);
       }
 
       const folderFailures = folderResults.filter(

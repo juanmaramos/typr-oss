@@ -1,9 +1,11 @@
-import { useLingui } from "@lingui/react/macro";
+import { i18n } from "@lingui/core";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { RiCornerDownLeftLine } from "@remixicon/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Building2, CircleMinus, FileText, Pencil, Plus, SearchIcon, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import type { LinkProps } from "@tanstack/react-router";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { type Human, type Organization } from "@typr/plugin-db";
 import { commands as windowsCommands } from "@typr/plugin-windows";
@@ -12,7 +14,6 @@ import { Input } from "@typr/ui/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
 import { cn } from "@typr/ui/lib/utils";
 import { getInitials } from "@typr/utils";
-import type { LinkProps } from "@tanstack/react-router";
 
 interface ContactViewProps {
   userId: string;
@@ -21,6 +22,7 @@ interface ContactViewProps {
 }
 
 export function ContactView({ userId, initialPersonId, initialOrgId }: ContactViewProps) {
+  const { t } = useLingui();
   const [selectedOrganization, setSelectedOrganization] = useState<string | null>(initialOrgId || null);
   const [selectedPerson, setSelectedPerson] = useState<string | null>(initialPersonId || null);
   const [editingPerson, setEditingPerson] = useState<string | null>(null);
@@ -135,7 +137,9 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
     <div className="flex h-full">
       <div className="w-[200px] border-r border flex flex-col">
         <div className="px-3 py-2 border-b border flex items-center justify-between">
-          <h3 className="text-xs font-medium text-muted-foreground">Organizations</h3>
+          <h3 className="text-xs font-medium text-muted-foreground">
+            <Trans>Organizations</Trans>
+          </h3>
           <button
             onClick={() => setShowNewOrg(true)}
             className="p-0.5 rounded hover:bg-surface-400 transition-colors"
@@ -153,7 +157,7 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
               )}
             >
               <User className="h-4 w-4 text-muted-foreground" />
-              All People
+              <Trans>All People</Trans>
             </button>
             {showNewOrg && (
               <NewOrganizationForm
@@ -207,7 +211,9 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
 
       <div className="w-[250px] border-r border flex flex-col">
         <div className="px-3 py-2 border-b border flex items-center justify-between">
-          <h3 className="text-xs font-medium text-muted-foreground">People</h3>
+          <h3 className="text-xs font-medium text-muted-foreground">
+            <Trans>People</Trans>
+          </h3>
           <button
             onClick={() => {
               const newPersonId = crypto.randomUUID();
@@ -248,7 +254,7 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{person.full_name || person.email || "Unnamed"}</div>
+                  <div className="font-medium truncate">{person.full_name || person.email || t`Unnamed`}</div>
                   {person.email && person.full_name && (
                     <div className="text-xs text-muted-foreground truncate">{person.email}</div>
                   )}
@@ -284,7 +290,7 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
                         <div className="flex items-start justify-between">
                           <div>
                             <h2 className="text-lg font-semibold">
-                              {selectedPersonData.full_name || "Unnamed Contact"}
+                              {selectedPersonData.full_name || t`Unnamed Contact`}
                             </h2>
                             {selectedPersonData.job_title && (
                               <p className="text-sm text-muted-foreground">{selectedPersonData.job_title}</p>
@@ -308,7 +314,9 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
                   </div>
 
                   <div className="flex-1 p-6">
-                    <h3 className="text-sm font-medium text-muted-foreground mb-4 pl-3">Related Notes</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-4 pl-3">
+                      <Trans>Related Notes</Trans>
+                    </h3>
                     <div className="h-full overflow-y-auto">
                       <div className="space-y-2">
                         {personSessions.length > 0
@@ -322,18 +330,22 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
                                 <div className="flex items-center gap-2 mb-1">
                                   <FileText className="h-4 w-4 text-muted-foreground" />
                                   <span className="font-medium text-sm">
-                                    {session.title || "New note"}
+                                    {session.title || t`New note`}
                                   </span>
                                 </div>
                                 {session.created_at && (
                                   <div className="text-xs text-muted-foreground">
-                                    {new Date(session.created_at).toLocaleDateString()}
+                                    {new Date(session.created_at).toLocaleDateString(i18n.locale || undefined)}
                                   </div>
                                 )}
                               </button>
                             ))
                           )
-                          : <p className="text-sm text-muted-foreground pl-3">No related notes found</p>}
+                          : (
+                            <p className="text-sm text-muted-foreground pl-3">
+                              <Trans>No related notes found</Trans>
+                            </p>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -342,7 +354,9 @@ export function ContactView({ userId, initialPersonId, initialOrgId }: ContactVi
           )
           : (
             <div className="flex-1 flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">Select a person to view details</p>
+              <p className="text-sm text-muted-foreground">
+                <Trans>Select a person to view details</Trans>
+              </p>
             </div>
           )}
       </div>
@@ -415,7 +429,9 @@ function EditPersonForm({
       {/* Header */}
       <div className="px-6 py-4 border-b border">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Edit Contact</h3>
+          <h3 className="text-lg font-semibold">
+            <Trans>Edit Contact</Trans>
+          </h3>
           <div className="flex gap-2">
             <Button
               type="button"
@@ -424,7 +440,7 @@ function EditPersonForm({
               onClick={onCancel}
               className="hover:bg-surface-400 text-foreground/80"
             >
-              Cancel
+              <Trans>Cancel</Trans>
             </Button>
             <Button
               onClick={handleSubmit}
@@ -433,7 +449,7 @@ function EditPersonForm({
               disabled={updatePersonMutation.isPending}
               className="bg-muted hover:bg-surface-400 text-foreground/80"
             >
-              Save
+              <Trans>Save</Trans>
             </Button>
           </div>
         </div>
@@ -454,7 +470,9 @@ function EditPersonForm({
         <div className="border-t border">
           {/* Name Field */}
           <div className="flex items-center px-4 py-3 border-b border">
-            <div className="w-28 text-sm text-muted-foreground">Name</div>
+            <div className="w-28 text-sm text-muted-foreground">
+              <Trans>Name</Trans>
+            </div>
             <div className="flex-1">
               <Input
                 value={formData.full_name}
@@ -467,7 +485,9 @@ function EditPersonForm({
 
           {/* Job Title Field */}
           <div className="flex items-center px-4 py-3 border-b border">
-            <div className="w-28 text-sm text-muted-foreground">Job Title</div>
+            <div className="w-28 text-sm text-muted-foreground">
+              <Trans>Job Title</Trans>
+            </div>
             <div className="flex-1">
               <Input
                 value={formData.job_title}
@@ -480,7 +500,9 @@ function EditPersonForm({
 
           {/* Company Field */}
           <div className="flex items-center px-4 py-3 border-b border">
-            <div className="w-28 text-sm text-muted-foreground">Company</div>
+            <div className="w-28 text-sm text-muted-foreground">
+              <Trans>Company</Trans>
+            </div>
             <div className="flex-1">
               <ContactOrganizationSelector
                 value={formData.organization_id}
@@ -491,7 +513,9 @@ function EditPersonForm({
 
           {/* Email Field */}
           <div className="flex items-center px-4 py-3 border-b border">
-            <div className="w-28 text-sm text-muted-foreground">Email</div>
+            <div className="w-28 text-sm text-muted-foreground">
+              <Trans>Email</Trans>
+            </div>
             <div className="flex-1">
               <Input
                 type="email"
@@ -559,7 +583,11 @@ function ContactOrganizationSelector({
                 </span>
               </div>
             )
-            : <span className="text-muted-foreground text-base">Select organization</span>}
+            : (
+              <span className="text-muted-foreground text-base">
+                <Trans>Select organization</Trans>
+              </span>
+            )}
         </div>
       </PopoverTrigger>
 
@@ -643,7 +671,9 @@ function OrganizationControl({
 
   return (
     <div className="flex flex-col gap-3 max-w-[450px]">
-      <div className="text-sm font-medium text-foreground/80">Organization</div>
+      <div className="text-sm font-medium text-foreground/80">
+        <Trans>Organization</Trans>
+      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-2">
@@ -687,7 +717,7 @@ function OrganizationControl({
                     <span className="text-xs">+</span>
                   </span>
                   <span className="flex items-center gap-1 font-medium text-muted-foreground">
-                    Create
+                    <Trans>Create</Trans>
                     <span className="text-foreground truncate max-w-[140px]">
                       &quot;{searchTerm.trim()}&quot;
                     </span>

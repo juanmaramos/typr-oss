@@ -115,7 +115,7 @@ export function STTLanguageSelector({
       variant="ghost"
       size={isActive ? "icon" : undefined}
       disabled={disabled}
-      title={isActive ? (selectedOption ? getTranslatedLabel(selectedOption.key) : "Select model") : undefined}
+      title={isActive ? (selectedOption ? getTranslatedLabel(selectedOption.key) : t`Select model`) : undefined}
       className={cn(
         isInlineTrigger
           ? "h-auto gap-0.5 px-0 py-0 text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground"
@@ -322,7 +322,7 @@ export function STTLanguageSelector({
                               </div>
                             </TooltipTrigger>
                             <TooltipContent side="left">
-                              <p>{modelStatus.isDownloading ? "Downloading..." : `Download ${option.size}`}</p>
+                              <p>{modelStatus.isDownloading ? t`Downloading...` : t`Download ${option.size}`}</p>
                             </TooltipContent>
                           </Tooltip>
                         )
@@ -445,7 +445,7 @@ export function STTLanguageSelector({
                               </div>
                             </TooltipTrigger>
                             <TooltipContent side="left">
-                              <p>{modelStatus.isDownloading ? "Downloading..." : `Download ${option.size}`}</p>
+                              <p>{modelStatus.isDownloading ? t`Downloading...` : t`Download ${option.size}`}</p>
                             </TooltipContent>
                           </Tooltip>
                         )

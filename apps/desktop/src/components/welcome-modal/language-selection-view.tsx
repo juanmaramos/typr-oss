@@ -1,3 +1,4 @@
+import { getLanguageName } from "@/lib/language-labels";
 import { LANGUAGES_ISO_639_1 } from "@huggingface/languages";
 import { i18n } from "@lingui/core";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -118,7 +119,7 @@ export function LanguageSelectionView({ onContinue, onBack }: LanguageSelectionV
                 variant="secondary"
                 className="flex items-center gap-1 px-2 py-0.5 text-xs bg-muted"
               >
-                {LANGUAGES_ISO_639_1[langCode as ISO_639_1_CODE]?.name || langCode}
+                {getLanguageName(langCode)}
                 {selectedLanguages.length > 1 && langCode !== "en" && (
                   <button
                     type="button"
@@ -154,13 +155,12 @@ export function LanguageSelectionView({ onContinue, onBack }: LanguageSelectionV
                   {SUPPORTED_LANGUAGES.filter(
                     (lang) => !selectedLanguages.includes(lang),
                   ).map((lang) => {
-                    const language = LANGUAGES_ISO_639_1[lang];
                     return (
                       <CommandItem
                         key={lang}
                         onSelect={() => handleAddLanguage(lang)}
                       >
-                        {language.name}
+                        {getLanguageName(lang)}
                       </CommandItem>
                     );
                   })}

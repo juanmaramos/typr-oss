@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, useRouter } from "@tanstack/react-router";
 import { BuildingIcon } from "lucide-react";
@@ -114,6 +115,7 @@ function OrgView({ value }: { value: Organization }) {
 }
 
 function OrgEdit({ form }: { form: ReturnType<typeof useForm<FormSchema>> }) {
+  const { t } = useLingui();
   // Refs for auto-resizing textareas
   const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -162,10 +164,12 @@ function OrgEdit({ form }: { form: ReturnType<typeof useForm<FormSchema>> }) {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <div className="flex items-center">
-                      <div className="w-28 text-sm text-muted-foreground">Name</div>
+                      <div className="w-28 text-sm text-muted-foreground">
+                        <Trans>Name</Trans>
+                      </div>
                       <FormControl className="flex-1">
                         <Input
-                          placeholder="Organization Name"
+                          placeholder={t`Organization Name`}
                           {...field}
                           className="border-none p-0 h-7 text-base focus-visible:ring-0 focus-visible:ring-offset-0"
                         />
@@ -185,11 +189,11 @@ function OrgEdit({ form }: { form: ReturnType<typeof useForm<FormSchema>> }) {
                   <FormItem className="flex-1">
                     <div className="flex items-start">
                       <div className="w-28 text-sm text-muted-foreground">
-                        Description
+                        <Trans>Description</Trans>
                       </div>
                       <FormControl className="flex-1 -mt-[3px]">
                         <Textarea
-                          placeholder="Company description"
+                          placeholder={t`Company description`}
                           {...field}
                           ref={(e) => {
                             field.ref(e);

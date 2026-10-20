@@ -2,12 +2,12 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { message } from "@tauri-apps/plugin-dialog";
+import { relaunch } from "@tauri-apps/plugin-process";
 import { commands as listenerCommands } from "@typr/plugin-listener";
 import { Button } from "@typr/ui/components/ui/button";
 import { Spinner } from "@typr/ui/components/ui/spinner";
 import { cn } from "@typr/ui/lib/utils";
-import { message } from "@tauri-apps/plugin-dialog";
-import { relaunch } from "@tauri-apps/plugin-process";
 
 interface PermissionItemProps {
   icon: React.ReactNode;
@@ -60,7 +60,7 @@ function PermissionItem({
                   <Trans>Requesting...</Trans>
                 </>
               )
-              : <Trans>{buttonText}</Trans>}
+              : buttonText}
           </Button>
         )}
       </div>
@@ -131,7 +131,7 @@ export default function Sound() {
           done={micPermissionStatus.data}
           isPending={micPermission.isPending}
           onRequest={handleMicPermissionAction}
-          buttonText={micPermissionRequested && !micPermissionStatus.data ? "Open Settings" : "Enable"}
+          buttonText={micPermissionRequested && !micPermissionStatus.data ? t`Open Settings` : t`Enable`}
         />
 
         <PermissionItem
@@ -141,7 +141,7 @@ export default function Sound() {
           done={systemAudioPermissionStatus.data}
           isPending={capturePermission.isPending}
           onRequest={() => capturePermission.mutate({})}
-          buttonText="Enable"
+          buttonText={t`Enable`}
         />
       </div>
     </div>

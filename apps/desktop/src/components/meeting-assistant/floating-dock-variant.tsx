@@ -14,12 +14,12 @@ import { PromptInput, PromptInputAction, PromptInputActions, PromptInputTextarea
 import { promptInputClassNames, promptTextareaContracts } from "@/components/ui/prompt-input-contracts";
 import { debugLogFor } from "@/components/utils/debug-logger";
 import { useRightPanel } from "@/contexts";
+import { useMatch } from "@tanstack/react-router";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { Button } from "@typr/ui/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { cn } from "@typr/ui/lib/utils";
 import { useOngoingSession, useSession } from "@typr/utils/contexts";
-import { useMatch } from "@tanstack/react-router";
 
 import { ChatView } from "@/components/right-panel/views/chat-view";
 
@@ -458,6 +458,7 @@ function DockExpandedShell({
 type DockMode = "idle" | "composing";
 
 export function FloatingDockVariant() {
+  const { t } = useLingui();
   const noteMatch = useMatch({ from: "/app/note/$id", shouldThrow: false });
   const {
     floatingState,
@@ -596,7 +597,7 @@ export function FloatingDockVariant() {
     return null;
   }
 
-  const noteTitle = session.title || "Current note";
+  const noteTitle = session.title || t`Current note`;
   const hasHistory = !!chatHistorySummary.data;
   const hasActiveChat = !!activeFloatingChatGroupId;
   const hasActiveChatMessages = !!activeGroupHasMessages.data;

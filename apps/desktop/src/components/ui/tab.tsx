@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -29,6 +30,7 @@ export function Tab({
   showRecordingIndicator = false,
   variant = "line",
 }: TabProps) {
+  const { t } = useLingui();
   return (
     <button
       type="button"
@@ -71,7 +73,7 @@ export function Tab({
             selected ? "bg-muted/60" : "bg-muted",
           )}
         >
-          {badgeText || "Save 35%"}
+          {badgeText || t`Save 35%`}
         </Badge>
       )}
     </button>

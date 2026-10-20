@@ -1,11 +1,13 @@
 import { Icon } from "@/components/ui/icon";
 import { debugLogFor } from "@/components/utils/debug-logger";
 import { useRightPanel } from "@/contexts";
+import { useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { cn } from "@typr/ui/lib/utils";
 
 export function ProjectBriefSidebarButton() {
+  const { t } = useLingui();
   const { hidePanel, isViewVisible, showSidebar } = useRightPanel();
   const isActive = isViewVisible("project-brief");
 
@@ -34,11 +36,11 @@ export function ProjectBriefSidebarButton() {
           )}
         >
           <Icon name={isActive ? "ri-layout-right-2-line" : "ri-layout-right-line"} className="h-[18px] w-[18px]" />
-          <span className="sr-only">{isActive ? "Close project brief" : "Open project brief"}</span>
+          <span className="sr-only">{isActive ? t`Close project brief` : t`Open project brief`}</span>
         </Button>
       </TooltipTrigger>
       <TooltipContent side="bottom">
-        <p>{isActive ? "Close project brief" : "Open project brief"}</p>
+        <p>{isActive ? t`Close project brief` : t`Open project brief`}</p>
       </TooltipContent>
     </Tooltip>
   );

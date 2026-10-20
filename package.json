@@ -15,6 +15,9 @@
     "prepare": "husky",
     "test:health": "pnpm -F @typr/desktop test",
     "test:db": "cargo test --package db-user",
-    "tauri": "pnpm -F @typr/desktop tauri"
+    "tauri": "pnpm -F @typr/desktop tauri",
+    "i18n:check": "node apps/desktop/scripts/check-translations.mjs",
+    "i18n:check:staged": "node apps/desktop/scripts/check-staged-translations.mjs",
+    "test:i18n": "node --test apps/desktop/scripts/localization.test.mjs"
   }
 }

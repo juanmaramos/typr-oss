@@ -64,5 +64,9 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.6.3"
+  },
+  "peerDependencies": {
+    "@lingui/core": "^5.3.2",
+    "@lingui/react": "^5.3.2"
   }
 }

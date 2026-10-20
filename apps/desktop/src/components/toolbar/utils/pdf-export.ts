@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { appDataDir } from "@tauri-apps/api/path";
 import { writeFile } from "@tauri-apps/plugin-fs";
 import type { jsPDF } from "jspdf";
@@ -177,7 +179,7 @@ export const exportToPDF = async (session: SessionData): Promise<string> => {
   let yPosition = margin;
 
   // Add title with text wrapping
-  const title = session?.title || "New note";
+  const title = session?.title || i18n._(msg`New note`);
   pdf.setFontSize(16);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(0, 0, 0); // Black
@@ -196,7 +198,9 @@ export const exportToPDF = async (session: SessionData): Promise<string> => {
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(100, 100, 100); // Gray
-    const createdAt = `Created: ${new Date(session.created_at).toLocaleDateString()}`;
+    const createdAt = i18n._(
+      msg`Created: ${new Date(session.created_at).toLocaleDateString(i18n.locale || undefined)}`,
+    );
     pdf.text(createdAt, margin, yPosition);
     yPosition += lineHeight;
   }
@@ -209,7 +213,7 @@ export const exportToPDF = async (session: SessionData): Promise<string> => {
 
     // Event name
     if (event.name) {
-      pdf.text(`Event: ${event.name}`, margin, yPosition);
+      pdf.text(i18n._(msg`Event: ${event.name}`), margin, yPosition);
       yPosition += lineHeight;
     }
 
@@ -218,9 +222,9 @@ export const exportToPDF = async (session: SessionData): Promise<string> => {
       const startDate = new Date(event.start_date);
       const endDate = event.end_date ? new Date(event.end_date) : null;
 
-      let dateText = `Date: ${startDate.toLocaleDateString()}`;
+      let dateText = i18n._(msg`Date: ${startDate.toLocaleDateString(i18n.locale || undefined)}`);
       if (endDate && startDate.toDateString() !== endDate.toDateString()) {
-        dateText += ` - ${endDate.toLocaleDateString()}`;
+        dateText += ` - ${endDate.toLocaleDateString(i18n.locale || undefined)}`;
       }
 
       pdf.text(dateText, margin, yPosition);
@@ -228,10 +232,30 @@ export const exportToPDF = async (session: SessionData): Promise<string> => {
 
       // Time
       const timeText = endDate
-        ? `Time: ${startDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })} - ${
-          endDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })
-        }`
-        : `Time: ${startDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })}`;
+        ? i18n._(
+          msg`Time: ${
+            startDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          } - ${
+            endDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          }`,
+        )
+        : i18n._(
+          msg`Time: ${
+            startDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          }`,
+        );
       pdf.text(timeText, margin, yPosition);
       yPosition += lineHeight;
     }
@@ -249,7 +273,7 @@ export const exportToPDF = async (session: SessionData): Promise<string> => {
       .join(", ");
 
     if (participantNames) {
-      const participantText = `Participants: ${participantNames}`;
+      const participantText = i18n._(msg`Participants: ${participantNames}`);
       const participantLines = splitTextToLines(participantText, pdf, maxWidth);
 
       for (const line of participantLines) {
@@ -263,14 +287,14 @@ export const exportToPDF = async (session: SessionData): Promise<string> => {
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(100, 100, 100); // Gray
-  pdf.text("Summarized by ", margin, yPosition);
+  pdf.text(i18n._(msg`Summarized by `), margin, yPosition);
 
   // Calculate width of "Summarized by " to position "Typr"
-  const madeByWidth = pdf.getTextWidth("Summarized by ");
+  const madeByWidth = pdf.getTextWidth(i18n._(msg`Summarized by `));
   pdf.setTextColor(37, 99, 235); // Blue color for Typr
 
   // Create clickable link for Typr
-  const typrText = "Typr - AI note taker";
+  const typrText = i18n._(msg`Typr - AI note taker`);
   pdf.textWithLink(typrText, margin + madeByWidth, yPosition, { url: "https://www.typrapp.com" });
 
   yPosition += lineHeight * 2;
@@ -281,7 +305,7 @@ export const exportToPDF = async (session: SessionData): Promise<string> => {
   yPosition += lineHeight;
 
   // Convert HTML to structured text and add content
-  const segments = htmlToStructuredText(session?.enhanced_memo_html || "No content available");
+  const segments = htmlToStructuredText(session?.enhanced_memo_html || i18n._(msg`No content available`));
 
   for (const segment of segments) {
     // Check if we need a new page

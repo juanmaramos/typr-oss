@@ -1,7 +1,8 @@
-import { Button } from "@typr/ui/components/ui/button";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { RiFlashlightFill, RiPlayFill } from "@remixicon/react";
 import { mergeAttributes, Node, NodeViewProps } from "@tiptap/core";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
+import { Button } from "@typr/ui/components/ui/button";
 import { useState } from "react";
 
 // OSS builds must not depend on Typr-hosted CDN assets.
@@ -44,6 +45,7 @@ export const TyprchargeNode = Node.create({
 });
 
 const OnboardingVideo = ({ HTMLAttributes }: NodeViewProps) => {
+  const { t } = useLingui();
   const [isPlaying, setIsPlaying] = useState(false);
   const hasVideo = ONBOARDING_VIDEO_URL.length > 0;
 
@@ -67,7 +69,7 @@ const OnboardingVideo = ({ HTMLAttributes }: NodeViewProps) => {
             >
               <img
                 src="/assets/video-thumbnail.png"
-                alt="Video thumbnail"
+                alt={t`Video thumbnail`}
                 className="w-full h-full object-cover"
               />
               {hasVideo && (
@@ -87,10 +89,12 @@ const OnboardingVideo = ({ HTMLAttributes }: NodeViewProps) => {
           {/* Column 2: Text content */}
           <div className="flex-1 min-w-0">
             <h3 className="text-base font-semibold text-foreground mb-1">
-              See Typr in action
+              <Trans>See Typr in action</Trans>
             </h3>
             <p className="text-sm text-muted-foreground">
-              {hasVideo ? "Watch live transcription demo (30 secs)" : "Demo video is not bundled in OSS builds"}
+              {hasVideo
+                ? <Trans>Watch live transcription demo (30 secs)</Trans>
+                : <Trans>Demo video is not bundled in OSS builds</Trans>}
             </p>
           </div>
 
@@ -104,7 +108,9 @@ const OnboardingVideo = ({ HTMLAttributes }: NodeViewProps) => {
                 className="gap-2"
               >
                 <RiPlayFill className="w-4 h-4" />
-                <span>Play Demo</span>
+                <span>
+                  <Trans>Play Demo</Trans>
+                </span>
               </Button>
             </div>
           )}
@@ -121,7 +127,7 @@ const OnboardingVideo = ({ HTMLAttributes }: NodeViewProps) => {
               onPlay={() => setIsPlaying(true)}
             >
               <source src={ONBOARDING_VIDEO_URL} type="video/mp4" />
-              Your browser does not support the video tag.
+              <Trans>Your browser does not support the video tag.</Trans>
             </video>
           </div>
         )}

@@ -15,12 +15,12 @@ import { promptInputClassNames, promptTextareaContracts } from "@/components/ui/
 import { debugLogFor } from "@/components/utils/debug-logger";
 import { useRightPanel } from "@/contexts";
 import { useRecordingTimer } from "@/hooks/useRecordingTimer";
+import { useMatch } from "@tanstack/react-router";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { Button } from "@typr/ui/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { cn } from "@typr/ui/lib/utils";
 import { useOngoingSession, useSession } from "@typr/utils/contexts";
-import { useMatch } from "@tanstack/react-router";
 
 import { ChatView } from "@/components/right-panel/views/chat-view";
 import { canSwitchFloatingVariant, useFeatureFlags } from "@/stores/feature-flags";
@@ -466,6 +466,7 @@ function FloatingAssistantShell({
 }
 
 export function FloatingMeetingAssistant() {
+  const { t } = useLingui();
   const variant = useFeatureFlags((s) => s.floatingVariant);
   const toggleVariant = useFeatureFlags((s) => s.toggleFloatingVariant);
 
@@ -490,7 +491,7 @@ export function FloatingMeetingAssistant() {
             onClick={toggleVariant}
             className="rounded-md bg-black/60 px-2 py-0.5 font-mono text-ui-tiny text-white/70 backdrop-blur-sm transition-colors hover:bg-black/80 hover:text-white"
           >
-            {variant === "dock" ? "dock" : "rail"} ⌘⇧U
+            {variant === "dock" ? t`dock` : t`rail`} ⌘⇧U
           </button>
         </div>
       )}
@@ -499,6 +500,7 @@ export function FloatingMeetingAssistant() {
 }
 
 function FloatingRailVariant() {
+  const { t } = useLingui();
   const noteMatch = useMatch({ from: "/app/note/$id", shouldThrow: false });
   const {
     floatingState,
@@ -647,7 +649,7 @@ function FloatingRailVariant() {
     return null;
   }
 
-  const noteTitle = session.title || "Current note";
+  const noteTitle = session.title || t`Current note`;
   const hasHistory = !!chatHistorySummary.data;
   const hasActiveFloatingChat = !!activeFloatingChatGroupId;
   const hasActiveFloatingChatMessages = !!activeGroupHasMessages.data;

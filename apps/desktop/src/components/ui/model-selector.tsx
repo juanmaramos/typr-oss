@@ -247,9 +247,12 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                         )}
                       />
                       <span
-                        className={cn("font-medium truncate", compact ? "max-w-16 text-ui-caption" : "max-w-24 text-xs")}
+                        className={cn(
+                          "font-medium truncate",
+                          compact ? "max-w-16 text-ui-caption" : "max-w-24 text-xs",
+                        )}
                       >
-                        Auto
+                        <Trans>Auto</Trans>
                       </span>
                     </>
                   )
@@ -263,7 +266,10 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                         )}
                       />
                       <span
-                        className={cn("font-medium truncate", compact ? "max-w-16 text-ui-caption" : "max-w-24 text-xs")}
+                        className={cn(
+                          "font-medium truncate",
+                          compact ? "max-w-16 text-ui-caption" : "max-w-24 text-xs",
+                        )}
                       >
                         {displayModel.name}
                       </span>
@@ -315,14 +321,14 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
           </TooltipTrigger>
           <TooltipContent side="top" className="text-xs">
             {isSingleModelAvailable
-              ? displayModel?.name || "AI model"
+              ? displayModel?.name || t`AI model`
               : isAutoMode
               ? autoTooltip
               : displayModel
-              ? `${displayModel.name} - Click to change`
+              ? t`${displayModel.name} - Click to change`
               : showNoModelState
-              ? "Select a model to enable AI features"
-              : "Select AI model"}
+              ? t`Select a model to enable AI features`
+              : t`Select AI model`}
           </TooltipContent>
         </Tooltip>
 
@@ -456,7 +462,7 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
                   onClick={handleAddModels}
                 >
                   <PlusIcon className="h-3.5 w-3.5" />
-                  Add Models
+                  <Trans>Add Models</Trans>
                 </Button>
               </div>
             )}
@@ -575,7 +581,9 @@ function AutomaticOption({ description, isSelected, onSelect }: AutomaticOptionP
         <i className="ri-sparkling-fill text-base" />
       </div>
       <div className="flex flex-col flex-1 ml-2.5 min-w-0">
-        <span className="font-medium text-xs leading-tight">Auto</span>
+        <span className="font-medium text-xs leading-tight">
+          <Trans>Auto</Trans>
+        </span>
         <span className="text-muted-foreground text-ui-caption leading-tight">
           {description}
         </span>
@@ -664,6 +672,7 @@ interface ModelItemWithDownloadProps {
 }
 
 function ModelItemWithDownload({ model, onDownload }: ModelItemWithDownloadProps) {
+  const { t } = useLingui();
   return (
     <div className="flex items-start px-2.5 py-2 rounded-lg hover:bg-surface-400/50 transition-colors opacity-75">
       {/* Column 1: Provider Icon */}
@@ -689,7 +698,7 @@ function ModelItemWithDownload({ model, onDownload }: ModelItemWithDownloadProps
           )}
         </div>
         <span className="text-muted-foreground text-ui-caption leading-tight">
-          {model.isDownloading ? "Downloading..." : model.description}
+          {model.isDownloading ? t`Downloading...` : model.description}
         </span>
       </div>
 

@@ -50,6 +50,11 @@ This applies to: `memo()` components, components defined in the same file as the
 ## After adding/changing strings
 
 ```bash
-pnpm -F desktop lingui:extract
-pnpm -F desktop lingui:compile --typescript
+pnpm -F @typr/desktop lingui:extract --clean
+pnpm -F @typr/desktop lingui:compile
 ```
+
+
+## Required checks
+
+Run `pnpm i18n:check` before committing. It covers desktop and shared UI, utilities, and editor sources, requires complete Spanish translations, and validates ICU and compiled catalogs. The pre-commit hook checks the staged snapshot; the required Translations CI check validates pull requests. See `docs/localization.md` for details and the limits of static checks.

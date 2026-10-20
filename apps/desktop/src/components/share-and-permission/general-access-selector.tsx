@@ -1,3 +1,6 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 import { BuildingIcon, ChevronDown, ChevronRight, FolderIcon, GlobeIcon, LockIcon } from "lucide-react";
 import { useState } from "react";
 
@@ -18,23 +21,39 @@ type AccessType = {
 const accessTypes: Record<string, AccessType> = {
   invited: {
     icon: <LockIcon className="size-4 text-muted-foreground" />,
-    title: "Invited Only",
-    description: "Only invited people can access",
+    get title() {
+      return i18n._(msg`Invited Only`);
+    },
+    get description() {
+      return i18n._(msg`Only invited people can access`);
+    },
   },
   folder: {
     icon: <FolderIcon className="size-4 text-muted-foreground" />,
-    title: "Folder Members",
-    description: "+ Authorized personnels can access",
+    get title() {
+      return i18n._(msg`Folder Members`);
+    },
+    get description() {
+      return i18n._(msg`+ Authorized personnels can access`);
+    },
   },
   workspace: {
     icon: <BuildingIcon className="size-4 text-muted-foreground" />,
-    title: "All Workspace Members",
-    description: "+ Everyone in the workspace can access",
+    get title() {
+      return i18n._(msg`All Workspace Members`);
+    },
+    get description() {
+      return i18n._(msg`+ Everyone in the workspace can access`);
+    },
   },
   public: {
     icon: <GlobeIcon className="size-4 text-muted-foreground" />,
-    title: "Publish Publicly",
-    description: "+ Everyone with a link can access",
+    get title() {
+      return i18n._(msg`Publish Publicly`);
+    },
+    get description() {
+      return i18n._(msg`+ Everyone with a link can access`);
+    },
   },
 } as const;
 
@@ -42,6 +61,7 @@ export const GeneralAccessSelector = ({
   expanded,
   onToggle,
 }: GeneralAccessSelectorProps) => {
+  useLingui();
   const [selectedAccess, setSelectedAccess] = useState<keyof typeof accessTypes>("invited");
 
   return (

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { Loader } from "./loader";
 
@@ -18,6 +19,7 @@ interface ToolProps {
 }
 
 export function Tool({ toolPart, defaultOpen = false, className }: ToolProps) {
+  const { t } = useLingui();
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const { type, state, input, output, errorText } = toolPart;
 
@@ -54,15 +56,15 @@ export function Tool({ toolPart, defaultOpen = false, className }: ToolProps) {
   const getStateText = () => {
     switch (state) {
       case "pending":
-        return "Ready";
+        return t`Ready`;
       case "running":
-        return "Processing";
+        return t`Processing`;
       case "output-available":
-        return "Completed";
+        return t`Completed`;
       case "error":
-        return "Error";
+        return t`Error`;
       default:
-        return "Unknown";
+        return t`Unknown`;
     }
   };
 
@@ -115,7 +117,9 @@ export function Tool({ toolPart, defaultOpen = false, className }: ToolProps) {
           {/* Input */}
           {input && Object.keys(input).length > 0 && (
             <div>
-              <h4 className="text-xs font-medium text-muted-foreground mb-2">Input:</h4>
+              <h4 className="text-xs font-medium text-muted-foreground mb-2">
+                <Trans>Input:</Trans>
+              </h4>
               <div className="text-sm bg-muted/50 rounded p-3 font-mono">
                 {Object.entries(input).map(([key, value]) => (
                   <div key={key} className="mb-1 last:mb-0">
@@ -132,7 +136,9 @@ export function Tool({ toolPart, defaultOpen = false, className }: ToolProps) {
           {/* Output */}
           {state === "output-available" && output && (
             <div>
-              <h4 className="text-xs font-medium text-muted-foreground mb-2">Output:</h4>
+              <h4 className="text-xs font-medium text-muted-foreground mb-2">
+                <Trans>Output:</Trans>
+              </h4>
               <div className="text-sm bg-success/5 border border-success/20 rounded p-3">
                 {typeof output === "object" && output !== null
                   ? (
@@ -157,7 +163,9 @@ export function Tool({ toolPart, defaultOpen = false, className }: ToolProps) {
           {/* Error */}
           {state === "error" && errorText && (
             <div>
-              <h4 className="text-xs font-medium text-muted-foreground mb-2">Error:</h4>
+              <h4 className="text-xs font-medium text-muted-foreground mb-2">
+                <Trans>Error:</Trans>
+              </h4>
               <div className="text-sm bg-destructive/5 border border-destructive/20 rounded p-3 text-destructive">
                 {errorText}
               </div>
@@ -168,7 +176,9 @@ export function Tool({ toolPart, defaultOpen = false, className }: ToolProps) {
           {state === "running" && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader variant="typing" size="sm" />
-              <span>Processing request...</span>
+              <span>
+                <Trans>Processing request...</Trans>
+              </span>
             </div>
           )}
         </div>

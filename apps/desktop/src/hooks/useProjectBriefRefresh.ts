@@ -11,11 +11,12 @@ import {
 } from "@/lib/project-knowledge-jobs";
 import { getProjectActionErrorMessage } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
+import { useLingui } from "@lingui/react/macro";
+import { useIsMutating, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { commands as connectorCommands } from "@typr/plugin-connector";
 import type { ProjectBrief } from "@typr/plugin-db";
 import { toast } from "@typr/ui/components/ui/toast";
 import { resolveAiTaskModelId } from "@typr/utils";
-import { commands as connectorCommands } from "@typr/plugin-connector";
-import { useIsMutating, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function getProjectBriefRefreshMutationKey(projectId: string) {
   return [projectBriefQueryKeys.refresh, projectId] as const;
@@ -26,6 +27,7 @@ function debugProjectBrief(event: string, payload?: Record<string, unknown>) {
 }
 
 export function useProjectBriefRefresh(projectId: string) {
+  const { t } = useLingui();
   const queryClient = useQueryClient();
   const { userId } = useTypr();
   const { selectedModel, isAutoMode } = useAllModels();
@@ -117,7 +119,7 @@ export function useProjectBriefRefresh(projectId: string) {
 
       toast({
         id: "project-brief-refresh-error",
-        title: "Couldn’t refresh brief",
+        title: t`Couldn’t refresh brief`,
         content: message,
       });
     },

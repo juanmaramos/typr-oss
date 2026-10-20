@@ -36,7 +36,7 @@ export const useNoteSelection = (visibleNoteIds: string[]) => {
       );
 
       if (failures.length > 0) {
-        throw new Error(`Failed to delete ${failures.length} items`);
+        throw new Error(t`Failed to delete ${failures.length} items`);
       }
 
       return noteIds;

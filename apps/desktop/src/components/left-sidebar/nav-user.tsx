@@ -4,6 +4,9 @@ import { useTypr } from "@/contexts";
 import { useSettingsDialog } from "@/contexts/settings-dialog";
 import { useAppInfo } from "@/hooks/use-app-info";
 import { cn } from "@/lib/utils";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { Avatar, AvatarFallback } from "@typr/ui/components/ui/avatar";
 import { Badge } from "@typr/ui/components/ui/badge";
@@ -18,9 +21,6 @@ import {
   DropdownMenuTrigger,
 } from "@typr/ui/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
-import { Trans } from "@lingui/react/macro";
-import { useQuery } from "@tanstack/react-query";
-import { openUrl } from "@tauri-apps/plugin-opener";
 
 import { ThemeToggle } from "@/components/left-sidebar/theme-toggle";
 import { useShortcuts } from "@/components/shortcuts-window";
@@ -42,6 +42,7 @@ import { useShortcuts } from "@/components/shortcuts-window";
 // }
 
 export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" }) {
+  const { t } = useLingui();
   // const handleClickFinder = () => {
   //   windowsCommands.windowShow({ type: "finder" });
   // };
@@ -80,7 +81,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
   };
 
   const { openShortcuts } = useShortcuts();
-  const railTooltipLabel = "Account & settings";
+  const railTooltipLabel = t`Account & settings`;
   const avatar = userProfile.data?.full_name
     ? (
       <Avatar className={cn("bg-secondary", variant === "rail" ? "h-9 w-9" : "h-8 w-8")}>

@@ -1,4 +1,7 @@
 import { cn } from "@/lib/utils";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 import { AnimatePresence, motion } from "motion/react";
 
 type WritingBarState = "analyzing" | "writing" | "cancelling";
@@ -45,6 +48,7 @@ function TypingLoader({ className }: { className?: string }) {
 }
 
 export function StreamingWritingBar({ state }: StreamingWritingBarProps) {
+  useLingui();
   const getBarStyles = () => {
     switch (state) {
       case "cancelling":
@@ -67,13 +71,13 @@ export function StreamingWritingBar({ state }: StreamingWritingBarProps) {
   const getMessageText = () => {
     switch (state) {
       case "analyzing":
-        return "Analyzing transcript";
+        return i18n._(msg`Analyzing transcript`);
       case "writing":
-        return "Writing summary";
+        return i18n._(msg`Writing summary`);
       case "cancelling":
-        return "Cancelled";
+        return i18n._(msg`Cancelled`);
       default:
-        return "Analyzing transcript";
+        return i18n._(msg`Analyzing transcript`);
     }
   };
 

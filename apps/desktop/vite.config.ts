@@ -23,6 +23,7 @@ const shouldUploadSentrySourcemaps = Boolean(
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
   resolve: {
+    dedupe: ["@lingui/core", "@lingui/react"],
     alias: [
       {
         find: "@typr/ui/globals.css",
@@ -69,22 +70,22 @@ export default defineConfig(async () => ({
       },
     }),
     shouldUploadSentrySourcemaps
-      && sentryVitePlugin({
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        org: process.env.SENTRY_ORG,
-        project: process.env.SENTRY_PROJECT,
-        telemetry: false,
-        release: {
-          name: process.env.VITE_SENTRY_RELEASE,
-          setCommits: {
-            auto: true,
-          },
+    && sentryVitePlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      telemetry: false,
+      release: {
+        name: process.env.VITE_SENTRY_RELEASE,
+        setCommits: {
+          auto: true,
         },
-        sourcemaps: {
-          assets: "./dist/**",
-          filesToDeleteAfterUpload: ["./dist/**/*.map"],
-        },
-      }),
+      },
+      sourcemaps: {
+        assets: "./dist/**",
+        filesToDeleteAfterUpload: ["./dist/**/*.map"],
+      },
+    }),
   ],
   ...tauri,
 }));

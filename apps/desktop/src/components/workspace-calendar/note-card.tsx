@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import type { LinkProps } from "@tanstack/react-router";
 import { format } from "date-fns";
@@ -17,6 +18,7 @@ export function NoteCard({
   session: Session;
   showTime?: boolean;
 }) {
+  const { t } = useLingui();
   const { userId } = useTypr();
   const [open, setOpen] = useState(false);
 
@@ -99,13 +101,13 @@ export function NoteCard({
             : <File className="w-2.5 h-2.5 text-muted-foreground flex-shrink-0" />}
 
           <div className="flex-1 text-xs text-foreground truncate">
-            {linkedEvent.data?.name || session.title || "New note"}
+            {linkedEvent.data?.name || session.title || t`New note`}
           </div>
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-72 p-4 bg-background m-2">
         <h3 className="font-semibold text-lg mb-2">
-          {linkedEvent.data?.name || session.title || "New note"}
+          {linkedEvent.data?.name || session.title || t`New note`}
         </h3>
 
         <p className="text-sm mb-2 text-muted-foreground">
@@ -122,7 +124,7 @@ export function NoteCard({
             )
             : (
               <>
-                Created: {format(getStartDate(), "MMM d, h:mm a")}
+                <Trans>Created:</Trans> {format(getStartDate(), "MMM d, h:mm a")}
               </>
             )}
         </p>
@@ -141,7 +143,7 @@ export function NoteCard({
             ? <FileText className="size-3 text-muted-foreground flex-shrink-0" />
             : <File className="size-3 text-muted-foreground flex-shrink-0" />}
           <div className="text-xs font-medium text-foreground truncate">
-            {linkedEvent.data?.name || session.title || "New note"}
+            {linkedEvent.data?.name || session.title || t`New note`}
           </div>
         </div>
       </PopoverContent>

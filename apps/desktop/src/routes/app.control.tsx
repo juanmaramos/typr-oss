@@ -1,6 +1,7 @@
 import { Loader } from "@/components/ui/loader";
 import { TyprProvider } from "@/contexts";
 import { safeUnlisten } from "@/utils/safe-unlisten";
+import { useLingui } from "@lingui/react/macro";
 import { createFileRoute } from "@tanstack/react-router";
 import { emit } from "@tauri-apps/api/event";
 import { Circle, Grip, Mic, MicOff, Square, Volume2, VolumeX } from "lucide-react";
@@ -26,6 +27,7 @@ function ControlComponent() {
 }
 
 function ControlContent() {
+  const { t } = useLingui();
   // Using useRef directly
   const toolbarRef = useRef<HTMLDivElement>(null);
   const controlRef = useRef<HTMLDivElement | null>(null);
@@ -102,7 +104,7 @@ function ControlContent() {
           <div className="flex gap-2 items-center">
             <img
               src="/icons/logo.png"
-              alt="Logo"
+              alt={t`Logo`}
               className="size-8"
             />
 
@@ -144,11 +146,12 @@ function AudioControls({
   onToggleMic: () => void;
   onToggleSpeaker: () => void;
 }) {
+  const { t } = useLingui();
   return (
     <div className="flex gap-1 items-center">
       <IconButton
         onClick={onToggleMic}
-        tooltip={micMuted ? "Unmute Microphone" : "Mute Microphone"}
+        tooltip={micMuted ? t`Unmute Microphone` : t`Mute Microphone`}
         className={micMuted ? "bg-destructive/60 hover:bg-destructive/80" : "bg-foreground/60 hover:bg-foreground/70"}
       >
         {micMuted ? <MicOff size={16} /> : <Mic size={16} />}
@@ -156,7 +159,7 @@ function AudioControls({
 
       <IconButton
         onClick={onToggleSpeaker}
-        tooltip={speakerMuted ? "Unmute Speaker" : "Mute Speaker"}
+        tooltip={speakerMuted ? t`Unmute Speaker` : t`Mute Speaker`}
         className={speakerMuted
           ? "bg-destructive/60 hover:bg-destructive/80"
           : "bg-foreground/60 hover:bg-foreground/70"}
@@ -180,12 +183,13 @@ function RecordingControls({
   onToggleRecording: () => void;
   onPauseRecording: () => void;
 }) {
+  const { t } = useLingui();
   return (
     <div className="flex gap-1 items-center">
       {isRecording && (
         <IconButton
           onClick={isRecordingActive ? onPauseRecording : onToggleRecording}
-          tooltip={isRecordingActive ? "Pause Recording" : "Resume Recording"}
+          tooltip={isRecordingActive ? t`Pause Recording` : t`Resume Recording`}
           className={isRecordingActive
             ? "bg-warning/60 hover:bg-warning/70"
             : "bg-success/60 hover:bg-success/80"}
@@ -201,7 +205,7 @@ function RecordingControls({
 
       <IconButton
         onClick={onToggleRecording}
-        tooltip={isRecording ? "Stop Recording" : "Start Recording"}
+        tooltip={isRecording ? t`Stop Recording` : t`Start Recording`}
         className={isRecording
           ? "bg-destructive/70 hover:bg-destructive/90 shadow-lg shadow-destructive/30"
           : "bg-foreground/60 hover:bg-foreground/70"}
@@ -222,12 +226,13 @@ function Divider() {
 }
 
 function DragHandle({ onMouseDown }: { onMouseDown: (e: React.MouseEvent) => void }) {
+  const { t } = useLingui();
   return (
     <div className="flex gap-1 items-center">
       <div
         className="ml-1 p-1.5 text-background/60 cursor-move hover:text-background/90 hover:bg-foreground/40 rounded-lg transition-all duration-200"
         onMouseDown={onMouseDown}
-        title="Drag to move"
+        title={t`Drag to move`}
         style={{ userSelect: "none" }}
       >
         <Grip size={16} />

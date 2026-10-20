@@ -1,4 +1,5 @@
-import { Trans } from "@lingui/react/macro";
+import { i18n } from "@lingui/core";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useMatch, useNavigate } from "@tanstack/react-router";
 import { BuildingIcon, CalendarIcon, FileTextIcon, UserIcon } from "lucide-react";
@@ -49,7 +50,7 @@ export default function SearchList({ matches }: { matches: SearchMatch[] }) {
   if (matches.length === 0) {
     return (
       <div className="py-4 text-center text-muted-foreground text-sm">
-        No results found
+        <Trans>No results found</Trans>
       </div>
     );
   }
@@ -79,7 +80,7 @@ export default function SearchList({ matches }: { matches: SearchMatch[] }) {
         <section>
           <h2 className="font-bold text-muted-foreground mb-1 flex items-center gap-1">
             <FileTextIcon className="h-4 w-4 text-muted-foreground" />
-            Notes
+            <Trans>Notes</Trans>
           </h2>
           <div>
             {sessionMatches.map((match, i) => (
@@ -98,7 +99,7 @@ export default function SearchList({ matches }: { matches: SearchMatch[] }) {
         <section>
           <h2 className="font-bold text-muted-foreground mb-1 flex items-center gap-1">
             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-            Events
+            <Trans>Events</Trans>
           </h2>
           <div>
             {eventMatches.map((match, i) => (
@@ -117,7 +118,7 @@ export default function SearchList({ matches }: { matches: SearchMatch[] }) {
         <section>
           <h2 className="font-bold text-muted-foreground mb-1 flex items-center gap-1">
             <UserIcon className="h-4 w-4 text-muted-foreground" />
-            People
+            <Trans>People</Trans>
           </h2>
           <div>
             {humanMatches.map((match, i) => (
@@ -136,7 +137,7 @@ export default function SearchList({ matches }: { matches: SearchMatch[] }) {
         <section>
           <h2 className="font-bold text-muted-foreground mb-1 flex items-center gap-1">
             <BuildingIcon className="h-4 w-4 text-muted-foreground" />
-            Organizations
+            <Trans>Organizations</Trans>
           </h2>
           <div>
             {organizationMatches.map((match, i) => (
@@ -159,6 +160,7 @@ export function SessionMatch({ match: { item: session }, isSelected, query }: {
   isSelected: boolean;
   query: string;
 }) {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const elementRef = useRef<HTMLButtonElement>(null);
 
@@ -183,10 +185,10 @@ export function SessionMatch({ match: { item: session }, isSelected, query }: {
     >
       <div className="flex flex-col items-start gap-1">
         <div className="font-medium text-sm truncate">
-          {highlightText(session.title || "New note", query)}
+          {highlightText(session.title || t`New note`, query)}
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground line-clamp-1">
-          {new Date(session.created_at).toLocaleDateString()}
+          {new Date(session.created_at).toLocaleDateString(i18n.locale || undefined)}
         </div>
       </div>
     </button>
@@ -232,6 +234,7 @@ function HumanMatch({ match: { item }, isSelected, query }: {
   isSelected: boolean;
   query: string;
 }) {
+  const { t } = useLingui();
   const navigate = useNavigate();
   const routeMatch = useMatch({ from: "/app/human/$id", shouldThrow: false });
   const [isOpen, setIsOpen] = useState(false);
@@ -276,7 +279,7 @@ function HumanMatch({ match: { item }, isSelected, query }: {
           <div className="flex flex-col items-start gap-1">
             <div className="font-medium text-sm line-clamp-1 flex items-center gap-2 w-full">
               <span className="truncate">
-                {highlightText(human.data?.full_name || "Unnamed Person", query)}
+                {highlightText(human.data?.full_name || t`Unnamed Person`, query)}
               </span>
               <span className="text-muted-foreground text-xs font-normal ml-auto truncate max-w-[120px]">
                 {highlightText(human.data?.job_title || "", query)}

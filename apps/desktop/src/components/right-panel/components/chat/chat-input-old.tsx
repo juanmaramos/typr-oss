@@ -62,7 +62,7 @@ export function ChatInput(
 
     switch (entityType) {
       case "note":
-        return noteData?.title || "New note";
+        return noteData?.title || t`New note`;
       case "human":
         return humanData?.full_name || "";
       case "organization":

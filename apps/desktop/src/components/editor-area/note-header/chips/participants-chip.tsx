@@ -52,21 +52,22 @@ export function useParticipantsWithOrg(sessionId: string) {
 }
 
 export function ParticipantsChip({ sessionId }: { sessionId: string }) {
+  const { t } = useLingui();
   const participants = useParticipantsWithOrg(sessionId);
   const { userId } = useTypr();
 
   const count = participants.reduce((acc, group) => acc + (group.participants?.length ?? 0), 0);
   const buttonText = useMemo(() => {
     if (count === 0) {
-      return "Add participants";
+      return t`Add participants`;
     }
 
     const previewHuman = participants.find((group) => group.participants.length > 0)?.participants[0]!;
     if (previewHuman.id === userId && !previewHuman.full_name) {
-      return "You";
+      return t`You`;
     }
     return previewHuman.full_name ?? "??";
-  }, [participants, userId]);
+  }, [participants, userId, t]);
 
   const handleClickHuman = (human: Human) => {
     windowsCommands.windowShow({ type: "human", value: human.id });
@@ -92,6 +93,7 @@ export function ParticipantsChip({ sessionId }: { sessionId: string }) {
 export function ParticipantsChipInner(
   { sessionId, handleClickHuman }: { sessionId: string; handleClickHuman: (human: Human) => void },
 ) {
+  const { t } = useLingui();
   const participants = useParticipantsWithOrg(sessionId);
 
   return (
@@ -99,12 +101,14 @@ export function ParticipantsChipInner(
       ? <ParticipantAddControl sessionId={sessionId} />
       : (
         <div className="flex flex-col gap-3">
-          <div className="text-sm font-medium text-foreground/80">Participants</div>
+          <div className="text-sm font-medium text-foreground/80">
+            <Trans>Participants</Trans>
+          </div>
           <div className="flex flex-col gap-4 max-h-[40vh] overflow-y-auto custom-scrollbar pr-1">
             {participants.map(({ organization, participants }) => (
               <div key={organization?.id ?? NO_ORGANIZATION_ID} className="flex flex-col gap-1.5">
                 <div className="text-xs font-medium text-muted-foreground/70 truncate">
-                  {organization?.name ?? "No organization"}
+                  {organization?.name ?? t`No organization`}
                 </div>
                 <div className="flex flex-col rounded-md overflow-hidden bg-muted/50 border border/50">
                   {(participants ?? []).map((member, index) => (
@@ -137,6 +141,7 @@ function ParticipentItem({
   isLast?: boolean;
   handleClickHuman: (human: Human) => void;
 }) {
+  const { t } = useLingui();
   const queryClient = useQueryClient();
   const { userId } = useTypr();
 
@@ -203,7 +208,7 @@ function ParticipentItem({
             )
             : (
               <span className="text-sm font-medium text-muted-foreground/70">
-                {member.id === userId ? "You" : "Unknown"}
+                {member.id === userId ? t`You` : t`Unknown`}
               </span>
             )}
           {member.job_title && (

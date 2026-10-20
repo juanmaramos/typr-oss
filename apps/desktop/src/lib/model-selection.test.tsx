@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { setupI18n } from "@lingui/core";
+import { messages as enMessages } from "@/locales/en/messages.po";
+import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { notifyManager, QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { act, createContext, useContext, type ReactNode } from "react";
+import { act, createContext, type ReactNode, useContext } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -16,45 +17,72 @@ const native = vi.hoisted(() => ({
   unavailableStt: new Set<string>(),
   noDownloadedModels: false,
   defaults: { project_brief_model_id: null, meeting_summary_model_id: null } as {
-    project_brief_model_id: string | null; meeting_summary_model_id: string | null;
+    project_brief_model_id: string | null;
+    meeting_summary_model_id: string | null;
   },
   listeners: new Map<string, Set<() => void>>(),
 }));
-vi.mock("@typr/plugin-connector", () => ({ commands: {
-  getSttModel: vi.fn(async () => native.stt),
-  setSttModel: vi.fn(async (model: string) => { native.stt = model; }),
-  getCloudModel: vi.fn(async () => native.cloud),
-  setCloudModel: vi.fn(async (model: string) => { native.cloud = model; }),
-  getCustomLlmEnabled: vi.fn(async () => native.customEnabled),
-  setCustomLlmEnabled: vi.fn(async (enabled: boolean) => { native.customEnabled = enabled; return null; }),
-  getLlmConnection: vi.fn(),
-  getAiTaskDefaults: vi.fn(async () => ({ ...native.defaults })),
-  setAiTaskDefaults: vi.fn(async (defaults: typeof native.defaults) => { native.defaults = defaults; }),
-  getAssemblyaiApiKey: vi.fn(async () => "configured-key"),
-} }));
-vi.mock("@typr/plugin-local-stt", () => ({ commands: {
-  getCurrentModel: vi.fn(async () => native.stt === "assemblyai-universal" ? "QuantizedLargeTurbo" : native.stt || "QuantizedBaseEn"),
-  setCurrentModel: vi.fn(async (model: string) => { native.stt = model; }),
-  isModelDownloaded: vi.fn(async () => true),
-  isServerRunning: vi.fn(async () => native.runningStt),
-  startServer: vi.fn(async () => "local"), restartServer: vi.fn(async () => "local"),
-  downloadModelBackground: vi.fn(async () => null),
-} }));
-vi.mock("@typr/plugin-local-llm", () => ({ commands: {
-  getCurrentModel: vi.fn(async () => native.chat),
-  setCurrentModel: vi.fn(async (model: string) => { native.chat = model; }),
-  isModelDownloaded: vi.fn(async () => true),
-  isServerRunning: vi.fn(async () => native.runningChat),
-  startServer: vi.fn(async () => "local"), restartServer: vi.fn(async () => "local"),
-  listSupportedModels: vi.fn(async () => []), downloadModelBackground: vi.fn(async () => null),
-} }));
+vi.mock("@typr/plugin-connector", () => ({
+  commands: {
+    getSttModel: vi.fn(async () => native.stt),
+    setSttModel: vi.fn(async (model: string) => {
+      native.stt = model;
+    }),
+    getCloudModel: vi.fn(async () => native.cloud),
+    setCloudModel: vi.fn(async (model: string) => {
+      native.cloud = model;
+    }),
+    getCustomLlmEnabled: vi.fn(async () => native.customEnabled),
+    setCustomLlmEnabled: vi.fn(async (enabled: boolean) => {
+      native.customEnabled = enabled;
+      return null;
+    }),
+    getLlmConnection: vi.fn(),
+    getAiTaskDefaults: vi.fn(async () => ({ ...native.defaults })),
+    setAiTaskDefaults: vi.fn(async (defaults: typeof native.defaults) => {
+      native.defaults = defaults;
+    }),
+    getAssemblyaiApiKey: vi.fn(async () => "configured-key"),
+  },
+}));
+vi.mock("@typr/plugin-local-stt", () => ({
+  commands: {
+    getCurrentModel: vi.fn(async () =>
+      native.stt === "assemblyai-universal" ? "QuantizedLargeTurbo" : native.stt || "QuantizedBaseEn"
+    ),
+    setCurrentModel: vi.fn(async (model: string) => {
+      native.stt = model;
+    }),
+    isModelDownloaded: vi.fn(async () => true),
+    isServerRunning: vi.fn(async () => native.runningStt),
+    startServer: vi.fn(async () => "local"),
+    restartServer: vi.fn(async () => "local"),
+    downloadModelBackground: vi.fn(async () => null),
+  },
+}));
+vi.mock("@typr/plugin-local-llm", () => ({
+  commands: {
+    getCurrentModel: vi.fn(async () => native.chat),
+    setCurrentModel: vi.fn(async (model: string) => {
+      native.chat = model;
+    }),
+    isModelDownloaded: vi.fn(async () => true),
+    isServerRunning: vi.fn(async () => native.runningChat),
+    startServer: vi.fn(async () => "local"),
+    restartServer: vi.fn(async () => "local"),
+    listSupportedModels: vi.fn(async () => []),
+    downloadModelBackground: vi.fn(async () => null),
+  },
+}));
 vi.mock("@tauri-apps/api/event", () => ({
   emit: vi.fn(async () => {}),
   listen: vi.fn(async (event: string, listener: () => void) => {
     const listeners = native.listeners.get(event) ?? new Set();
     listeners.add(listener);
     native.listeners.set(event, listeners);
-    return () => { listeners.delete(listener); };
+    return () => {
+      listeners.delete(listener);
+    };
   }),
 }));
 vi.mock("@/contexts", () => ({ useTypr: () => ({ userId: null }) }));
@@ -62,83 +90,139 @@ vi.mock("@/utils/analytics-safe", () => ({ safeAnalyticsEvent: vi.fn() }));
 vi.mock("@/utils/open-settings-window", () => ({ openSettingsWindow: vi.fn() }));
 vi.mock("@/components/utils/debug-logger", () => ({ debugLogFor: vi.fn() }));
 vi.mock("@/hooks/usePlatform", () => ({ usePlatform: () => ({ supportsLocalModels: true }) }));
-vi.mock("@/hooks/useModelState", () => ({ useModelState: () => ({
-  isLoading: false, getModel: (id: string) => ({
-    isDownloaded: !native.noDownloadedModels && !native.unavailableStt.has(id), isDownloading: false,
+vi.mock("@/hooks/useModelState", () => ({
+  useModelState: () => ({
+    isLoading: false,
+    getModel: (id: string) => ({
+      isDownloaded: !native.noDownloadedModels && !native.unavailableStt.has(id),
+      isDownloading: false,
+    }),
   }),
-}) }));
-vi.mock("@/hooks/useModelRegistry", () => ({ useModelRegistry: () => ({
-  selectableModels: [{ id: "Gemma4E4b", name: "Gemma 4", isDownloaded: true }],
-  isLoading: false,
-}) }));
+}));
+vi.mock("@/hooks/useModelRegistry", () => ({
+  useModelRegistry: () => ({
+    selectableModels: [{ id: "Gemma4E4b", name: "Gemma 4", isDownloaded: true }],
+    isLoading: false,
+  }),
+}));
 vi.mock("@/hooks/useOpenAIModels", () => ({ useOpenAIModels: () => ({ models: [], isLoading: false }) }));
 vi.mock("@/hooks/useGroqModels", () => ({ useGroqModels: () => ({ models: [], isLoading: false }) }));
 vi.mock("@/hooks/useOpenRouterModels", () => ({ useOpenRouterModels: () => ({ models: [], isLoading: false }) }));
 vi.mock("@/components/settings/components/wer-modal", () => ({ WERPerformanceModal: () => null }));
 vi.mock("@typr/ui/components/ui/toast", () => ({
-  toast: vi.fn(), sonnerToast: { dismiss: vi.fn(), success: vi.fn(), error: vi.fn() },
+  toast: vi.fn(),
+  sonnerToast: { dismiss: vi.fn(), success: vi.fn(), error: vi.fn() },
 }));
 vi.mock("@typr/ui/components/ui/select", () => {
   const Selection = createContext<(value: string) => void>(() => {});
   const Container = ({ children }: { children: ReactNode }) => <div>{children}</div>;
   return {
-    Select: ({ value, onValueChange, children }: { value: string; onValueChange: (value: string) => void; children: ReactNode }) =>
-      <Selection.Provider value={onValueChange}><div data-selection={value}>{children}</div></Selection.Provider>,
+    Select: (
+      { value, onValueChange, children }: {
+        value: string;
+        onValueChange: (value: string) => void;
+        children: ReactNode;
+      },
+    ) => (
+      <Selection.Provider value={onValueChange}>
+        <div data-selection={value}>{children}</div>
+      </Selection.Provider>
+    ),
     SelectItem: ({ value, children, disabled }: { value: string; children: ReactNode; disabled?: boolean }) => {
       const change = useContext(Selection);
       return <button disabled={disabled} data-option={value} onClick={() => change(value)}>{children}</button>;
     },
-    SelectContent: Container, SelectTrigger: Container, SelectValue: Container,
+    SelectContent: Container,
+    SelectTrigger: Container,
+    SelectValue: Container,
   };
 });
 
+import { STTView } from "@/components/settings/components/ai/stt-view";
+import { AiTaskDefaultsSettings } from "@/components/settings/components/ai/task-defaults";
+import ModelDownloadNotification from "@/components/toast/model-download";
+import { showLlmModelDownloadToast, showSttModelDownloadToast } from "@/components/toast/shared";
+import { useSTTModel } from "@/components/transcript/hooks/useSTTModel";
+import { useCloudModelSelection } from "@/hooks/useCloudModelSelection";
+import { useLocalModels } from "@/hooks/useModels";
+import { useModelSelectionSync } from "@/hooks/useModelSelectionSync";
 import { listen } from "@tauri-apps/api/event";
 import { commands as connector } from "@typr/plugin-connector";
 import { commands as llm } from "@typr/plugin-local-llm";
 import { commands as stt } from "@typr/plugin-local-stt";
-import { toast, sonnerToast } from "@typr/ui/components/ui/toast";
-import ModelDownloadNotification from "@/components/toast/model-download";
-import { useSTTModel } from "@/components/transcript/hooks/useSTTModel";
-import { AiTaskDefaultsSettings } from "@/components/settings/components/ai/task-defaults";
-import { STTView } from "@/components/settings/components/ai/stt-view";
-import { showLlmModelDownloadToast, showSttModelDownloadToast } from "@/components/toast/shared";
-import { useModelSelectionSync } from "@/hooks/useModelSelectionSync";
-import { useCloudModelSelection } from "@/hooks/useCloudModelSelection";
-import { useLocalModels } from "@/hooks/useModels";
+import { sonnerToast, toast } from "@typr/ui/components/ui/toast";
 import {
-  getModelSelectionController, modelSelectionKeys, transcriptionModelQueryOptions,
-  localChatModelQueryOptions, cloudChatModelQueryOptions, MODEL_SELECTION_CHANGED_EVENT,
+  cloudChatModelQueryOptions,
+  getModelSelectionController,
+  localChatModelQueryOptions,
+  MODEL_SELECTION_CHANGED_EVENT,
+  modelSelectionKeys,
+  transcriptionModelQueryOptions,
 } from "./model-selection";
 
-const i18n = setupI18n({ locale: "en", messages: { en: {} } });
 let queryClient: QueryClient;
 let root: Root;
 let container: HTMLDivElement;
 
 function Pickers() {
-  return <><AiTaskDefaultsSettings /><div data-testid="stt-cards"><STTView
-    sttModels={[
-      { key: "QuantizedLargeTurbo", name: "Turbo", accuracy: 3, speed: 3, size: "574 MB", downloaded: true, fileName: "" },
-      { key: "DistilLargeV35En", name: "English", accuracy: 3, speed: 3, size: "1.5 GB", downloaded: true, fileName: "" },
-    ]}
-    downloadingModels={new Set()} handleModelDownload={async () => {}} handleShowFileLocation={async () => {}}
-    supportsLocalModels isWerModalOpen={false} setIsWerModalOpen={() => {}}
-  /></div></>;
+  return (
+    <>
+      <AiTaskDefaultsSettings />
+      <div data-testid="stt-cards">
+        <STTView
+          sttModels={[
+            {
+              key: "QuantizedLargeTurbo",
+              name: "Turbo",
+              accuracy: 3,
+              speed: 3,
+              size: "574 MB",
+              downloaded: true,
+              fileName: "",
+            },
+            {
+              key: "DistilLargeV35En",
+              name: "English",
+              accuracy: 3,
+              speed: 3,
+              size: "1.5 GB",
+              downloaded: true,
+              fileName: "",
+            },
+          ]}
+          downloadingModels={new Set()}
+          handleModelDownload={async () => {}}
+          handleShowFileLocation={async () => {}}
+          supportsLocalModels
+          isWerModalOpen={false}
+          setIsWerModalOpen={() => {}}
+        />
+      </div>
+    </>
+  );
 }
 
 async function render(children: ReactNode) {
   await act(async () => {
-    root.render(<QueryClientProvider client={queryClient}><I18nProvider i18n={i18n}>{children}</I18nProvider></QueryClientProvider>);
+    root.render(
+      <QueryClientProvider client={queryClient}>
+        <I18nProvider i18n={i18n}>{children}</I18nProvider>
+      </QueryClientProvider>,
+    );
   });
 }
 async function settle(assertion: () => void) {
   await vi.waitFor(async () => {
-    await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
     assertion();
   });
 }
 
 beforeEach(() => {
+  i18n.load("en", enMessages);
+  i18n.activate("en");
   vi.clearAllMocks();
   vi.stubGlobal("localStorage", { getItem: vi.fn(() => null), setItem: vi.fn() });
   vi.stubGlobal("sessionStorage", { getItem: vi.fn(() => null), setItem: vi.fn() });
@@ -170,17 +254,19 @@ afterEach(async () => {
 describe("model selection ownership", () => {
   it("keeps the real transcription Use card and Defaults picker synchronized in both directions", async () => {
     await render(<Pickers />);
-    await settle(() => expect(container.querySelector('[data-option="DistilLargeV35En"]')).not.toBeNull());
-    const useButton = [...container.querySelectorAll('[data-testid="stt-cards"] button')]
+    await settle(() => expect(container.querySelector("[data-option=\"DistilLargeV35En\"]")).not.toBeNull());
+    const useButton = [...container.querySelectorAll("[data-testid=\"stt-cards\"] button")]
       .find(button => button.textContent === "Use") as HTMLButtonElement;
     expect(useButton).toBeDefined();
     await act(async () => useButton.click());
-    await settle(() => expect(container.querySelector('[data-selection="DistilLargeV35En"]')).not.toBeNull());
+    await settle(() => expect(container.querySelector("[data-selection=\"DistilLargeV35En\"]")).not.toBeNull());
     expect(queryClient.getQueryData(modelSelectionKeys.transcription)).toBe("DistilLargeV35En");
-    await act(async () => (container.querySelector('[data-option="QuantizedLargeTurbo"]') as HTMLButtonElement).click());
-    await settle(() => expect(container.querySelector('[data-selection="QuantizedLargeTurbo"]')).not.toBeNull());
-    const cards = container.querySelector('[data-testid="stt-cards"]')!;
-    const turbo = [...cards.querySelectorAll("span")].find(span => span.textContent === "Turbo")!;
+    await act(async () =>
+      (container.querySelector("[data-option=\"QuantizedLargeTurbo\"]") as HTMLButtonElement).click()
+    );
+    await settle(() => expect(container.querySelector("[data-selection=\"QuantizedLargeTurbo\"]")).not.toBeNull());
+    const cards = container.querySelector("[data-testid=\"stt-cards\"]")!;
+    const turbo = [...cards.querySelectorAll("span")].find(span => span.textContent === "Large")!;
     expect(turbo.parentElement?.parentElement?.parentElement?.textContent).toContain("Current");
     expect(stt.setCurrentModel).toHaveBeenLastCalledWith("QuantizedLargeTurbo");
   });
@@ -189,8 +275,8 @@ describe("model selection ownership", () => {
     native.stt = "QuantizedSmall";
     native.unavailableStt.add("QuantizedSmall");
     await render(<Pickers />);
-    await settle(() => expect(container.querySelector('[data-selection="QuantizedSmall"]')).not.toBeNull());
-    expect(container.querySelector('[data-selection="QuantizedLargeTurbo"]')).toBeNull();
+    await settle(() => expect(container.querySelector("[data-selection=\"QuantizedSmall\"]")).not.toBeNull());
+    expect(container.querySelector("[data-selection=\"QuantizedLargeTurbo\"]")).toBeNull();
     expect(stt.setCurrentModel).not.toHaveBeenCalled();
   });
 
@@ -198,8 +284,8 @@ describe("model selection ownership", () => {
     native.stt = "assemblyai-universal";
     vi.mocked(connector.getAssemblyaiApiKey).mockResolvedValueOnce("");
     await render(<Pickers />);
-    await settle(() => expect(container.querySelector('[data-selection="assemblyai-universal"]')).not.toBeNull());
-    expect(container.querySelector('[data-selection="QuantizedLargeTurbo"]')).toBeNull();
+    await settle(() => expect(container.querySelector("[data-selection=\"assemblyai-universal\"]")).not.toBeNull());
+    expect(container.querySelector("[data-selection=\"QuantizedLargeTurbo\"]")).toBeNull();
   });
 
   it("normalizes legacy transcription storage and falls back to native preference only when storage is empty", async () => {
@@ -213,7 +299,9 @@ describe("model selection ownership", () => {
     native.noDownloadedModels = true;
     await render(<ModelDownloadNotification />);
     await settle(() => expect(toast).toHaveBeenCalled());
-    await act(async () => { await getModelSelectionController(queryClient).selectTranscription("assemblyai-universal"); });
+    await act(async () => {
+      await getModelSelectionController(queryClient).selectTranscription("assemblyai-universal");
+    });
     await settle(() => expect(sonnerToast.dismiss).toHaveBeenCalledWith("model-download-needed"));
   });
 
@@ -227,7 +315,9 @@ describe("model selection ownership", () => {
     expect(toast).not.toHaveBeenCalled();
     expect(connector.getLlmConnection).not.toHaveBeenCalled();
     expect(queryClient.getQueryData(modelSelectionKeys.customEndpointEnabled)).toBe(true);
-    await act(async () => { await getModelSelectionController(queryClient).selectLocalChat("Gemma4E4b"); });
+    await act(async () => {
+      await getModelSelectionController(queryClient).selectLocalChat("Gemma4E4b");
+    });
     expect(queryClient.getQueryData(modelSelectionKeys.customEndpointEnabled)).toBe(false);
   });
 
@@ -240,7 +330,9 @@ describe("model selection ownership", () => {
     }
     await render(<LanguageSelector />);
     await settle(() => expect(container.textContent).toBe("english"));
-    await act(async () => { model.handleLanguageChange("english"); });
+    await act(async () => {
+      model.handleLanguageChange("english");
+    });
     await settle(() => expect(native.stt).toBe("DistilLargeV35En"));
     expect(stt.setCurrentModel).toHaveBeenLastCalledWith("DistilLargeV35En");
   });
@@ -254,7 +346,9 @@ describe("model selection ownership", () => {
     await render(<LanguageSelector />);
     await settle(() => expect(queryClient.getQueryData(modelSelectionKeys.transcription)).toBe("QuantizedLargeTurbo"));
     vi.mocked(stt.isModelDownloaded).mockResolvedValueOnce(false);
-    await act(async () => { model.handleLanguageChange("english"); });
+    await act(async () => {
+      model.handleLanguageChange("english");
+    });
     await settle(() => expect(sonnerToast.error).toHaveBeenCalledWith("Download a model first", expect.any(Object)));
     expect(native.stt).toBe("QuantizedLargeTurbo");
   });
@@ -268,28 +362,33 @@ describe("model selection ownership", () => {
     }
     await render(<ChatSelection />);
     await settle(() => expect(container.textContent).toBe(`${cloud}:false`));
-    await act(async () => { await getModelSelectionController(queryClient).selectLocalChat("Gemma4E4b"); });
+    await act(async () => {
+      await getModelSelectionController(queryClient).selectLocalChat("Gemma4E4b");
+    });
     await settle(() => expect(container.textContent).toBe(":true"));
     expect(connector.setCloudModel).toHaveBeenLastCalledWith("");
   });
 
-  it.each(["chat", "transcription"] as const)("routes %s download completion through selection and warms the server", async (type) => {
-    if (type === "chat") {
-      showLlmModelDownloadToast("Gemma4E4b", undefined, queryClient);
-    } else {
-      showSttModelDownloadToast("DistilLargeV35En", undefined, queryClient);
-    }
-    const call = vi.mocked(toast).mock.calls.at(-1)![0] as { content: ReactNode };
-    await render(call.content);
-    await settle(() => expect(type === "chat" ? llm.startServer : stt.startServer).toHaveBeenCalledOnce());
-    if (type === "chat") {
-      await settle(() => expect(native.cloud).toBe(""));
-      expect(llm.setCurrentModel).toHaveBeenCalledOnce();
-    } else {
-      expect(native.stt).toBe("DistilLargeV35En");
-      expect(stt.setCurrentModel).toHaveBeenCalledOnce();
-    }
-  });
+  it.each(["chat", "transcription"] as const)(
+    "routes %s download completion through selection and warms the server",
+    async (type) => {
+      if (type === "chat") {
+        showLlmModelDownloadToast("Gemma4E4b", undefined, queryClient);
+      } else {
+        showSttModelDownloadToast("DistilLargeV35En", undefined, queryClient);
+      }
+      const call = vi.mocked(toast).mock.calls.at(-1)![0] as { content: ReactNode };
+      await render(call.content);
+      await settle(() => expect(type === "chat" ? llm.startServer : stt.startServer).toHaveBeenCalledOnce());
+      if (type === "chat") {
+        await settle(() => expect(native.cloud).toBe(""));
+        expect(llm.setCurrentModel).toHaveBeenCalledOnce();
+      } else {
+        expect(native.stt).toBe("DistilLargeV35En");
+        expect(stt.setCurrentModel).toHaveBeenCalledOnce();
+      }
+    },
+  );
 
   it("preserves cloud selection when the local save fails and refreshes a partial transcription write", async () => {
     await queryClient.fetchQuery(cloudChatModelQueryOptions());
@@ -371,7 +470,9 @@ describe("model selection ownership", () => {
     await settle(() => expect(container.textContent).toBe("QuantizedLargeTurbo"));
     for (const event of [MODEL_SELECTION_CHANGED_EVENT, "stt-model-selection-changed"]) {
       native.stt = event === MODEL_SELECTION_CHANGED_EVENT ? "DistilLargeV35En" : "assemblyai-universal";
-      await act(async () => { native.listeners.get(event)?.forEach(listener => listener()); });
+      await act(async () => {
+        native.listeners.get(event)?.forEach(listener => listener());
+      });
       await settle(() => expect(container.textContent).toBe(native.stt));
     }
     await render(null);
@@ -379,8 +480,16 @@ describe("model selection ownership", () => {
   });
   it("resynchronizes a selection changed during listener registration and disposes late listeners", async () => {
     const registrations: ((unlisten: () => void) => void)[] = [];
-    vi.mocked(listen).mockImplementationOnce(() => new Promise(resolve => { registrations.push(resolve); }));
-    vi.mocked(listen).mockImplementationOnce(() => new Promise(resolve => { registrations.push(resolve); }));
+    vi.mocked(listen).mockImplementationOnce(() =>
+      new Promise(resolve => {
+        registrations.push(resolve);
+      })
+    );
+    vi.mocked(listen).mockImplementationOnce(() =>
+      new Promise(resolve => {
+        registrations.push(resolve);
+      })
+    );
     function SelectionObserver() {
       useModelSelectionSync();
       const query = useQuery(transcriptionModelQueryOptions());
@@ -390,19 +499,30 @@ describe("model selection ownership", () => {
     await settle(() => expect(container.textContent).toBe("QuantizedLargeTurbo"));
     native.stt = "DistilLargeV35En";
     const unlisten = vi.fn();
-    await act(async () => { registrations.forEach(resolve => resolve(unlisten)); });
+    await act(async () => {
+      registrations.forEach(resolve => resolve(unlisten));
+    });
     await settle(() => expect(container.textContent).toBe("DistilLargeV35En"));
     await render(null);
     expect(unlisten).toHaveBeenCalledTimes(2);
 
     registrations.length = 0;
-    vi.mocked(listen).mockImplementationOnce(() => new Promise(resolve => { registrations.push(resolve); }));
-    vi.mocked(listen).mockImplementationOnce(() => new Promise(resolve => { registrations.push(resolve); }));
+    vi.mocked(listen).mockImplementationOnce(() =>
+      new Promise(resolve => {
+        registrations.push(resolve);
+      })
+    );
+    vi.mocked(listen).mockImplementationOnce(() =>
+      new Promise(resolve => {
+        registrations.push(resolve);
+      })
+    );
     await render(<SelectionObserver />);
     await render(null);
     const lateUnlisten = vi.fn();
-    await act(async () => { registrations.forEach(resolve => resolve(lateUnlisten)); });
+    await act(async () => {
+      registrations.forEach(resolve => resolve(lateUnlisten));
+    });
     expect(lateUnlisten).toHaveBeenCalledTimes(2);
   });
-
 });

@@ -1,6 +1,6 @@
+import { useLingui } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import { Input } from "@typr/ui/components/ui/input";
-import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
 
 // Remix Icon Components (with original sizes maintained)
@@ -28,7 +28,7 @@ export function ChatSearchHeader({ onClose, messages }: ChatSearchHeaderProps) {
 
   // Convert messages to a plain text content for TipTap search
   const content = messages.map(msg => {
-    const prefix = msg.isUser ? "You: " : "Assistant: ";
+    const prefix = msg.isUser ? t`You: ` : t`Assistant: `;
     return `${prefix}${msg.content}`;
   }).join("\n\n");
 

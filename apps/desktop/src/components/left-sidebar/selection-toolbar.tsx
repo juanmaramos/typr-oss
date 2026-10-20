@@ -1,3 +1,4 @@
+import { Plural, Trans } from "@lingui/react/macro";
 import { Button } from "@typr/ui/components/ui/button";
 import { Loader2, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -30,7 +31,7 @@ export function SelectionToolbar({
       >
         <div className="flex items-center gap-2">
           <div className="text-sm font-medium text-foreground">
-            {selectedCount} selected
+            <Trans>{selectedCount} selected</Trans>
           </div>
         </div>
 
@@ -43,7 +44,7 @@ export function SelectionToolbar({
             className="h-7 px-2"
           >
             <X className="h-3 w-3 mr-1" />
-            Cancel
+            <Trans>Cancel</Trans>
           </Button>
 
           <Button
@@ -54,7 +55,7 @@ export function SelectionToolbar({
             className="h-7 px-2"
           >
             {isDeleting ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : null}
-            Delete {selectedCount === 1 ? "note" : "notes"}
+            <Plural value={selectedCount} one="Delete note" other="Delete notes" />
           </Button>
         </div>
       </motion.div>

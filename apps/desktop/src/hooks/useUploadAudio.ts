@@ -1,14 +1,15 @@
+import { useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { appDataDir } from "@tauri-apps/api/path";
 import { useCallback, useRef } from "react";
 
 import { useTypr } from "@/contexts";
 import { useAudioUploadStore } from "@/stores/audio-upload";
+import { remove } from "@tauri-apps/plugin-fs";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { commands as dbCommands, Word } from "@typr/plugin-db";
 import { commands as localSttCommands, events as localSttEvents } from "@typr/plugin-local-stt";
 import { useSessions } from "@typr/utils/contexts";
-import { remove } from "@tauri-apps/plugin-fs";
 
 export const AUDIO_EXTENSIONS = ["wav", "mp3", "ogg", "mp4", "m4a", "flac"];
 export const AUDIO_UPLOAD_MONTHLY_LIMIT = 2;
@@ -22,6 +23,7 @@ export const AUDIO_UPLOAD_MONTHLY_LIMIT = 2;
  * (toasts, buttons) can react without prop-drilling.
  */
 export function useUploadAudio() {
+  const { t } = useLingui();
   const queryClient = useQueryClient();
   const { userId } = useTypr();
   const setProgress = useAudioUploadStore((s) => s.setProgress);
@@ -65,7 +67,7 @@ export function useUploadAudio() {
     );
     if (currentStatus === "processing") {
       console.warn("[useUploadAudio:upload] BLOCKED — another upload already in progress");
-      throw new Error("Another audio upload is already in progress");
+      throw new Error(t`Another audio upload is already in progress`);
     }
 
     abortRef.current = false;

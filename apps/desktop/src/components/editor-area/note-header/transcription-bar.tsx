@@ -1,3 +1,4 @@
+import { localizeDefaultTemplate } from "@/utils/default-templates";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
@@ -6,7 +7,7 @@ import { PlayerControls } from "./player-controls";
 
 import { Icon } from "@/components/ui/icon";
 import { TemplateIcon } from "@/components/ui/template-icon";
-import { useTypr, useRightPanel } from "@/contexts";
+import { useRightPanel, useTypr } from "@/contexts";
 import { useEnhancePendingState } from "@/hooks/enhance-pending";
 import { useModelState } from "@/hooks/useModelState";
 import { useConsentNotification } from "@/utils/consent-notification";
@@ -330,7 +331,7 @@ function AdvancedRecordingControls({
                   disabled={sessionId === onboardingSessionId || ongoingSessionState.status === "running_active"}
                 />
                 <span className="text-sm text-muted-foreground">
-                  <Trans>{!ongoingSessionState.micMuted ? "Transcribe" : "Don't transcribe"}</Trans>
+                  {!ongoingSessionState.micMuted ? t`Transcribe` : t`Don't transcribe`}
                 </span>
               </div>
             </div>
@@ -349,7 +350,7 @@ function AdvancedRecordingControls({
                   disabled={ongoingSessionState.status === "running_active"}
                 />
                 <span className="text-sm text-muted-foreground">
-                  <Trans>{!ongoingSessionState.speakerMuted ? "Transcribe" : "Don't transcribe"}</Trans>
+                  {!ongoingSessionState.speakerMuted ? t`Transcribe` : t`Don't transcribe`}
                 </span>
               </div>
             </div>
@@ -398,7 +399,7 @@ function AdvancedRecordingControls({
                 {selectedTemplate === "auto" || !selectedTemplate
                   ? t`Auto`
                   : getTemplateDisplayName(
-                    templatesQuery.data?.find(t => t.id === selectedTemplate)?.title,
+                    templatesQuery.data?.map(localizeDefaultTemplate).find(t => t.id === selectedTemplate)?.title,
                     t`Auto`,
                   )}
               </span>
@@ -411,8 +412,8 @@ function AdvancedRecordingControls({
                 <Trans>Auto</Trans>
               </div>
             </SelectItem>
-            {templatesQuery.data?.map((template) => {
-              const title = getTemplateDisplayName(template.title, "Untitled");
+            {templatesQuery.data?.map(localizeDefaultTemplate).map((template) => {
+              const title = getTemplateDisplayName(template.title, t`Untitled`);
               const truncatedTitle = title.length > 20 ? title.substring(0, 20) + "..." : title;
 
               return (
@@ -492,13 +493,17 @@ function MicrophoneDropdown({
           ? (
             <div className="p-4 text-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-foreground/50 mx-auto"></div>
-              <p className="text-sm text-muted-foreground mt-2">Loading devices...</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                <Trans>Loading devices...</Trans>
+              </p>
             </div>
           )
           : allDevicesQuery.data?.length === 0
           ? (
             <div className="p-4 text-center">
-              <p className="text-sm text-muted-foreground">No microphones found</p>
+              <p className="text-sm text-muted-foreground">
+                <Trans>No microphones found</Trans>
+              </p>
             </div>
           )
           : (

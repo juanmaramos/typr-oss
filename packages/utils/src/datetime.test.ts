@@ -1,7 +1,14 @@
+import { tz } from "@date-fns/tz";
 import { i18n } from "@lingui/core";
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { differenceInBusinessDays, formatCategorizedDate, formatRelativeWithDay } from "./datetime";
+import {
+  differenceInBusinessDays,
+  format,
+  formatCategorizedDate,
+  formatDistanceToNow,
+  formatRelativeWithDay,
+} from "./datetime";
 
 beforeAll(() => {
   // Load minimal messages for testing
@@ -114,5 +121,28 @@ describe("formatCategorizedDate", () => {
     // Test with different timezone - the logic should still work
     const date = "2024-03-15T05:00:00.000Z"; // Different time but same day in UTC
     expect(formatCategorizedDate(date, "UTC")).toBe("Today");
+  });
+});
+
+describe("localized date names", () => {
+  it("uses the active app locale for weekdays and month names", () => {
+    i18n.load("es", {
+      "{days} days later ({dayOfWeek})": "Dentro de {days} días ({dayOfWeek})",
+    });
+    i18n.activate("es");
+
+    try {
+      expect(formatRelativeWithDay("2025-04-14T09:07:57.843843Z", "UTC", new Date("2025-04-12T08:16:31.438Z")))
+        .toBe("Dentro de 2 días (lun)");
+      expect(formatDistanceToNow(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), { addSuffix: true }))
+        .toBe("hace 2 días");
+      expect(format(new Date("2025-01-15T12:00:00Z"), "MMMM", { in: tz("UTC") }))
+        .toBe("enero");
+    } finally {
+      i18n.activate("en");
+    }
+
+    expect(formatRelativeWithDay("2025-04-14T09:07:57.843843Z", "UTC", new Date("2025-04-12T08:16:31.438Z")))
+      .toBe("2 days later (Mon)");
   });
 });

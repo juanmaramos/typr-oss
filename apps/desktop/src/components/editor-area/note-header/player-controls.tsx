@@ -2,6 +2,7 @@ import GoogleMeetWaveform from "@/components/ui/google-meet-waveform";
 import { Icon } from "@/components/ui/icon";
 import { Loader } from "@/components/ui/loader";
 import { useRecordingTimer } from "@/hooks/useRecordingTimer";
+import { Trans } from "@lingui/react/macro";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { cn } from "@typr/ui/lib/utils";
 import { useOngoingSession } from "@typr/utils/contexts";
@@ -161,7 +162,9 @@ export function PlayerControls({ sessionId, onPause, onResume, onStop }: PlayerC
           </button>
         </TooltipTrigger>
         <TooltipContent side="bottom">
-          <p>Stop</p>
+          <p>
+            <Trans>Stop</Trans>
+          </p>
         </TooltipContent>
       </Tooltip>
     </div>

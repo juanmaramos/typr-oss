@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef } from "react";
 
@@ -44,6 +45,7 @@ export function useChatQueries({
   allowAutoSelectLatest,
   selectionSource,
 }: UseChatQueriesProps) {
+  const { t } = useLingui();
   // Get state from Zustand store
   const { isGenerating: isGeneratingFn, setMessages } = useChatState();
   const queryClient = useQueryClient();
@@ -290,11 +292,12 @@ export function useChatQueries({
     queryKey: ["session", "chat-context", sessionId],
     queryFn: () => sessionId ? loadSessionData(sessionId) : null,
   });
-  const fetchSessionData = (capturedSessionId: string) => queryClient.fetchQuery({
-    queryKey: ["session", "chat-context", capturedSessionId],
-    queryFn: () => loadSessionData(capturedSessionId),
-    staleTime: 0,
-  });
+  const fetchSessionData = (capturedSessionId: string) =>
+    queryClient.fetchQuery({
+      queryKey: ["session", "chat-context", capturedSessionId],
+      queryFn: () => loadSessionData(capturedSessionId),
+      staleTime: 0,
+    });
   const getChatGroupId = async (signal?: AbortSignal): Promise<string> => {
     const throwIfAborted = () => {
       if (signal?.aborted) {
@@ -304,7 +307,7 @@ export function useChatQueries({
 
     throwIfAborted();
     if (!sessionId || !userId) {
-      throw new Error("No session or user");
+      throw new Error(t`No session or user`);
     }
 
     if (currentChatGroupId && !isNewChatRequested && !isNewChatPending) {

@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import type { LinkProps } from "@tanstack/react-router";
 import { format } from "date-fns";
@@ -19,6 +19,7 @@ export function EventCard({
   event: Event;
   showTime?: boolean;
 }) {
+  const { t } = useLingui();
   const { userId } = useTypr();
   const session = useQuery({
     queryKey: ["event-session", event.id],
@@ -99,7 +100,7 @@ export function EventCard({
           <Calendar className="w-2.5 h-2.5 text-muted-foreground flex-shrink-0" />
 
           <div className="flex-1 text-xs text-foreground truncate">
-            {event.name || "Untitled Event"}
+            {event.name || t`Untitled Event`}
           </div>
         </div>
       </PopoverTrigger>
@@ -111,7 +112,7 @@ export function EventCard({
               console.error("Failed to open event URL:", error)
             )}
         >
-          {event.name || "Untitled Event"}
+          {event.name || t`Untitled Event`}
         </div>
 
         <p className="text-sm text-muted-foreground mb-2">
@@ -137,7 +138,7 @@ export function EventCard({
             >
               <FileText className="size-3 text-muted-foreground flex-shrink-0" />
               <div className="text-xs font-medium text-foreground truncate">
-                {session.data.title || "New note"}
+                {session.data.title || t`New note`}
               </div>
             </div>
           )

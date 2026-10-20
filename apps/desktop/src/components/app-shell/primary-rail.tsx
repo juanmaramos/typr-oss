@@ -1,10 +1,10 @@
 import { Icon } from "@/components/ui/icon";
 import { useCommandPalette } from "@/contexts/search";
 import { cn } from "@/lib/utils";
-import { Button } from "@typr/ui/components/ui/button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { useLingui } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
+import { Button } from "@typr/ui/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import type { ReactNode } from "react";
 import { NavUser } from "../left-sidebar/nav-user";
 import { ShortcutById } from "../shortcut-by-id";
@@ -12,7 +12,6 @@ import { useShellMode } from "./use-shell-mode";
 
 type NavItem = {
   id: "notes" | "ask" | "projects";
-  label: string;
   to: "/app" | "/app/ask" | "/app/projects";
   iconName: string;
 };
@@ -20,19 +19,16 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   {
     id: "notes",
-    label: "Notes",
     to: "/app",
     iconName: "ri-sticky-note-line",
   },
   {
     id: "ask",
-    label: "Ask",
     to: "/app/ask",
     iconName: "ri-chat-3-line",
   },
   {
     id: "projects",
-    label: "Projects",
     to: "/app/projects",
     iconName: "ri-folder-3-line",
   },

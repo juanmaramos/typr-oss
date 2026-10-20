@@ -1,7 +1,7 @@
 import { usePlatform } from "@/hooks/usePlatform";
 import { type CalendarIntegration } from "@/types";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { Badge } from "@typr/ui/components/ui/badge";
-import { Trans } from "@lingui/react/macro";
 import { AppleCalendarIntegrationDetails, CalendarIconWithText } from "../components/calendar";
 
 const supportedIntegrations: CalendarIntegration[] = [
@@ -11,6 +11,7 @@ const supportedIntegrations: CalendarIntegration[] = [
 ];
 
 export default function Calendar() {
+  const { t } = useLingui();
   const { isWindows, isLoading } = usePlatform();
 
   if (isLoading) {
@@ -26,7 +27,7 @@ export default function Calendar() {
             <div className="flex items-center gap-3">
               <img
                 src="/icons/outlook.svg"
-                alt="Outlook Calendar"
+                alt={t`Outlook Calendar`}
                 className="size-6"
               />
               <div>

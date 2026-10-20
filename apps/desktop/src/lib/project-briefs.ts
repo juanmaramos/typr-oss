@@ -3,6 +3,8 @@ import { debugLogFor } from "@/components/utils/debug-logger";
 import { hashText } from "@/lib/project-context-sources";
 import { getProjectKnowledgeFreshness, listProjectKnowledgeSourceMaterials } from "@/lib/project-knowledge";
 import { getProject } from "@/lib/projects";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import {
   commands as dbCommands,
   type ProjectBrief,
@@ -159,7 +161,7 @@ export async function refreshProjectBrief({
 }) {
   const project = await getProject(projectId);
   if (!project) {
-    throw new Error("Project not found");
+    throw new Error(i18n._(msg`Project not found`));
   }
 
   const existingBrief = await dbCommands.getLatestProjectBrief(projectId);
@@ -170,12 +172,12 @@ export async function refreshProjectBrief({
   try {
     const cards = await buildProjectBriefSourceCards(projectId);
     if (cards.length === 0) {
-      throw new Error("Project brief requires at least one included note summary or indexed text file.");
+      throw new Error(i18n._(msg`Project brief requires at least one included note summary or indexed text file.`));
     }
     const synthesis = await dbCommands.getProjectKnowledgeSynthesis(projectId);
     const sourceOnlyFingerprint = await fingerprintProjectBriefSources(cards);
     if (synthesis?.source_fingerprint !== sourceOnlyFingerprint) {
-      throw new Error("Project knowledge synthesis is still building.");
+      throw new Error(i18n._(msg`Project knowledge synthesis is still building.`));
     }
 
     const now = new Date().toISOString();
@@ -252,7 +254,7 @@ export async function refreshProjectBrief({
 
     const markdown = normalizeBriefMarkdown(text);
     if (!markdown) {
-      throw new Error("The AI model returned an empty project brief.");
+      throw new Error(i18n._(msg`The AI model returned an empty project brief.`));
     }
     validateBriefCitations(markdown, cards);
 
@@ -381,7 +383,7 @@ async function buildProjectBriefSourceCards(projectId: string): Promise<BriefSou
   return materials.slice(0, PROJECT_BRIEF_SOURCE_LIMIT).map((material, index) => {
     const digest = digestBySource.get(`${material.sourceType}:${material.sourceId}`);
     if (digest?.source_hash !== material.sourceHash) {
-      throw new Error("Project source digests are still building.");
+      throw new Error(i18n._(msg`Project source digests are still building.`));
     }
     return toBriefSourceCard(digest, `S${index + 1}`);
   });
@@ -469,6 +471,8 @@ function buildBriefPromptMessages(
     },
     {
       role: "user" as const,
+      // Canonical model protocol: these headings are validated and parsed as stable English markers.
+      /* eslint-disable typr-i18n/ui-strings */
       content: [
         `Project: ${projectName}`,
         projectDescription ? `Description: ${projectDescription}` : null,
@@ -494,6 +498,7 @@ function buildBriefPromptMessages(
         "Source digests:",
         sourceBlock,
       ].filter(Boolean).join("\n"),
+      /* eslint-enable typr-i18n/ui-strings */
     },
   ];
 }
@@ -587,21 +592,25 @@ function validateBriefCitations(markdown: string, cards: BriefSourceCard[]) {
     .trim();
 
   if (!previewSection || sections[0]?.id !== "project-brief") {
-    throw new Error("Project brief must start with a ## Project brief section.");
+    throw new Error(i18n._(msg`Project brief must start with a ## Project brief section.`));
   }
 
   if (extractCitationKeys(previewSection.markdown).length > 0) {
-    throw new Error("Project brief preview copy must not include citations.");
+    throw new Error(i18n._(msg`Project brief preview copy must not include citations.`));
   }
 
   const citedKeys = extractCitationKeys(nonPreviewMarkdown);
   if (!nonPreviewMarkdown || citedKeys.length === 0) {
-    throw new Error("Project brief needs at least one cited detail section from the current project sources.");
+    throw new Error(
+      i18n._(msg`Project brief needs at least one cited detail section from the current project sources.`),
+    );
   }
 
   const invalidKeys = citedKeys.filter(key => !validKeys.has(key));
   if (invalidKeys.length > 0) {
-    throw new Error(`Project brief cited unknown source keys: ${Array.from(new Set(invalidKeys)).join(", ")}.`);
+    throw new Error(
+      i18n._(msg`Project brief cited unknown source keys: ${Array.from(new Set(invalidKeys)).join(", ")}.`),
+    );
   }
 }
 

@@ -1,4 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { diffWords } from "diff";
 import { memo, useEffect, useState } from "react";
 
@@ -199,7 +199,9 @@ export const DiffPreview = memo(({
       <div className="px-4 py-3 border-b border-border bg-muted/20">
         <div className="flex items-center gap-2">
           <i className="ri-quill-pen-ai-line text-base text-muted-foreground" />
-          <span className="text-sm font-medium text-foreground">Suggested change</span>
+          <span className="text-sm font-medium text-foreground">
+            <Trans>Suggested change</Trans>
+          </span>
         </div>
         {reasoning && (
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
@@ -253,7 +255,9 @@ export const DiffPreview = memo(({
                 className="h-7 px-3 text-xs gap-1.5 bg-primary hover:bg-primary/90 text-primary-foreground flex items-center"
               >
                 <i className="ri-check-line text-sm" />
-                <span>Accept</span>
+                <span>
+                  <Trans>Accept</Trans>
+                </span>
                 <ShortcutById shortcutId="accept-changes" variant="ghost" className="text-xs opacity-70" />
               </Button>
               <Button
@@ -263,7 +267,9 @@ export const DiffPreview = memo(({
                 className="h-7 px-3 text-xs gap-1.5 text-muted-foreground hover:text-foreground flex items-center"
               >
                 <i className="ri-close-line text-sm" />
-                <span>Reject</span>
+                <span>
+                  <Trans>Reject</Trans>
+                </span>
                 <ShortcutById shortcutId="reject-changes" variant="ghost" className="text-xs opacity-70" />
               </Button>
             </>
@@ -272,13 +278,17 @@ export const DiffPreview = memo(({
           ? (
             <div className="flex items-center gap-2 text-xs text-primary">
               <i className="ri-check-line text-sm" />
-              <span className="font-medium">Changes accepted</span>
+              <span className="font-medium">
+                <Trans>Changes accepted</Trans>
+              </span>
             </div>
           )
           : (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <i className="ri-close-line text-sm" />
-              <span className="font-medium">Changes rejected</span>
+              <span className="font-medium">
+                <Trans>Changes rejected</Trans>
+              </span>
             </div>
           )}
       </div>

@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { writeText as writeTextToClipboard } from "@tauri-apps/plugin-clipboard-manager";
 
 import { commands as dbCommands, type Session } from "@typr/plugin-db";
@@ -5,7 +7,7 @@ import { formatSessionForSharing } from "./content-formatter";
 
 const formatHtmlForClipboard = (html: string): string => {
   if (!html) {
-    return "No content available";
+    return i18n._(msg`No content available`);
   }
 
   const tempDiv = document.createElement("div");
@@ -94,29 +96,49 @@ export async function copyAiSummaryToClipboard(session: Session): Promise<void> 
     dbCommands.sessionGetEvent(session.id),
   ]);
 
-  const title = session.title || "New note";
+  const title = session.title || i18n._(msg`New note`);
   let metadata = "";
 
   if (event) {
     if (event.name) {
-      metadata += `Event: ${event.name}\n`;
+      metadata += i18n._(msg`Event: ${event.name}\n`);
     }
 
     if (event.start_date) {
       const startDate = new Date(event.start_date);
       const endDate = event.end_date ? new Date(event.end_date) : null;
 
-      let dateText = `Date: ${startDate.toLocaleDateString()}`;
+      let dateText = i18n._(msg`Date: ${startDate.toLocaleDateString(i18n.locale || undefined)}`);
       if (endDate && startDate.toDateString() !== endDate.toDateString()) {
-        dateText += ` - ${endDate.toLocaleDateString()}`;
+        dateText += ` - ${endDate.toLocaleDateString(i18n.locale || undefined)}`;
       }
       metadata += `${dateText}\n`;
 
       const timeText = endDate
-        ? `Time: ${startDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })} - ${
-          endDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })
-        }`
-        : `Time: ${startDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })}`;
+        ? i18n._(
+          msg`Time: ${
+            startDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          } - ${
+            endDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          }`,
+        )
+        : i18n._(
+          msg`Time: ${
+            startDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          }`,
+        );
       metadata += `${timeText}\n`;
     }
   }
@@ -128,7 +150,7 @@ export async function copyAiSummaryToClipboard(session: Session): Promise<void> 
       .join(", ");
 
     if (participantNames) {
-      metadata += `Participants: ${participantNames}\n`;
+      metadata += i18n._(msg`Participants: ${participantNames}\n`);
     }
   }
 

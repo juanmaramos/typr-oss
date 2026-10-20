@@ -1,11 +1,6 @@
 import { cn } from "@/lib/utils";
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useLingui } from "@lingui/react/macro";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Markdown } from "./markdown";
 
 type ReasoningContextType = {
@@ -16,9 +11,10 @@ type ReasoningContextType = {
 const ReasoningContext = createContext<ReasoningContextType | undefined>(undefined);
 
 function useReasoningContext() {
+  const { t } = useLingui();
   const context = useContext(ReasoningContext);
   if (!context) {
-    throw new Error("useReasoningContext must be used within a Reasoning provider");
+    throw new Error(t`useReasoningContext must be used within a Reasoning provider`);
   }
   return context;
 }

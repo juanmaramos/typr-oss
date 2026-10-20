@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 export * from "./default-toolbar";
 export * from "./entity-toolbar";
 export * from "./main-toolbar";
@@ -33,6 +34,7 @@ export function EditableEntityWrapper({
 }
 
 function EditButton() {
+  const { t } = useLingui();
   const { isEditing, setIsEditing } = useEditMode();
   return (
     <Button
@@ -40,7 +42,7 @@ function EditButton() {
       size="sm"
       onClick={() => setIsEditing(!isEditing)}
     >
-      {isEditing ? "Save" : "Edit"}
+      {isEditing ? t`Save` : t`Edit`}
     </Button>
   );
 }

@@ -4,6 +4,10 @@ import { useTypr } from "@/contexts";
 import { archiveAskThread, askQueryKeys, createAskThread, listAskMessages, listAskThreads } from "@/lib/ask";
 import { listProjects, projectQueryKeys } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
+import { zodValidator } from "@tanstack/zod-adapter";
 import { Button } from "@typr/ui/components/ui/button";
 import {
   DropdownMenu,
@@ -15,11 +19,7 @@ import { Input } from "@typr/ui/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@typr/ui/components/ui/select";
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
 import { toast } from "@typr/ui/components/ui/toast";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
-import { zodValidator } from "@tanstack/zod-adapter";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "@typr/utils/datetime";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 

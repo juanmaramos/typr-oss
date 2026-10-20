@@ -1,3 +1,5 @@
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import { type Event, type Human, type Session } from "@typr/plugin-db";
 
 export interface FormattedContent {
@@ -91,7 +93,7 @@ export interface FormattedContent {
 // Convert HTML to formatted plain text for email compatibility
 const htmlToFormattedText = (html: string): string => {
   if (!html) {
-    return "No content available";
+    return i18n._(msg`No content available`);
   }
 
   const tempDiv = document.createElement("div");
@@ -166,25 +168,45 @@ const formatMetadataAsText = (session: Session, participants: Human[], event: Ev
   // Event info
   if (event) {
     if (event.name) {
-      items.push(`Event: ${event.name}`);
+      items.push(i18n._(msg`Event: ${event.name}`));
     }
 
     if (event.start_date) {
       const startDate = new Date(event.start_date);
       const endDate = event.end_date ? new Date(event.end_date) : null;
 
-      let dateText = `Date: ${startDate.toLocaleDateString()}`;
+      let dateText = i18n._(msg`Date: ${startDate.toLocaleDateString(i18n.locale || undefined)}`);
       if (endDate && startDate.toDateString() !== endDate.toDateString()) {
-        dateText += ` - ${endDate.toLocaleDateString()}`;
+        dateText += ` - ${endDate.toLocaleDateString(i18n.locale || undefined)}`;
       }
       items.push(dateText);
 
       // Time
       const timeText = endDate
-        ? `Time: ${startDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })} - ${
-          endDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })
-        }`
-        : `Time: ${startDate.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: undefined })}`;
+        ? i18n._(
+          msg`Time: ${
+            startDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          } - ${
+            endDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          }`,
+        )
+        : i18n._(
+          msg`Time: ${
+            startDate.toLocaleTimeString(i18n.locale || undefined, {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: undefined,
+            })
+          }`,
+        );
       items.push(timeText);
     }
   }
@@ -197,7 +219,7 @@ const formatMetadataAsText = (session: Session, participants: Human[], event: Ev
       .join(", ");
 
     if (participantNames) {
-      items.push(`Participants: ${participantNames}`);
+      items.push(i18n._(msg`Participants: ${participantNames}`));
     }
   }
 
@@ -210,13 +232,15 @@ export const formatSessionForSharing = (
   event: Event | null,
   format: "email" | "text" = "email",
 ): FormattedContent => {
-  const title = session.title || "New note";
+  const title = session.title || i18n._(msg`New note`);
 
   if (format === "email") {
     // Plain text format optimized for email (mailto: compatibility)
     const content = htmlToFormattedText(session.enhanced_memo_html || "");
     const metadata = formatMetadataAsText(session, participants, event);
-    const attribution = `\n${"─".repeat(50)}\nSummarized with Typr - Offline AI note-taking.\nhttps://www.typrapp.com`;
+    const attribution = `\n${"─".repeat(50)}\n${
+      i18n._(msg`Summarized with Typr - Offline AI note-taking.`)
+    }\nhttps://www.typrapp.com`;
 
     return {
       title,
@@ -229,9 +253,9 @@ export const formatSessionForSharing = (
     // Plain text format (for other uses)
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = session.enhanced_memo_html || "";
-    const content = tempDiv.textContent || tempDiv.innerText || "No content available";
+    const content = tempDiv.textContent || tempDiv.innerText || i18n._(msg`No content available`);
     const metadata = formatMetadataAsText(session, participants, event);
-    const attribution = "Summarized with Typr - Offline AI note-taking.\nhttps://www.typrapp.com";
+    const attribution = `${i18n._(msg`Summarized with Typr - Offline AI note-taking.`)}\nhttps://www.typrapp.com`;
 
     return {
       title,

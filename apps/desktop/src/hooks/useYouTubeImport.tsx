@@ -4,8 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { useTypr, useRightPanel } from "@/contexts";
-import { YouTubeImportError, YouTubeImportService } from "@/services/youtube-service";
+import { useRightPanel, useTypr } from "@/contexts";
+import { getYouTubeImportErrorMessage, YouTubeImportError, YouTubeImportService } from "@/services/youtube-service";
 import { captureTelemetryException } from "@/utils/telemetry";
 import { toast } from "@typr/ui/components/ui/toast";
 
@@ -30,6 +30,8 @@ export function useYouTubeImport(options: UseYouTubeImportOptions = {}) {
 
       if (!videoUrl.trim()) {
         console.log("❌ [YouTube Hook] Empty URL");
+        // Keep this error identity stable; getYouTubeImportErrorMessage localizes it for display.
+        // eslint-disable-next-line typr-i18n/ui-strings
         throw new Error("Please enter a YouTube URL");
       }
 
@@ -86,8 +88,8 @@ export function useYouTubeImport(options: UseYouTubeImportOptions = {}) {
         || error.message === "Please enter a YouTube URL";
 
       const errorMessage = isKnownUserError
-        ? error.message
-        : "Failed to import YouTube video";
+        ? getYouTubeImportErrorMessage(error.message)
+        : _(msg`Failed to import YouTube video`);
 
       // Report unexpected errors to Sentry — user-facing limit/validation errors are not bugs
       if (!isKnownUserError) {

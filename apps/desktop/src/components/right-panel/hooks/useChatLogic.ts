@@ -1,16 +1,12 @@
+import { useLingui } from "@lingui/react/macro";
 import { useEffect, useRef } from "react";
+import { EmptyChatResponseError, getUserFriendlyChatErrorMessage } from "./chat-errors";
 
+import { useRightPanel } from "@/contexts";
 import { useChatState } from "@/stores/useChatState";
-import {
-  abortChatGeneration,
-  finishChatGeneration,
-  hasActiveChatGeneration,
-  startChatGeneration,
-} from "./chat-generation";
 import { useSelectionContext } from "@/stores/useSelectionContext";
 import { safeAnalyticsEvent } from "@/utils/analytics-safe";
 import { showInlineDiffPreview } from "@/utils/inline-diff-preview";
-import { useRightPanel } from "@/contexts";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { commands as localLlmCommands } from "@typr/plugin-local-llm";
@@ -27,6 +23,12 @@ import {
 import { generateText, modelProvider, streamText } from "@typr/utils/ai";
 import { useSessions } from "@typr/utils/contexts";
 import { SHOW_WEB_SEARCH_IN_CHAT_INPUT } from "../constants/features";
+import {
+  abortChatGeneration,
+  finishChatGeneration,
+  hasActiveChatGeneration,
+  startChatGeneration,
+} from "./chat-generation";
 
 import type { ActiveEntityInfo, Message, MessagePart } from "../types/chat-types";
 import type { ChatSessionContextData } from "./useChatQueries";
@@ -113,6 +115,7 @@ export function useChatLogic({
   researchMode = false,
   setResearchMode,
 }: UseChatLogicProps) {
+  const { t } = useLingui();
   // Removed noisy log - only log on mode changes, not every render
   // Use Zustand store for messages and isGenerating so they persist across tab switches
   const {
@@ -580,7 +583,7 @@ export function useChatLogic({
         setMessagesInStore(sessionId, (prev) => [...prev, {
           id: errorMessageId,
           content:
-            "⚠️ I apologize - I didn't make any changes to the document. Could you please rephrase your request more specifically? For example, instead of 'make it bold', try 'wrap the word X in <strong> tags' or 'make the heading bold'.",
+            t`⚠️ I apologize - I didn't make any changes to the document. Could you please rephrase your request more specifically? For example, instead of 'make it bold', try 'wrap the word X in <strong> tags' or 'make the heading bold'.`,
           isUser: false,
           timestamp: new Date(),
         }]);
@@ -612,7 +615,7 @@ export function useChatLogic({
           setMessagesInStore(sessionId, (prev) => [...prev, {
             id: errorMessageId,
             content:
-              "⚠️ I apologize - I made an error and tried to delete most of your document instead of adding to it. I've prevented this to protect your content. Please try rephrasing your request with more specific details. For example, instead of 'add a summary', try 'add a summary section at the top that covers the main points discussed in the document'.",
+              t`⚠️ I apologize - I made an error and tried to delete most of your document instead of adding to it. I've prevented this to protect your content. Please try rephrasing your request with more specific details. For example, instead of 'add a summary', try 'add a summary section at the top that covers the main points discussed in the document'.`,
             isUser: false,
             timestamp: new Date(),
           }]);
@@ -785,7 +788,7 @@ export function useChatLogic({
 
       const guideResponseMsg = {
         id: crypto.randomUUID(),
-        content: `For formatting, please use these quick shortcuts:
+        content: t`For formatting, please use these quick shortcuts:
 
 • Bold: Select text and press ⌘B
 • Italic: Select text and press ⌘I
@@ -845,7 +848,7 @@ Would you like me to help improve the content instead?`,
       // Get editor
       const editor = window.__TYPR_EDITORS__?.[sessionId]?.editor;
       if (!editor) {
-        throw new Error("No editor");
+        throw new Error(t`No editor`);
       }
 
       // Auto-clean any pending diff marks (same as document edits)
@@ -978,7 +981,7 @@ Leave everything else in the document completely unchanged.`;
         const errorMsg = {
           id: crypto.randomUUID(),
           content:
-            "⚠️ I didn't make any changes to your selection. Please try being more specific. For example: 'wrap \"key phrase\" in <strong> tags' or 'make the first sentence bold'.",
+            t`⚠️ I didn't make any changes to your selection. Please try being more specific. For example: 'wrap "key phrase" in <strong> tags' or 'make the first sentence bold'.`,
           isUser: false,
           timestamp: new Date(),
         };
@@ -1048,7 +1051,7 @@ Leave everything else in the document completely unchanged.`;
     const freshSessionData = await fetchSessionData(capturedSessionId);
 
     if (!freshSessionData) {
-      throw new Error("Failed to load session data");
+      throw new Error(t`Failed to load session data`);
     }
 
     const { type } = await connectorCommands.getLlmConnection();
@@ -1572,7 +1575,7 @@ Leave everything else in the document completely unchanged.`;
                 const diffMessageId = crypto.randomUUID();
                 const diffMessage = {
                   id: diffMessageId,
-                  content: "Here's the new content:",
+                  content: t`Here's the new content:`,
                   isUser: false,
                   timestamp: new Date(),
                   parts: [{
@@ -1581,7 +1584,7 @@ Leave everything else in the document completely unchanged.`;
                     diffData: {
                       original: "",
                       edited: result.newContent,
-                      reasoning: result.reasoning || "Content inserted",
+                      reasoning: result.reasoning || t`Content inserted`,
                       range: { from: result.position, to: result.position },
                     },
                     isComplete: true,
@@ -1792,8 +1795,8 @@ Leave everything else in the document completely unchanged.`;
 
         if (startsWithReasoning) {
           setMessagesInStore(capturedSessionId, (prev) => prev.filter(msg => msg.id !== aiMessageId));
-          throw new Error(
-            "The AI model returned an empty response. This might be due to rate limiting or model unavailability. Please try again.",
+          throw new EmptyChatResponseError(
+            t`The AI model returned an empty response. This might be due to rate limiting or model unavailability. Please try again.`,
           );
         }
 
@@ -1819,8 +1822,8 @@ Leave everything else in the document completely unchanged.`;
           reasoningResponse = "";
         } else {
           setMessagesInStore(capturedSessionId, (prev) => prev.filter(msg => msg.id !== aiMessageId));
-          throw new Error(
-            "The AI model returned an empty response. This might be due to rate limiting or model unavailability. Please try again.",
+          throw new EmptyChatResponseError(
+            t`The AI model returned an empty response. This might be due to rate limiting or model unavailability. Please try again.`,
           );
         }
       }
@@ -1869,16 +1872,7 @@ Leave everything else in the document completely unchanged.`;
 
       const errorMessageId = crypto.randomUUID();
       const errorDetails = error instanceof Error ? error.message : String(error);
-
-      // Provide more specific error messages for common issues
-      let userFriendlyMessage = `Sorry, I encountered an error: ${errorDetails}. Please try again.`;
-
-      if (errorDetails.includes("Rate limit") || errorDetails.includes("429")) {
-        userFriendlyMessage =
-          "⏳ The AI model's rate limit has been reached. Please wait a moment and try again, or switch to a different model in Settings.";
-      } else if (errorDetails.includes("empty response")) {
-        userFriendlyMessage = "The AI model returned an empty response. This might be temporary - please try again.";
-      }
+      const userFriendlyMessage = getUserFriendlyChatErrorMessage(error);
 
       const aiMessage: Message = {
         id: errorMessageId,
@@ -1894,7 +1888,7 @@ Leave everything else in the document completely unchanged.`;
         group_id: groupId,
         created_at: new Date().toISOString(),
         role: "Assistant",
-        content: `Error: ${errorDetails}`,
+        content: t`Error: ${errorDetails}`,
         parts: null,
       });
       return false;

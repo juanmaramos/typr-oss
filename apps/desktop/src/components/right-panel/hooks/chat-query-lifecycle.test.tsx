@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+import { messages as enMessages } from "@/locales/en/messages.po";
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
 import { notifyManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, createElement, type ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -25,8 +28,8 @@ const fixture = vi.hoisted(() => ({
 vi.mock("@typr/plugin-db", () => ({ commands: fixture.db }));
 vi.mock("@/components/utils/debug-logger", () => ({ debugLogFor: vi.fn(), debugWarnFor: vi.fn() }));
 
-import { useChatQueries } from "./useChatQueries";
 import { useChatState } from "@/stores/useChatState";
+import { useChatQueries } from "./useChatQueries";
 
 type ChatGroup = {
   id: string;
@@ -43,7 +46,9 @@ type Deferred<T> = {
 
 function deferred<T>(): Deferred<T> {
   let resolve!: (value: T) => void;
-  const promise = new Promise<T>((res) => { resolve = res; });
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
   return { promise, resolve };
 }
 
@@ -104,7 +109,7 @@ function SwitchingChatQueryOwner() {
 }
 
 function TestProviders({ children }: { children: ReactNode }) {
-  return createElement(QueryClientProvider, { client: queryClient }, children);
+  return createElement(I18nProvider, { i18n }, createElement(QueryClientProvider, { client: queryClient }, children));
 }
 
 async function waitForInitialQueries() {
@@ -117,6 +122,8 @@ async function waitForInitialQueries() {
 
 describe("chat group creation cancellation", () => {
   beforeEach(() => {
+    i18n.load("en", enMessages);
+    i18n.activate("en");
     vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
     fixture.db.listChatGroups.mockReset().mockResolvedValue([]);
     fixture.db.listChatMessages.mockReset().mockResolvedValue([]);
@@ -142,7 +149,9 @@ describe("chat group creation cancellation", () => {
     queryClient = new QueryClient({ defaultOptions: { queries: { gcTime: 0, retry: false } } });
     container = document.createElement("div");
     root = createRoot(container);
-    notifyManager.setNotifyFunction((callback) => { act(() => callback()); });
+    notifyManager.setNotifyFunction((callback) => {
+      act(() => callback());
+    });
   });
 
   afterEach(async () => {
@@ -239,16 +248,18 @@ describe("chat group creation cancellation", () => {
       }
       return requestedSessionId === "session-b" ? [groupB] : [];
     });
-    fixture.db.listChatMessages.mockImplementation(async (groupId: string) => groupId === "group-b"
-      ? [{
-        id: "message-b",
-        group_id: "group-b",
-        role: "User",
-        content: "B message",
-        created_at: new Date().toISOString(),
-        parts: null,
-      }]
-      : []);
+    fixture.db.listChatMessages.mockImplementation(async (groupId: string) =>
+      groupId === "group-b"
+        ? [{
+          id: "message-b",
+          group_id: "group-b",
+          role: "User",
+          content: "B message",
+          created_at: new Date().toISOString(),
+          parts: null,
+        }]
+        : []
+    );
     fixture.db.getSession.mockImplementation(async ({ id }: { id: string }) => ({
       id,
       title: `Session ${id}`,
@@ -309,7 +320,9 @@ describe("chat group creation cancellation", () => {
     expect(fixture.db.listChatGroups.mock.calls.filter(([requestedSessionId]) => requestedSessionId === "session-b"))
       .toHaveLength(1);
 
-    await act(async () => { oldGroupsForA.resolve([originalGroupA]); });
+    await act(async () => {
+      oldGroupsForA.resolve([originalGroupA]);
+    });
     expect(queryClient.getQueryData<ChatGroup[]>(["chat-groups", "session-a"])).toEqual([
       expect.objectContaining({ id: "old-group-a" }),
       expect.objectContaining({ id: "group-from-a" }),
@@ -327,8 +340,10 @@ describe("chat group creation cancellation", () => {
     await act(async () => {
       root.render(createElement(TestProviders, null, createElement(SwitchingChatQueryOwner)));
     });
-    await vi.waitFor(() => expect(fixture.db.listChatGroups.mock.calls.filter(([requestedSessionId]) => requestedSessionId === "session-a"))
-      .toHaveLength(3));
+    await vi.waitFor(() =>
+      expect(fixture.db.listChatGroups.mock.calls.filter(([requestedSessionId]) => requestedSessionId === "session-a"))
+        .toHaveLength(3)
+    );
     await vi.waitFor(() => expect(fixture.groupIdsBySession["session-a"]).toBe("group-from-a"));
     expect(fixture.activeGroupId).toBe("group-from-a");
   });

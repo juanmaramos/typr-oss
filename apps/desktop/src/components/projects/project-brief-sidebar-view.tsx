@@ -17,16 +17,17 @@ import {
   listProjects,
   projectQueryKeys,
 } from "@/lib/projects";
+import { i18n } from "@lingui/core";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { useQuery } from "@tanstack/react-query";
+import { useMatch, useNavigate } from "@tanstack/react-router";
+import { openPath } from "@tauri-apps/plugin-opener";
 import type { ProjectBriefSource } from "@typr/plugin-db";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import { Skeleton } from "@typr/ui/components/ui/skeleton";
 import { toast } from "@typr/ui/components/ui/toast";
 import { cn } from "@typr/ui/lib/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { useQuery } from "@tanstack/react-query";
-import { useMatch, useNavigate } from "@tanstack/react-router";
-import { openPath } from "@tauri-apps/plugin-opener";
 import { type ReactNode, useMemo } from "react";
 
 function formatBriefUpdatedAt(updatedAt: string) {
@@ -36,7 +37,7 @@ function formatBriefUpdatedAt(updatedAt: string) {
     return null;
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(i18n.locale || undefined, {
     month: "short",
     day: "numeric",
     hour: "numeric",

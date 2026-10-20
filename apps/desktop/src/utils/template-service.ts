@@ -1,7 +1,9 @@
 import { debugLogFor } from "@/components/utils/debug-logger";
+import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import type { Template } from "@typr/plugin-db";
 import { commands as dbCommands } from "@typr/plugin-db";
-import { DEFAULT_TEMPLATES, isDefaultTemplate } from "./default-templates";
+import { getDefaultTemplates, isDefaultTemplate } from "./default-templates";
 
 export class TemplateService {
   static async getAllTemplates(): Promise<Template[]> {
@@ -10,16 +12,16 @@ export class TemplateService {
 
       const filteredDbTemplates = dbTemplates.filter(t => !isDefaultTemplate(t.id));
 
-      return [...DEFAULT_TEMPLATES, ...filteredDbTemplates];
+      return [...getDefaultTemplates(), ...filteredDbTemplates];
     } catch (error) {
       console.error("Failed to load database templates:", error);
 
-      return DEFAULT_TEMPLATES;
+      return getDefaultTemplates();
     }
   }
 
   static async getTemplate(templateId: string): Promise<Template | null> {
-    const hardcodedTemplate = DEFAULT_TEMPLATES.find(t => t.id === templateId);
+    const hardcodedTemplate = getDefaultTemplates().find(t => t.id === templateId);
     if (hardcodedTemplate) {
       return hardcodedTemplate;
     }
@@ -51,7 +53,7 @@ export class TemplateService {
 
   static async saveTemplate(template: Template): Promise<Template> {
     if (isDefaultTemplate(template.id)) {
-      throw new Error("Cannot save built-in template");
+      throw new Error(i18n._(msg`Cannot save built-in template`));
     }
 
     return await dbCommands.upsertTemplate(template);
@@ -59,7 +61,7 @@ export class TemplateService {
 
   static async deleteTemplate(templateId: string): Promise<void> {
     if (isDefaultTemplate(templateId)) {
-      throw new Error("Cannot delete built-in template");
+      throw new Error(i18n._(msg`Cannot delete built-in template`));
     }
 
     await dbCommands.deleteTemplate(templateId);

@@ -110,7 +110,7 @@ function Component() {
 
   return (
     <main
-      aria-label={`Transcription status: ${view.label}`}
+      aria-label={t`Transcription status: ${view.label}`}
       aria-live="polite"
       className="h-screen w-screen select-none bg-transparent"
     >
@@ -128,8 +128,8 @@ function Component() {
 
         <button
           type="button"
-          aria-label={stopping ? "Stopping transcription" : "Stop transcription"}
-          title={stopping ? "Stopping transcription" : "Stop transcription"}
+          aria-label={stopping ? t`Stopping transcription` : t`Stop transcription`}
+          title={stopping ? t`Stopping transcription` : t`Stop transcription`}
           disabled={stopping}
           onClick={stopTranscription}
           className="flex size-[18px] items-center justify-center justify-self-center rounded-full border border-destructive/50 bg-destructive/85 text-destructive-foreground shadow-sm shadow-destructive/20 transition-[background-color,box-shadow,transform] hover:bg-destructive hover:shadow-md hover:shadow-destructive/30 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/45 disabled:cursor-default disabled:opacity-55"

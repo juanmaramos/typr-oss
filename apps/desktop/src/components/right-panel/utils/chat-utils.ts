@@ -1,4 +1,5 @@
 import { i18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 
 export const formatDate = (date: Date) => {
   const now = new Date();
@@ -17,17 +18,17 @@ export const formatDate = (date: Date) => {
 
   // Less than a week - show days ago
   if (diffDays < 7) {
-    return `${diffDays}d`;
+    return i18n._(msg`${diffDays}d`);
   }
 
   // Less than a month - show weeks
   if (diffDays < 30) {
     const weeks = Math.floor(diffDays / 7);
-    return `${weeks}w`;
+    return i18n._(msg`${weeks}w`);
   }
 
   // More than a month - show month/day or full date
-  const month = date.toLocaleString("default", { month: "short" });
+  const month = date.toLocaleString(i18n.locale || undefined, { month: "short" });
   const day = date.getDate();
 
   if (date.getFullYear() === now.getFullYear()) {

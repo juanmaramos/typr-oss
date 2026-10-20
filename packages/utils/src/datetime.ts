@@ -1,6 +1,9 @@
 import * as FNS_TZ from "@date-fns/tz";
 import { i18n } from "@lingui/core";
 import * as FNS from "date-fns";
+import { enUS, es } from "date-fns/locale";
+
+const dateLocale = () => i18n.locale?.startsWith("es") ? es : enUS;
 
 export const format = (
   date: Parameters<typeof FNS.format>[0],
@@ -8,8 +11,13 @@ export const format = (
   options?: Parameters<typeof FNS.format>[2],
 ) => {
   const tz = options?.in ?? FNS_TZ.tz(timezone());
-  return FNS.format(new Date(date), format, { ...options, in: tz });
+  return FNS.format(new Date(date), format, { locale: dateLocale(), ...options, in: tz });
 };
+
+export const formatDistanceToNow = (
+  date: Parameters<typeof FNS.formatDistanceToNow>[0],
+  options?: Parameters<typeof FNS.formatDistanceToNow>[1],
+) => FNS.formatDistanceToNow(date, { locale: dateLocale(), ...options });
 
 export function formatRemainingTime(date: Date): string {
   const now = new Date();
@@ -72,10 +80,10 @@ export const formatRelative = (date: string | null | undefined, t?: string) => {
       const dateYear = d.getFullYear();
 
       if (dateYear === currentYear) {
-        const formattedDate = FNS.format(d, "MMM d", { in: tz });
+        const formattedDate = FNS.format(d, "MMM d", { in: tz, locale: dateLocale() });
         return i18n._("{date}", { date: formattedDate });
       } else {
-        const formattedDate = FNS.format(d, "MMM d, yyyy", { in: tz });
+        const formattedDate = FNS.format(d, "MMM d, yyyy", { in: tz, locale: dateLocale() });
         return i18n._("{date}", { date: formattedDate });
       }
     }
@@ -102,8 +110,7 @@ export const formatRelativeWithDay = (date: string | null | undefined, t?: strin
     const startOfToday = FNS.startOfDay(now);
     const diffInDays = FNS.differenceInCalendarDays(startOfToday, startOfDay, { in: tz });
 
-    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const dayOfWeek = daysOfWeek[d.getDay()];
+    const dayOfWeek = FNS.format(d, "EEE", { in: tz, locale: dateLocale() });
 
     if (diffInDays === 0) {
       return i18n._("Today ({dayOfWeek})", { dayOfWeek });
@@ -118,10 +125,10 @@ export const formatRelativeWithDay = (date: string | null | undefined, t?: strin
       const dateYear = d.getFullYear();
 
       if (dateYear === currentYear) {
-        const formattedDate = FNS.format(d, "MMM d", { in: tz });
+        const formattedDate = FNS.format(d, "MMM d", { in: tz, locale: dateLocale() });
         return i18n._("{date} ({dayOfWeek})", { date: formattedDate, dayOfWeek });
       } else {
-        const formattedDate = FNS.format(d, "MMM d, yyyy", { in: tz });
+        const formattedDate = FNS.format(d, "MMM d, yyyy", { in: tz, locale: dateLocale() });
         return i18n._("{date} ({dayOfWeek})", { date: formattedDate, dayOfWeek });
       }
     }
@@ -133,6 +140,8 @@ export const formatRelativeWithDay = (date: string | null | undefined, t?: strin
 
 export const timezone = () => {
   if (typeof window === "undefined") {
+    // Programmer diagnostic: this helper requires the browser Intl environment.
+    // eslint-disable-next-line typr-i18n/ui-strings
     throw new Error("timezone is only available on browser");
   }
 
@@ -241,15 +250,14 @@ export function formatUpcomingTime(date: Date | string): string {
 }
 
 /**
- * Formats time consistently using user's device locale settings
- * This ensures AM/PM casing and 12hr/24hr format matches user's system preferences
+ * Formats time consistently using the active interface language.
  */
 export function formatTimeLocale(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleTimeString([], {
+  return d.toLocaleTimeString(i18n.locale || undefined, {
     hour: "numeric",
     minute: "2-digit",
-    hour12: undefined, // Let the system decide based on user's locale
+    hour12: undefined, // Use the active locale’s default hour cycle
   });
 }
 
@@ -313,10 +321,10 @@ export const formatSimpleDateWithTime = (date: string | null | undefined, t?: st
       const dateYear = d.getFullYear();
 
       if (dateYear === currentYear) {
-        const formattedDate = FNS.format(d, "MMM d", { in: tz });
+        const formattedDate = FNS.format(d, "MMM d", { in: tz, locale: dateLocale() });
         return i18n._("{date}, {time}", { date: formattedDate, time: timeStr });
       } else {
-        const formattedDate = FNS.format(d, "MMM d, yyyy", { in: tz });
+        const formattedDate = FNS.format(d, "MMM d, yyyy", { in: tz, locale: dateLocale() });
         return i18n._("{date}, {time}", { date: formattedDate, time: timeStr });
       }
     }
