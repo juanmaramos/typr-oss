@@ -69,7 +69,7 @@ export function ShareMenu({ session }: ShareMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-full px-3 text-[13px] shadow-none">
+        <Button variant="ghost" size="sm" className="h-8 gap-2 rounded-full px-3 text-ui shadow-none">
           <Icon name="ri-share-forward-line" className="h-4 w-4 text-muted-foreground" />
           <Trans>Share</Trans>
           <Icon name="ri-arrow-down-s-line" className="h-4 w-4 text-muted-foreground" />

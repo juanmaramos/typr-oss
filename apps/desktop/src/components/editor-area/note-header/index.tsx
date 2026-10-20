@@ -153,7 +153,7 @@ export function NoteHeader(
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 gap-2 rounded-full px-3 text-[13px] shadow-none"
+                          className="h-8 gap-2 rounded-full px-3 text-ui shadow-none"
                         >
                           {selectedTemplate
                             ? <TemplateIcon template={selectedTemplate} className="h-4 w-4 text-muted-foreground" />

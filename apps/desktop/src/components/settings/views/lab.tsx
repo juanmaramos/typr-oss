@@ -139,7 +139,7 @@ function FeatureFlag({
                 {title}
               </div>
               {badge && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-medium">
+                <Badge variant="secondary" className="text-ui-tiny px-1.5 py-0 font-medium">
                   {badge}
                 </Badge>
               )}

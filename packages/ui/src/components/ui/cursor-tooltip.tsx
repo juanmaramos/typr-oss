@@ -63,6 +63,7 @@ const CursorFollowTooltip: React.FC<CursorFollowTooltipProps> = ({
       {childWithMouseEvents}
       {visible && !disabled && ReactDOM.createPortal(
         <div
+          className="text-sm"
           style={{
             position: "fixed",
             top: position.y,
@@ -75,8 +76,6 @@ const CursorFollowTooltip: React.FC<CursorFollowTooltipProps> = ({
             border: "1px solid hsl(var(--border))",
             boxShadow: "0 2px 10px hsla(var(--card-foreground), 0.1)",
             pointerEvents: "none",
-            fontSize: "0.875rem",
-            lineHeight: "1.25rem",
             maxWidth: "160px",
             textAlign: "left",
           }}

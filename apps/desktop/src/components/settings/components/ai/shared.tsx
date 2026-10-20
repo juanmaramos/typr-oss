@@ -12,7 +12,7 @@ export const RatingDisplay = (
   },
 ) => (
   <div className="flex flex-col items-center px-2">
-    <span className="text-[10px] text-muted-foreground uppercase font-medium tracking-wider mb-1.5">{label}</span>
+    <span className="text-ui-tiny text-muted-foreground uppercase font-medium tracking-wider mb-1.5">{label}</span>
     <div className="flex space-x-1">
       {[...Array(maxRating)].map((_, i) => (
         <Icon
@@ -31,7 +31,7 @@ export const RatingDisplay = (
 export const LanguageDisplay = ({ support }: { support: "multilingual" | "english-only" }) => {
   return (
     <div className="flex flex-col items-center px-2">
-      <span className="text-[10px] text-muted-foreground uppercase font-medium tracking-wider mb-1.5">
+      <span className="text-ui-tiny text-muted-foreground uppercase font-medium tracking-wider mb-1.5">
         Language
       </span>
       <div className="text-xs font-medium">

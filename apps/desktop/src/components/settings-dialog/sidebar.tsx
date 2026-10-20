@@ -58,7 +58,7 @@ export function SettingsDialogSidebar() {
 
         {/* General Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-[11px] text-muted-foreground uppercase tracking-wider">
+          <SidebarGroupLabel className="px-4 text-ui-caption text-muted-foreground uppercase tracking-wider">
             <Trans>General</Trans>
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -82,7 +82,7 @@ export function SettingsDialogSidebar() {
 
         {/* Privacy Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-[11px] text-muted-foreground uppercase tracking-wider">
+          <SidebarGroupLabel className="px-4 text-ui-caption text-muted-foreground uppercase tracking-wider">
             <Trans>Privacy</Trans>
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -106,7 +106,7 @@ export function SettingsDialogSidebar() {
 
         {/* Features Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-[11px] text-muted-foreground uppercase tracking-wider">
+          <SidebarGroupLabel className="px-4 text-ui-caption text-muted-foreground uppercase tracking-wider">
             <Trans>Features</Trans>
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -130,7 +130,7 @@ export function SettingsDialogSidebar() {
 
         {/* Account Section */}
         <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-[11px] text-muted-foreground uppercase tracking-wider">
+          <SidebarGroupLabel className="px-4 text-ui-caption text-muted-foreground uppercase tracking-wider">
             <Trans>Account</Trans>
           </SidebarGroupLabel>
           <SidebarGroupContent>

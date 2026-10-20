@@ -404,7 +404,7 @@ export function ChatInput(
 
       {/* Privacy Disclaimer */}
       <div className="hidden w-full mt-2 px-1">
-        <p className="text-[10px] text-muted-foreground leading-relaxed text-center w-full">
+        <p className="text-ui-tiny text-muted-foreground leading-relaxed text-center w-full">
           <Trans>
             Your conversations are private and never used for AI models training. Typr may make mistakes, so verify its
             responses.

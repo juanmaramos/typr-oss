@@ -264,7 +264,7 @@ function EventItem({
         >
           <div className="flex-1 flex flex-col justify-center truncate">
             <EventItemTitle event={event} />
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground line-clamp-1">
+            <div className="flex items-center gap-2 text-ui-caption text-muted-foreground line-clamp-1">
               <span>{formatUpcomingTime(new Date(event.start_date))}</span>
             </div>
           </div>
@@ -299,7 +299,7 @@ function EventItemTitle({ event }: { event: EventWithSession }) {
 
 function EventItemTitleWithoutSession({ event }: { event: EventWithSession }) {
   return (
-    <div className="font-medium text-[13px] text-sidebar-foreground line-clamp-1">
+    <div className="font-medium text-ui text-sidebar-foreground line-clamp-1">
       {event.name}
     </div>
   );
@@ -308,7 +308,7 @@ function EventItemTitleWithoutSession({ event }: { event: EventWithSession }) {
 function EventItemTitleWithSession({ sessionId }: { sessionId: string }) {
   const title = useSession(sessionId, (s) => s.session.title);
   return (
-    <div className="font-medium text-[13px] text-sidebar-foreground line-clamp-1">
+    <div className="font-medium text-ui text-sidebar-foreground line-clamp-1">
       {title}
     </div>
   );

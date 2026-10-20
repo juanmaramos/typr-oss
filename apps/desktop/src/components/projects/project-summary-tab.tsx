@@ -86,7 +86,7 @@ export function ProjectSummaryTab({ brief, sourceCount }: ProjectSummaryTabProps
           <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {leadSection.title}
           </h3>
-          <Markdown className="prose prose-sm max-w-none text-[15px] leading-7 text-foreground prose-p:my-0 prose-strong:text-foreground">
+          <Markdown className="prose prose-sm max-w-none text-ui-body leading-7 text-foreground prose-p:my-0 prose-strong:text-foreground">
             {leadSection.markdown}
           </Markdown>
         </section>

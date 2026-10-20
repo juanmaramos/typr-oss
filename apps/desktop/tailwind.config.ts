@@ -19,8 +19,6 @@ const config = {
           "Racing Sans One",
           "cursive",
         ],
-        sans: ["var(--font-sans)"],
-        mono: ["var(--font-mono)"],
       },
       borderRadius: {
         composer: "var(--radius-composer)",

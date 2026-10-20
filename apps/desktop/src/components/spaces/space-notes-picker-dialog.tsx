@@ -200,7 +200,7 @@ export function SpaceNotesPickerDialog({ onOpenChange, open, spaceId, userId }: 
                                 <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                   <span>{format(new Date(timestamp), "h:mm a")}</span>
                                   {session.words.length > 0 && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-ui-caption font-medium text-muted-foreground">
                                       <i className="ri-mic-line text-[12px]" />
                                       <Trans>Transcript</Trans>
                                     </span>

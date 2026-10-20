@@ -174,7 +174,7 @@ export default function LeftSidebar() {
           <div className="px-3 pb-1 pt-2">
             <button
               type="button"
-              className="flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              className="flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-ui font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               onClick={() => createNewNote("sidebar")}
             >
               <i className="ri-edit-box-line shrink-0 text-sm text-muted-foreground" />
@@ -183,7 +183,7 @@ export default function LeftSidebar() {
             <button
               type="button"
               className={cn(
-                "relative mt-1 flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                "relative mt-1 flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-ui font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 isAskActive
                   ? "bg-sidebar-accent text-sidebar-accent-foreground before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:rounded-l-md before:bg-primary"
                   : "text-sidebar-foreground",
@@ -217,7 +217,7 @@ export default function LeftSidebar() {
               <div className="flex-1 h-full overflow-y-auto scrollbar-none rounded-bl-xl">
                 <div className={showBulkActionBar ? "h-full space-y-0 px-3 pb-20" : "h-full space-y-0 px-3 pb-4"}>
                   <div className="flex items-center justify-between pb-1 pt-1">
-                    <div className="text-[13px] font-semibold text-muted-foreground">
+                    <div className="text-ui font-semibold text-muted-foreground">
                       <Trans>Notes</Trans>
                     </div>
                   </div>

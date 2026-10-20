@@ -67,14 +67,14 @@ export const EmptyChatState = memo(({ onQuickAction, onFocusInput, layout = "sid
       {/* Header */}
       <motion.div variants={CONTENT_VARIANTS} className={layout === "floating" ? "mb-2" : "mb-3"}>
         <div className={cn("flex items-center justify-center gap-3", layout === "floating" ? "mb-1.5" : "mb-2")}>
-          <h2 className={cn("font-semibold text-foreground", layout === "floating" ? "text-[17px]" : "text-lg")}>
+          <h2 className={cn("font-semibold text-foreground", layout === "floating" ? "text-ui-title" : "text-lg")}>
             <Trans>Start a conversation</Trans>
           </h2>
         </div>
         <p
           className={cn(
             "text-muted-foreground leading-relaxed",
-            layout === "floating" ? "max-w-[320px] text-[13px]" : "max-w-[280px] text-sm",
+            layout === "floating" ? "max-w-[320px] text-ui" : "max-w-[280px] text-sm",
           )}
         >
           <Trans>
@@ -99,7 +99,7 @@ export const EmptyChatState = memo(({ onQuickAction, onFocusInput, layout = "sid
             onClick={handleButtonClick(action.prompt)}
             className={cn(
               "font-medium bg-surface-300 text-muted-foreground border-0 hover:bg-surface-300 hover:text-primary transition-colors justify-center whitespace-nowrap flex-shrink-0",
-              layout === "floating" ? "h-7 min-w-[124px] px-3 py-1 text-[12px]" : "h-6 min-w-[110px] px-2 py-1 text-xs",
+              layout === "floating" ? "h-7 min-w-[124px] px-3 py-1 text-ui-label" : "h-6 min-w-[110px] px-2 py-1 text-xs",
             )}
           >
             {action.label}

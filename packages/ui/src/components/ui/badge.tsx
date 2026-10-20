@@ -80,7 +80,7 @@ const NumberBadge = React.forwardRef<HTMLDivElement, NumberBadgeProps>(({
       ref={ref}
       className={cn(
         badgeVariants({ variant, size, disabled }),
-        "h-5 min-w-5 justify-center px-1.5 py-0 text-[11px] font-medium tabular-nums",
+        "h-5 min-w-5 justify-center px-1.5 py-0 text-ui-caption font-medium tabular-nums",
         className,
       )}
       {...props}

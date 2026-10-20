@@ -34,7 +34,7 @@ export default function Calendar() {
                   <Trans>Outlook Calendar</Trans>
                   <Badge
                     variant="secondary"
-                    className="text-[10px] px-1.5 py-0.5 font-medium"
+                    className="text-ui-tiny px-1.5 py-0.5 font-medium"
                   >
                     <Trans>Coming soon</Trans>
                   </Badge>

@@ -10,7 +10,7 @@ export const RatingDisplay = (
   },
 ) => (
   <div className="flex flex-col items-center px-1 sm:px-2">
-    <span className="text-[8px] sm:text-[10px] text-muted-foreground uppercase font-medium tracking-wider mb-1 sm:mb-1.5">
+    <span className="text-ui-micro sm:text-ui-tiny text-muted-foreground uppercase font-medium tracking-wider mb-1 sm:mb-1.5">
       {label}
     </span>
     <div className="flex space-x-0.5 sm:space-x-1">
@@ -30,7 +30,7 @@ export const RatingDisplay = (
 
 export const LanguageDisplay = ({ support }: { support: "multilingual" | "english-only" }) => (
   <div className="flex flex-col items-center px-2">
-    <span className="text-[10px] text-muted-foreground uppercase font-medium tracking-wider mb-1.5">
+    <span className="text-ui-tiny text-muted-foreground uppercase font-medium tracking-wider mb-1.5">
       <Trans>Language</Trans>
     </span>
     <div className="flex items-center">

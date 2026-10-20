@@ -16,7 +16,7 @@ export const promptTextareaContracts = {
   },
   floatingInline: {
     minHeight: 36,
-    className: "py-1.5 text-[15px] leading-6 placeholder:text-muted-foreground/70",
+    className: "py-1.5 text-ui-body leading-6 placeholder:text-muted-foreground/70",
   },
   projectInline: {
     minHeight: 32,
@@ -24,6 +24,6 @@ export const promptTextareaContracts = {
   },
   floatingDock: {
     minHeight: 40,
-    className: "py-[9px] text-[15px] leading-[22px] text-foreground placeholder:text-muted-foreground/70",
+    className: "py-[9px] text-ui-body leading-ui-composer text-foreground placeholder:text-muted-foreground/70",
   },
 } as const;

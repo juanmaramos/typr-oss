@@ -203,7 +203,7 @@ export function LLMLocalView({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-foreground">{model.name}</span>
-                        <span className="text-[11px] text-muted-foreground">{model.provider}</span>
+                        <span className="text-ui-caption text-muted-foreground">{model.provider}</span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5 truncate">
                         {model.description}
@@ -213,14 +213,14 @@ export function LLMLocalView({
                     <div className="shrink-0">
                       {model.isDownloaded
                         ? (
-                          <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
+                          <span className="inline-flex items-center gap-1.5 text-ui-caption text-success">
                             <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
                             <Trans>Ready</Trans>
                           </span>
                         )
                         : isDownloading
                         ? (
-                          <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5 text-ui-caption text-muted-foreground">
                             <i className="ri-loader-4-line animate-spin text-sm" />
                             <Trans>Downloading…</Trans>
                           </span>
@@ -285,7 +285,7 @@ export function LLMLocalView({
                       </div>
                       <span
                         className={cn(
-                          "inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[11px] font-medium",
+                          "inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-ui-caption font-medium",
                           hasProviderApiKey
                             ? "border-success/20 bg-success/5 text-success"
                             : "border-primary/20 bg-primary/5 text-primary",
@@ -351,7 +351,7 @@ export function LLMLocalView({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
                                 <span className="truncate text-sm font-medium text-foreground">{model.name}</span>
-                                <span className="shrink-0 text-[11px] text-muted-foreground">
+                                <span className="shrink-0 text-ui-caption text-muted-foreground">
                                   {model.vendor || model.provider}
                                 </span>
                               </div>
@@ -376,7 +376,7 @@ export function LLMLocalView({
                                   </Button>
                                 )
                                 : (
-                                  <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-[11px] font-medium text-primary">
+                                  <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-ui-caption font-medium text-primary">
                                     <Trans>API key required</Trans>
                                   </span>
                                 )}

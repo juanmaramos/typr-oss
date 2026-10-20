@@ -24,7 +24,7 @@ export function ProjectNotesPanel({ children, count, onAddNotes }: ProjectNotesP
             </div>
             <Badge
               variant="outline"
-              className="rounded-full border bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
+              className="rounded-full border bg-muted/50 px-2 py-0.5 text-ui-caption font-medium text-muted-foreground"
             >
               {count}
             </Badge>

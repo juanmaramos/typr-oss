@@ -64,7 +64,7 @@ export function ProjectsSection() {
       <div className="group/header mb-1 flex items-center justify-between">
         <button
           type="button"
-          className="text-[13px] font-semibold text-muted-foreground transition-colors hover:text-foreground"
+          className="text-ui font-semibold text-muted-foreground transition-colors hover:text-foreground"
           onClick={() => navigate({ to: "/app/projects" })}
         >
           <Trans>Projects</Trans>
@@ -174,7 +174,7 @@ export function ProjectsSection() {
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
                   className={cn(
-                    "relative flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] transition-colors duration-200",
+                    "relative flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-ui transition-colors duration-200",
                     isActive
                       ? "bg-sidebar-accent text-sidebar-accent-foreground before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:rounded-l-md before:bg-primary"
                       : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -208,7 +208,7 @@ export function ProjectsSection() {
             <button
               type="button"
               onClick={() => navigate({ to: "/app/projects" })}
-              className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-ui text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <i className="ri-arrow-right-line text-sm" />
               <Trans>View all projects</Trans>
@@ -222,7 +222,7 @@ export function ProjectsSection() {
           <button
             type="button"
             onClick={() => setCreateDialogOpen(true)}
-            className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-ui text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           >
             <i className="ri-folder-add-line shrink-0 text-sm" />
             <Trans>Create first project</Trans>

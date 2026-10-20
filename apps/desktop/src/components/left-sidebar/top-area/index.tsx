@@ -31,7 +31,7 @@ export function TopArea() {
           <span className="flex-1 text-left">
             <Trans>Search notes...</Trans>
           </span>
-          <kbd className="pointer-events-none text-[10px] font-medium text-muted-foreground/60">⌘K</kbd>
+          <kbd className="pointer-events-none text-ui-tiny font-medium text-muted-foreground/60">⌘K</kbd>
         </button>
       </div>
     </div>
