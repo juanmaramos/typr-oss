@@ -8,6 +8,7 @@ import * as shared from "../shared";
 import { mention, type MentionConfig } from "./mention";
 
 export type { TiptapEditor };
+export { BubbleMenu, useEditorState } from "@tiptap/react";
 export type TiptapEditorHandle = {
   editor: TiptapEditor | null;
   setSuppressChangeHandling: (suppress: boolean) => void;

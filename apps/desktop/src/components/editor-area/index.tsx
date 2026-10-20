@@ -6,7 +6,7 @@ import { AnimatePresence } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { debugLogFor } from "@/components/utils/debug-logger";
-import { useTypr, useRightPanel } from "@/contexts";
+import { useRightPanel, useTypr } from "@/contexts";
 import { resolveNoteTitle } from "@/lib/note-title";
 import { safeAnalyticsEvent } from "@/utils/analytics-safe";
 import { extractTextFromHtml } from "@/utils/parse";
@@ -685,10 +685,11 @@ export default function EditorArea({
       </div>
 
       {/* Selection Actions Toolbar */}
-      {editable && isAgentWritingEnabled && (
+      {editable && (
         <SelectionActions
           editor={editorInstance}
           sessionId={sessionId}
+          isAgentWritingEnabled={isAgentWritingEnabled}
           onImproveWriting={handleImproveWriting}
         />
       )}
@@ -768,12 +769,14 @@ export function useEnhanceMutation({
       templateId: string | null;
     } | null
   >(null);
-  const enhanceRollbackRef = useRef<{
-    sessionId: string;
-    enhancedMemoHtml: string | null;
-    editorHtml: string | null;
-    showRaw: boolean;
-  } | null>(null);
+  const enhanceRollbackRef = useRef<
+    {
+      sessionId: string;
+      enhancedMemoHtml: string | null;
+      editorHtml: string | null;
+      showRaw: boolean;
+    } | null
+  >(null);
   const { persistSession, setEnhancedContent, restoreEnhancedContent } = useSession(sessionId, (s) => ({
     persistSession: s.persistSession,
     setEnhancedContent: s.updateEnhancedNote,
