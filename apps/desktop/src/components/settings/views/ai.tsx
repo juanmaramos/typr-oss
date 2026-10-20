@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { openPath } from "@tauri-apps/plugin-opener";
 import { useState } from "react";
 
-import { sttModelMetadata } from "@/components/transcript/constants/languageData";
+import { getSttModelSize, sttModelMetadata } from "@/components/transcript/constants/languageData";
 import { type AISettingsSection, useSettingsDialog } from "@/contexts/settings-dialog";
 import { usePlatform } from "@/hooks/usePlatform";
 import { getAvailableSettingsSttModels, sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
@@ -29,15 +29,12 @@ const getInitialSttModels = (
 ): STTModel[] => [
   ...modelKeys.map((key) => {
     const metadata = sttModelMetadata[key];
-    const nativeModel = capabilities?.find(capability => capability.model === key);
 
     return {
       key,
       name: metadata.name,
 
-      size: nativeModel?.size_bytes
-        ? `${Math.round(nativeModel.size_bytes / 1_000_000)} MB`
-        : metadata.size,
+      size: getSttModelSize(key, capabilities),
       downloaded: false,
       fileName: "",
     };

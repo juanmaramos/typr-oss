@@ -4,6 +4,7 @@ import {
   getSttModelDescription,
   getSttModelLabel,
   getSttModelMetadata,
+  getSttModelSize,
   getSttSupportedLanguages,
   LANGUAGE_OPTIONS,
   type LanguageOption,
@@ -92,6 +93,20 @@ afterEach(async () => {
 });
 
 describe("canonical STT presentation", () => {
+  it("formats native download sizes in decimal MB or GB from the shared presentation controller", () => {
+    expect(getSttModelSize("Nemotron3p5Streaming", [native])).toBe("742 MB");
+    const distil = { ...native, model: "DistilLargeV35En" as const, size_bytes: 1_500_000_000 };
+    const small = { ...native, model: "QuantizedSmall" as const, size_bytes: 264_000_000 };
+    expect(getSttModelSize("DistilLargeV35En", [distil])).toBe("1.5 GB");
+    expect(getSttModelSize("english", [distil])).toBe("1.5 GB");
+    expect(getSttModelSize("QuantizedSmall", [small])).toBe("264 MB");
+    expect(getSttModelSize("english", [{ ...distil, size_bytes: 1_000_000_000 }])).toBe("1 GB");
+    expect(getSttModelSize("english", [{ ...distil, size_bytes: 2_750_000_000 }])).toBe("2.8 GB");
+    expect(getSttModelSize("english")).toBe("1.5 GB");
+    i18n.activate("es");
+    expect(getSttModelSize("english", [distil])).toBe("1,5 GB");
+  });
+
   it("keeps every selectable native model's true identity rather than substituting a generic size or language", () => {
     const expected = {
       Nemotron3p5Streaming: ["Nemotron 3.5", "NVIDIA"],

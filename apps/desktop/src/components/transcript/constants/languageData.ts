@@ -1,3 +1,4 @@
+import { formatModelSize } from "@/lib/model-metadata";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import type { ModelCapabilities, SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
@@ -106,6 +107,11 @@ const aliases = {
 export function getSttModelMetadata(model: string | null | undefined): SttModelMetadata | undefined {
   const canonical = model ? aliases[model as keyof typeof aliases] ?? model : "";
   return sttModelMetadata[canonical as keyof typeof sttModelMetadata];
+}
+export function getSttModelSize(model: string, capabilities?: readonly ModelCapabilities[]): string {
+  const canonical = aliases[model as keyof typeof aliases] ?? model;
+  const nativeModel = capabilities?.find(capability => capability.model === canonical);
+  return nativeModel ? formatModelSize(nativeModel.size_bytes) : getSttModelMetadata(model)?.size ?? "";
 }
 export function getSttModelDescription(model: string, capabilities?: readonly ModelCapabilities[]) {
   const metadata = getSttModelMetadata(model);

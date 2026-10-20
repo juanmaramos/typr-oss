@@ -15,6 +15,7 @@ import {
   getAvailableLanguageOptions,
   getSttModelDescription,
   getSttModelLabel,
+  getSttModelSize,
   LANGUAGE_OPTIONS,
   type LanguageOption,
 } from "../constants/languageData";
@@ -149,6 +150,7 @@ export function STTLanguageSelector({
                 </div>
                 {options.map(option => {
                   const availability = getModelAvailability(option.modelKey);
+                  const size = getSttModelSize(option.modelKey, capabilities.data);
                   const isSelected = selectedOption?.modelKey === option.modelKey;
                   return (
                     <div
@@ -181,8 +183,8 @@ export function STTLanguageSelector({
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6"
-                            aria-label={t`Download ${option.size}`}
-                            title={t`Download ${option.size}`}
+                            aria-label={t`Download ${size}`}
+                            title={t`Download ${size}`}
                             onClick={() => void downloadModel(option.key)}
                           >
                             <i className="ri-download-line text-sm" />
