@@ -32,6 +32,25 @@ pub struct PipelineStatus {
 }
 
 impl PipelineStatus {
+    pub(crate) fn fail_for_session(&mut self, session_id: &str, reason: String) -> bool {
+        if self.session_id.as_deref() != Some(session_id)
+            || !matches!(
+                self.phase,
+                PipelineStatusPhase::Starting
+                    | PipelineStatusPhase::Active
+                    | PipelineStatusPhase::Reconnecting
+                    | PipelineStatusPhase::Paused
+            )
+        {
+            return false;
+        }
+        self.phase = PipelineStatusPhase::Failed;
+        self.reason = Some(reason);
+        self.reconnect_attempt = None;
+        self.reconnect_max_attempts = None;
+        true
+    }
+
     pub fn inactive() -> Self {
         Self {
             phase: PipelineStatusPhase::Inactive,
@@ -126,5 +145,62 @@ impl From<(&[f32], &[f32])> for SessionEvent {
 impl From<(&Vec<f32>, &Vec<f32>)> for SessionEvent {
     fn from((mic_chunk, speaker_chunk): (&Vec<f32>, &Vec<f32>)) -> Self {
         Self::from((mic_chunk.as_slice(), speaker_chunk.as_slice()))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn live_status(phase: PipelineStatusPhase) -> PipelineStatus {
+        PipelineStatus {
+            phase,
+            session_id: Some("recording".to_string()),
+            ..PipelineStatus::inactive()
+        }
+    }
+
+    #[tokio::test]
+    async fn delayed_connection_failure_after_stop_keeps_inactive_status() {
+        let status = std::sync::Arc::new(tokio::sync::Mutex::new(live_status(
+            PipelineStatusPhase::Starting,
+        )));
+        let (failure_tx, failure_rx) = tokio::sync::oneshot::channel();
+        let delayed_status = status.clone();
+        let delayed_failure = tokio::spawn(async move {
+            failure_rx.await.unwrap();
+            delayed_status
+                .lock()
+                .await
+                .fail_for_session("recording", "websocket_connect_failed".to_string())
+        });
+
+        *status.lock().await = PipelineStatus::inactive();
+        failure_tx.send(()).unwrap();
+        assert!(!delayed_failure.await.unwrap());
+        assert_eq!(*status.lock().await, PipelineStatus::inactive());
+    }
+
+    #[test]
+    fn current_live_session_failure_changes_status_to_failed() {
+        for phase in [
+            PipelineStatusPhase::Starting,
+            PipelineStatusPhase::Active,
+            PipelineStatusPhase::Reconnecting,
+            PipelineStatusPhase::Paused,
+        ] {
+            let mut status = live_status(phase);
+            assert!(status.fail_for_session("recording", "connection_failed".to_string()));
+            assert_eq!(status.phase, PipelineStatusPhase::Failed);
+            assert_eq!(status.reason.as_deref(), Some("connection_failed"));
+        }
+    }
+
+    #[test]
+    fn another_sessions_failure_does_not_change_current_status() {
+        let mut status = live_status(PipelineStatusPhase::Active);
+        let expected = status.clone();
+        assert!(!status.fail_for_session("old-recording", "connection_failed".to_string()));
+        assert_eq!(status, expected);
     }
 }

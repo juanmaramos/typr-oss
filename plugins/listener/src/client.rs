@@ -490,6 +490,22 @@ impl WebSocketIO for ListenClientAssemblyAISingleChannel {
         Some(Message::Text(r#"{"type":"Terminate"}"#.into()))
     }
 
+    fn requires_terminal_message() -> bool {
+        true
+    }
+
+    fn terminal_message(msg: &Message) -> Option<Result<(), typr_ws::Error>> {
+        let Message::Text(text) = msg else {
+            return None;
+        };
+        let value: serde_json::Value = serde_json::from_str(text).ok()?;
+        match value.get("type").and_then(serde_json::Value::as_str) {
+            Some("Termination") => Some(Ok(())),
+            Some("Error") => Some(Err(typr_ws::Error::Unknown)),
+            _ => None,
+        }
+    }
+
     fn from_message(msg: Message) -> Option<Self::Output> {
         match msg {
             Message::Text(text) => {
@@ -643,7 +659,17 @@ impl ListenClientAssemblyAISingleChannel {
                     });
                     futures_util::pin_mut!(stream);
 
-                    while let Some(mut chunk) = stream.next().await {
+                    while let Some(result) = stream.next().await {
+                        let mut chunk = match result {
+                            Ok(chunk) => chunk,
+                            Err(error) => {
+                                let _ = events_tx.send(AssemblyAiSessionEvent::Failed {
+                                    index: session_index,
+                                    error,
+                                });
+                                break;
+                            }
+                        };
                         offset_assemblyai_chunk_timestamps(
                             &mut chunk,
                             session_index,
@@ -686,7 +712,10 @@ impl ListenClientAssemblyAISingleChannel {
     pub async fn from_realtime_audio(
         &self,
         audio_stream: impl Stream<Item = bytes::Bytes> + Send + Unpin + 'static,
-    ) -> Result<Pin<Box<dyn Stream<Item = ListenOutputChunk> + Send>>, typr_ws::Error> {
+    ) -> Result<
+        Pin<Box<dyn Stream<Item = Result<ListenOutputChunk, typr_ws::Error>> + Send>>,
+        typr_ws::Error,
+    > {
         let speaker_id = self.speaker_identity.clone();
         let channel_name = self.channel_name.clone();
         let channel_id = match &speaker_id {
@@ -857,7 +886,7 @@ impl ListenClientAssemblyAISingleChannel {
                                     chunk.words.len(),
                                     index
                                 );
-                                yield chunk;
+                                yield Ok(chunk);
                             }
                             AssemblyAiSessionEvent::Failed { index, error } => {
                                 if next.as_ref().map(|handle| handle.index) == Some(index) {
@@ -874,11 +903,11 @@ impl ListenClientAssemblyAISingleChannel {
                                     acceptance.remove(&index);
                                     retry_after = Some(Instant::now() + ASSEMBLYAI_ROLLOVER_RETRY_AFTER);
                                 } else if index == active.index {
+                                    yield Err(error);
                                     tracing::error!(
-                                        "[AAI_{}] Active session {} failed: {:?}",
+                                        "[AAI_{}] Active session {} failed",
                                         channel_name,
-                                        index,
-                                        error
+                                        index
                                     );
                                     if next.is_some() {
                                         cutover_to_next_assemblyai_session(
@@ -902,6 +931,7 @@ impl ListenClientAssemblyAISingleChannel {
                                     retry_after = Some(Instant::now() + ASSEMBLYAI_ROLLOVER_RETRY_AFTER);
                                 }
                                 if index == active.index && !input_closed {
+                                    yield Err(typr_ws::Error::Unknown);
                                     tracing::warn!(
                                         "[AAI_{}] Active session {} closed while input is still open",
                                         channel_name,
@@ -971,7 +1001,7 @@ impl ListenClient {
     pub async fn from_realtime_audio(
         &self,
         audio_stream: impl AsyncSource + Send + Unpin + 'static,
-    ) -> Result<impl Stream<Item = ListenOutputChunk>, typr_ws::Error> {
+    ) -> Result<impl Stream<Item = Result<ListenOutputChunk, typr_ws::Error>>, typr_ws::Error> {
         let input_stream = audio_stream.to_i16_le_chunks(16 * 1000, 1024);
         let ws = WebSocketClient::new(self.request.clone());
         ws.from_audio::<Self>(input_stream).await
@@ -983,8 +1013,10 @@ impl ListenClientDual {
         &self,
         mic_stream: impl Stream<Item = bytes::Bytes> + Send + Unpin + 'static,
         speaker_stream: impl Stream<Item = bytes::Bytes> + Send + Unpin + 'static,
-    ) -> Result<std::pin::Pin<Box<dyn Stream<Item = ListenOutputChunk> + Send>>, typr_ws::Error>
-    {
+    ) -> Result<
+        std::pin::Pin<Box<dyn Stream<Item = Result<ListenOutputChunk, typr_ws::Error>> + Send>>,
+        typr_ws::Error,
+    > {
         let dual_stream = mic_stream.zip(speaker_stream);
 
         if self.provider.is_assemblyai() {
@@ -1046,30 +1078,12 @@ impl ListenClientDual {
 
             let (output_tx, mut output_rx) = tokio::sync::mpsc::unbounded_channel();
 
-            for (label, client, stream) in [
-                ("MIC", mic_client, mic_stream),
-                ("SPEAKER", speaker_client, speaker_stream),
-            ] {
+            for (client, stream) in [(mic_client, mic_stream), (speaker_client, speaker_stream)] {
                 let output_tx = output_tx.clone();
 
                 tokio::spawn(async move {
-                    match client.from_realtime_audio(stream).await {
-                        Ok(transcript_stream) => {
-                            futures_util::pin_mut!(transcript_stream);
-                            while let Some(chunk) = transcript_stream.next().await {
-                                if output_tx.send(chunk).is_err() {
-                                    break;
-                                }
-                            }
-                        }
-                        Err(error) => {
-                            tracing::warn!(
-                                "[AAI_{}] Channel stream failed during startup: {:?}",
-                                label,
-                                error
-                            );
-                        }
-                    }
+                    forward_channel_output(client.from_realtime_audio(stream).await, output_tx)
+                        .await;
                 });
             }
 
@@ -1091,10 +1105,100 @@ impl ListenClientDual {
     }
 }
 
+async fn forward_channel_output(
+    stream: Result<
+        Pin<Box<dyn Stream<Item = Result<ListenOutputChunk, typr_ws::Error>> + Send>>,
+        typr_ws::Error,
+    >,
+    output_tx: mpsc::UnboundedSender<Result<ListenOutputChunk, typr_ws::Error>>,
+) {
+    match stream {
+        Ok(mut stream) => {
+            while let Some(result) = stream.next().await {
+                if output_tx.send(result).is_err() {
+                    break;
+                }
+            }
+        }
+        Err(error) => {
+            let _ = output_tx.send(Err(error));
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use futures_util::{SinkExt, StreamExt};
+
+    #[test]
+    fn assemblyai_requires_termination_and_reports_provider_error() {
+        type Channel = ListenClientAssemblyAISingleChannel;
+        assert!(Channel::requires_terminal_message());
+        assert!(matches!(
+            Channel::terminal_message(&Message::Text(r#"{"type":"Termination"}"#.into())),
+            Some(Ok(()))
+        ));
+        assert!(matches!(
+            Channel::terminal_message(&Message::Text(
+                r#"{"type":"Error","error_code":3007}"#.into()
+            )),
+            Some(Err(_))
+        ));
+        assert!(Channel::terminal_message(&Message::Text(r#"{"type":"Turn"}"#.into())).is_none());
+    }
+
+    #[tokio::test]
+    async fn dual_channel_startup_failure_does_not_discard_other_channel_words() {
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        forward_channel_output(Err(typr_ws::Error::Unknown), tx.clone()).await;
+        forward_channel_output(
+            Ok(Box::pin(futures_util::stream::iter(vec![Ok(
+                ListenOutputChunk {
+                    words: vec![typr_listener_interface::Word {
+                        text: "final".to_string(),
+                        speaker: None,
+                        confidence: None,
+                        start_ms: None,
+                        end_ms: None,
+                    }],
+                    meta: None,
+                    update: None,
+                },
+            )]))),
+            tx.clone(),
+        )
+        .await;
+        drop(tx);
+        assert!(rx.recv().await.unwrap().is_err());
+        assert_eq!(rx.recv().await.unwrap().unwrap().words[0].text, "final");
+        assert!(rx.recv().await.is_none());
+    }
+
+    #[tokio::test]
+    async fn dual_channel_runtime_errors_are_forwarded_after_received_words() {
+        let (tx, mut rx) = mpsc::unbounded_channel();
+        for _ in 0..2 {
+            forward_channel_output(
+                Ok(Box::pin(futures_util::stream::iter(vec![
+                    Ok(ListenOutputChunk {
+                        words: vec![],
+                        meta: None,
+                        update: None,
+                    }),
+                    Err(typr_ws::Error::Unknown),
+                ]))),
+                tx.clone(),
+            )
+            .await;
+        }
+        drop(tx);
+        for _ in 0..2 {
+            assert!(rx.recv().await.unwrap().is_ok());
+            assert!(rx.recv().await.unwrap().is_err());
+        }
+        assert!(rx.recv().await.is_none());
+    }
 
     #[test]
     fn assemblyai_url_includes_json_array_keyterms_when_present() {
@@ -1369,7 +1473,7 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(chunks.len(), 1);
-        assert_eq!(chunks[0].words[0].text, "hola");
+        assert_eq!(chunks[0].as_ref().unwrap().words[0].text, "hola");
         server.await.unwrap();
     }
 
