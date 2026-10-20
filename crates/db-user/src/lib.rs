@@ -37,6 +37,7 @@ mod project_source_digests_types;
 mod project_sources_ops;
 mod project_sources_types;
 mod sessions_ops;
+mod sessions_recording_ops;
 mod sessions_types;
 mod spaces_ops;
 mod spaces_types;

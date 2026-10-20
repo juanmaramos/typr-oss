@@ -28,6 +28,18 @@ async toggleCalendarSelected(trackingId: string) : Promise<Calendar> {
 async upsertSession(session: Session) : Promise<Session> {
     return await TAURI_INVOKE("plugin:db|upsert_session", { session });
 },
+async setSummaryTemplate(sessionId: string, templateId: string | null) : Promise<null> {
+    return await TAURI_INVOKE("plugin:db|set_summary_template", { sessionId, templateId });
+},
+async saveRecordingSummary(sessionId: string, words: Word[], recordEnd: string, previousHtml: string | null, html: string) : Promise<boolean> {
+    return await TAURI_INVOKE("plugin:db|save_recording_summary", { sessionId, words, recordEnd, previousHtml, html });
+},
+async updateSessionNoteFields(sessionId: string, updates: SessionNoteUpdate[]) : Promise<Session | null> {
+    return await TAURI_INVOKE("plugin:db|update_session_note_fields", { sessionId, updates });
+},
+async saveRecordingTitle(sessionId: string, recordEnd: string, previousTitle: string, title: string) : Promise<boolean> {
+    return await TAURI_INVOKE("plugin:db|save_recording_title", { sessionId, recordEnd, previousTitle, title });
+},
 async visitSession(id: string) : Promise<null> {
     return await TAURI_INVOKE("plugin:db|visit_session", { id });
 },
@@ -325,7 +337,7 @@ export type Human = { id: string; organization_id: string | null; is_user: boole
 export type ListEventFilter = ({ user_id: string; limit: number | null }) & ({ type: "simple" } | { type: "search"; query: string } | { type: "dateRange"; start: string; end: string } | { type: "not-assigned-past" })
 export type ListHumanFilter = { search: [number, string] }
 export type ListOrganizationFilter = { search: [number, string] }
-export type ListSessionFilter = ({ user_id: string; limit: number | null }) & ({ type: "search"; query: string } | { type: "recentlyVisited" } | { type: "dateRange"; start: string; end: string } | { type: "tagFilter"; tag_ids: string[] } | { type: "needsEnhance" })
+export type ListSessionFilter = ({ user_id: string; limit: number | null }) & ({ type: "search"; query: string } | { type: "recentlyVisited" } | { type: "dateRange"; start: string; end: string } | { type: "tagFilter"; tag_ids: string[] } | { type: "needsEnhance"; exclude_ids?: string[] | null })
 export type Organization = { id: string; name: string; description: string | null }
 export type Platform = "Apple" | "Google" | "Outlook"
 export type ProjectBrief = { id: string; project_id: string; markdown: string; status: ProjectBriefStatus; source_count: number; source_limit: number; source_fingerprint: string; model_id: string | null; prompt_template_version: string; error_message: string | null; generated_at: string | null; created_at: string; updated_at: string }
@@ -349,6 +361,7 @@ export type ProjectSourceDigest = { project_id: string; source_type: string; sou
 export type ProjectSourceDigestSourceKind = "ExistingAiNotes" | "GeneratedFromChunks" | "ManualFallback"
 export type ProjectSourceStatus = "Included" | "ExcludedFromBrief" | "NeedsReview"
 export type Session = { id: string; created_at: string; visited_at: string; user_id: string; calendar_event_id: string | null; title: string; raw_memo_html: string; enhanced_memo_html: string | null; auto_enhanced_memo_html: string | null; words: Word[]; record_start: string | null; record_end: string | null; pre_meeting_memo_html: string | null; source_type: string | null; source_metadata: string | null; space_id: string | null; needs_enhance: boolean }
+export type SessionNoteUpdate = { field: "title"; value: string } | { field: "raw_memo_html"; value: string } | { field: "enhanced_memo_html"; value: string | null } | { field: "auto_enhanced_memo_html"; value: string | null } | { field: "pre_meeting_memo_html"; value: string | null }
 export type Space = { id: string; name: string; description: string | null; icon_type: string; icon_value: string; icon_color: string; created_at: string; updated_at: string }
 export type SpeakerIdentity = { type: "unassigned"; value: { index: number } } | { type: "assigned"; value: { id: string; label: string } }
 export type Tag = { id: string; name: string }
