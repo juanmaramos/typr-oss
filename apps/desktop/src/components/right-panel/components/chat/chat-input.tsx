@@ -10,6 +10,7 @@ import { promptInputClassNames, promptTextareaContracts } from "@/components/ui/
 import { debugLogFor } from "@/components/utils/debug-logger";
 import { useRightPanel } from "@/contexts";
 import { useAgentWritingFeature } from "@/hooks/use-agent-writing-feature";
+import { useAIAvailability } from "@/hooks/useAIAvailability";
 import { useSelectionContext } from "@/stores/useSelectionContext";
 import { commands as dbCommands } from "@typr/plugin-db";
 import { Button } from "@typr/ui/components/ui/button";
@@ -63,6 +64,19 @@ export function ChatInput(
   const { chatInputRef } = useRightPanel();
   const isAgentWritingEnabled = useAgentWritingFeature();
   const isFloatingLayout = layout === "floating";
+  const { availability } = useAIAvailability();
+  const submitWhenReady = () => {
+    if (availability.canStart) {
+      onSubmit();
+    }
+  };
+  const keyDownWhenReady = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey && !availability.canStart) {
+      event.preventDefault();
+      return;
+    }
+    onKeyDown(event);
+  };
 
   const { data: noteData } = useQuery({
     queryKey: ["session", entityId],
@@ -184,7 +198,7 @@ export function ChatInput(
           <PromptInput
             value={inputValue}
             onValueChange={handleValueChange}
-            onSubmit={onSubmit}
+            onSubmit={submitWhenReady}
             isLoading={isGenerating}
             maxHeight={isFloatingLayout ? 136 : 128}
             debugName={isFloatingLayout ? "floating-chat" : undefined}
@@ -238,7 +252,7 @@ export function ChatInput(
                             researchMode,
                           });
                         }
-                        onKeyDown(event);
+                        keyDownWhenReady(event);
                       }}
                       className={cn("min-w-0 flex-1", promptTextareaContracts.floatingInline.className)}
                       disabled={isGenerating}
@@ -304,9 +318,9 @@ export function ChatInput(
                                   editMode,
                                   researchMode,
                                 });
-                                onSubmit();
+                                submitWhenReady();
                               }}
-                              disabled={!inputValue.trim() || isGenerating}
+                              disabled={!inputValue.trim() || isGenerating || !availability.canStart}
                               className="h-9 w-9 shrink-0 rounded-full p-0"
                             >
                               <ArrowUpIcon className="h-4 w-4 text-primary-foreground" />
@@ -324,7 +338,7 @@ export function ChatInput(
                       placeholder={editMode === "edit"
                         ? t`Describe the changes you want to make...`
                         : t`Ask about this meeting...`}
-                      onKeyDown={onKeyDown}
+                      onKeyDown={keyDownWhenReady}
                       className={promptTextareaContracts.sidebar.className}
                       disabled={isGenerating}
                     />
@@ -385,8 +399,8 @@ export function ChatInput(
                               <Button
                                 variant="default"
                                 size="icon"
-                                onClick={onSubmit}
-                                disabled={!inputValue.trim() || isGenerating}
+                                onClick={submitWhenReady}
+                                disabled={!inputValue.trim() || isGenerating || !availability.canStart}
                                 className="h-8 w-8 shrink-0 rounded-full p-0"
                               >
                                 <ArrowUpIcon className="h-4 w-4 text-primary-foreground" />

@@ -1,7 +1,6 @@
 import { getAvailableSettingsSttModels, sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
-// Using remix icons instead of lucide
 import { type ReactNode, useState } from "react";
 
 import { Button } from "@typr/ui/components/ui/button";
@@ -9,7 +8,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/
 import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { cn } from "@typr/ui/lib/utils";
 
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
 import { usePlatform } from "@/hooks/usePlatform";
+import { openSettingsWindow } from "@/utils/open-settings-window";
 import {
   getAvailableLanguageOptions,
   getSttModelDescription,
@@ -25,7 +26,7 @@ export interface STTLanguageSelectorProps {
   onChange: (value: LanguageOption) => void;
   disabled?: boolean;
   size?: "compact" | "full";
-  isActive?: boolean; // When true, uses ghost style with no borders
+  isActive?: boolean;
   triggerLabel?: ReactNode;
   triggerVariant?: "button" | "inline";
 }
@@ -40,118 +41,73 @@ export function STTLanguageSelector({
   triggerVariant = "button",
 }: STTLanguageSelectorProps) {
   const { t } = useLingui();
+  const statusLabel = useModelAvailabilityLabel();
   const [isOpen, setIsOpen] = useState(false);
-  const { getModelStatus, downloadModel } = useModelDownload();
+  const { getModelAvailability, downloadModel, retry } = useModelDownload();
   const { supportsLocalModels } = usePlatform();
-
-  // Use filtered options based on platform
   const capabilities = useQuery(sttCapabilitiesQueryOptions());
   const availableOptions = getAvailableLanguageOptions(
     supportsLocalModels,
     getAvailableSettingsSttModels(capabilities.data),
   );
   const selectedOption = LANGUAGE_OPTIONS.find(option => option.key === value || option.modelKey === value);
+  const selectedAvailability = getModelAvailability(selectedOption?.modelKey ?? value);
   const isCompact = size === "compact";
-
-  // Availability must never substitute a different model for the saved selection.
-  const displayOption = selectedOption;
-
-  // Debug: Log if icon is missing
-  if (!displayOption && value) {
-    console.warn("[STT Selector] No option found for value:", value, "Available:", availableOptions.map(o => o.key));
-  }
-
-  // If only one option available, make it display-only (non-interactive)
-  const isSingleOption = availableOptions.length === 1 && availableOptions[0].modelKey === selectedOption?.modelKey;
-  const showCustomTrigger = !!triggerLabel && !isActive && !isSingleOption;
+  const showCustomTrigger = !!triggerLabel && !isActive;
   const isInlineTrigger = showCustomTrigger && triggerVariant === "inline";
+  const openSettings = () => {
+    setIsOpen(false);
+    return openSettingsWindow("/app/settings?tab=ai&section=transcription");
+  };
 
   const handleSelect = (optionKey: LanguageOption) => {
-    const option = availableOptions.find(o => o.key === optionKey);
-
-    // Cloud models don't need download check
-    if (option && "isCloud" in option && option.isCloud) {
-      onChange(optionKey);
-      setIsOpen(false);
+    if (!getModelAvailability(optionKey).canSelect) {
       return;
     }
-
-    // Existing download check for local models
-    const modelStatus = getModelStatus(optionKey);
-    if (modelStatus.isDownloaded) {
-      onChange(optionKey);
-      setIsOpen(false);
-    } else {
-      // Show download required message but keep modal open
-      // User needs to download first
-    }
+    onChange(optionKey);
+    setIsOpen(false);
   };
 
-  const handleDownload = (optionKey: LanguageOption, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent option selection
-    downloadModel(optionKey);
-  };
-
-  const SelectorButton = (
+  const selectorButton = (
     <Button
       variant="ghost"
       size={isActive ? "icon" : undefined}
       disabled={disabled}
-      title={isActive ? (selectedOption ? getSttModelLabel(selectedOption.key) : t`Select model`) : undefined}
+      title={selectedOption ? getSttModelLabel(selectedOption.key) : t`Select model`}
       className={cn(
         isInlineTrigger
           ? "h-auto gap-0.5 px-0 py-0 text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground"
           : isActive
-          ? "h-7 w-7 transition-all" // Icon-only when active
-          : "justify-between gap-1.5 h-7 px-2 text-sm transition-all", // Full layout when not active
+          ? "h-7 w-7 transition-all"
+          : "justify-between gap-1.5 h-7 px-2 text-sm transition-all",
         disabled && "opacity-50 cursor-not-allowed",
       )}
       onClick={() => !disabled && setIsOpen(!isOpen)}
     >
       {isActive
-        ? (
-          // Active state: just the model icon
-          <STTProviderIcon model={displayOption?.modelKey ?? ""} />
-        )
-        : showCustomTrigger
-        ? (
+        ? <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
+        : (
           <>
-            <span
-              className={isInlineTrigger
-                ? "text-xs font-medium"
-                : isCompact
-                ? "text-xs font-medium"
-                : "text-sm font-medium"}
-            >
-              {triggerLabel}
-            </span>
+            {showCustomTrigger
+              ? (
+                <span className={isCompact || isInlineTrigger ? "text-xs font-medium" : "text-sm font-medium"}>
+                  {triggerLabel}
+                </span>
+              )
+              : (
+                <span className="flex items-center gap-1.5">
+                  <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
+                  <span className={isCompact ? "text-xs" : "text-xs font-medium"}>
+                    {selectedOption ? getSttModelLabel(selectedOption.key) : <Trans>Select model</Trans>}
+                  </span>
+                </span>
+              )}
             <i
               className={cn(
-                isInlineTrigger
-                  ? "ri-arrow-down-s-line text-xs text-muted-foreground transition-transform duration-200"
-                  : "ri-arrow-down-s-line text-sm text-muted-foreground transition-transform duration-200",
+                "ri-arrow-down-s-line text-sm text-muted-foreground transition-transform duration-200",
                 isOpen && "rotate-180",
               )}
             />
-          </>
-        )
-        : (
-          // Inactive state: model name + optional chevron
-          <>
-            <div className="flex items-center gap-1.5">
-              <STTProviderIcon model={displayOption?.modelKey ?? ""} />
-              <span className={isCompact ? "text-xs" : "text-xs font-medium"}>
-                {displayOption ? getSttModelLabel(displayOption.key) : <Trans>Select model</Trans>}
-              </span>
-            </div>
-            {!isSingleOption && (
-              <i
-                className={cn(
-                  "ri-arrow-down-s-line text-sm text-muted-foreground transition-transform duration-200",
-                  isOpen && "rotate-180",
-                )}
-              />
-            )}
           </>
         )}
       <span className="sr-only">
@@ -160,32 +116,12 @@ export function STTLanguageSelector({
     </Button>
   );
 
-  // If only one option, show as display-only (no dropdown)
-  if (isSingleOption) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="cursor-default">
-            {SelectorButton}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{displayOption ? getSttModelLabel(displayOption.key) : <Trans>Transcription model</Trans>}</p>
-        </TooltipContent>
-      </Tooltip>
-    );
-  }
-
   if (disabled) {
     return (
       <Tooltip>
-        <TooltipTrigger asChild>
-          {SelectorButton}
-        </TooltipTrigger>
+        <TooltipTrigger asChild>{selectorButton}</TooltipTrigger>
         <TooltipContent>
-          <p>
-            <Trans>Stop or pause recording to change transcription model</Trans>
-          </p>
+          <Trans>Stop or pause recording to change transcription model</Trans>
         </TooltipContent>
       </Tooltip>
     );
@@ -193,184 +129,104 @@ export function STTLanguageSelector({
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        {SelectorButton}
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{selectorButton}</PopoverTrigger>
       <PopoverContent
         className="w-80 max-w-[var(--radix-popover-content-available-width)] max-h-[var(--radix-popover-content-available-height)] overflow-y-auto overscroll-contain border-0 shadow-lg"
         align="center"
         sideOffset={4}
       >
         <div className="space-y-3">
-          {/* On-device Models Section - Only show header if local models exist */}
-          {availableOptions.some(o => o.isLocal) && (
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              <Trans>On-device</Trans>
-            </div>
-          )}
-          <div className="space-y-1">
-            {availableOptions.filter(o => o.isLocal).map((option) => {
-              const isCloud = "isCloud" in option && option.isCloud;
-              const modelStatus = isCloud ? null : getModelStatus(option.key);
-              const isSelected = value === option.key;
-
-              return (
-                <Button
-                  key={option.key}
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 rounded-md whitespace-normal",
-                    isSelected && "bg-muted/50 border border",
-                    !isCloud && modelStatus && !modelStatus.isDownloaded && "opacity-75",
-                  )}
-                  onClick={() => handleSelect(option.key)}
-                  disabled={!isCloud && modelStatus?.isDownloading}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                      <STTProviderIcon model={option.modelKey} className="mt-0.5" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <div className="font-medium text-xs leading-tight">
-                            {getSttModelLabel(option.key)}
-                          </div>
-                          {!isCloud && modelStatus && !modelStatus.isDownloaded && (
-                            <span className="text-xs text-muted-foreground/70 font-medium">{option.size}</span>
-                          )}
-                        </div>
-                        <div className="text-xs text-muted-foreground leading-tight mt-0.5 break-words">
-                          {isCloud
-                            ? getSttModelDescription(option.key, capabilities.data)
-                            : modelStatus && !modelStatus.isDownloaded
-                            ? t`Not downloaded`
-                            : getSttModelDescription(option.key, capabilities.data)}
-                        </div>
+          <p className="text-xs text-muted-foreground" role="status">{statusLabel(selectedAvailability)}</p>
+          {[true, false].map(local => {
+            const options = availableOptions.filter(option => option.isLocal === local);
+            if (!options.length) {
+              return null;
+            }
+            return (
+              <div key={local ? "local" : "cloud"} className="space-y-1">
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  {local ? <Trans>On-device</Trans> : <Trans>Cloud Models</Trans>}
+                </div>
+                {options.map(option => {
+                  const availability = getModelAvailability(option.modelKey);
+                  const isSelected = selectedOption?.modelKey === option.modelKey;
+                  return (
+                    <div
+                      key={option.key}
+                      role="group"
+                      aria-label={getSttModelLabel(option.key)}
+                      className={cn("flex items-center gap-1 rounded-md", isSelected && "bg-muted/50 border border")}
+                    >
+                      <Button
+                        variant="ghost"
+                        className="flex-1 min-w-0 justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 rounded-md whitespace-normal"
+                        onClick={() => handleSelect(option.key)}
+                        disabled={!availability.canSelect}
+                      >
+                        <span className="flex items-start gap-2.5 min-w-0">
+                          <STTProviderIcon model={option.modelKey} className="mt-0.5" />
+                          <span className="min-w-0">
+                            <span className="font-medium text-xs leading-tight">{getSttModelLabel(option.key)}</span>
+                            <span className="block text-xs text-muted-foreground leading-tight mt-0.5 break-words">
+                              {availability.status === "ready" && availability.reason !== "native-fallback"
+                                ? getSttModelDescription(option.key, capabilities.data)
+                                : statusLabel(availability)}
+                            </span>
+                          </span>
+                        </span>
+                      </Button>
+                      <div className="flex items-center gap-1 pr-2">
+                        {availability.canDownload && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            aria-label={t`Download ${option.size}`}
+                            title={t`Download ${option.size}`}
+                            onClick={() => void downloadModel(option.key)}
+                          >
+                            <i className="ri-download-line text-sm" />
+                          </Button>
+                        )}
+                        {availability.canRetry && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            aria-label={t`Retry`}
+                            title={t`Retry`}
+                            onClick={() => void retry()}
+                          >
+                            <i className="ri-refresh-line text-sm" />
+                          </Button>
+                        )}
+                        {(availability.status === "needs-api-key" || availability.status === "unavailable")
+                          && availability.canConfigure && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            aria-label={t`Open Settings`}
+                            title={t`Open Settings`}
+                            onClick={() => void openSettings()}
+                          >
+                            <i className="ri-settings-3-line text-sm" />
+                          </Button>
+                        )}
+                        {(availability.status === "downloading" || availability.status === "loading"
+                            || availability.status === "checking")
+                          ? <i className="ri-loader-4-line text-sm animate-spin" aria-hidden="true" />
+                          : isSelected && <i className="ri-check-line text-sm text-primary" aria-hidden="true" />}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 ml-2">
-                      {isCloud
-                        ? (
-                          <>
-                            {isSelected && <i className="ri-check-line text-sm text-success" />}
-                          </>
-                        )
-                        : modelStatus && !modelStatus.isDownloaded
-                        ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div
-                                className={cn(
-                                  "inline-flex items-center justify-center h-6 w-6 rounded-md border border-input bg-background hover:bg-surface-400 hover:text-foreground cursor-pointer transition-colors",
-                                  modelStatus.isDownloading && "opacity-50 cursor-not-allowed",
-                                )}
-                                onClick={(e) => !modelStatus.isDownloading && handleDownload(option.key, e)}
-                              >
-                                {modelStatus.isDownloading
-                                  ? <i className="ri-loader-4-line text-sm animate-spin" />
-                                  : <i className="ri-download-line text-sm" />}
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="left">
-                              <p>{modelStatus.isDownloading ? t`Downloading...` : t`Download ${option.size}`}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )
-                        : (
-                          <>
-                            {isSelected && <i className="ri-check-line text-sm text-primary" />}
-                          </>
-                        )}
-                    </div>
-                  </div>
-                </Button>
-              );
-            })}
-          </div>
-
-          {/* Cloud Models Section - Only show header if both local AND cloud models exist */}
-          {availableOptions.some(o => o.isLocal) && availableOptions.some(o => "isCloud" in o && o.isCloud) && (
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              <Trans>Cloud Models</Trans>
-            </div>
-          )}
-          <div className="space-y-1">
-            {availableOptions.filter(o => "isCloud" in o && o.isCloud).map((option) => {
-              const isCloud = "isCloud" in option && option.isCloud;
-              const modelStatus = isCloud ? null : getModelStatus(option.key);
-              const isSelected = value === option.key;
-
-              return (
-                <Button
-                  key={option.key}
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start text-left h-auto p-2.5 hover:bg-surface-400/50 rounded-md whitespace-normal",
-                    isSelected && "bg-muted/50 border border",
-                    !isCloud && modelStatus && !modelStatus.isDownloaded && "opacity-75",
-                  )}
-                  onClick={() => handleSelect(option.key)}
-                  disabled={!isCloud && modelStatus?.isDownloading}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                      <STTProviderIcon model={option.modelKey} className="mt-0.5" />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <div className="font-medium text-xs leading-tight">
-                            {getSttModelLabel(option.key)}
-                          </div>
-                          {!isCloud && modelStatus && !modelStatus.isDownloaded && (
-                            <span className="text-xs text-muted-foreground/70 font-medium">{option.size}</span>
-                          )}
-                        </div>
-                        <div className="text-xs text-muted-foreground leading-tight mt-0.5 break-words">
-                          {isCloud
-                            ? getSttModelDescription(option.key, capabilities.data)
-                            : modelStatus && !modelStatus.isDownloaded
-                            ? t`Not downloaded`
-                            : getSttModelDescription(option.key, capabilities.data)}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 ml-2">
-                      {isCloud
-                        ? (
-                          <>
-                            {isSelected && <i className="ri-check-line text-sm text-primary" />}
-                          </>
-                        )
-                        : modelStatus && !modelStatus.isDownloaded
-                        ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div
-                                className={cn(
-                                  "inline-flex items-center justify-center h-6 w-6 rounded-md border border-input bg-background hover:bg-surface-400 hover:text-foreground cursor-pointer transition-colors",
-                                  modelStatus.isDownloading && "opacity-50 cursor-not-allowed",
-                                )}
-                                onClick={(e) => !modelStatus.isDownloading && handleDownload(option.key, e)}
-                              >
-                                {modelStatus.isDownloading
-                                  ? <i className="ri-loader-4-line text-sm animate-spin" />
-                                  : <i className="ri-download-line text-sm" />}
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="left">
-                              <p>{modelStatus.isDownloading ? t`Downloading...` : t`Download ${option.size}`}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )
-                        : (
-                          <>
-                            {isSelected && <i className="ri-check-line text-sm text-primary" />}
-                          </>
-                        )}
-                    </div>
-                  </div>
-                </Button>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+          <Button variant="ghost" size="sm" onClick={() => void openSettings()}>
+            <Trans>Open Settings</Trans>
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

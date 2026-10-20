@@ -94,16 +94,12 @@ export type CustomFormValues = {
 
 export interface SharedSTTProps {
   sttModels: STTModel[];
-  downloadingModels: Set<string>;
   handleModelDownload: (modelKey: string) => Promise<void>;
   handleShowFileLocation: (modelType: "stt" | "llm") => Promise<void>;
   supportsLocalModels: boolean;
 }
 
 export interface SharedLLMProps {
-  // Model State
-  downloadingModels: Set<string>;
-
   // Functions
   handleModelDownload: (modelKey: string) => Promise<void>;
   handleShowFileLocation: (modelType: "stt" | "llm") => Promise<void>;

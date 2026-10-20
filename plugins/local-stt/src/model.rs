@@ -116,6 +116,8 @@ pub struct ModelCapabilities {
     pub available: bool,
     pub supported_languages: Option<Vec<String>>,
     pub supported_locales: Option<Vec<String>>,
+    pub live_fallback_models: Vec<SupportedModel>,
+    pub recorded_fallback_models: Vec<SupportedModel>,
 }
 
 impl SupportedModel {
@@ -165,6 +167,16 @@ impl SupportedModel {
                 .map(String::from)
                 .collect()
         })
+    }
+    pub fn live_fallback_models(&self) -> &'static [SupportedModel] {
+        if self.is_streaming() {
+            STREAMING_WHISPER_FALLBACKS
+        } else {
+            &[]
+        }
+    }
+    pub fn recorded_fallback_models(&self) -> &'static [SupportedModel] {
+        STREAMING_WHISPER_FALLBACKS
     }
     pub fn sha256(&self) -> Option<&'static str> {
         match self {

@@ -4,6 +4,7 @@ import "remixicon/fonts/remixicon.css";
 import "./styles/globals.css";
 
 import { useModelSelectionSync } from "./hooks/useModelSelectionSync";
+import { useModelLifecycleSync } from "./hooks/useModelState";
 
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
@@ -194,6 +195,7 @@ const rootElement = document.getElementById("root")!;
 
 function App() {
   useModelSelectionSync();
+  useModelLifecycleSync();
   const queryClient = useQueryClient();
   const [i18nReady, setI18nReady] = useState(false);
   const [bootError, setBootError] = useState<string | null>(null);

@@ -15,6 +15,8 @@ describe("native STT capabilities", () => {
         supported_locales: ["en-US", "es-ES"],
         realtime: true,
         recorded: false,
+        live_fallback_models: ["QuantizedLargeTurbo"],
+        recorded_fallback_models: ["QuantizedLargeTurbo"],
         available: false,
       }]),
     ).toEqual([]);
@@ -30,6 +32,8 @@ describe("native STT capabilities", () => {
         supported_locales: ["en-US", "es-ES"],
         realtime: true,
         recorded: false,
+        live_fallback_models: ["QuantizedLargeTurbo"],
+        recorded_fallback_models: ["QuantizedLargeTurbo"],
         available: true,
       },
       {
@@ -40,6 +44,8 @@ describe("native STT capabilities", () => {
         supported_locales: null,
         realtime: false,
         recorded: true,
+        live_fallback_models: [],
+        recorded_fallback_models: ["QuantizedLargeTurbo"],
         available: true,
       },
     ]);

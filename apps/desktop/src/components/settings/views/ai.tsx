@@ -68,9 +68,6 @@ export default function LocalAI() {
   const [isWerModalOpen, setIsWerModalOpen] = useState(false);
   const sttModels = visibleSttModels;
 
-  // LLM State
-  const [downloadingModels, setDownloadingModels] = useState<Set<string>>(new Set());
-
   // Shared Model Download Function
   const handleModelDownload = async (modelKey: string) => {
     const sttModel = sttModels.find(model => model.key === modelKey);
@@ -85,27 +82,11 @@ export default function LocalAI() {
     }
 
     // Handle STT model download
-    setDownloadingModels(prev => new Set([...prev, modelKey]));
-
-    showSttModelDownloadToast(modelKey as SupportedSttModel, () => {
-      setDownloadingModels(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(modelKey);
-        return newSet;
-      });
-    }, queryClient);
+    showSttModelDownloadToast(modelKey as SupportedSttModel, undefined, queryClient);
   };
 
   const handleLlmModelDownload = async (modelKey: string) => {
-    setDownloadingModels((prev) => new Set([...prev, modelKey]));
-
-    showLlmModelDownloadToast(modelKey as SupportedModel, () => {
-      setDownloadingModels((prev) => {
-        const s = new Set(prev);
-        s.delete(modelKey);
-        return s;
-      });
-    }, queryClient);
+    showLlmModelDownloadToast(modelKey as SupportedModel, undefined, queryClient);
   };
 
   const handleShowFileLocation = async (modelType: "stt" | "llm") => {
@@ -116,7 +97,6 @@ export default function LocalAI() {
   // Prepare props for child components
   const sttProps: SharedSTTProps & { isWerModalOpen: boolean; setIsWerModalOpen: (open: boolean) => void } = {
     sttModels,
-    downloadingModels,
     handleModelDownload,
     handleShowFileLocation,
     isWerModalOpen,
@@ -125,7 +105,6 @@ export default function LocalAI() {
   };
 
   const localLlmProps: SharedLLMProps = {
-    downloadingModels,
     handleModelDownload,
     handleShowFileLocation,
     supportsLocalModels,

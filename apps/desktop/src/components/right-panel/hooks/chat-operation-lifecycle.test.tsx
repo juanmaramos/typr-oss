@@ -7,6 +7,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
+  canStart: true,
   streamText: vi.fn(),
   getChatGroupId: vi.fn(),
   fetchSessionData: vi.fn(),
@@ -21,6 +22,11 @@ const mocks = vi.hoisted(() => ({
     return { promise, resolve };
   })(),
 }));
+
+vi.mock(
+  "@/hooks/useAIAvailability",
+  () => ({ useAIAvailability: () => ({ availability: { canStart: mocks.canStart } }) }),
+);
 
 vi.mock(
   "@/contexts",
@@ -103,6 +109,20 @@ function Harness({ sessionId }: { sessionId: string }) {
 }
 
 describe("Stop after moving the live chat view", () => {
+  it("blocks input, suggested prompts and quick actions until the central model policy permits starting", async () => {
+    mocks.canStart = false;
+    await act(async () => root.render(<Harness sessionId="session-1" />));
+    await act(async () => {
+      expect(await actions?.handleSubmit()).toBe(false);
+      expect(actions?.handleSubmitWithValue("suggested", { source: "test", bypassDebounce: true })).toBe(false);
+      await actions?.handleQuickAction("quick action");
+    });
+    expect(mocks.getChatGroupId).not.toHaveBeenCalled();
+    expect(mocks.streamText).not.toHaveBeenCalled();
+    expect(mocks.setInputValue).toHaveBeenCalledWith("quick action");
+    expect(hasActiveChatGeneration("session-1")).toBe(false);
+  });
+
   beforeEach(() => {
     i18n.load("en", enMessages);
     i18n.activate("en");
@@ -110,6 +130,7 @@ describe("Stop after moving the live chat view", () => {
     container = document.createElement("div");
     root = createRoot(container);
     actions = null;
+    mocks.canStart = true;
     releasePendingGroupId = null;
     releasePendingStream = null;
     mocks.panel.surface = "floating";

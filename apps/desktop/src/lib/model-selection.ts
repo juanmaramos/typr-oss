@@ -1,9 +1,15 @@
-import { queryOptions, type QueryClient } from "@tanstack/react-query";
+import { type QueryClient, queryOptions } from "@tanstack/react-query";
 import { emit } from "@tauri-apps/api/event";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { commands as localLlmCommands, type SupportedModel as LocalChatModel } from "@typr/plugin-local-llm";
 import { commands as localSttCommands, type SupportedModel as LocalTranscriptionModel } from "@typr/plugin-local-stt";
-import { AUTO_CLOUD_MODEL_ID, LEGACY_WINDOWS_DEFAULT_CLOUD_MODEL_ID, normalizeAiTaskDefaults, type AiTaskDefaults } from "@typr/utils";
+import {
+  type AiTaskDefaults,
+  AUTO_CLOUD_MODEL_ID,
+  LEGACY_WINDOWS_DEFAULT_CLOUD_MODEL_ID,
+  normalizeAiTaskDefaults,
+} from "@typr/utils";
+import { modelLifecycleKey, type ModelStateMap } from "./model-lifecycle";
 
 export const MODEL_SELECTION_CHANGED_EVENT = "model-selection-changed";
 export const MODEL_NOT_DOWNLOADED = "model_not_downloaded";
@@ -19,44 +25,50 @@ export const modelSelectionKeys = {
   customEndpointEnabled: ["custom-llm-enabled"],
 } as const;
 
-export const localChatModelQueryOptions = () => queryOptions({
-  queryKey: modelSelectionKeys.localChat,
-  queryFn: () => localLlmCommands.getCurrentModel(),
-  staleTime: 30_000,
-});
-export const cloudChatModelQueryOptions = () => queryOptions({
-  queryKey: modelSelectionKeys.cloudChat,
-  queryFn: async () => (await connectorCommands.getCloudModel())?.trim() ?? "",
-  staleTime: 30_000,
-});
-export const transcriptionModelQueryOptions = () => queryOptions({
-  queryKey: modelSelectionKeys.transcription,
-  queryFn: async () => {
-    const model = (await connectorCommands.getSttModel())?.trim() ?? "";
-    if (model === "AssemblyAIUniversal") {
-      return CLOUD_TRANSCRIPTION_MODEL;
-    }
-    return model || await localSttCommands.getCurrentModel();
-  },
-});
-export const localTranscriptionModelQueryOptions = () => queryOptions({
-  queryKey: modelSelectionKeys.localTranscription,
-  queryFn: () => localSttCommands.getCurrentModel(),
-});
-export const customEndpointEnabledQueryOptions = () => queryOptions({
-  queryKey: modelSelectionKeys.customEndpointEnabled,
-  queryFn: () => connectorCommands.getCustomLlmEnabled(),
-  staleTime: 30_000,
-});
-export const aiTaskDefaultsQueryOptions = () => queryOptions({
-  queryKey: modelSelectionKeys.taskDefaults,
-  queryFn: () => connectorCommands.getAiTaskDefaults(),
-});
+export const localChatModelQueryOptions = () =>
+  queryOptions({
+    queryKey: modelSelectionKeys.localChat,
+    queryFn: () => localLlmCommands.getCurrentModel(),
+    staleTime: 30_000,
+  });
+export const cloudChatModelQueryOptions = () =>
+  queryOptions({
+    queryKey: modelSelectionKeys.cloudChat,
+    queryFn: async () => (await connectorCommands.getCloudModel())?.trim() ?? "",
+    staleTime: 30_000,
+  });
+export const transcriptionModelQueryOptions = () =>
+  queryOptions({
+    queryKey: modelSelectionKeys.transcription,
+    queryFn: async () => {
+      const model = (await connectorCommands.getSttModel())?.trim() ?? "";
+      if (model === "AssemblyAIUniversal") {
+        return CLOUD_TRANSCRIPTION_MODEL;
+      }
+      return model || await localSttCommands.getCurrentModel();
+    },
+  });
+export const localTranscriptionModelQueryOptions = () =>
+  queryOptions({
+    queryKey: modelSelectionKeys.localTranscription,
+    queryFn: () => localSttCommands.getCurrentModel(),
+  });
+export const customEndpointEnabledQueryOptions = () =>
+  queryOptions({
+    queryKey: modelSelectionKeys.customEndpointEnabled,
+    queryFn: () => connectorCommands.getCustomLlmEnabled(),
+    staleTime: 30_000,
+  });
+export const aiTaskDefaultsQueryOptions = () =>
+  queryOptions({
+    queryKey: modelSelectionKeys.taskDefaults,
+    queryFn: () => connectorCommands.getAiTaskDefaults(),
+  });
 
 export async function refreshModelSelection(queryClient: QueryClient) {
-  await Promise.all(Object.values(modelSelectionKeys).map(queryKey =>
-    queryClient.invalidateQueries({ queryKey, refetchType: "all" })
-  ));
+  await Promise.all(
+    Object.values(modelSelectionKeys).map(queryKey => queryClient.invalidateQueries({ queryKey, refetchType: "all" })),
+  );
 }
 
 // Keep read/modify/write task updates and local/cloud transitions in user-action order.
@@ -97,9 +109,10 @@ function createModelSelectionController(queryClient: QueryClient) {
     const running = await localLlmCommands.isServerRunning();
     // Preserve the cloud/Auto preference if saving the local model fails.
     await localLlmCommands.setCurrentModel(model);
-    if (running && previousModel !== model) {
+    const retryInitialization = !!queryClient.getQueryData<ModelStateMap>(modelLifecycleKey("llm"))?.[model]?.error;
+    if (running && (previousModel !== model || retryInitialization)) {
       await localLlmCommands.restartServer();
-    } else if (!running && startServer) {
+    } else if (!running && (startServer || retryInitialization)) {
       await localLlmCommands.startServer();
     }
     await connectorCommands.setCustomLlmEnabled(false);
@@ -127,30 +140,35 @@ function createModelSelectionController(queryClient: QueryClient) {
 
   return {
     selectLocalChat: (model: LocalChatModel) => update(() => setLocalChat(model)),
-    selectCloudChat: (model: string) => update(async () => {
-      await connectorCommands.setCloudModel(model);
-    }),
+    selectCloudChat: (model: string) =>
+      update(async () => {
+        await connectorCommands.setCloudModel(model);
+      }),
     selectTranscription: (model: TranscriptionModel) => update(() => setTranscription(model)),
     // Downloads retain the existing auto-select + warm-server policy, through
     // exactly the same selection path as the manual pickers.
     completeChatDownload: (model: LocalChatModel) => update(() => setLocalChat(model, true)),
     completeTranscriptionDownload: (model: LocalTranscriptionModel) => update(() => setTranscription(model, true)),
-    setTaskDefault: (task: keyof AiTaskDefaults, model: string | null) => update(async () => {
-      const defaults = normalizeAiTaskDefaults(await connectorCommands.getAiTaskDefaults());
-      await connectorCommands.setAiTaskDefaults(normalizeAiTaskDefaults({ ...defaults, [task]: model }));
-    }),
-    initializePlatformDefaults: (platform: string) => update(async () => {
-      if (platform !== "windows") {
-        return;
-      }
-      const sttModel = await connectorCommands.getSttModel();
-      if (!sttModel || !sttModel.includes("assemblyai")) {
-        await setTranscription(CLOUD_TRANSCRIPTION_MODEL);
-      }
-      const chatModel = await connectorCommands.getCloudModel();
-      if (!chatModel || chatModel === "groq-openai/gpt-oss-20b" || chatModel === LEGACY_WINDOWS_DEFAULT_CLOUD_MODEL_ID) {
-        await connectorCommands.setCloudModel(AUTO_CLOUD_MODEL_ID);
-      }
-    }),
+    setTaskDefault: (task: keyof AiTaskDefaults, model: string | null) =>
+      update(async () => {
+        const defaults = normalizeAiTaskDefaults(await connectorCommands.getAiTaskDefaults());
+        await connectorCommands.setAiTaskDefaults(normalizeAiTaskDefaults({ ...defaults, [task]: model }));
+      }),
+    initializePlatformDefaults: (platform: string) =>
+      update(async () => {
+        if (platform !== "windows") {
+          return;
+        }
+        const sttModel = await connectorCommands.getSttModel();
+        if (!sttModel || !sttModel.includes("assemblyai")) {
+          await setTranscription(CLOUD_TRANSCRIPTION_MODEL);
+        }
+        const chatModel = await connectorCommands.getCloudModel();
+        if (
+          !chatModel || chatModel === "groq-openai/gpt-oss-20b" || chatModel === LEGACY_WINDOWS_DEFAULT_CLOUD_MODEL_ID
+        ) {
+          await connectorCommands.setCloudModel(AUTO_CLOUD_MODEL_ID);
+        }
+      }),
   };
 }

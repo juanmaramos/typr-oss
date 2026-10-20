@@ -1,6 +1,3 @@
-import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
-import { usePlatform } from "@/hooks/usePlatform";
-import { getAvailableSettingsSttModels, sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { localizeDefaultTemplate } from "@/utils/default-templates";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -12,13 +9,13 @@ import { Icon } from "@/components/ui/icon";
 import { TemplateIcon } from "@/components/ui/template-icon";
 import { useRightPanel, useTypr } from "@/contexts";
 import { useEnhancePendingState } from "@/hooks/enhance-pending";
-import { useModelState } from "@/hooks/useModelState";
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
+import { useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
 import { useConsentNotification } from "@/utils/consent-notification";
 import { getTemplateDisplayName } from "@/utils/template-presentation";
 import { TemplateService } from "@/utils/template-service";
 import { commands as configCommands } from "@typr/plugin-config";
 import { commands as listenerCommands } from "@typr/plugin-listener";
-import { commands as localSttCommands } from "@typr/plugin-local-stt";
 import { Button } from "@typr/ui/components/ui/button";
 import { ButtonGroup, buttonGroupItemVariants, ButtonGroupSeparator } from "@typr/ui/components/ui/button-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
@@ -28,12 +25,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/
 import { cn } from "@typr/ui/lib/utils";
 import { useOngoingSession, useSession } from "@typr/utils/contexts";
 
-// STT Components
-import {
-  getAvailableLanguageOptions,
-  getSttModelLabel,
-  LANGUAGE_OPTIONS,
-} from "../../transcript/constants/languageData";
+import { STTLanguageSelector } from "../../transcript/actions/STTLanguageSelector";
 import { useSTTModel } from "../../transcript/hooks/useSTTModel";
 import { useTranscriptState } from "../../transcript/hooks/useTranscriptState";
 
@@ -51,23 +43,8 @@ export default function TranscriptionBar({
   const isOnboarding = sessionId === onboardingSessionId;
   const { showSidebar } = useRightPanel();
 
-  // Single source of truth for STT model availability (event-driven, always fresh)
-  const { isSttModelAvailable, isSttLoading, isDownloaded } = useModelState();
-
-  // Check if any STT model exists (for onboarding only)
-  const supportedModelsQuery = useQuery({
-    queryKey: ["supported-stt-models"],
-    queryFn: () => localSttCommands.listSupportedModels(),
-    staleTime: 60 * 1000,
-    enabled: isOnboarding,
-  });
-
-  const anySttModelExists = {
-    data: isOnboarding && supportedModelsQuery.data
-      ? supportedModelsQuery.data.some(model => isDownloaded(model.toString()))
-      : false,
-    isLoading: supportedModelsQuery.isLoading,
-  };
+  const { availability, retry } = useTranscriptionAvailability();
+  const statusLabel = useModelAvailabilityLabel();
 
   const ongoingSessionStatus = useOngoingSession((s) => s.status);
   const ongoingSessionId = useOngoingSession((s) => s.sessionId);
@@ -101,7 +78,7 @@ export default function TranscriptionBar({
   const meetingEnded = isEnhancePending || nonEmptySession;
 
   const handleStartSession = () => {
-    if (ongoingSessionStatus === "inactive") {
+    if (ongoingSessionStatus === "inactive" && availability.canStart) {
       ongoingSessionStore.start(sessionId);
 
       // Show consent notification if enabled in settings
@@ -177,12 +154,10 @@ export default function TranscriptionBar({
                 "gap-2 text-ui font-medium",
               )}
               onClick={handleStartSession}
-              disabled={isSttLoading
-                || (isOnboarding
-                  ? !anySttModelExists.data || (meetingEnded && isEnhancePending)
-                  : !isSttModelAvailable || (meetingEnded && isEnhancePending))}
+              disabled={!availability.canStart || (meetingEnded && isEnhancePending)}
+              title={statusLabel(availability)}
             >
-              {isSttLoading
+              {(availability.status === "checking" || availability.status === "loading")
                 ? <i className="ri-loader-4-line text-sm animate-spin" />
                 : (
                   <i
@@ -204,10 +179,7 @@ export default function TranscriptionBar({
                       className={cn(
                         "rounded-md rounded-l-none w-9 p-0",
                       )}
-                      disabled={isSttLoading
-                        || (isOnboarding
-                          ? !anySttModelExists.data || (meetingEnded && isEnhancePending)
-                          : !isSttModelAvailable || (meetingEnded && isEnhancePending))}
+                      aria-label={t`More settings`}
                     >
                       {isSettingsOpen
                         ? <ChevronUpIcon className="h-4 w-4" />
@@ -228,6 +200,22 @@ export default function TranscriptionBar({
               </PopoverContent>
             </Popover>
           </ButtonGroup>
+        )}
+
+        {ongoingSessionStatus === "inactive"
+          && (availability.status !== "ready" || availability.reason === "native-fallback") && (
+          <span className="text-xs text-muted-foreground" role="status">
+            {statusLabel(availability)}
+            {availability.canRetry && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void retry()}
+              >
+                <Trans>Retry</Trans>
+              </Button>
+            )}
+          </span>
         )}
 
         {(ongoingSessionStatus === "running_active" || ongoingSessionStatus === "running_paused") && isActiveSession
@@ -269,7 +257,6 @@ function AdvancedRecordingControls({
 
   // Get disabled state for STT model selector
   const { isLanguageChangeable } = useTranscriptState(sessionId);
-  const { isChanging } = useSTTModel();
 
   const toggleMicMuted = useMutation({
     mutationFn: async () => {
@@ -390,7 +377,7 @@ function AdvancedRecordingControls({
           <Trans>Transcription model</Trans>
         </label>
         <STTModelDropdown
-          disabled={sessionId === onboardingSessionId || !isLanguageChangeable || isChanging}
+          disabled={!isLanguageChangeable}
         />
       </div>
 
@@ -525,55 +512,7 @@ function MicrophoneDropdown({
   );
 }
 
-function STTModelDropdown({
-  disabled,
-}: {
-  disabled?: boolean;
-}) {
+function STTModelDropdown({ disabled }: { disabled?: boolean }) {
   const { selectedLanguage, handleLanguageChange } = useSTTModel();
-  const capabilities = useQuery(sttCapabilitiesQueryOptions());
-  const { supportsLocalModels } = usePlatform();
-  const availableOptions = getAvailableLanguageOptions(
-    supportsLocalModels,
-    getAvailableSettingsSttModels(capabilities.data),
-  );
-  const { t } = useLingui();
-
-  const handleSelect = (optionKey: string) => {
-    handleLanguageChange(optionKey as any);
-  };
-
-  const selectedOption = LANGUAGE_OPTIONS.find(option => option.key === selectedLanguage);
-  const displayLabel = selectedOption ? getSttModelLabel(selectedOption.key) : t`Select model`;
-
-  return (
-    <Select
-      value={selectedLanguage}
-      onValueChange={handleSelect}
-      disabled={disabled}
-    >
-      <SelectTrigger size="sm" className="w-full">
-        <SelectValue>
-          <div className="flex items-center justify-between w-full">
-            <span className="flex items-center gap-2 truncate">
-              {selectedOption && <STTProviderIcon model={selectedOption.modelKey} />}
-              {displayLabel}
-            </span>
-          </div>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent className="max-h-48 overflow-y-auto" side="top">
-        {availableOptions.map((option) => (
-          <SelectItem key={option.key} value={option.key}>
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2">
-                <STTProviderIcon model={option.modelKey} />
-                <span className="truncate">{getSttModelLabel(option.key)}</span>
-              </div>
-            </div>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
+  return <STTLanguageSelector value={selectedLanguage} onChange={handleLanguageChange} disabled={disabled} />;
 }

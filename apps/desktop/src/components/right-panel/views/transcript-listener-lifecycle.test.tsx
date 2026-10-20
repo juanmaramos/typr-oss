@@ -67,7 +67,12 @@ vi.mock("@/stores/audio-upload", () => ({
 vi.mock("@/hooks/useRecordingTimer", () => ({
   useRecordingTimer: () => ({ remaining: 0, isWarning: false, isDanger: false, shouldShowTimer: false }),
 }));
-vi.mock("@/hooks/useModelState", () => ({ useModelState: () => ({ models: [] }) }));
+vi.mock("@/hooks/useTranscriptionAvailability", () => ({
+  useTranscriptionAvailability: () => ({
+    availability: { status: "ready", reason: "ready", canStart: true, canRetry: false },
+    retry: vi.fn(),
+  }),
+}));
 vi.mock("../../transcript/hooks/useSTTModel", () => ({
   useSTTModel: () => ({ selectedLanguage: "en", handleLanguageChange: vi.fn(), isChanging: false }),
 }));

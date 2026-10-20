@@ -1,5 +1,4 @@
 import { useAudioUpload } from "@/contexts/audio-upload";
-import { transcriptionModelQueryOptions } from "@/lib/model-selection";
 import { sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { useAudioUploadStore } from "@/stores/audio-upload";
 import { Trans, useLingui } from "@lingui/react/macro";
@@ -13,9 +12,9 @@ import { TranscriptActionBar } from "../../transcript/actions/TranscriptActionBa
 import type { TranscriptState } from "../../transcript/hooks/useTranscriptState";
 
 import { useTypr } from "@/contexts";
-import { useModelState } from "@/hooks/useModelState";
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
+import { useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
 import { commands as dbCommands, Word } from "@typr/plugin-db";
-import { commands as localSttCommands } from "@typr/plugin-local-stt";
 
 import TranscriptEditor, { type TranscriptEditorRef } from "@typr/tiptap/transcript";
 
@@ -446,38 +445,17 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
 
   const panelWidth = useContainerWidth(containerRef);
   const isOnboardingSession = sessionId === thankYouSessionId;
-  const { models } = useModelState();
+  const { availability, retry } = useTranscriptionAvailability();
+  const statusLabel = useModelAvailabilityLabel();
   const isUploadProcessing = useAudioUploadStore((s) => s.progress.status === "processing");
-  const { selectedLanguage, handleLanguageChange, isChanging } = useSTTModel();
+  const { selectedLanguage, handleLanguageChange } = useSTTModel();
   const capabilities = useQuery(sttCapabilitiesQueryOptions());
-
-  const supportedModelsQuery = useQuery({
-    queryKey: ["supported-stt-models"],
-    queryFn: () => localSttCommands.listSupportedModels(),
-    staleTime: 60 * 1000,
-  });
-
-  const selectedSttModelQuery = useQuery(transcriptionModelQueryOptions());
-
-  const anyModelDownloaded = {
-    data: (() => {
-      const hasLocalDownloaded =
-        supportedModelsQuery.data?.some(model => models.find(m => m.id === model.toString())?.isDownloaded || false)
-        || false;
-
-      const hasCloudSelected = (selectedSttModelQuery.data && selectedSttModelQuery.data.includes("assemblyai"))
-        || false;
-
-      return hasLocalDownloaded || hasCloudSelected;
-    })(),
-    isLoading: supportedModelsQuery.isLoading || selectedSttModelQuery.isLoading,
-  };
 
   const handleStartRecording = () => {
     if (isUploadProcessing) {
       return;
     }
-    if (ongoingSession.status === "inactive" && anyModelDownloaded.data) {
+    if (ongoingSession.status === "inactive" && availability.canStart) {
       ongoingSession.start(sessionId);
     }
   };
@@ -510,7 +488,9 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
           <Trans>Start a transcription</Trans>
         </h2>
         <p className="text-sm text-muted-foreground max-w-[280px] leading-relaxed">
-          {getSttModelDescription(selectedModel?.modelKey ?? "", capabilities.data)}
+          {availability.status !== "ready" || availability.reason === "native-fallback"
+            ? statusLabel(availability)
+            : getSttModelDescription(selectedModel?.modelKey ?? "", capabilities.data)}
         </p>
       </motion.div>
 
@@ -529,7 +509,7 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
           <STTLanguageSelector
             value={selectedLanguage}
             onChange={handleLanguageChange}
-            disabled={isChanging || ongoingSession.status !== "inactive"}
+            disabled={ongoingSession.status !== "inactive"}
             size="compact"
             triggerLabel={t`Change`}
             triggerVariant="inline"
@@ -543,7 +523,7 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
             <Button
               variant="default"
               onClick={isUploadProcessing ? undefined : handleStartRecording}
-              disabled={ongoingSession.loading || !anyModelDownloaded.data || isOnboardingSession || isUploadProcessing}
+              disabled={ongoingSession.loading || !availability.canStart || isOnboardingSession || isUploadProcessing}
               className={`${isUltraCompact ? "px-3" : "px-6"} mb-3 gap-2`}
               title={isUltraCompact
                 ? (
@@ -553,8 +533,8 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
                     ? t`Try the demo video above first!`
                     : ongoingSession.loading
                     ? t`Starting...`
-                    : !anyModelDownloaded.data
-                    ? t`Download a model first`
+                    : !availability.canStart
+                    ? statusLabel(availability)
                     : t`Start transcribing`
                 )
                 : undefined}
@@ -585,6 +565,12 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
         </Popover>
       </motion.div>
 
+      {availability.canRetry && (
+        <Button variant="ghost" size="sm" onClick={() => void retry()}>
+          <Trans>Retry</Trans>
+        </Button>
+      )}
+
       {!isUltraCompact && !isOnboardingSession && layout !== "floating" && (
         <motion.div variants={BUTTON_VARIANTS} className="flex flex-col items-center gap-2">
           <UploadAudioButton sessionId={sessionId} disabled={false} />
@@ -594,8 +580,8 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
       <motion.p variants={BUTTON_VARIANTS} className="text-xs text-muted-foreground/70">
         {isOnboardingSession
           ? <Trans>Watch the demo video above to see how Typr transcription works!</Trans>
-          : anyModelDownloaded.data === false
-          ? <Trans>Download a transcription model above to begin</Trans>
+          : !availability.canStart
+          ? statusLabel(availability)
           : ongoingSession.loading
           ? <Trans>Loading AI model into memory... This may take a few seconds on first start</Trans>
           : null}

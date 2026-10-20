@@ -14,11 +14,12 @@ import {
   getSttModelMetadata,
   getSttSupportedLanguages,
 } from "@/components/transcript/constants/languageData";
+import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
+import { cloudSttApiKeysQueryOptions, useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
 import { Button } from "@typr/ui/components/ui/button";
 import { Input } from "@typr/ui/components/ui/input";
-import { useModelState } from "../../../../hooks/useModelState";
 import { WERPerformanceModal } from "../wer-modal";
 import { SharedSTTProps } from "./shared";
 
@@ -33,7 +34,6 @@ type CloudSttApiKeys = {
 
 export function STTView({
   sttModels,
-  downloadingModels,
   handleModelDownload,
   handleShowFileLocation,
   isWerModalOpen,
@@ -42,6 +42,8 @@ export function STTView({
 }: STTViewProps) {
   useLingui();
   const capabilities = useQuery(sttCapabilitiesQueryOptions());
+  const { getAvailability, retry } = useTranscriptionAvailability();
+  const statusLabel = useModelAvailabilityLabel();
   const [expandedModel, setExpandedModel] = React.useState<string | null>(null);
   const [cloudSttApiKeys, setCloudSttApiKeys] = React.useState<CloudSttApiKeys>({
     assemblyai: "",
@@ -51,12 +53,7 @@ export function STTView({
   const currentSTTModel = useQuery(transcriptionModelQueryOptions());
   const selectedSTTModel = currentSTTModel.data ?? "";
 
-  const cloudSttApiKeysQuery = useQuery({
-    queryKey: ["cloud-stt-api-keys"],
-    queryFn: async (): Promise<CloudSttApiKeys> => ({
-      assemblyai: await connectorCommands.getAssemblyaiApiKey(),
-    }),
-  });
+  const cloudSttApiKeysQuery = useQuery(cloudSttApiKeysQueryOptions());
 
   useEffect(() => {
     if (cloudSttApiKeysQuery.data) {
@@ -74,9 +71,6 @@ export function STTView({
     || selectedSTTModel === "AssemblyAIUniversal";
 
   const selectCloudModel = () => selectTranscription("assemblyai-universal");
-
-  // ✅ Derive model download state directly from useModelState (same pattern as useModelDownload)
-  const { getModel } = useModelState();
 
   const selectLocalModel = (modelKey: string) => selectTranscription(modelKey as SupportedSttModel);
 
@@ -112,11 +106,10 @@ export function STTView({
             <Trans>On-device</Trans>
           </p>
           <div className="space-y-2">
-            {sttModels.filter(model => !model.hidden && !(model as any).isCloud).map((model) => {
+            {sttModels.filter(model => !model.hidden && !model.isCloud).map((model) => {
               const isExpanded = expandedModel === model.key;
               const showLanguages = (getSttSupportedLanguages(model.key, capabilities.data)?.length ?? 0) > 1;
-              const modelState = getModel(model.key);
-              const isCloud = false;
+              const availability = getAvailability(model.key);
 
               return (
                 <div key={model.key}>
@@ -147,54 +140,63 @@ export function STTView({
                       <div className="flex flex-col items-end gap-2 shrink-0">
                         {/* Action / Status */}
                         <div>
-                          {isCloud
+                          {availability.canRetry
                             ? (
-                              <span className="inline-flex items-center gap-1.5 text-ui-caption text-success">
-                                <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
-                                <Trans>Ready</Trans>
-                              </span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  if (availability.canDownload) {
+                                    void handleModelDownload(model.key);
+                                  } else if (availability.canSelect) {
+                                    void selectLocalModel(model.key);
+                                  } else {
+                                    void retry();
+                                  }
+                                }}
+                                className="text-xs h-7"
+                              >
+                                <Trans>Retry</Trans>
+                              </Button>
                             )
-                            : modelState?.isDownloaded && selectedSTTModel === model.key
+                            : availability.canSelect && selectedSTTModel === model.key
                             ? (
                               <span className="inline-flex items-center gap-1.5 text-ui-caption text-success">
                                 <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
                                 <Trans>Current</Trans>
                               </span>
                             )
-                            : modelState?.isDownloaded
+                            : availability.canSelect
                             ? (
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  void selectLocalModel(model.key);
-                                }}
+                                onClick={() => void selectLocalModel(model.key)}
                                 className="text-xs h-7 gap-1.5"
                               >
                                 <Trans>Use</Trans>
                               </Button>
                             )
-                            : modelState?.isDownloading
+                            : availability.canDownload
                             ? (
-                              <span className="inline-flex items-center gap-1.5 text-ui-caption text-muted-foreground">
-                                <i className="ri-loader-4-line animate-spin text-sm" />
-                                <Trans>Downloading…</Trans>
-                              </span>
-                            )
-                            : (
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleModelDownload(model.key);
-                                }}
+                                onClick={() => void handleModelDownload(model.key)}
                                 className="text-xs h-7 gap-1.5"
                               >
                                 <i className="ri-download-line text-sm" />
                                 {model.size}
                               </Button>
+                            )
+                            : (
+                              <span className="inline-flex items-center gap-1.5 text-ui-caption text-muted-foreground">
+                                {(availability.status === "checking" || availability.status === "loading"
+                                  || availability.status === "downloading") && (
+                                  <i className="ri-loader-4-line animate-spin text-sm" />
+                                )}
+                                {statusLabel(availability)}
+                              </span>
                             )}
                         </div>
                       </div>
@@ -249,9 +251,10 @@ export function STTView({
           <Trans>Cloud</Trans>
         </p>
         <div className="space-y-2">
-          {sttModels.filter(model => !model.hidden && !!(model as any).isCloud).map((model) => {
+          {sttModels.filter(model => !model.hidden && !!model.isCloud).map((model) => {
             const isExpanded = expandedModel === model.key;
             const showLanguages = (getSttSupportedLanguages(model.key, capabilities.data)?.length ?? 0) > 1;
+            const availability = getAvailability(model.key);
 
             return (
               <div key={model.key}>
@@ -281,10 +284,16 @@ export function STTView({
                     {/* Right column: action + dots */}
                     <div className="flex flex-col items-end gap-2 shrink-0">
                       <div>
-                        {!hasAssemblyAiApiKey
+                        {availability.canRetry
+                          ? (
+                            <Button size="sm" variant="outline" onClick={() => void retry()} className="text-xs h-7">
+                              <Trans>Retry</Trans>
+                            </Button>
+                          )
+                          : !availability.canSelect
                           ? (
                             <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-ui-caption font-medium text-primary">
-                              <Trans>API key required</Trans>
+                              {statusLabel(availability)}
                             </span>
                           )
                           : isAssemblyAiSelected
@@ -323,7 +332,9 @@ export function STTView({
                       onBlur={(event) => void saveCloudSttApiKey(event.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {hasAssemblyAiApiKey
+                      {cloudSttApiKeysQuery.isPending || cloudSttApiKeysQuery.isError
+                        ? statusLabel(availability)
+                        : hasAssemblyAiApiKey
                         ? <Trans>Key stored locally. Audio is sent directly to AssemblyAI.</Trans>
                         : <Trans>Add a key to use AssemblyAI cloud transcription.</Trans>}
                     </p>

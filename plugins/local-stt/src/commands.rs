@@ -34,6 +34,8 @@ pub fn list_model_capabilities<R: tauri::Runtime>(
             available: model.backend() == crate::SttBackend::Whisper || nemotron_available,
             supported_languages: model.supported_languages(),
             supported_locales: model.supported_locales(),
+            live_fallback_models: model.live_fallback_models().to_vec(),
+            recorded_fallback_models: model.recorded_fallback_models().to_vec(),
         })
         .collect()
 }
@@ -135,41 +137,17 @@ pub async fn process_recorded<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
     audio_path: String,
 ) -> Result<(), String> {
-    let models_dir = app.models_dir();
     let current_model = app.get_current_model().map_err(|e| e.to_string())?;
-    let mut model_path = models_dir.join(current_model.file_name());
-
-    // If the selected model isn't downloaded, find any available downloaded model
-    if current_model.backend() != crate::SttBackend::Whisper || !model_path.exists() {
-        tracing::warn!(
-            "[PROCESS_RECORDED] Selected model {:?} not found at {:?}, scanning for alternatives",
-            current_model,
-            model_path
-        );
-        let mut found = false;
-        for candidate in crate::STREAMING_WHISPER_FALLBACKS {
-            let candidate_path = models_dir.join(candidate.file_name());
-            if app
-                .is_model_downloaded(candidate)
+    let model = resolve_recorded_model(current_model, |candidate| {
+        let app = &app;
+        async move {
+            app.is_model_downloaded(&candidate)
                 .await
-                .map_err(|error| error.to_string())?
-            {
-                tracing::info!(
-                    "[PROCESS_RECORDED] Using fallback model {:?} at {:?}",
-                    candidate,
-                    candidate_path
-                );
-                model_path = candidate_path;
-                found = true;
-                break;
-            }
+                .map_err(|error| error.to_string())
         }
-        if !found {
-            return Err(
-                "No local STT model downloaded. Download one in Settings → AI.".to_string(),
-            );
-        }
-    }
+    })
+    .await?;
+    let model_path = app.models_dir().join(model.file_name());
 
     tracing::info!(
         "[PROCESS_RECORDED] Processing {:?} with model {:?}",
@@ -190,4 +168,95 @@ pub async fn process_recorded<R: tauri::Runtime>(
     .await
     .map_err(|e| e.to_string())
     .and_then(|r| r)
+}
+
+// Availability is validated by the native artifact check, not file existence:
+// an in-progress or truncated selected file must not enter the decoder.
+async fn resolve_recorded_model<F, Fut>(
+    selected: crate::SupportedModel,
+    mut is_downloaded: F,
+) -> Result<crate::SupportedModel, String>
+where
+    F: FnMut(crate::SupportedModel) -> Fut,
+    Fut: std::future::Future<Output = Result<bool, String>>,
+{
+    if selected.backend() == crate::SttBackend::Whisper && is_downloaded(selected.clone()).await? {
+        return Ok(selected);
+    }
+    for candidate in selected.recorded_fallback_models() {
+        if is_downloaded(candidate.clone()).await? {
+            return Ok(candidate.clone());
+        }
+    }
+    Err("No local STT model downloaded. Download one in Settings → AI.".to_string())
+}
+
+#[cfg(test)]
+mod capability_tests {
+    #[tokio::test]
+    async fn invalid_selected_whisper_uses_validated_fallback_in_native_order() {
+        use crate::SupportedModel;
+        let mut checked = Vec::new();
+        let selected = SupportedModel::QuantizedBaseEn;
+        // A partial selected artifact is not downloaded even though its path exists.
+        let resolved = super::resolve_recorded_model(selected.clone(), |candidate| {
+            checked.push(candidate.clone());
+            std::future::ready(Ok(candidate == SupportedModel::QuantizedSmall))
+        })
+        .await
+        .unwrap();
+        assert_eq!(resolved, SupportedModel::QuantizedSmall);
+        assert_eq!(
+            checked,
+            vec![
+                selected,
+                SupportedModel::QuantizedLargeTurbo,
+                SupportedModel::QuantizedSmall
+            ]
+        );
+    }
+
+    #[tokio::test]
+    async fn valid_explicit_whisper_selection_takes_precedence_and_missing_artifacts_fail() {
+        let selected = crate::SupportedModel::DistilLargeV35En;
+        let mut checked = Vec::new();
+        let resolved = super::resolve_recorded_model(selected.clone(), |candidate| {
+            checked.push(candidate);
+            std::future::ready(Ok(true))
+        })
+        .await
+        .unwrap();
+        assert_eq!(resolved, selected);
+        assert_eq!(checked, vec![selected]);
+        assert!(
+            super::resolve_recorded_model(crate::SupportedModel::Nemotron3p5Streaming, |_| {
+                std::future::ready(Ok(false))
+            })
+            .await
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn advertised_fallbacks_match_the_native_live_and_recorded_policies() {
+        let app = tauri::test::mock_builder()
+            .build(tauri::test::mock_context(tauri::test::noop_assets()))
+            .unwrap();
+        let capabilities = super::list_model_capabilities(app.handle().clone());
+        assert_eq!(capabilities.len(), crate::SUPPORTED_MODELS.len());
+        for capability in capabilities {
+            assert_eq!(
+                capability.recorded_fallback_models.as_slice(),
+                crate::STREAMING_WHISPER_FALLBACKS
+            );
+            if capability.model == crate::SupportedModel::Nemotron3p5Streaming {
+                assert_eq!(
+                    capability.live_fallback_models.as_slice(),
+                    crate::STREAMING_WHISPER_FALLBACKS
+                );
+            } else {
+                assert!(capability.live_fallback_models.is_empty());
+            }
+        }
+    }
 }
