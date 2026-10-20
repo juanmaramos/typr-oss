@@ -1,5 +1,6 @@
 import { getLanguageName } from "@/lib/language-labels";
 import { transcriptionModelQueryOptions } from "@/lib/model-selection";
+import { sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LANGUAGES_ISO_639_1 } from "@huggingface/languages";
 import { i18n } from "@lingui/core";
@@ -11,7 +12,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { showModelSelectToast } from "@/components/toast/model-select";
-import { LANGUAGE_OPTIONS } from "@/components/transcript/constants/languageData";
+import {
+  getSttModelMetadata,
+  getSttSupportedLanguages,
+  LANGUAGE_OPTIONS,
+} from "@/components/transcript/constants/languageData";
 import { VocabularyTags } from "@/components/vocabulary-tags";
 import { commands } from "@/types";
 import { restartForLanguageChange } from "@/utils/app-restart";
@@ -82,7 +87,7 @@ const SUPPORTED_LANGUAGES: ISO_639_1_CODE[] = [
 const schema = z.object({
   autostart: z.boolean().optional(),
   displayLanguage: z.enum(SUPPORTED_LANGUAGES as [string, ...string[]]),
-  spokenLanguages: z.array(z.enum(SUPPORTED_LANGUAGES as [string, ...string[]])),
+  spokenLanguages: z.array(z.enum(Object.keys(LANGUAGES_ISO_639_1) as [string, ...string[]])),
   jargons: z.array(z.string()),
   saveRecordings: z.boolean().optional(),
   summaryLanguage: z.enum(SUPPORTED_LANGUAGES as [string, ...string[]]),
@@ -102,7 +107,13 @@ export default function General() {
   // Get current STT model to show model-aware UI
   const { data: connectorModel } = useQuery(transcriptionModelQueryOptions());
 
-  // Determine if using cloud (Real-time multilingual) model
+  const capabilities = useQuery(sttCapabilitiesQueryOptions());
+  const supportedModelLanguages = getSttSupportedLanguages(connectorModel ?? "", capabilities.data);
+  const nativeLanguagesUnavailable = getSttModelMetadata(connectorModel)?.provider === "NVIDIA"
+    && supportedModelLanguages === null;
+  const availableSpokenLanguages = supportedModelLanguages ?? (nativeLanguagesUnavailable ? [] : SUPPORTED_LANGUAGES);
+
+  // Determine if using a cloud transcription model
   const selectedModelOption = LANGUAGE_OPTIONS.find(o =>
     o.key === connectorModel || ("modelKey" in o && o.modelKey === connectorModel)
   );
@@ -282,6 +293,22 @@ export default function General() {
                     <Trans>Add languages to improve accuracy. Leave empty for automatic detection.</Trans>
                   </FormDescription>
                 </div>
+                {nativeLanguagesUnavailable && (
+                  <p className="text-xs text-muted-foreground">
+                    {capabilities.isPending
+                      ? <Trans>Loading model languages...</Trans>
+                      : (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => void capabilities.refetch()}
+                        >
+                          <Trans>Reload language list</Trans>
+                        </Button>
+                      )}
+                  </p>
+                )}
                 <FormControl>
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
@@ -324,6 +351,7 @@ export default function General() {
                             variant="outline"
                             size="icon"
                             className="h-[38px] w-[38px]"
+                            disabled={nativeLanguagesUnavailable}
                           >
                             <Plus className="h-4 w-4" />
                           </Button>
@@ -335,7 +363,7 @@ export default function General() {
                               <Trans>No language found.</Trans>
                             </CommandEmpty>
                             <CommandGroup className="max-h-[200px] overflow-auto">
-                              {SUPPORTED_LANGUAGES.filter(
+                              {availableSpokenLanguages.filter(
                                 (lang) => !field.value.includes(lang),
                               ).map((lang) => (
                                 <CommandItem
@@ -365,8 +393,7 @@ export default function General() {
                             {field.value.length === 0
                               ? (
                                 <Trans>
-                                  Detects any language automatically. Specify languages for faster, more accurate
-                                  transcription.
+                                  Detects supported languages automatically. Choose languages to guide transcription.
                                 </Trans>
                               )
                               : field.value.length === 1

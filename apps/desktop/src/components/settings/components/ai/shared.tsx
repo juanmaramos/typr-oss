@@ -57,13 +57,10 @@ export interface LLMModel {
 export interface STTModel {
   key: string;
   name: string;
-  accuracy: number;
-  speed: number;
   size: string;
   downloaded: boolean;
   fileName: string;
   isCloud?: boolean;
-  supportedLanguages?: string; // Optional: For cloud models to display language capabilities
   hidden?: boolean; // Optional: Hide from UI but keep functional in backend
 }
 

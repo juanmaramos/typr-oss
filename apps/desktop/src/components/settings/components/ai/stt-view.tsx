@@ -1,16 +1,23 @@
+import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
 import { useModelPreferences } from "@/hooks/useModelPreferences";
-import { getLanguageLabel } from "@/lib/language-labels";
+import { getLanguageName } from "@/lib/language-labels";
 import { transcriptionModelQueryOptions } from "@/lib/model-selection";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
+import { useLingui } from "@lingui/react";
+import { Trans } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 
-import { sttModelMetadata, WER_PERFORMANCE_TIERS } from "@/components/transcript/constants/languageData";
+import {
+  getSttModelDescription,
+  getSttModelLabel,
+  getSttModelMetadata,
+  getSttSupportedLanguages,
+} from "@/components/transcript/constants/languageData";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { type SupportedModel as SupportedSttModel } from "@typr/plugin-local-stt";
 import { Button } from "@typr/ui/components/ui/button";
 import { Input } from "@typr/ui/components/ui/input";
-import { cn } from "@typr/ui/lib/utils";
 import { useModelState } from "../../../../hooks/useModelState";
 import { WERPerformanceModal } from "../wer-modal";
 import { SharedSTTProps } from "./shared";
@@ -19,67 +26,6 @@ interface STTViewProps extends SharedSTTProps {
   isWerModalOpen: boolean;
   setIsWerModalOpen: (open: boolean) => void;
 }
-
-// AssemblyAI U3 Pro supported languages (real-time cloud transcription)
-const ASSEMBLYAI_LANGUAGES = {
-  multilingualSupport: {
-    languages: [
-      "English",
-      "Spanish",
-      "French",
-      "German",
-      "Italian",
-      "Portuguese",
-    ],
-  },
-  highAccuracy: {
-    languages: [
-      "English",
-      "Spanish",
-      "French",
-      "German",
-      "Indonesian",
-      "Italian",
-      "Japanese",
-      "Dutch",
-      "Polish",
-      "Portuguese",
-      "Russian",
-      "Turkish",
-      "Ukrainian",
-      "Catalan",
-    ],
-  },
-  goodAccuracy: {
-    languages: [
-      "Arabic",
-      "Azerbaijani",
-      "Bulgarian",
-      "Bosnian",
-      "Mandarin Chinese",
-      "Czech",
-      "Danish",
-      "Greek",
-      "Estonian",
-      "Finnish",
-      "Filipino",
-      "Galician",
-      "Hindi",
-      "Croatian",
-      "Hungarian",
-      "Korean",
-      "Macedonian",
-      "Malay",
-      "Norwegian",
-      "Romanian",
-      "Slovak",
-      "Swedish",
-      "Thai",
-      "Urdu",
-      "Vietnamese",
-    ],
-  },
-} as const;
 
 type CloudSttApiKeys = {
   assemblyai: string;
@@ -94,7 +40,8 @@ export function STTView({
   setIsWerModalOpen,
   supportsLocalModels,
 }: STTViewProps) {
-  const { t } = useLingui();
+  useLingui();
+  const capabilities = useQuery(sttCapabilitiesQueryOptions());
   const [expandedModel, setExpandedModel] = React.useState<string | null>(null);
   const [cloudSttApiKeys, setCloudSttApiKeys] = React.useState<CloudSttApiKeys>({
     assemblyai: "",
@@ -131,37 +78,7 @@ export function STTView({
   // ✅ Derive model download state directly from useModelState (same pattern as useModelDownload)
   const { getModel } = useModelState();
 
-  const isMultilingual = (modelKey: string) => {
-    const metadata = sttModelMetadata[modelKey as keyof typeof sttModelMetadata];
-
-    return metadata?.languageSupport === "multilingual" || modelKey === "AssemblyAIUniversal";
-  };
-
   const selectLocalModel = (modelKey: string) => selectTranscription(modelKey as SupportedSttModel);
-
-  const renderLocalModelDescription = (modelKey: string) => {
-    switch (modelKey) {
-      case "Nemotron3p5Streaming":
-        return (
-          <Trans>
-            Experimental live transcription in English and Spanish. Whisper handles recorded audio and recovery.
-          </Trans>
-        );
-      case "QuantizedBase":
-        return <Trans>Small multilingual model for faster offline transcription</Trans>;
-      case "QuantizedBaseEn":
-        return <Trans>Small English-only model for faster offline transcription</Trans>;
-      case "QuantizedSmall":
-        return <Trans>Balanced multilingual model for everyday offline use</Trans>;
-      case "QuantizedSmallEn":
-        return <Trans>Balanced English-only model for everyday offline use</Trans>;
-      case "DistilLargeV35En":
-        return <Trans>Highest quality for English meetings</Trans>;
-      case "QuantizedLargeTurbo":
-      default:
-        return <Trans>Recommended multilingual model for most meetings</Trans>;
-    }
-  };
 
   return (
     <div className="space-y-5">
@@ -172,7 +89,7 @@ export function STTView({
             <Trans>Transcription</Trans>
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            <Trans>Convert your meeting audio into written text in real-time</Trans>
+            <Trans>Choose a model to turn speech into text.</Trans>
           </p>
         </div>
         {supportsLocalModels && (
@@ -197,12 +114,9 @@ export function STTView({
           <div className="space-y-2">
             {sttModels.filter(model => !model.hidden && !(model as any).isCloud).map((model) => {
               const isExpanded = expandedModel === model.key;
-              const showLanguages = model.key !== "Nemotron3p5Streaming" && isMultilingual(model.key);
+              const showLanguages = (getSttSupportedLanguages(model.key, capabilities.data)?.length ?? 0) > 1;
               const modelState = getModel(model.key);
               const isCloud = false;
-
-              const modelIcon = sttModelMetadata[model.key as keyof typeof sttModelMetadata]?.iconClass
-                ?? "ri-wifi-off-line";
 
               return (
                 <div key={model.key}>
@@ -211,18 +125,21 @@ export function STTView({
                     <div className="flex gap-3">
                       {/* Icon */}
                       <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted mt-0.5">
-                        <i className={cn("text-base text-foreground", modelIcon)} />
+                        <STTProviderIcon model={model.key} />
                       </div>
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-foreground">
-                            {sttModelMetadata[model.key]?.name ?? t`Real-time multilingual`}
+                            {getSttModelLabel(model.key)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {getSttModelMetadata(model.key)?.provider}
                           </span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                          {renderLocalModelDescription(model.key)}
+                          {getSttModelDescription(model.key, capabilities.data)}
                         </p>
                       </div>
 
@@ -280,44 +197,6 @@ export function STTView({
                               </Button>
                             )}
                         </div>
-
-                        {/* Performance dots */}
-                        {model.accuracy > 0 && (
-                          <div className="flex flex-col gap-1 items-end">
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
-                                <Trans>Accuracy</Trans>
-                              </span>
-                              <div className="flex gap-0.5">
-                                {[1, 2, 3].map((step) => (
-                                  <div
-                                    key={step}
-                                    className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      model.accuracy >= step ? "bg-primary" : "bg-border",
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
-                                <Trans>Speed</Trans>
-                              </span>
-                              <div className="flex gap-0.5">
-                                {[1, 2, 3].map((step) => (
-                                  <div
-                                    key={step}
-                                    className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      model.speed >= step ? "bg-primary" : "bg-border",
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -346,113 +225,15 @@ export function STTView({
                           )
                           : (
                             <>
-                              <Trans>View 50+ supported languages</Trans>
+                              <Trans>View supported languages</Trans>
                               <i className="ri-arrow-down-s-line text-sm" />
                             </>
                           )}
                       </button>
                     )}
 
-                    {/* Expandable language support */}
                     {isExpanded && showLanguages && (
-                      <div className="mt-3 pt-3 ml-11 border-t animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="text-xs font-medium text-foreground mb-3">
-                          {model.key === "AssemblyAIUniversal"
-                            ? <Trans>Languages & features</Trans>
-                            : <Trans>Supported languages by performance</Trans>}
-                        </div>
-                        <div className="space-y-3">
-                          {model.key === "AssemblyAIUniversal"
-                            ? (
-                              <>
-                                {Object.entries(ASSEMBLYAI_LANGUAGES).map(([key, data]) => (
-                                  <div key={key} className="space-y-1">
-                                    <div className="flex items-start gap-2">
-                                      <div
-                                        className={cn(
-                                          "w-2 h-2 rounded-full mt-1 flex-shrink-0",
-                                          key === "multilingualSupport"
-                                            ? "bg-success"
-                                            : key === "highAccuracy"
-                                            ? "bg-info"
-                                            : "bg-warning",
-                                        )}
-                                      />
-                                      <div className="flex-1">
-                                        <span className="text-xs font-medium text-foreground block">
-                                          {key === "multilingualSupport"
-                                            ? <Trans>Multilingual code-switching</Trans>
-                                            : key === "highAccuracy"
-                                            ? <Trans>High accuracy (≤10% error)</Trans>
-                                            : <Trans>Good accuracy (10-25% error)</Trans>}
-                                        </span>
-                                        <span className="text-ui-caption text-muted-foreground block mb-1">
-                                          {key === "multilingualSupport"
-                                            ? (
-                                              <Trans>
-                                                Dynamically switches between these languages in a single conversation
-                                              </Trans>
-                                            )
-                                            : key === "highAccuracy"
-                                            ? <Trans>Best performance languages</Trans>
-                                            : <Trans>Reliable transcription quality</Trans>}
-                                        </span>
-                                        <p className="text-xs text-muted-foreground leading-relaxed">
-                                          {data.languages.map(getLanguageLabel).join(", ")}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                                <div className="pt-2 mt-2 border-t border-border/50">
-                                  <p className="text-ui-caption text-muted-foreground leading-relaxed">
-                                    <Trans>
-                                      Plus 50+ additional languages with moderate to fair accuracy. Total 99 languages
-                                      supported.
-                                    </Trans>
-                                  </p>
-                                </div>
-                              </>
-                            )
-                            : Object.entries(WER_PERFORMANCE_TIERS).map(([tier, data]) => (
-                              <div key={tier} className="space-y-1">
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className={cn(
-                                      "w-2 h-2 rounded-full",
-                                      tier === "excellent"
-                                        ? "bg-success"
-                                        : tier === "good"
-                                        ? "bg-info"
-                                        : tier === "moderate"
-                                        ? "bg-warning"
-                                        : tier === "weak"
-                                        ? "bg-warning/70"
-                                        : "bg-destructive/60",
-                                    )}
-                                  />
-                                  <span className="text-xs font-medium text-foreground">
-                                    {tier === "excellent"
-                                      ? <Trans>Excellent</Trans>
-                                      : tier === "good"
-                                      ? <Trans>Good</Trans>
-                                      : tier === "moderate"
-                                      ? <Trans>Moderate</Trans>
-                                      : tier === "weak"
-                                      ? <Trans>Fair</Trans>
-                                      : <Trans>Limited</Trans>}
-                                  </span>
-                                  <span className="text-ui-tiny text-muted-foreground">
-                                    ({data.range})
-                                  </span>
-                                </div>
-                                <p className="text-xs text-muted-foreground pl-4 leading-relaxed">
-                                  {data.languages.map(getLanguageLabel).join(", ")}
-                                </p>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
+                      <SupportedSttLanguages model={model.key} capabilities={capabilities.data} />
                     )}
                   </div>
                 </div>
@@ -470,9 +251,7 @@ export function STTView({
         <div className="space-y-2">
           {sttModels.filter(model => !model.hidden && !!(model as any).isCloud).map((model) => {
             const isExpanded = expandedModel === model.key;
-            const showLanguages = isMultilingual(model.key);
-
-            const modelIcon = model.key === "AssemblyAIUniversal" ? "ri-flashlight-fill" : "ri-cloud-line";
+            const showLanguages = (getSttSupportedLanguages(model.key, capabilities.data)?.length ?? 0) > 1;
 
             return (
               <div key={model.key}>
@@ -481,18 +260,21 @@ export function STTView({
                   <div className="flex gap-3">
                     {/* Icon */}
                     <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted mt-0.5">
-                      <i className={cn("text-base text-foreground", modelIcon)} />
+                      <STTProviderIcon model={model.key} />
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium text-foreground">
-                          <Trans>AssemblyAI</Trans>
+                          {getSttModelLabel(model.key)}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {getSttModelMetadata(model.key)?.provider}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                        <Trans>Cloud transcription using your AssemblyAI API key</Trans>
+                        {getSttModelDescription(model.key, capabilities.data)}
                       </p>
                     </div>
 
@@ -526,42 +308,6 @@ export function STTView({
                             </Button>
                           )}
                       </div>
-
-                      {/* Performance dots */}
-                      <div className="flex flex-col gap-1 items-end">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
-                            <Trans>Accuracy</Trans>
-                          </span>
-                          <div className="flex gap-0.5">
-                            {[1, 2, 3].map((step) => (
-                              <div
-                                key={step}
-                                className={cn(
-                                  "w-1.5 h-1.5 rounded-full",
-                                  model.accuracy >= step ? "bg-primary" : "bg-border",
-                                )}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-ui-fine text-muted-foreground uppercase tracking-wide">
-                            <Trans>Speed</Trans>
-                          </span>
-                          <div className="flex gap-0.5">
-                            {[1, 2, 3].map((step) => (
-                              <div
-                                key={step}
-                                className={cn(
-                                  "w-1.5 h-1.5 rounded-full",
-                                  model.speed >= step ? "bg-primary" : "bg-border",
-                                )}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
 
@@ -581,21 +327,6 @@ export function STTView({
                         ? <Trans>Key stored locally. Audio is sent directly to AssemblyAI.</Trans>
                         : <Trans>Add a key to use AssemblyAI cloud transcription.</Trans>}
                     </p>
-                  </div>
-
-                  <div className="mt-3 ml-11">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-xs font-medium text-foreground">
-                          {sttModelMetadata[model.key]?.name ?? t`Real-time multilingual`}
-                        </p>
-                        <p className="mt-0.5 text-xs text-muted-foreground truncate">
-                          {model.key === "AssemblyAIUniversal"
-                            ? <Trans>Auto language detection and switching</Trans>
-                            : <Trans>Cloud-based transcription</Trans>}
-                        </p>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Language toggle */}
@@ -630,70 +361,8 @@ export function STTView({
                     </button>
                   )}
 
-                  {/* Expandable language support */}
                   {isExpanded && showLanguages && (
-                    <div className="mt-3 pt-3 ml-11 border-t animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="text-xs font-medium text-foreground mb-3">
-                        {model.key === "AssemblyAIUniversal"
-                          ? <Trans>Languages & features</Trans>
-                          : <Trans>Supported languages</Trans>}
-                      </div>
-                      <div className="space-y-3">
-                        {model.key === "AssemblyAIUniversal"
-                          ? (
-                            <>
-                              {Object.entries(ASSEMBLYAI_LANGUAGES).map(([key, data]) => (
-                                <div key={key} className="space-y-1">
-                                  <div className="flex items-start gap-2">
-                                    <div
-                                      className={cn(
-                                        "w-2 h-2 rounded-full mt-1 flex-shrink-0",
-                                        key === "multilingualSupport"
-                                          ? "bg-success"
-                                          : key === "highAccuracy"
-                                          ? "bg-info"
-                                          : "bg-warning",
-                                      )}
-                                    />
-                                    <div className="flex-1">
-                                      <span className="text-xs font-medium text-foreground block">
-                                        {key === "multilingualSupport"
-                                          ? <Trans>Multilingual code-switching</Trans>
-                                          : key === "highAccuracy"
-                                          ? <Trans>High accuracy (≤10% error)</Trans>
-                                          : <Trans>Good accuracy (10-25% error)</Trans>}
-                                      </span>
-                                      <span className="text-ui-caption text-muted-foreground block mb-1">
-                                        {key === "multilingualSupport"
-                                          ? (
-                                            <Trans>
-                                              Dynamically switches between these languages in a single conversation
-                                            </Trans>
-                                          )
-                                          : key === "highAccuracy"
-                                          ? <Trans>Best performance languages</Trans>
-                                          : <Trans>Reliable transcription quality</Trans>}
-                                      </span>
-                                      <p className="text-xs text-muted-foreground leading-relaxed">
-                                        {data.languages.map(getLanguageLabel).join(", ")}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                              <div className="pt-2 mt-2 border-t border-border/50">
-                                <p className="text-ui-caption text-muted-foreground leading-relaxed">
-                                  <Trans>
-                                    Plus 50+ additional languages with moderate to fair accuracy. Total 99 languages
-                                    supported.
-                                  </Trans>
-                                </p>
-                              </div>
-                            </>
-                          )
-                          : null}
-                      </div>
-                    </div>
+                    <SupportedSttLanguages model={model.key} capabilities={capabilities.data} />
                   )}
                 </div>
               </div>
@@ -706,6 +375,20 @@ export function STTView({
         isOpen={isWerModalOpen}
         onClose={() => setIsWerModalOpen(false)}
       />
+    </div>
+  );
+}
+
+function SupportedSttLanguages(
+  { model, capabilities }: { model: string; capabilities?: import("@typr/plugin-local-stt").ModelCapabilities[] },
+) {
+  const languages = getSttSupportedLanguages(model, capabilities);
+  if (!languages?.length) {
+    return null;
+  }
+  return (
+    <div className="mt-3 pt-3 ml-11 border-t">
+      <p className="text-xs text-muted-foreground leading-relaxed">{languages.map(getLanguageName).join(", ")}</p>
     </div>
   );
 }

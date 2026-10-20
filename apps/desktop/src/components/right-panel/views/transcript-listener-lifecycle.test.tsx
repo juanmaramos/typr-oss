@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
-import { setupI18n } from "@lingui/core";
+import { messages as enMessages } from "@/locales/en/messages.po";
+import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { notifyManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, type ComponentType, createElement, type ReactNode } from "react";
@@ -28,8 +29,6 @@ const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   upsertSession: vi.fn(),
 }));
-
-const i18n = setupI18n({ locale: "en", messages: { en: {} } });
 
 vi.mock("@tauri-apps/api/event", () => ({ listen: mocks.listen }));
 vi.mock("sonner", () => ({
@@ -212,6 +211,8 @@ async function fire(listener: Listener, type: string, sessionId: string) {
 
 describe("persistent RightPanel transcript session-event listener", () => {
   beforeEach(() => {
+    i18n.load("en", enMessages);
+    i18n.activate("en");
     vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
     vi.stubGlobal(
       "ResizeObserver",

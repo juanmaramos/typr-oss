@@ -40,14 +40,17 @@ fn bilingual_dual_channel_worker_streams_and_finishes_over_framed_ipc() {
         .parse()
         .unwrap();
     let mut child = ReapChild(
-        Command::new(env!("CARGO_BIN_EXE_typr-nemotron-worker"))
-            .arg("--sdk-library")
-            .arg(sdk)
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::null())
-            .spawn()
-            .unwrap(),
+        Command::new(
+            std::env::var_os("TYPR_NEMOTRON_WORKER")
+                .unwrap_or_else(|| env!("CARGO_BIN_EXE_typr-nemotron-worker").into()),
+        )
+        .arg("--sdk-library")
+        .arg(sdk)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap(),
     );
     let mut input = child.0.stdin.take().unwrap();
     let mut output = child.0.stdout.take().unwrap();
@@ -89,6 +92,22 @@ fn bilingual_dual_channel_worker_streams_and_finishes_over_framed_ipc() {
             protocol_version: PROTOCOL_VERSION
         }
     );
+    // Exercise every out-of-box locale through the actual worker and pinned
+    // C ABI. This verifies configuration compatibility, not language accuracy.
+    let mut configured_locales = 0;
+    for locale in typr_nemotron_runtime::languages::supported_locales() {
+        write_frame(
+            &mut input,
+            &Request::Configure {
+                language: locale.into(),
+            },
+        )
+        .unwrap();
+        assert_eq!(response(), Response::Configured, "locale {locale}");
+        configured_locales += 1;
+    }
+    assert_eq!(configured_locales, 32);
+    eprintln!("Configured {configured_locales} out-of-box locales through the real worker/C ABI");
     // The prewarmed model remains loaded; the real recording language is
     // applied before any samples. Auto permits independent English and Spanish.
     write_frame(

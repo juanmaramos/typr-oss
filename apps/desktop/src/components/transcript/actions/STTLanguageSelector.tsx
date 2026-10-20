@@ -10,8 +10,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/
 import { cn } from "@typr/ui/lib/utils";
 
 import { usePlatform } from "@/hooks/usePlatform";
-import { getAvailableLanguageOptions, type LanguageOption } from "../constants/languageData";
+import {
+  getAvailableLanguageOptions,
+  getSttModelDescription,
+  getSttModelLabel,
+  LANGUAGE_OPTIONS,
+  type LanguageOption,
+} from "../constants/languageData";
 import { useModelDownload } from "../hooks/useModelDownload";
+import { STTProviderIcon } from "../STTProviderIcon";
 
 export interface STTLanguageSelectorProps {
   value: LanguageOption;
@@ -43,11 +50,11 @@ export function STTLanguageSelector({
     supportsLocalModels,
     getAvailableSettingsSttModels(capabilities.data),
   );
-  const selectedOption = availableOptions.find(option => option.key === value);
+  const selectedOption = LANGUAGE_OPTIONS.find(option => option.key === value || option.modelKey === value);
   const isCompact = size === "compact";
 
-  // If only one option, use it regardless of what's in state
-  const displayOption = availableOptions.length === 1 ? availableOptions[0] : selectedOption;
+  // Availability must never substitute a different model for the saved selection.
+  const displayOption = selectedOption;
 
   // Debug: Log if icon is missing
   if (!displayOption && value) {
@@ -55,44 +62,9 @@ export function STTLanguageSelector({
   }
 
   // If only one option available, make it display-only (non-interactive)
-  const isSingleOption = availableOptions.length === 1;
+  const isSingleOption = availableOptions.length === 1 && availableOptions[0].modelKey === selectedOption?.modelKey;
   const showCustomTrigger = !!triggerLabel && !isActive && !isSingleOption;
   const isInlineTrigger = showCustomTrigger && triggerVariant === "inline";
-
-  // Helper function to get translated model labels and descriptions
-  const getTranslatedLabel = (key: string) => {
-    switch (key) {
-      case "nemotron-streaming":
-        return t`Nemotron streaming`;
-      case "balanced":
-        return t`Multilingual`;
-      case "english":
-        return t`English high accuracy`;
-      case "multilingual":
-        return t`Multilingual high accuracy`;
-      case "assemblyai-universal":
-        return t`Multilingual`;
-      default:
-        return key;
-    }
-  };
-
-  const getTranslatedDescription = (key: string) => {
-    switch (key) {
-      case "nemotron-streaming":
-        return t`Experimental live transcription with Whisper fallback`;
-      case "balanced":
-        return t`Good for most meetings and calls`;
-      case "english":
-        return t`Best for English-only, professional use`;
-      case "multilingual":
-        return t`Best for international meetings`;
-      case "assemblyai-universal":
-        return t`Works with any language automatically`;
-      default:
-        return "";
-    }
-  };
 
   const handleSelect = (optionKey: LanguageOption) => {
     const option = availableOptions.find(o => o.key === optionKey);
@@ -125,7 +97,7 @@ export function STTLanguageSelector({
       variant="ghost"
       size={isActive ? "icon" : undefined}
       disabled={disabled}
-      title={isActive ? (selectedOption ? getTranslatedLabel(selectedOption.key) : t`Select model`) : undefined}
+      title={isActive ? (selectedOption ? getSttModelLabel(selectedOption.key) : t`Select model`) : undefined}
       className={cn(
         isInlineTrigger
           ? "h-auto gap-0.5 px-0 py-0 text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground"
@@ -139,7 +111,7 @@ export function STTLanguageSelector({
       {isActive
         ? (
           // Active state: just the model icon
-          displayOption?.iconClass && <i className={`${displayOption.iconClass} text-sm`} />
+          displayOption && <STTProviderIcon model={displayOption.modelKey} />
         )
         : showCustomTrigger
         ? (
@@ -167,9 +139,9 @@ export function STTLanguageSelector({
           // Inactive state: model name + optional chevron
           <>
             <div className="flex items-center gap-1.5">
-              {displayOption?.iconClass && <i className={`${displayOption.iconClass} text-sm`} />}
+              {displayOption && <STTProviderIcon model={displayOption.modelKey} />}
               <span className={isCompact ? "text-xs" : "text-xs font-medium"}>
-                {displayOption ? getTranslatedLabel(displayOption.key) : <Trans>Select model</Trans>}
+                {displayOption ? getSttModelLabel(displayOption.key) : <Trans>Select model</Trans>}
               </span>
             </div>
             {!isSingleOption && (
@@ -183,7 +155,7 @@ export function STTLanguageSelector({
           </>
         )}
       <span className="sr-only">
-        {selectedOption ? getTranslatedLabel(selectedOption.key) : <Trans>Select model</Trans>}
+        {selectedOption ? getSttModelLabel(selectedOption.key) : <Trans>Select model</Trans>}
       </span>
     </Button>
   );
@@ -198,7 +170,7 @@ export function STTLanguageSelector({
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{displayOption ? getTranslatedLabel(displayOption.key) : <Trans>Transcription model</Trans>}</p>
+          <p>{displayOption ? getSttModelLabel(displayOption.key) : <Trans>Transcription model</Trans>}</p>
         </TooltipContent>
       </Tooltip>
     );
@@ -252,15 +224,11 @@ export function STTLanguageSelector({
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                      <i
-                        className={`${option.iconClass} text-base mt-0.5 flex-shrink-0 ${
-                          !isCloud && modelStatus && !modelStatus.isDownloaded ? "text-muted-foreground/70" : ""
-                        }`}
-                      />
+                      <STTProviderIcon model={option.modelKey} className="mt-0.5" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <div className="font-medium text-xs leading-tight">
-                            {getTranslatedLabel(option.key)}
+                            {getSttModelLabel(option.key)}
                           </div>
                           {!isCloud && modelStatus && !modelStatus.isDownloaded && (
                             <span className="text-xs text-muted-foreground/70 font-medium">{option.size}</span>
@@ -268,44 +236,11 @@ export function STTLanguageSelector({
                         </div>
                         <div className="text-xs text-muted-foreground leading-tight mt-0.5 break-words">
                           {isCloud
-                            ? getTranslatedDescription(option.key)
+                            ? getSttModelDescription(option.key, capabilities.data)
                             : modelStatus && !modelStatus.isDownloaded
                             ? t`Not downloaded`
-                            : getTranslatedDescription(option.key)}
+                            : getSttModelDescription(option.key, capabilities.data)}
                         </div>
-                        {/* Unbenchmarked models do not receive performance ratings. */}
-                        {option.accuracy > 0 && (
-                          <div className="flex items-center gap-3 mt-1">
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-muted-foreground/70 font-medium">{t`Accuracy`}</span>
-                              <div className="flex gap-0.5">
-                                {[1, 2, 3].map((dot) => (
-                                  <div
-                                    key={dot}
-                                    className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      dot <= option.accuracy ? "bg-primary" : "bg-border",
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-muted-foreground/70 font-medium">{t`Speed`}</span>
-                              <div className="flex gap-0.5">
-                                {[1, 2, 3].map((dot) => (
-                                  <div
-                                    key={dot}
-                                    className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      dot <= option.speed ? "bg-primary" : "bg-border",
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 ml-2">
@@ -339,7 +274,6 @@ export function STTLanguageSelector({
                         : (
                           <>
                             {isSelected && <i className="ri-check-line text-sm text-primary" />}
-                            {option.hasInfo && <LanguageInfoTooltip />}
                           </>
                         )}
                     </div>
@@ -375,15 +309,11 @@ export function STTLanguageSelector({
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                      <i
-                        className={`${option.iconClass} text-base mt-0.5 flex-shrink-0 ${
-                          !isCloud && modelStatus && !modelStatus.isDownloaded ? "text-muted-foreground/70" : ""
-                        }`}
-                      />
+                      <STTProviderIcon model={option.modelKey} className="mt-0.5" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <div className="font-medium text-xs leading-tight">
-                            {getTranslatedLabel(option.key)}
+                            {getSttModelLabel(option.key)}
                           </div>
                           {!isCloud && modelStatus && !modelStatus.isDownloaded && (
                             <span className="text-xs text-muted-foreground/70 font-medium">{option.size}</span>
@@ -391,44 +321,11 @@ export function STTLanguageSelector({
                         </div>
                         <div className="text-xs text-muted-foreground leading-tight mt-0.5 break-words">
                           {isCloud
-                            ? getTranslatedDescription(option.key)
+                            ? getSttModelDescription(option.key, capabilities.data)
                             : modelStatus && !modelStatus.isDownloaded
                             ? t`Not downloaded`
-                            : getTranslatedDescription(option.key)}
+                            : getSttModelDescription(option.key, capabilities.data)}
                         </div>
-                        {/* Unbenchmarked models do not receive performance ratings. */}
-                        {option.accuracy > 0 && (
-                          <div className="flex items-center gap-3 mt-1">
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-muted-foreground/70 font-medium">{t`Accuracy`}</span>
-                              <div className="flex gap-0.5">
-                                {[1, 2, 3].map((dot) => (
-                                  <div
-                                    key={dot}
-                                    className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      dot <= option.accuracy ? "bg-primary" : "bg-border",
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-muted-foreground/70 font-medium">{t`Speed`}</span>
-                              <div className="flex gap-0.5">
-                                {[1, 2, 3].map((dot) => (
-                                  <div
-                                    key={dot}
-                                    className={cn(
-                                      "w-1.5 h-1.5 rounded-full",
-                                      dot <= option.speed ? "bg-primary" : "bg-border",
-                                    )}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 ml-2">
@@ -462,7 +359,6 @@ export function STTLanguageSelector({
                         : (
                           <>
                             {isSelected && <i className="ri-check-line text-sm text-primary" />}
-                            {option.hasInfo && <LanguageInfoTooltip />}
                           </>
                         )}
                     </div>
@@ -474,38 +370,5 @@ export function STTLanguageSelector({
         </div>
       </PopoverContent>
     </Popover>
-  );
-}
-
-function LanguageInfoTooltip() {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <i className="ri-information-2-fill text-xs text-muted-foreground/70 cursor-help hover:text-muted-foreground" />
-      </TooltipTrigger>
-      <TooltipContent side="left" className="max-w-xs text-xs">
-        <div className="space-y-1.5">
-          <div>
-            <div className="font-medium text-xs text-success">
-              <Trans>Excellent (2.8-5.0% error)</Trans>
-            </div>
-            <div className="text-xs text-muted-foreground leading-tight">
-              <Trans>Spanish, Italian, Korean, Portuguese, English, Polish, Japanese, German, Russian</Trans>
-            </div>
-          </div>
-          <div>
-            <div className="font-medium text-xs text-blue-dark">
-              <Trans>Good (5.2-7.8% error)</Trans>
-            </div>
-            <div className="text-xs text-muted-foreground leading-tight">
-              <Trans>Dutch, French, Indonesian, Ukrainian, Turkish, Swedish, Mandarin, Finnish</Trans>
-            </div>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            <Trans>+ 10 more languages supported</Trans>
-          </div>
-        </div>
-      </TooltipContent>
-    </Tooltip>
   );
 }

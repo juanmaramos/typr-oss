@@ -194,11 +194,7 @@ impl Recognizer {
         if !model.is_absolute() || !model.is_file() {
             return Err("model must be an existing absolute file path".into());
         }
-        if !matches!(language, "en-US" | "en-GB" | "es-ES" | "es-US" | "auto") {
-            return Err(
-                "prototype supports English, Spanish, and automatic language detection".into(),
-            );
-        }
+        crate::languages::validate_locale(language)?;
         let api = Api::load(library)?;
         let model_path = CString::new(model.to_str().ok_or("model path must be UTF-8")?)
             .map_err(|_| "invalid model path")?;
@@ -250,11 +246,7 @@ impl Recognizer {
     }
 
     pub fn stream_with_language(self: &Rc<Self>, language: &str) -> Result<Stream, String> {
-        if !matches!(language, "en-US" | "en-GB" | "es-ES" | "es-US" | "auto") {
-            return Err(
-                "prototype supports English, Spanish, and automatic language detection".into(),
-            );
-        }
+        crate::languages::validate_locale(language)?;
         let language = CString::new(language).map_err(|_| "invalid language")?;
         // SAFETY: default initializes the exact v0.2.0 options layout.
         let mut options = unsafe { (self.api.options_default)() };

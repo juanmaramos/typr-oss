@@ -174,8 +174,7 @@ function Pickers() {
             {
               key: "QuantizedLargeTurbo",
               name: "Turbo",
-              accuracy: 3,
-              speed: 3,
+
               size: "574 MB",
               downloaded: true,
               fileName: "",
@@ -183,8 +182,7 @@ function Pickers() {
             {
               key: "DistilLargeV35En",
               name: "English",
-              accuracy: 3,
-              speed: 3,
+
               size: "1.5 GB",
               downloaded: true,
               fileName: "",
@@ -266,7 +264,7 @@ describe("model selection ownership", () => {
     );
     await settle(() => expect(container.querySelector("[data-selection=\"QuantizedLargeTurbo\"]")).not.toBeNull());
     const cards = container.querySelector("[data-testid=\"stt-cards\"]")!;
-    const turbo = [...cards.querySelectorAll("span")].find(span => span.textContent === "Large")!;
+    const turbo = [...cards.querySelectorAll("span")].find(span => span.textContent === "Whisper Large v3 Turbo")!;
     expect(turbo.parentElement?.parentElement?.parentElement?.textContent).toContain("Current");
     expect(stt.setCurrentModel).toHaveBeenLastCalledWith("QuantizedLargeTurbo");
   });
@@ -321,7 +319,7 @@ describe("model selection ownership", () => {
     expect(queryClient.getQueryData(modelSelectionKeys.customEndpointEnabled)).toBe(false);
   });
 
-  it("derives the correct quick-pick category and still changes a different model in the same category", async () => {
+  it("keeps the actual English model identity and still selects a different English model", async () => {
     native.stt = "QuantizedSmallEn";
     let model: ReturnType<typeof useSTTModel>;
     function LanguageSelector() {
@@ -329,7 +327,7 @@ describe("model selection ownership", () => {
       return <output>{model.selectedLanguage}</output>;
     }
     await render(<LanguageSelector />);
-    await settle(() => expect(container.textContent).toBe("english"));
+    await settle(() => expect(container.textContent).toBe("QuantizedSmallEn"));
     await act(async () => {
       model.handleLanguageChange("english");
     });

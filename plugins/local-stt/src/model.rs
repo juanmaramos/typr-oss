@@ -114,6 +114,8 @@ pub struct ModelCapabilities {
     pub realtime: bool,
     pub recorded: bool,
     pub available: bool,
+    pub supported_languages: Option<Vec<String>>,
+    pub supported_locales: Option<Vec<String>>,
 }
 
 impl SupportedModel {
@@ -126,14 +128,43 @@ impl SupportedModel {
     pub fn is_streaming(&self) -> bool {
         self.backend() == SttBackend::NemotronStreaming
     }
+    /// Session-option acceptance for pre-capture recovery. Whisper retains its
+    /// existing decoder language handling; the streaming backend must select a
+    /// prompt that the pinned model can transcribe without fine-tuning.
     pub fn supports_languages(&self, languages: &[typr_language::Language]) -> bool {
-        self.backend() == SttBackend::Whisper
-            || languages.iter().all(|language| {
-                matches!(
-                    **language,
-                    typr_language::ISO639::En | typr_language::ISO639::Es
-                )
-            })
+        self.backend() == SttBackend::Whisper || self.streaming_locale(languages).is_ok()
+    }
+    pub fn streaming_locale(
+        &self,
+        languages: &[typr_language::Language],
+    ) -> Result<&'static str, String> {
+        let codes: Vec<_> = languages
+            .iter()
+            .map(|language| language.iso639().code())
+            .collect();
+        typr_nemotron_runtime::languages::locale_for_languages(&codes)
+    }
+    pub fn supported_languages(&self) -> Option<Vec<String>> {
+        match self {
+            Self::Nemotron3p5Streaming => Some(
+                typr_nemotron_runtime::languages::SUPPORTED_LANGUAGES
+                    .iter()
+                    .map(|language| language.code.into())
+                    .collect(),
+            ),
+            Self::QuantizedTinyEn
+            | Self::QuantizedBaseEn
+            | Self::QuantizedSmallEn
+            | Self::DistilLargeV35En => Some(vec!["en".into()]),
+            _ => None,
+        }
+    }
+    pub fn supported_locales(&self) -> Option<Vec<String>> {
+        self.is_streaming().then(|| {
+            typr_nemotron_runtime::languages::supported_locales()
+                .map(String::from)
+                .collect()
+        })
     }
     pub fn sha256(&self) -> Option<&'static str> {
         match self {

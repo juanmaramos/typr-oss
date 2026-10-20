@@ -24,6 +24,39 @@ isolates those dependencies and gives Typr bounded cancellation even while the
 SDK is inside a synchronous decode. The SDK exposes no inference abort callback.
 This boundary uses Tauri's existing native-sidecar packaging model.
 
+## Supported languages and locale selection
+
+The native registry in `crates/nemotron-runtime/src/languages.rs` is shared by
+worker validation, local STT selection, and exported model capabilities. It
+contains the pinned model card's 32 transcription-ready/broad-coverage locales,
+representing 28 distinct languages. Eight adaptation-only locales are excluded:
+Greek, Lithuanian, Latvian, Maltese, Slovenian, Hebrew, Thai, and Norwegian
+Nynorsk. Their tokenizer/prompt presence does not establish usable transcription
+without fine-tuning.
+
+The app exposes these language codes: `en`, `es`, `fr`, `it`, `pt`, `nl`, `de`,
+`tr`, `ru`, `ar`, `hi`, `ja`, `ko`, `vi`, `uk`, `pl`, `sv`, `cs`, `no`, `da`,
+`bg`, `fi`, `hr`, `sk`, `zh`, `hu`, `ro`, and `et`. The existing Norwegian `no`
+preference maps to the out-of-box Bokmål locale `nb-NO`; it does not select the
+adaptation-only `nn-NO`. A single language chooses the registry's preferred
+locale; multiple supported languages or no selection use native automatic
+language detection. Any unsupported selection retains central Whisper recovery.
+
+`ModelCapabilities.supported_languages` reports these 28 app codes, and
+`supported_locales` reports the exact 32 SDK locales. Null means unreported,
+not zero support: existing multilingual Whisper models retain their existing
+language selection, while English-only Whisper variants report `en`.
+
+The pinned GGUF's `asr.rnnt.prompt_dictionary` was inspected to confirm all 32
+locale keys. SDK v0.2.0 forwards `language_code` through the supported C ABI to
+that exact prompt dictionary. Because unknown SDK locale strings silently use
+the automatic prompt, Typr validates the registry before opening a stream.
+A real worker integration test configures every advertised locale before
+running English and Spanish audio. This proves configuration compatibility;
+transcription accuracy in the other languages has not been benchmarked here.
+
+Source: [pinned NVIDIA model card](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b/blob/1c8deaecc64b91f034d73e08dd8b64625eb3395d/README.md#supported-languages).
+
 ## Pinned native contract
 
 - Runtime: NVIDIA/NeMo-Speech.cpp **v0.2.0**, commit
@@ -177,7 +210,7 @@ validated. Windows packaging and Linux real-time performance are not validated;
 the build helper supports macOS and a CPU-only Linux development build.
 
 Startup resolves the effective backend centrally. Missing resources, unsupported
-prototype languages, invalid model integrity, or native initialization failures
+selected languages, invalid model integrity, or native initialization failures
 select an already downloaded multilingual Whisper model before capture starts.
 The saved default remains unchanged and the recording emits a fallback event.
 Without a usable Whisper model, capture does not start. A failure after capture

@@ -72,7 +72,7 @@ sttModelStateChanged: "plugin:local-stt:stt-model-state-changed"
 /** user-defined types **/
 
 export type GgmlBackend = { kind: string; name: string; description: string; total_memory_mb: number; free_memory_mb: number }
-export type ModelCapabilities = { model: SupportedModel; backend: SttBackend; size_bytes: number; realtime: boolean; recorded: boolean; available: boolean }
+export type ModelCapabilities = { model: SupportedModel; backend: SttBackend; size_bytes: number; realtime: boolean; recorded: boolean; available: boolean; supported_languages: string[] | null; supported_locales: string[] | null }
 export type ModelState = "NotDownloaded" | { Downloading: { progress: number } } | "Downloaded" | { Error: { message: string } }
 export type ModelStateEvent = { model_id: string; state: ModelState; timestamp: number }
 export type RecordedProcessingEvent = { Progress: { current: number; total: number; word: Word } }

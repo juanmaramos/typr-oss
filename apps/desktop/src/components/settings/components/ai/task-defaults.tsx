@@ -1,4 +1,10 @@
-import { SETTINGS_LOCAL_STT_MODEL_KEYS, sttModelMetadata } from "@/components/transcript/constants/languageData";
+import {
+  getSttModelDescription,
+  getSttModelLabel,
+  SETTINGS_LOCAL_STT_MODEL_KEYS,
+  sttModelMetadata,
+} from "@/components/transcript/constants/languageData";
+import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
 import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { useAllModels, useCustomModels, useModelSelection, useModelSelectionState } from "@/hooks/useModels";
 import { useModelState } from "@/hooks/useModelState";
@@ -61,14 +67,6 @@ function getTextTaskDefaultLabel({
   }
 
   return getModelNameLabel(model, compactModelId(value));
-}
-
-function getTranscriptionModelLabel(modelId: string) {
-  if (modelId === ASSEMBLYAI_STT_MODEL) {
-    return "AssemblyAI";
-  }
-
-  return sttModelMetadata[modelId as keyof typeof sttModelMetadata]?.name ?? modelId;
 }
 
 function isSettingsLocalSttModel(modelId: string): modelId is SupportedSttModel {
@@ -158,7 +156,7 @@ export function AiTaskDefaultsSettings() {
   const chatModelLabel = chatModelValue === AUTO_CLOUD_MODEL_ID
     ? t`Auto`
     : getModelNameLabel(selectedModel ?? allModels.find(model => model.id === chatModelValue), chatModelValue);
-  const transcriptionLabel = getTranscriptionModelLabel(transcriptionValue);
+  const transcriptionLabel = getSttModelLabel(transcriptionValue);
 
   return (
     <section className="rounded-lg border border-border bg-background p-4">
@@ -283,15 +281,22 @@ export function AiTaskDefaultsSettings() {
           <Select value={transcriptionValue} onValueChange={(value) => void updateTranscriptionDefault(value)}>
             <SelectTrigger className="h-9 w-full rounded-lg sm:w-72">
               <SelectValue placeholder={t`Select model`}>
-                <SelectTriggerLabel label={transcriptionLabel} />
+                <span className="flex items-center gap-2">
+                  <STTProviderIcon model={transcriptionValue} />
+                  <SelectTriggerLabel label={transcriptionLabel} />
+                </span>
               </SelectValue>
             </SelectTrigger>
             <SelectContent className="max-h-72">
-              <SelectItem value={ASSEMBLYAI_STT_MODEL} textValue={t`AssemblyAI`} disabled={!hasAssemblyAiApiKey}>
+              <SelectItem
+                value={ASSEMBLYAI_STT_MODEL}
+                textValue={getSttModelLabel(ASSEMBLYAI_STT_MODEL)}
+                disabled={!hasAssemblyAiApiKey}
+              >
                 <ModelSelectLabel
-                  icon="ri-flashlight-fill"
-                  label={t`AssemblyAI`}
-                  description={hasAssemblyAiApiKey ? t`Cloud transcription` : t`API key required`}
+                  icon={<STTProviderIcon model={ASSEMBLYAI_STT_MODEL} />}
+                  label={getSttModelLabel(ASSEMBLYAI_STT_MODEL)}
+                  description={hasAssemblyAiApiKey ? getSttModelDescription(ASSEMBLYAI_STT_MODEL) : t`API key required`}
                 />
               </SelectItem>
               {supportsLocalModels && availableSttModels.map((modelKey) => {
@@ -304,9 +309,7 @@ export function AiTaskDefaultsSettings() {
                   ? t`Downloading...`
                   : isUnavailable
                   ? t`Download in Transcription settings`
-                  : metadata.languageSupport === "english-only"
-                  ? t`On-device English`
-                  : t`On-device multilingual`;
+                  : getSttModelDescription(modelKey, sttCapabilities.data);
 
                 return (
                   <SelectItem
@@ -316,7 +319,7 @@ export function AiTaskDefaultsSettings() {
                     disabled={isDownloading || isUnavailable}
                   >
                     <ModelSelectLabel
-                      icon={metadata.iconClass}
+                      icon={<STTProviderIcon model={modelKey} />}
                       label={metadata.name}
                       description={description}
                     />
@@ -378,12 +381,12 @@ function ModelSelectLabel({
   label,
 }: {
   description?: ReactNode;
-  icon: string;
+  icon: ReactNode;
   label: ReactNode;
 }) {
   return (
     <span className="flex min-w-0 items-center gap-2">
-      <i className={cn("shrink-0 text-sm text-muted-foreground", icon)} />
+      {typeof icon === "string" ? <i className={cn("shrink-0 text-sm text-muted-foreground", icon)} /> : icon}
       <span className="min-w-0">
         <span className="block truncate">{label}</span>
         {description && (

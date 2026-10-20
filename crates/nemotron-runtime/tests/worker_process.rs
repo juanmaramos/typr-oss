@@ -51,6 +51,31 @@ fn malformed_input_fails_as_framed_error_without_native_loading() {
 }
 
 #[test]
+fn adaptation_only_locale_is_rejected_before_native_sdk_loading() {
+    let mut child = worker().spawn().unwrap();
+    write_frame(
+        child.stdin.as_mut().unwrap(),
+        &Request::Start {
+            protocol_version: typr_nemotron_runtime::protocol::PROTOCOL_VERSION,
+            gpu: -1,
+            // Existing absolute file suffices: rejection precedes native model load.
+            model_path: std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("Cargo.toml")
+                .to_string_lossy()
+                .into(),
+            language: "el-GR".into(),
+            channels: vec![Channel::Mixed],
+        },
+    )
+    .unwrap();
+    drop(child.stdin.take());
+    wait_bounded(&mut child);
+    let response: Response = read_frame(child.stdout.as_mut().unwrap()).unwrap().unwrap();
+    assert!(matches!(response, Response::Error { message } if message.contains("out-of-box")));
+    assert!(!child.wait().unwrap().success());
+}
+
+#[test]
 fn oversized_frame_rejected_without_waiting_for_payload() {
     let mut child = worker().spawn().unwrap();
     child

@@ -856,6 +856,10 @@ msgstr "{diffDays}d"
 msgid "{hours}h {remainingMinutes}m"
 msgstr "{hours}h {remainingMinutes}m"
 
+#: src/components/transcript/constants/languageData.ts:19
+msgid "{name} (English)"
+msgstr "{name} (English)"
+
 #: src/components/share-and-permission/invited-user.tsx:25
 msgid "{name}'s avatar"
 msgstr "{name}'s avatar"
@@ -903,10 +907,6 @@ msgstr "{totalCount} shortcuts"
 #: src/components/right-panel/utils/chat-utils.ts:27
 msgid "{weeks}w"
 msgstr "{weeks}w"
-
-#: src/components/transcript/actions/STTLanguageSelector.tsx:505
-msgid "+ 10 more languages supported"
-msgstr "+ 10 more languages supported"
 
 #: src/components/share-and-permission/general-access-selector.tsx:37
 msgid "+ Authorized personnels can access"
@@ -957,26 +957,6 @@ msgstr "⚠️ I didn't make any changes to your selection. Please try being mor
 msgid "1-on-1 Meeting"
 msgstr "1-on-1 Meeting"
 
-#: src/components/transcript/constants/languageData.ts:335
-msgid "11.6-14.8% error"
-msgstr "11.6-14.8% error"
-
-#: src/components/transcript/constants/languageData.ts:350
-msgid "17.0-19.7% error"
-msgstr "17.0-19.7% error"
-
-#: src/components/transcript/constants/languageData.ts:286
-msgid "2.8-5.0% error"
-msgstr "2.8-5.0% error"
-
-#: src/components/transcript/constants/languageData.ts:303
-msgid "5.2-7.8% error"
-msgstr "5.2-7.8% error"
-
-#: src/components/transcript/constants/languageData.ts:320
-msgid "8.2-10.9% error"
-msgstr "8.2-10.9% error"
-
 #: src/components/settings-dialog/content.tsx:42
 #: src/components/settings-dialog/sidebar.tsx:38
 msgid "About"
@@ -1024,13 +1004,6 @@ msgstr "Account"
 msgid "Account & settings"
 msgstr "Account & settings"
 
-#: src/components/settings/components/ai/stt-view.tsx:289
-#: src/components/settings/components/ai/stt-view.tsx:534
-#: src/components/transcript/actions/STTLanguageSelector.tsx:280
-#: src/components/transcript/actions/STTLanguageSelector.tsx:403
-msgid "Accuracy"
-msgstr "Accuracy"
-
 #: src/components/shortcuts-window.tsx:128
 msgid "Action"
 msgstr "Action"
@@ -1061,7 +1034,7 @@ msgstr "Add a few notes to start collecting the context you want to reopen from 
 msgid "Add a few related notes, then Typr can keep a brief for this project."
 msgstr "Add a few related notes, then Typr can keep a brief for this project."
 
-#: src/components/settings/components/ai/stt-view.tsx:582
+#: src/components/settings/components/ai/stt-view.tsx:328
 msgid "Add a key to use AssemblyAI cloud transcription."
 msgstr "Add a key to use AssemblyAI cloud transcription."
 
@@ -1073,7 +1046,7 @@ msgstr "Add a key to use this provider."
 msgid "Add API key above"
 msgstr "Add API key above"
 
-#: src/components/settings/views/general.tsx:282
+#: src/components/settings/views/general.tsx:293
 msgid "Add languages to improve accuracy. Leave empty for automatic detection."
 msgstr "Add languages to improve accuracy. Leave empty for automatic detection."
 
@@ -1134,7 +1107,7 @@ msgstr "Add Section"
 msgid "Add selected text to chat"
 msgstr "Add selected text to chat"
 
-#: src/components/settings/views/general.tsx:443
+#: src/components/settings/views/general.tsx:470
 msgid "Add specific terms or jargon that are used in your company. Used to improve the transcription accuracy."
 msgstr "Add specific terms or jargon that are used in your company. Used to improve the transcription accuracy."
 
@@ -1187,7 +1160,7 @@ msgstr "AI model"
 msgid "AI models"
 msgstr "AI models"
 
-#: src/components/welcome-modal/download-progress-view.tsx:229
+#: src/components/welcome-modal/download-progress-view.tsx:246
 msgid "AI models are ready"
 msgstr "AI models are ready"
 
@@ -1235,7 +1208,7 @@ msgstr "AI writing agent"
 msgid "AI writing assistant"
 msgstr "AI writing assistant"
 
-#: src/components/welcome-modal/download-progress-view.tsx:192
+#: src/components/welcome-modal/download-progress-view.tsx:209
 msgid "AI writing setup failed"
 msgstr "AI writing setup failed"
 
@@ -1322,7 +1295,7 @@ msgid "API Base URL"
 msgstr "API Base URL"
 
 #: src/components/settings/components/ai/llm-local-view.tsx:300
-#: src/components/settings/components/ai/stt-view.tsx:570
+#: src/components/settings/components/ai/stt-view.tsx:316
 msgid "API key"
 msgstr "API key"
 
@@ -1335,13 +1308,13 @@ msgstr "API Key"
 
 #: src/components/settings/components/ai/llm-local-view.tsx:294
 #: src/components/settings/components/ai/llm-local-view.tsx:380
-#: src/components/settings/components/ai/stt-view.tsx:505
-#: src/components/settings/components/ai/task-defaults.tsx:259
-#: src/components/settings/components/ai/task-defaults.tsx:294
+#: src/components/settings/components/ai/stt-view.tsx:287
+#: src/components/settings/components/ai/task-defaults.tsx:257
+#: src/components/settings/components/ai/task-defaults.tsx:299
 msgid "API key required"
 msgstr "API key required"
 
-#: src/components/settings/views/general.tsx:242
+#: src/components/settings/views/general.tsx:253
 #: src/components/welcome-modal/user-setup-view.tsx:116
 msgid "App language"
 msgstr "App language"
@@ -1452,12 +1425,6 @@ msgstr "Ask Typr about this project"
 msgid "Ask uses project knowledge. Start from a project, or choose one here, to chat with its notes and files."
 msgstr "Ask uses project knowledge. Start from a project, or choose one here, to chat with its notes and files."
 
-#: src/components/settings/components/ai/stt-view.tsx:491
-#: src/components/settings/components/ai/task-defaults.tsx:290
-#: src/components/settings/components/ai/task-defaults.tsx:293
-msgid "AssemblyAI"
-msgstr "AssemblyAI"
-
 #: src/components/settings/views/lab.tsx:59
 msgid "Assign formal tags to notes and filter related notes from the sidebar."
 msgstr "Assign formal tags to notes and filter related notes from the sidebar."
@@ -1476,7 +1443,7 @@ msgid "Audio"
 msgstr "Audio"
 
 #: src/components/editor-area/note-header/listen-button.tsx:532
-#: src/components/editor-area/note-header/transcription-bar.tsx:372
+#: src/components/editor-area/note-header/transcription-bar.tsx:379
 msgid "Audio input"
 msgstr "Audio input"
 
@@ -1492,11 +1459,11 @@ msgstr "Audio permissions"
 msgid "Audio Settings"
 msgstr "Audio Settings"
 
-#: src/components/right-panel/views/transcript-view.tsx:565
+#: src/components/right-panel/views/transcript-view.tsx:554
 msgid "Audio upload in progress"
 msgstr "Audio upload in progress"
 
-#: src/components/right-panel/views/transcript-view.tsx:595
+#: src/components/right-panel/views/transcript-view.tsx:584
 msgid "Audio upload in progress. Live transcription is unavailable until it finishes."
 msgstr "Audio upload in progress. Live transcription is unavailable until it finishes."
 
@@ -1514,15 +1481,15 @@ msgstr "Audio upload requires a downloaded local model. <0>Download one in Setti
 #: src/components/editor-area/note-header/listen-button.tsx:550
 #: src/components/editor-area/note-header/listen-button.tsx:553
 #: src/components/editor-area/note-header/listen-button.tsx:562
-#: src/components/editor-area/note-header/transcription-bar.tsx:400
-#: src/components/editor-area/note-header/transcription-bar.tsx:403
-#: src/components/editor-area/note-header/transcription-bar.tsx:412
-#: src/components/settings/components/ai/task-defaults.tsx:159
-#: src/components/settings/components/ai/task-defaults.tsx:190
-#: src/components/settings/components/ai/task-defaults.tsx:191
-#: src/components/settings/components/ai/task-defaults.tsx:220
-#: src/components/settings/components/ai/task-defaults.tsx:246
-#: src/components/settings/components/ai/task-defaults.tsx:247
+#: src/components/editor-area/note-header/transcription-bar.tsx:407
+#: src/components/editor-area/note-header/transcription-bar.tsx:410
+#: src/components/editor-area/note-header/transcription-bar.tsx:419
+#: src/components/settings/components/ai/task-defaults.tsx:157
+#: src/components/settings/components/ai/task-defaults.tsx:188
+#: src/components/settings/components/ai/task-defaults.tsx:189
+#: src/components/settings/components/ai/task-defaults.tsx:218
+#: src/components/settings/components/ai/task-defaults.tsx:244
+#: src/components/settings/components/ai/task-defaults.tsx:245
 #: src/components/transcript/actions/MicrophoneSelector.tsx:83
 #: src/components/transcript/actions/MicrophoneSelector.tsx:84
 #: src/components/ui/model-selector.tsx:255
@@ -1534,11 +1501,7 @@ msgstr "Auto"
 msgid "Auto - Best available configured model"
 msgstr "Auto - Best available configured model"
 
-#: src/components/settings/components/ai/stt-view.tsx:594
-msgid "Auto language detection and switching"
-msgstr "Auto language detection and switching"
-
-#: src/components/settings/views/general.tsx:292
+#: src/components/settings/views/general.tsx:319
 msgid "Auto-detect"
 msgstr "Auto-detect"
 
@@ -1573,40 +1536,12 @@ msgstr "Back to {0}"
 msgid "Back to Ask"
 msgstr "Back to Ask"
 
-#: src/components/settings/components/ai/stt-view.tsx:157
-msgid "Balanced English-only model for everyday offline use"
-msgstr "Balanced English-only model for everyday offline use"
-
-#: src/components/settings/components/ai/stt-view.tsx:155
-msgid "Balanced multilingual model for everyday offline use"
-msgstr "Balanced multilingual model for everyday offline use"
-
-#: src/components/transcript/constants/languageData.ts:205
-msgid "Balanced speed and accuracy, optimized for English audio."
-msgstr "Balanced speed and accuracy, optimized for English audio."
-
 #: src/hooks/cloud-model-catalog.ts:451
 msgid "Balanced speed and quality"
 msgstr "Balanced speed and quality"
 
-#: src/components/transcript/constants/languageData.ts:186
-msgid "Base"
-msgstr "Base"
-
-#: src/components/transcript/constants/languageData.ts:202
-msgid "Base - English"
-msgstr "Base - English"
-
-#: src/components/transcript/constants/languageData.ts:253
-msgid "Best accuracy across 50+ languages. Recommended for most users."
-msgstr "Best accuracy across 50+ languages. Recommended for most users."
-
-#: src/components/transcript/constants/languageData.ts:46
-msgid "Best accuracy for English-only content"
-msgstr "Best accuracy for English-only content"
-
-#: src/components/settings/components/ai/task-defaults.tsx:191
-#: src/components/settings/components/ai/task-defaults.tsx:247
+#: src/components/settings/components/ai/task-defaults.tsx:189
+#: src/components/settings/components/ai/task-defaults.tsx:245
 msgid "Best available model"
 msgstr "Best available model"
 
@@ -1614,22 +1549,9 @@ msgstr "Best available model"
 msgid "Best default balance of speed and quality"
 msgstr "Best default balance of speed and quality"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:87
-msgid "Best for English-only, professional use"
-msgstr "Best for English-only, professional use"
-
-#: src/components/transcript/actions/STTLanguageSelector.tsx:89
-msgid "Best for international meetings"
-msgstr "Best for international meetings"
-
 #: src/lib/model-metadata.ts:8
 msgid "Best for meeting Q&A and chat"
 msgstr "Best for meeting Q&A and chat"
-
-#: src/components/settings/components/ai/stt-view.tsx:397
-#: src/components/settings/components/ai/stt-view.tsx:674
-msgid "Best performance languages"
-msgstr "Best performance languages"
 
 #: src/hooks/cloud-model-catalog.ts:435
 msgid "Best quality for complex work"
@@ -1690,7 +1612,7 @@ msgstr "Building {0}/{1}"
 msgid "Building project brief from included sources..."
 msgstr "Building project brief from included sources..."
 
-#: src/components/settings/components/ai/task-defaults.tsx:108
+#: src/components/settings/components/ai/task-defaults.tsx:106
 msgid "Builds the project brief from included notes and files."
 msgstr "Builds the project brief from included notes and files."
 
@@ -1759,7 +1681,7 @@ msgstr "carousel"
 msgid "Catalan"
 msgstr "Catalan"
 
-#: src/components/right-panel/views/transcript-view.tsx:548
+#: src/components/right-panel/views/transcript-view.tsx:537
 msgid "Change"
 msgstr "Change"
 
@@ -1785,20 +1707,20 @@ msgstr "Changes rejected"
 
 #: src/components/right-panel/views/chat-view.tsx:502
 #: src/components/settings/components/ai/llm-local-view.tsx:155
-#: src/components/settings/views/ai.tsx:152
+#: src/components/settings/views/ai.tsx:147
 #: src/components/transcript/actions/TranscriptActionBar.tsx:107
 msgid "Chat"
 msgstr "Chat"
 
-#: src/components/settings/components/ai/task-defaults.tsx:180
+#: src/components/settings/components/ai/task-defaults.tsx:178
 msgid "Chat and Ask"
 msgstr "Chat and Ask"
 
-#: src/components/toast/shared.tsx:275
+#: src/components/toast/shared.tsx:277
 msgid "Chat and meeting summaries"
 msgstr "Chat and meeting summaries"
 
-#: src/components/toast/shared.tsx:274
+#: src/components/toast/shared.tsx:276
 msgid "Chat and meeting summaries · {modelSize}"
 msgstr "Chat and meeting summaries · {modelSize}"
 
@@ -1823,10 +1745,10 @@ msgstr "Check for Updates"
 msgid "Check out what's new in this release"
 msgstr "Check out what's new in this release"
 
-#: src/components/toast/shared.tsx:171
-#: src/components/toast/shared.tsx:252
-#: src/components/welcome-modal/download-progress-view.tsx:147
-#: src/components/welcome-modal/download-progress-view.tsx:185
+#: src/components/toast/shared.tsx:173
+#: src/components/toast/shared.tsx:254
+#: src/components/welcome-modal/download-progress-view.tsx:148
+#: src/components/welcome-modal/download-progress-view.tsx:202
 msgid "Check your connection and retry."
 msgstr "Check your connection and retry."
 
@@ -1850,6 +1772,10 @@ msgstr "Choose a date on or after {date}."
 msgid "Choose a date on or before {date}."
 msgstr "Choose a date on or before {date}."
 
+#: src/components/settings/components/ai/stt-view.tsx:92
+msgid "Choose a model to turn speech into text."
+msgstr "Choose a model to turn speech into text."
+
 #: src/routes/app.ask.tsx:75
 msgid "Choose a project before starting a new Ask chat."
 msgstr "Choose a project before starting a new Ask chat."
@@ -1858,11 +1784,15 @@ msgstr "Choose a project before starting a new Ask chat."
 msgid "Choose a simple marker for this project."
 msgstr "Choose a simple marker for this project."
 
+#: src/components/transcript/constants/languageData.ts:117
+msgid "Choose a transcription model."
+msgstr "Choose a transcription model."
+
 #: src/components/projects/project-files-dropzone.tsx:112
 msgid "Choose files"
 msgstr "Choose files"
 
-#: src/components/settings/views/general.tsx:218
+#: src/components/settings/views/general.tsx:229
 msgid "Choose whether to save your recordings locally."
 msgstr "Choose whether to save your recordings locally."
 
@@ -1935,9 +1865,9 @@ msgstr "Close modal/dialog"
 msgid "Close project brief"
 msgstr "Close project brief"
 
-#: src/components/right-panel/views/transcript-view.tsx:488
+#: src/components/right-panel/views/transcript-view.tsx:491
 #: src/components/settings/components/ai/llm-local-view.tsx:254
-#: src/components/settings/components/ai/stt-view.tsx:468
+#: src/components/settings/components/ai/stt-view.tsx:249
 msgid "Cloud"
 msgstr "Cloud"
 
@@ -1949,7 +1879,7 @@ msgstr "Cloud · typically 1–3 min"
 msgid "Cloud mode is already available. Download these only to use transcription and summaries offline."
 msgstr "Cloud mode is already available. Download these only to use transcription and summaries offline."
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:355
+#: src/components/transcript/actions/STTLanguageSelector.tsx:289
 #: src/components/ui/model-selector.tsx:392
 msgid "Cloud Models"
 msgstr "Cloud Models"
@@ -1962,10 +1892,6 @@ msgstr "Cloud models unavailable, switching to local transcription"
 msgid "Cloud summaries are already available. Download this model only if you want offline summaries."
 msgstr "Cloud summaries are already available. Download this model only if you want offline summaries."
 
-#: src/components/settings/components/ai/task-defaults.tsx:294
-msgid "Cloud transcription"
-msgstr "Cloud transcription"
-
 #: src/hooks/useTranscriptionFallback.ts:126
 #: src/hooks/useTranscriptionFallback.ts:255
 msgid "Cloud transcription failed"
@@ -1974,14 +1900,6 @@ msgstr "Cloud transcription failed"
 #: src/components/toast/model-download.tsx:107
 msgid "Cloud transcription is already available. Download this model only if you want offline transcription."
 msgstr "Cloud transcription is already available. Download this model only if you want offline transcription."
-
-#: src/components/settings/components/ai/stt-view.tsx:495
-msgid "Cloud transcription using your AssemblyAI API key"
-msgstr "Cloud transcription using your AssemblyAI API key"
-
-#: src/components/settings/components/ai/stt-view.tsx:595
-msgid "Cloud-based transcription"
-msgstr "Cloud-based transcription"
 
 #: src/components/left-sidebar/events-list.tsx:97
 msgid "Collapse Coming up"
@@ -2126,14 +2044,6 @@ msgstr "Conversation not found"
 #: src/components/app-shell/context-pane.tsx:22
 msgid "Conversations"
 msgstr "Conversations"
-
-#: src/components/right-panel/views/transcript-view.tsx:526
-msgid "Convert your audio to text in real-time."
-msgstr "Convert your audio to text in real-time."
-
-#: src/components/settings/components/ai/stt-view.tsx:175
-msgid "Convert your meeting audio into written text in real-time"
-msgstr "Convert your meeting audio into written text in real-time"
 
 #: src/components/editor-area/note-header/share-menu.tsx:88
 #: src/routes/app.ask.$threadId.tsx:570
@@ -2373,8 +2283,8 @@ msgstr "current"
 #: src/components/projects/project-brief-panel.tsx:60
 #: src/components/projects/project-brief-preview.ts:31
 #: src/components/projects/project-summary-tab.tsx:75
-#: src/components/settings/components/ai/stt-view.tsx:244
-#: src/components/settings/components/ai/stt-view.tsx:512
+#: src/components/settings/components/ai/stt-view.tsx:161
+#: src/components/settings/components/ai/stt-view.tsx:294
 msgid "Current"
 msgstr "Current"
 
@@ -2392,7 +2302,7 @@ msgstr "Current understanding"
 msgid "Custom Endpoints"
 msgstr "Custom Endpoints"
 
-#: src/components/settings/views/general.tsx:440
+#: src/components/settings/views/general.tsx:467
 msgid "Custom vocabulary"
 msgstr "Custom vocabulary"
 
@@ -2445,7 +2355,7 @@ msgstr "Default"
 msgid "Default (root)"
 msgstr "Default (root)"
 
-#: src/components/settings/components/ai/task-defaults.tsx:167
+#: src/components/settings/components/ai/task-defaults.tsx:165
 msgid "Defaults"
 msgstr "Defaults"
 
@@ -2509,13 +2419,13 @@ msgid "Detach event"
 msgstr "Detach event"
 
 #. placeholder {0}: field.value.length
-#: src/components/settings/views/general.tsx:380
+#: src/components/settings/views/general.tsx:407
 msgid "Detects among {0} specified languages, with automatic fallback."
 msgstr "Detects among {0} specified languages, with automatic fallback."
 
-#: src/components/settings/views/general.tsx:367
-msgid "Detects any language automatically. Specify languages for faster, more accurate transcription."
-msgstr "Detects any language automatically. Specify languages for faster, more accurate transcription."
+#: src/components/settings/views/general.tsx:395
+msgid "Detects supported languages automatically. Choose languages to guide transcription."
+msgstr "Detects supported languages automatically. Choose languages to guide transcription."
 
 #: src/components/settings/views/integrations.tsx:211
 msgid "Direct access"
@@ -2549,9 +2459,9 @@ msgstr "Dismiss update status"
 msgid "Display a notification to remind you to inform participants when transcription starts"
 msgstr "Display a notification to remind you to inform participants when transcription starts"
 
-#: src/components/transcript/constants/languageData.ts:266
-msgid "Distil v3.5 - English"
-msgstr "Distil v3.5 - English"
+#: src/components/transcript/constants/languageData.ts:56
+msgid "Distil-Whisper Large v3.5 (English)"
+msgstr "Distil-Whisper Large v3.5 (English)"
 
 #: src/components/meeting-assistant/floating-assistant.tsx:494
 msgid "dock"
@@ -2563,24 +2473,24 @@ msgstr "Don't remind me again"
 
 #: src/components/editor-area/note-header/listen-button.tsx:505
 #: src/components/editor-area/note-header/listen-button.tsx:523
-#: src/components/editor-area/note-header/transcription-bar.tsx:334
-#: src/components/editor-area/note-header/transcription-bar.tsx:353
+#: src/components/editor-area/note-header/transcription-bar.tsx:341
+#: src/components/editor-area/note-header/transcription-bar.tsx:360
 msgid "Don't transcribe"
 msgstr "Don't transcribe"
 
 #: src/components/settings/views/about.tsx:123
-#: src/components/transcript/hooks/useSTTModel.ts:92
+#: src/components/transcript/hooks/useSTTModel.ts:90
 msgid "Download"
 msgstr "Download"
 
 #. placeholder {0}: option.size
-#: src/components/transcript/actions/STTLanguageSelector.tsx:335
-#: src/components/transcript/actions/STTLanguageSelector.tsx:458
+#: src/components/transcript/actions/STTLanguageSelector.tsx:270
+#: src/components/transcript/actions/STTLanguageSelector.tsx:355
 msgid "Download {0}"
 msgstr "Download {0}"
 
-#: src/components/right-panel/views/transcript-view.tsx:571
-#: src/components/transcript/hooks/useSTTModel.ts:88
+#: src/components/right-panel/views/transcript-view.tsx:560
+#: src/components/transcript/hooks/useSTTModel.ts:86
 msgid "Download a model first"
 msgstr "Download a model first"
 
@@ -2592,15 +2502,15 @@ msgstr "Download a speech-to-text model in Settings → AI models to transcribe 
 msgid "Download a speech-to-text model to transcribe audio files."
 msgstr "Download a speech-to-text model to transcribe audio files."
 
-#: src/components/right-panel/views/transcript-view.tsx:612
+#: src/components/right-panel/views/transcript-view.tsx:601
 msgid "Download a transcription model above to begin"
 msgstr "Download a transcription model above to begin"
 
-#: src/components/toast/shared.tsx:316
+#: src/components/toast/shared.tsx:318
 msgid "Download failed. Please try again."
 msgstr "Download failed. Please try again."
 
-#: src/components/settings/components/ai/task-defaults.tsx:306
+#: src/components/settings/components/ai/task-defaults.tsx:311
 msgid "Download in Transcription settings"
 msgstr "Download in Transcription settings"
 
@@ -2635,16 +2545,16 @@ msgstr "Downloading update {0}"
 msgid "Downloading update {0}%."
 msgstr "Downloading update {0}%."
 
-#: src/components/settings/components/ai/task-defaults.tsx:304
-#: src/components/transcript/actions/STTLanguageSelector.tsx:335
-#: src/components/transcript/actions/STTLanguageSelector.tsx:458
+#: src/components/settings/components/ai/task-defaults.tsx:309
+#: src/components/transcript/actions/STTLanguageSelector.tsx:270
+#: src/components/transcript/actions/STTLanguageSelector.tsx:355
 #: src/components/ui/model-selector.tsx:287
 #: src/components/ui/model-selector.tsx:701
 msgid "Downloading..."
 msgstr "Downloading..."
 
 #: src/components/settings/components/ai/llm-local-view.tsx:225
-#: src/components/settings/components/ai/stt-view.tsx:265
+#: src/components/settings/components/ai/stt-view.tsx:182
 msgid "Downloading…"
 msgstr "Downloading…"
 
@@ -2671,15 +2581,6 @@ msgstr "Duration"
 #: src/lib/language-labels.ts:13
 msgid "Dutch"
 msgstr "Dutch"
-
-#: src/components/transcript/actions/STTLanguageSelector.tsx:501
-msgid "Dutch, French, Indonesian, Ukrainian, Turkish, Swedish, Mandarin, Finnish"
-msgstr "Dutch, French, Indonesian, Ukrainian, Turkish, Swedish, Mandarin, Finnish"
-
-#: src/components/settings/components/ai/stt-view.tsx:392
-#: src/components/settings/components/ai/stt-view.tsx:669
-msgid "Dynamically switches between these languages in a single conversation"
-msgstr "Dynamically switches between these languages in a single conversation"
 
 #: src/components/vocabulary-tags.tsx:21
 msgid "e.g., Project Phoenix, OKR cadence"
@@ -2747,7 +2648,7 @@ msgstr "EN"
 msgid "Enable"
 msgstr "Enable"
 
-#: src/components/editor-area/note-header/transcription-bar.tsx:365
+#: src/components/editor-area/note-header/transcription-bar.tsx:372
 msgid "Enable at least one voice source to capture audio"
 msgstr "Enable at least one voice source to capture audio"
 
@@ -2769,18 +2670,11 @@ msgstr "Enabled"
 msgid "Enabling..."
 msgstr "Enabling..."
 
-#: src/components/settings/views/general.tsx:260
-#: src/components/transcript/constants/languageData.ts:43
+#: src/components/settings/views/general.tsx:271
 #: src/components/welcome-modal/user-setup-view.tsx:127
 #: src/lib/language-labels.ts:14
 msgid "English"
 msgstr "English"
-
-#: src/components/editor-area/note-header/transcription-bar.tsx:535
-#: src/components/right-panel/views/transcript-view.tsx:496
-#: src/components/transcript/actions/STTLanguageSelector.tsx:70
-msgid "English high accuracy"
-msgstr "English high accuracy"
 
 #: src/components/settings/components/ai/shared.tsx:40
 msgid "English Only"
@@ -2887,7 +2781,7 @@ msgstr "Error:"
 msgid "Error: {errorDetails}"
 msgstr "Error: {errorDetails}"
 
-#: src/components/settings/views/general.tsx:263
+#: src/components/settings/views/general.tsx:274
 #: src/components/welcome-modal/user-setup-view.tsx:135
 msgid "Español"
 msgstr "Español"
@@ -2925,14 +2819,9 @@ msgstr "Events"
 msgid "Everything stays on your device. Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
 msgstr "Everything stays on your device. Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
 
-#: src/components/settings/components/ai/stt-view.tsx:436
 #: src/components/settings/components/wer-modal.tsx:66
 msgid "Excellent"
 msgstr "Excellent"
-
-#: src/components/transcript/actions/STTLanguageSelector.tsx:490
-msgid "Excellent (2.8-5.0% error)"
-msgstr "Excellent (2.8-5.0% error)"
 
 #: src/routes/app.projects.$projectId.tsx:721
 msgid "Exclude from brief"
@@ -2953,16 +2842,6 @@ msgstr "Expand projects"
 #: src/components/settings/views/lab.tsx:17
 msgid "Experimental features"
 msgstr "Experimental features"
-
-#: src/components/settings/components/ai/stt-view.tsx:146
-#: src/components/transcript/constants/languageData.ts:140
-msgid "Experimental live transcription in English and Spanish. Whisper handles recorded audio and recovery."
-msgstr "Experimental live transcription in English and Spanish. Whisper handles recorded audio and recovery."
-
-#: src/components/transcript/actions/STTLanguageSelector.tsx:83
-#: src/components/transcript/constants/languageData.ts:14
-msgid "Experimental live transcription with Whisper fallback"
-msgstr "Experimental live transcription with Whisper fallback"
 
 #: src/components/toolbar/buttons/share-button.tsx:321
 msgid "Export"
@@ -3015,7 +2894,7 @@ msgstr "Failed to delete {0} notes"
 msgid "Failed to disconnect Claude integration"
 msgstr "Failed to disconnect Claude integration"
 
-#: src/components/toast/shared.tsx:404
+#: src/components/toast/shared.tsx:406
 msgid "Failed to enhance meeting notes"
 msgstr "Failed to enhance meeting notes"
 
@@ -3028,7 +2907,7 @@ msgid "Failed to load session data"
 msgstr "Failed to load session data"
 
 #: src/components/right-panel/index.tsx:26
-#: src/components/right-panel/views/transcript-view.tsx:285
+#: src/components/right-panel/views/transcript-view.tsx:287
 msgid "Failed to load transcription"
 msgstr "Failed to load transcription"
 
@@ -3044,13 +2923,9 @@ msgstr "Failed to save profile"
 msgid "Failed to set up Claude integration"
 msgstr "Failed to set up Claude integration"
 
-#: src/components/toast/shared.tsx:454
+#: src/components/toast/shared.tsx:456
 msgid "Failed to start recording"
 msgstr "Failed to start recording"
-
-#: src/components/settings/components/ai/stt-view.tsx:442
-msgid "Fair"
-msgstr "Fair"
 
 #: src/lib/model-metadata.ts:7
 msgid "Fast and reliable for simple tasks"
@@ -3071,14 +2946,6 @@ msgstr "Fastest Groq text model for everyday tasks"
 #: src/hooks/cloud-model-catalog.ts:449
 msgid "Fastest responses, great for quick tasks"
 msgstr "Fastest responses, great for quick tasks"
-
-#: src/components/transcript/constants/languageData.ts:173
-msgid "Fastest, English-only. Optimized for speed on English audio."
-msgstr "Fastest, English-only. Optimized for speed on English audio."
-
-#: src/components/transcript/constants/languageData.ts:157
-msgid "Fastest, lowest accuracy. Good for offline, low-resource use."
-msgstr "Fastest, lowest accuracy. Good for offline, low-resource use."
 
 #: src/hooks/cloud-model-catalog.ts:437
 msgid "Fastest, lowest-cost OpenAI option"
@@ -3118,7 +2985,7 @@ msgstr "Finalizing"
 #: src/components/editor-area/index.tsx:609
 #: src/components/right-panel/components/search/chat-search-header.tsx:119
 #: src/components/right-panel/components/search/search-header.tsx:112
-#: src/components/right-panel/views/transcript-view.tsx:328
+#: src/components/right-panel/views/transcript-view.tsx:330
 msgid "Find"
 msgstr "Find"
 
@@ -3134,7 +3001,7 @@ msgstr "Find in current note"
 msgid "Find notes and actions..."
 msgstr "Find notes and actions..."
 
-#: src/components/welcome-modal/download-progress-view.tsx:232
+#: src/components/welcome-modal/download-progress-view.tsx:249
 msgid "Finish setup"
 msgstr "Finish setup"
 
@@ -3158,9 +3025,9 @@ msgstr "Folder Members"
 msgid "Folder View"
 msgstr "Folder View"
 
-#: src/components/settings/components/ai/task-defaults.tsx:221
-#: src/components/settings/components/ai/task-defaults.tsx:239
-#: src/components/settings/components/ai/task-defaults.tsx:242
+#: src/components/settings/components/ai/task-defaults.tsx:219
+#: src/components/settings/components/ai/task-defaults.tsx:237
+#: src/components/settings/components/ai/task-defaults.tsx:240
 msgid "Follow Chat and Ask"
 msgstr "Follow Chat and Ask"
 
@@ -3269,7 +3136,7 @@ msgstr "Generating title..."
 msgid "German"
 msgstr "German"
 
-#: src/components/toast/shared.tsx:408
+#: src/components/toast/shared.tsx:410
 msgid "Go to AI models settings to check the status."
 msgstr "Go to AI models settings to check the status."
 
@@ -3281,27 +3148,9 @@ msgstr "Go to home"
 msgid "Go to latest message"
 msgstr "Go to latest message"
 
-#: src/components/settings/components/ai/stt-view.tsx:438
 #: src/components/settings/components/wer-modal.tsx:67
 msgid "Good"
 msgstr "Good"
-
-#: src/components/transcript/actions/STTLanguageSelector.tsx:498
-msgid "Good (5.2-7.8% error)"
-msgstr "Good (5.2-7.8% error)"
-
-#: src/components/settings/components/ai/stt-view.tsx:387
-#: src/components/settings/components/ai/stt-view.tsx:664
-msgid "Good accuracy (10-25% error)"
-msgstr "Good accuracy (10-25% error)"
-
-#: src/components/transcript/constants/languageData.ts:189
-msgid "Good balance of speed and accuracy for multilingual use."
-msgstr "Good balance of speed and accuracy for multilingual use."
-
-#: src/components/transcript/actions/STTLanguageSelector.tsx:85
-msgid "Good for most meetings and calls"
-msgstr "Good for most meetings and calls"
 
 #: src/lib/model-metadata.ts:9
 msgid "Good for writing and conversation"
@@ -3364,35 +3213,10 @@ msgstr "Here you'll be able to view and manage your notes in a folder structure.
 msgid "Here's the new content:"
 msgstr "Here's the new content:"
 
-#: src/components/settings/components/ai/stt-view.tsx:336
-#: src/components/settings/components/ai/stt-view.tsx:613
+#: src/components/settings/components/ai/stt-view.tsx:215
+#: src/components/settings/components/ai/stt-view.tsx:344
 msgid "Hide languages"
 msgstr "Hide languages"
-
-#: src/components/settings/components/ai/stt-view.tsx:386
-#: src/components/settings/components/ai/stt-view.tsx:663
-msgid "High accuracy (≤10% error)"
-msgstr "High accuracy (≤10% error)"
-
-#: src/components/transcript/constants/languageData.ts:30
-msgid "High accuracy across 50+ languages"
-msgstr "High accuracy across 50+ languages"
-
-#: src/components/transcript/constants/languageData.ts:221
-msgid "Higher accuracy, moderate speed for multilingual transcription."
-msgstr "Higher accuracy, moderate speed for multilingual transcription."
-
-#: src/components/transcript/constants/languageData.ts:237
-msgid "Higher accuracy, moderate speed, optimized for English audio."
-msgstr "Higher accuracy, moderate speed, optimized for English audio."
-
-#: src/components/transcript/constants/languageData.ts:269
-msgid "Highest quality English transcription. Optimized for meetings and conversations."
-msgstr "Highest quality English transcription. Optimized for meetings and conversations."
-
-#: src/components/settings/components/ai/stt-view.tsx:159
-msgid "Highest quality for English meetings"
-msgstr "Highest quality for English meetings"
 
 #: src/lib/language-labels.ts:22
 msgid "Hindi"
@@ -3451,7 +3275,7 @@ msgstr "Include in brief"
 msgid "Indonesian"
 msgstr "Indonesian"
 
-#: src/components/right-panel/views/transcript-view.tsx:586
+#: src/components/right-panel/views/transcript-view.tsx:575
 msgid "Initializing model..."
 msgstr "Initializing model..."
 
@@ -3530,7 +3354,7 @@ msgstr "Key decisions"
 msgid "Key stored locally and used directly with this provider."
 msgstr "Key stored locally and used directly with this provider."
 
-#: src/components/settings/components/ai/stt-view.tsx:581
+#: src/components/settings/components/ai/stt-view.tsx:327
 msgid "Key stored locally. Audio is sent directly to AssemblyAI."
 msgstr "Key stored locally. Audio is sent directly to AssemblyAI."
 
@@ -3557,18 +3381,9 @@ msgstr "Lab"
 msgid "Language"
 msgstr "Language"
 
-#: src/components/settings/views/general.tsx:410
+#: src/components/settings/views/general.tsx:437
 msgid "Language for AI-generated meeting summaries"
 msgstr "Language for AI-generated meeting summaries"
-
-#: src/components/settings/components/ai/stt-view.tsx:361
-#: src/components/settings/components/ai/stt-view.tsx:638
-msgid "Languages & features"
-msgstr "Languages & features"
-
-#: src/components/transcript/constants/languageData.ts:250
-msgid "Large"
-msgstr "Large"
 
 #: src/components/projects/project-summary-tab.tsx:79
 msgid "Latest understanding from {briefSourceCountLabel}"
@@ -3606,10 +3421,6 @@ msgstr "Light"
 msgid "Lighter weights (medium→400, semibold→500)"
 msgstr "Lighter weights (medium→400, semibold→500)"
 
-#: src/components/settings/components/ai/stt-view.tsx:443
-msgid "Limited"
-msgstr "Limited"
-
 #: src/components/ui/inline-citation.tsx:29
 msgid "Line {start}"
 msgstr "Line {start}"
@@ -3618,13 +3429,25 @@ msgstr "Line {start}"
 msgid "Lines {start}-{end}"
 msgstr "Lines {start}-{end}"
 
-#: src/components/right-panel/views/transcript-view.tsx:362
+#: src/components/right-panel/views/transcript-view.tsx:364
 msgid "Listening. Text appears after speech pauses."
 msgstr "Listening. Text appears after speech pauses."
 
 #: src/components/transcript/components/HeaderTranscribingIndicator.tsx:34
 msgid "Live"
 msgstr "Live"
+
+#: src/components/transcript/constants/languageData.ts:115
+msgid "Live text as you speak. {count} languages. Works offline."
+msgstr "Live text as you speak. {count} languages. Works offline."
+
+#: src/components/transcript/constants/languageData.ts:39
+msgid "Live text as you speak. Works offline."
+msgstr "Live text as you speak. Works offline."
+
+#: src/components/transcript/constants/languageData.ts:73
+msgid "Live text in {count} languages. Requires an API key."
+msgstr "Live text in {count} languages. Requires an API key."
 
 #: src/components/right-panel/hooks/useTranscriptSessionEvents.ts:47
 msgid "Live transcription stopped"
@@ -3642,17 +3465,17 @@ msgstr "Llama 3.3 70B"
 msgid "Loading"
 msgstr "Loading"
 
-#: src/components/right-panel/views/transcript-view.tsx:614
+#: src/components/right-panel/views/transcript-view.tsx:603
 msgid "Loading AI model into memory... This may take a few seconds on first start"
 msgstr "Loading AI model into memory... This may take a few seconds on first start"
 
 #: src/components/settings/components/ai/llm-custom-view.tsx:550
-#: src/components/settings/components/ai/task-defaults.tsx:333
+#: src/components/settings/components/ai/task-defaults.tsx:336
 msgid "Loading available models..."
 msgstr "Loading available models..."
 
 #: src/components/editor-area/note-header/listen-button.tsx:635
-#: src/components/editor-area/note-header/transcription-bar.tsx:497
+#: src/components/editor-area/note-header/transcription-bar.tsx:504
 #: src/components/transcript/actions/MicrophoneSelector.tsx:120
 msgid "Loading devices..."
 msgstr "Loading devices..."
@@ -3664,6 +3487,10 @@ msgstr "Loading events..."
 #: src/components/transcript/actions/MicrophoneSelector.tsx:99
 msgid "Loading microphones..."
 msgstr "Loading microphones..."
+
+#: src/components/settings/views/general.tsx:299
+msgid "Loading model languages..."
+msgstr "Loading model languages..."
 
 #: src/components/settings/components/ai/llm-local-view.tsx:188
 #: src/components/settings/components/ai/llm-local-view.tsx:262
@@ -3679,7 +3506,7 @@ msgstr "Loading projects…"
 msgid "Loading templates..."
 msgstr "Loading templates..."
 
-#: src/components/right-panel/views/transcript-view.tsx:273
+#: src/components/right-panel/views/transcript-view.tsx:275
 msgid "Loading transcription..."
 msgstr "Loading transcription..."
 
@@ -3741,7 +3568,7 @@ msgstr "Meeting chat threads will live here while the note stays visible in the 
 msgid "Meeting Notes"
 msgstr "Meeting Notes"
 
-#: src/components/settings/components/ai/task-defaults.tsx:114
+#: src/components/settings/components/ai/task-defaults.tsx:112
 msgid "Meeting summaries"
 msgstr "Meeting summaries"
 
@@ -3792,7 +3619,6 @@ msgstr "Model"
 msgid "Model Name"
 msgstr "Model Name"
 
-#: src/components/settings/components/ai/stt-view.tsx:440
 #: src/components/settings/components/wer-modal.tsx:68
 msgid "Moderate"
 msgstr "Moderate"
@@ -3811,7 +3637,7 @@ msgid "More models"
 msgstr "More models"
 
 #: src/components/editor-area/note-header/listen-button.tsx:399
-#: src/components/editor-area/note-header/transcription-bar.tsx:213
+#: src/components/editor-area/note-header/transcription-bar.tsx:220
 msgid "More settings"
 msgstr "More settings"
 
@@ -3829,25 +3655,9 @@ msgstr "Move chat to sidebar"
 msgid "Move to sidebar"
 msgstr "Move to sidebar"
 
-#: src/components/editor-area/note-header/transcription-bar.tsx:533
-#: src/components/right-panel/views/transcript-view.tsx:494
 #: src/components/settings/components/ai/shared.tsx:40
-#: src/components/transcript/actions/STTLanguageSelector.tsx:68
-#: src/components/transcript/actions/STTLanguageSelector.tsx:74
-#: src/components/transcript/constants/languageData.ts:27
-#: src/components/transcript/constants/languageData.ts:74
 msgid "Multilingual"
 msgstr "Multilingual"
-
-#: src/components/settings/components/ai/stt-view.tsx:384
-#: src/components/settings/components/ai/stt-view.tsx:661
-msgid "Multilingual code-switching"
-msgstr "Multilingual code-switching"
-
-#: src/components/editor-area/note-header/transcription-bar.tsx:537
-#: src/components/transcript/actions/STTLanguageSelector.tsx:72
-msgid "Multilingual high accuracy"
-msgstr "Multilingual high accuracy"
 
 #: src/routes/app.control.tsx:154
 msgid "Mute Microphone"
@@ -3893,16 +3703,11 @@ msgstr "Needs review"
 msgid "Nemotron could not start. Using Whisper for this recording."
 msgstr "Nemotron could not start. Using Whisper for this recording."
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:66
-#: src/components/transcript/constants/languageData.ts:11
-msgid "Nemotron streaming"
-msgstr "Nemotron streaming"
-
 #: src/services/youtube-service.ts:47
 msgid "Network error, please check your connection"
 msgstr "Network error, please check your connection"
 
-#: src/components/toast/shared.tsx:423
+#: src/components/toast/shared.tsx:425
 msgid "New audio device detected"
 msgstr "New audio device detected"
 
@@ -4018,7 +3823,7 @@ msgstr "No filters active"
 msgid "No items found"
 msgstr "No items found"
 
-#: src/components/settings/views/general.tsx:335
+#: src/components/settings/views/general.tsx:363
 #: src/components/welcome-modal/language-selection-view.tsx:152
 msgid "No language found."
 msgstr "No language found."
@@ -4044,7 +3849,7 @@ msgid "No microphone selected"
 msgstr "No microphone selected"
 
 #: src/components/editor-area/note-header/listen-button.tsx:643
-#: src/components/editor-area/note-header/transcription-bar.tsx:505
+#: src/components/editor-area/note-header/transcription-bar.tsx:512
 #: src/components/transcript/actions/MicrophoneSelector.tsx:128
 msgid "No microphones found"
 msgstr "No microphones found"
@@ -4147,8 +3952,8 @@ msgstr "No upcoming events for this organization"
 msgid "Norwegian"
 msgstr "Norwegian"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:273
-#: src/components/transcript/actions/STTLanguageSelector.tsx:396
+#: src/components/transcript/actions/STTLanguageSelector.tsx:241
+#: src/components/transcript/actions/STTLanguageSelector.tsx:326
 msgid "Not downloaded"
 msgstr "Not downloaded"
 
@@ -4204,36 +4009,28 @@ msgstr "Official Templates"
 msgid "Older"
 msgstr "Older"
 
-#: src/components/right-panel/views/transcript-view.tsx:489
+#: src/components/right-panel/views/transcript-view.tsx:492
 #: src/components/settings/components/ai/llm-local-view.tsx:178
-#: src/components/settings/components/ai/stt-view.tsx:195
-#: src/components/transcript/actions/STTLanguageSelector.tsx:232
+#: src/components/settings/components/ai/stt-view.tsx:112
+#: src/components/transcript/actions/STTLanguageSelector.tsx:204
 #: src/components/ui/model-selector.tsx:357
 msgid "On-device"
 msgstr "On-device"
 
-#: src/components/settings/components/ai/task-defaults.tsx:308
-msgid "On-device English"
-msgstr "On-device English"
-
-#: src/components/settings/components/ai/task-defaults.tsx:206
+#: src/components/settings/components/ai/task-defaults.tsx:204
 msgid "On-device model"
 msgstr "On-device model"
-
-#: src/components/settings/components/ai/task-defaults.tsx:309
-msgid "On-device multilingual"
-msgstr "On-device multilingual"
 
 #: src/routes/app.ask.$threadId.tsx:542
 msgid "One answer was interrupted. Retry it from the message above."
 msgstr "One answer was interrupted. Retry it from the message above."
 
 #. placeholder {0}: sttMetadata?.size || "250 MB"
-#: src/components/welcome-modal/download-progress-view.tsx:148
+#: src/components/welcome-modal/download-progress-view.tsx:149
 msgid "One-time download, {0}"
 msgstr "One-time download, {0}"
 
-#: src/components/welcome-modal/download-progress-view.tsx:186
+#: src/components/welcome-modal/download-progress-view.tsx:203
 msgid "One-time download, 5.0 GB"
 msgstr "One-time download, 5.0 GB"
 
@@ -4266,7 +4063,7 @@ msgid "Open finder view"
 msgstr "Open finder view"
 
 #: src/components/settings/components/ai/llm-local-view.tsx:169
-#: src/components/settings/components/ai/stt-view.tsx:186
+#: src/components/settings/components/ai/stt-view.tsx:103
 #: src/components/settings/components/data-path-block.tsx:74
 msgid "Open folder"
 msgstr "Open folder"
@@ -4315,8 +4112,8 @@ msgstr "Open settings"
 
 #: src/components/audio-upload-dialog.tsx:155
 #: src/components/settings/views/sound.tsx:134
-#: src/components/toast/shared.tsx:411
-#: src/components/toast/shared.tsx:461
+#: src/components/toast/shared.tsx:413
+#: src/components/toast/shared.tsx:463
 #: src/components/welcome-modal/audio-permissions-view.tsx:137
 msgid "Open Settings"
 msgstr "Open Settings"
@@ -4388,7 +4185,7 @@ msgid "Other"
 msgstr "Other"
 
 #: src/components/editor-area/note-header/listen-button.tsx:513
-#: src/components/editor-area/note-header/transcription-bar.tsx:342
+#: src/components/editor-area/note-header/transcription-bar.tsx:349
 msgid "Other's voice"
 msgstr "Other's voice"
 
@@ -4492,7 +4289,7 @@ msgstr "Please enter a YouTube URL"
 msgid "Please inform all participants that this session is being transcribed for meeting summarization purposes."
 msgstr "Please inform all participants that this session is being transcribed for meeting summarization purposes."
 
-#: src/components/right-panel/views/transcript-view.tsx:261
+#: src/components/right-panel/views/transcript-view.tsx:263
 msgid "Please open a note to view its transcription."
 msgstr "Please open a note to view its transcription."
 
@@ -4508,11 +4305,6 @@ msgstr "Please try opening a note first or refresh the app"
 msgid "Please use the error dialog to refresh the application."
 msgstr "Please use the error dialog to refresh the application."
 
-#: src/components/settings/components/ai/stt-view.tsx:409
-#: src/components/settings/components/ai/stt-view.tsx:686
-msgid "Plus 50+ additional languages with moderate to fair accuracy. Total 99 languages supported."
-msgstr "Plus 50+ additional languages with moderate to fair accuracy. Total 99 languages supported."
-
 #: src/lib/language-labels.ts:34
 msgid "Polish"
 msgstr "Polish"
@@ -4526,11 +4318,11 @@ msgid "Portuguese"
 msgstr "Portuguese"
 
 #. placeholder {0}: getLanguageName(field.value[0])
-#: src/components/settings/views/general.tsx:374
+#: src/components/settings/views/general.tsx:401
 msgid "Prefers <0>{0}</0> but falls back to auto-detection if needed."
 msgstr "Prefers <0>{0}</0> but falls back to auto-detection if needed."
 
-#: src/components/welcome-modal/download-progress-view.tsx:205
+#: src/components/welcome-modal/download-progress-view.tsx:222
 msgid "Preparing AI writing"
 msgstr "Preparing AI writing"
 
@@ -4538,7 +4330,7 @@ msgstr "Preparing AI writing"
 msgid "Preparing notes"
 msgstr "Preparing notes"
 
-#: src/components/welcome-modal/download-progress-view.tsx:167
+#: src/components/welcome-modal/download-progress-view.tsx:176
 msgid "Preparing transcription"
 msgstr "Preparing transcription"
 
@@ -4563,7 +4355,7 @@ msgstr "Previous (Shift+Enter)"
 msgid "Previous slide"
 msgstr "Previous slide"
 
-#: src/components/settings/views/general.tsx:245
+#: src/components/settings/views/general.tsx:256
 msgid "Primary language for the interface"
 msgstr "Primary language for the interface"
 
@@ -4657,7 +4449,7 @@ msgstr "Project brief requires at least one included note summary or indexed tex
 msgid "Project brief will appear after Typr reviews these sources."
 msgstr "Project brief will appear after Typr reviews these sources."
 
-#: src/components/settings/components/ai/task-defaults.tsx:107
+#: src/components/settings/components/ai/task-defaults.tsx:105
 msgid "Project briefs"
 msgstr "Project briefs"
 
@@ -4791,23 +4583,12 @@ msgid "Readable source has no compiled digest yet."
 msgstr "Readable source has no compiled digest yet."
 
 #: src/components/settings/components/ai/llm-local-view.tsx:218
-#: src/components/settings/components/ai/stt-view.tsx:237
+#: src/components/settings/components/ai/stt-view.tsx:154
 #: src/components/ui/tool.tsx:59
-#: src/components/welcome-modal/download-progress-view.tsx:145
-#: src/components/welcome-modal/download-progress-view.tsx:183
+#: src/components/welcome-modal/download-progress-view.tsx:146
+#: src/components/welcome-modal/download-progress-view.tsx:200
 msgid "Ready"
 msgstr "Ready"
-
-#: src/components/right-panel/views/transcript-view.tsx:498
-#: src/components/settings/components/ai/stt-view.tsx:221
-#: src/components/settings/components/ai/stt-view.tsx:590
-#: src/components/settings/views/ai.tsx:50
-msgid "Real-time multilingual"
-msgstr "Real-time multilingual"
-
-#: src/components/editor-area/note-header/transcription-bar.tsx:539
-msgid "Real-time Universal"
-msgstr "Real-time Universal"
 
 #: src/lib/model-metadata.ts:11
 msgid "Reasoning-focused model for complex questions"
@@ -4821,11 +4602,7 @@ msgstr "Recent Notes"
 msgid "Recent updates"
 msgstr "Recent updates"
 
-#: src/components/settings/components/ai/stt-view.tsx:162
-msgid "Recommended multilingual model for most meetings"
-msgstr "Recommended multilingual model for most meetings"
-
-#: src/components/toast/shared.tsx:458
+#: src/components/toast/shared.tsx:460
 msgid "Recording could not be started. Check your audio settings."
 msgstr "Recording could not be started. Check your audio settings."
 
@@ -4883,13 +4660,12 @@ msgstr "Related Notes"
 msgid "Reliable general-purpose Groq model"
 msgstr "Reliable general-purpose Groq model"
 
-#: src/components/settings/components/ai/stt-view.tsx:398
-#: src/components/settings/components/ai/stt-view.tsx:675
-msgid "Reliable transcription quality"
-msgstr "Reliable transcription quality"
+#: src/components/settings/views/general.tsx:307
+msgid "Reload language list"
+msgstr "Reload language list"
 
 #: src/components/right-panel/components/listening-indicator.tsx:83
-#: src/components/right-panel/views/transcript-view.tsx:407
+#: src/components/right-panel/views/transcript-view.tsx:409
 msgid "remaining"
 msgstr "remaining"
 
@@ -4981,7 +4757,7 @@ msgstr "Resources"
 
 #: src/components/editor-area/note-header/listen-button.tsx:143
 #: src/components/editor-area/note-header/listen-button.tsx:232
-#: src/components/editor-area/note-header/transcription-bar.tsx:187
+#: src/components/editor-area/note-header/transcription-bar.tsx:194
 msgid "Resume"
 msgstr "Resume"
 
@@ -4991,11 +4767,11 @@ msgstr "Resume Recording"
 
 #: src/components/projects/project-brief-row.tsx:100
 #: src/components/projects/project-files-dropzone.tsx:176
-#: src/components/right-panel/views/transcript-view.tsx:296
-#: src/components/toast/shared.tsx:179
-#: src/components/toast/shared.tsx:260
-#: src/components/welcome-modal/download-progress-view.tsx:157
-#: src/components/welcome-modal/download-progress-view.tsx:195
+#: src/components/right-panel/views/transcript-view.tsx:298
+#: src/components/toast/shared.tsx:181
+#: src/components/toast/shared.tsx:262
+#: src/components/welcome-modal/download-progress-view.tsx:166
+#: src/components/welcome-modal/download-progress-view.tsx:212
 #: src/routes/app.ask.$threadId.tsx:530
 #: src/routes/app.ask.$threadId.tsx:719
 msgid "Retry"
@@ -5044,11 +4820,11 @@ msgstr "Save organization"
 msgid "Save Profile"
 msgstr "Save Profile"
 
-#: src/components/settings/views/general.tsx:215
+#: src/components/settings/views/general.tsx:226
 msgid "Save recordings"
 msgstr "Save recordings"
 
-#: src/components/settings/components/ai/task-defaults.tsx:268
+#: src/components/settings/components/ai/task-defaults.tsx:266
 msgid "Saved model"
 msgstr "Saved model"
 
@@ -5085,7 +4861,7 @@ msgstr "Search and select notes to add to this project."
 msgid "Search conversations"
 msgstr "Search conversations"
 
-#: src/components/settings/views/general.tsx:333
+#: src/components/settings/views/general.tsx:361
 #: src/components/welcome-modal/language-selection-view.tsx:150
 msgid "Search languages..."
 msgstr "Search languages..."
@@ -5225,18 +5001,18 @@ msgid "Select languages used in your meetings. The model will automatically dete
 msgstr "Select languages used in your meetings. The model will automatically detect which one is being spoken."
 
 #: src/components/editor-area/note-header/listen-button.tsx:624
-#: src/components/editor-area/note-header/transcription-bar.tsx:484
+#: src/components/editor-area/note-header/transcription-bar.tsx:491
 msgid "Select microphone..."
 msgstr "Select microphone..."
 
-#: src/components/editor-area/note-header/transcription-bar.tsx:550
+#: src/components/editor-area/note-header/transcription-bar.tsx:547
 #: src/components/settings/components/ai/llm-custom-view.tsx:560
-#: src/components/settings/components/ai/task-defaults.tsx:185
-#: src/components/settings/components/ai/task-defaults.tsx:234
-#: src/components/settings/components/ai/task-defaults.tsx:285
-#: src/components/transcript/actions/STTLanguageSelector.tsx:128
-#: src/components/transcript/actions/STTLanguageSelector.tsx:172
-#: src/components/transcript/actions/STTLanguageSelector.tsx:186
+#: src/components/settings/components/ai/task-defaults.tsx:183
+#: src/components/settings/components/ai/task-defaults.tsx:232
+#: src/components/settings/components/ai/task-defaults.tsx:283
+#: src/components/transcript/actions/STTLanguageSelector.tsx:100
+#: src/components/transcript/actions/STTLanguageSelector.tsx:144
+#: src/components/transcript/actions/STTLanguageSelector.tsx:158
 #: src/components/ui/model-selector.tsx:299
 #: src/components/ui/model-selector.tsx:311
 msgid "Select model"
@@ -5316,7 +5092,7 @@ msgstr "Serbian"
 msgid "Session not found"
 msgstr "Session not found"
 
-#: src/components/right-panel/views/transcript-view.tsx:307
+#: src/components/right-panel/views/transcript-view.tsx:309
 msgid "Session not found. Please try refreshing the app."
 msgstr "Session not found. Please try refreshing the app."
 
@@ -5328,7 +5104,7 @@ msgstr "Set as default"
 msgid "Set up your profile to personalize your experience."
 msgstr "Set up your profile to personalize your experience."
 
-#: src/components/toast/shared.tsx:380
+#: src/components/toast/shared.tsx:382
 #: src/components/ui/model-download-banner.tsx:34
 msgid "Setting up AI assistant"
 msgstr "Setting up AI assistant"
@@ -5337,7 +5113,7 @@ msgstr "Setting up AI assistant"
 msgid "Setting up offline AI models - you'll be able to chat soon"
 msgstr "Setting up offline AI models - you'll be able to chat soon"
 
-#: src/components/toast/shared.tsx:346
+#: src/components/toast/shared.tsx:348
 msgid "Setting up transcription"
 msgstr "Setting up transcription"
 
@@ -5457,22 +5233,6 @@ msgstr "Slovak"
 msgid "Slovenian"
 msgstr "Slovenian"
 
-#: src/components/transcript/constants/languageData.ts:218
-msgid "Small"
-msgstr "Small"
-
-#: src/components/transcript/constants/languageData.ts:234
-msgid "Small - English"
-msgstr "Small - English"
-
-#: src/components/settings/components/ai/stt-view.tsx:153
-msgid "Small English-only model for faster offline transcription"
-msgstr "Small English-only model for faster offline transcription"
-
-#: src/components/settings/components/ai/stt-view.tsx:151
-msgid "Small multilingual model for faster offline transcription"
-msgstr "Small multilingual model for faster offline transcription"
-
 #: src/lib/model-metadata.ts:10
 msgid "Smarter responses for complex questions and long meetings"
 msgstr "Smarter responses for complex questions and long meetings"
@@ -5519,17 +5279,13 @@ msgid "Source digest job is missing a valid source."
 msgstr "Source digest job is missing a valid source."
 
 #: src/components/editor-area/note-header/listen-button.tsx:488
-#: src/components/editor-area/note-header/transcription-bar.tsx:317
+#: src/components/editor-area/note-header/transcription-bar.tsx:324
 msgid "Sources"
 msgstr "Sources"
 
 #: src/lib/language-labels.ts:41
 msgid "Spanish"
 msgstr "Spanish"
-
-#: src/components/transcript/actions/STTLanguageSelector.tsx:493
-msgid "Spanish, Italian, Korean, Portuguese, English, Polish, Japanese, German, Russian"
-msgstr "Spanish, Italian, Korean, Portuguese, English, Polish, Japanese, German, Russian"
 
 #: src/components/right-panel/hooks/useTranscriptSessionEvents.ts:33
 msgid "Speaker labels added"
@@ -5538,13 +5294,6 @@ msgstr "Speaker labels added"
 #: src/components/toast/model-select.tsx:30
 msgid "Speech-to-Text Model Mismatch"
 msgstr "Speech-to-Text Model Mismatch"
-
-#: src/components/settings/components/ai/stt-view.tsx:305
-#: src/components/settings/components/ai/stt-view.tsx:550
-#: src/components/transcript/actions/STTLanguageSelector.tsx:294
-#: src/components/transcript/actions/STTLanguageSelector.tsx:417
-msgid "Speed"
-msgstr "Speed"
 
 #: src/components/projects/project-brief-preview.ts:37
 msgid "Stale"
@@ -5562,7 +5311,7 @@ msgstr "Start a conversation"
 msgid "Start a cross-meeting query from the main canvas and your threads will appear in this list."
 msgstr "Start a cross-meeting query from the main canvas and your threads will appear in this list."
 
-#: src/components/right-panel/views/transcript-view.tsx:523
+#: src/components/right-panel/views/transcript-view.tsx:513
 msgid "Start a transcription"
 msgstr "Start a transcription"
 
@@ -5591,8 +5340,8 @@ msgstr "Start Recording"
 msgid "Start taking notes..."
 msgstr "Start taking notes..."
 
-#: src/components/right-panel/views/transcript-view.tsx:572
-#: src/components/right-panel/views/transcript-view.tsx:586
+#: src/components/right-panel/views/transcript-view.tsx:561
+#: src/components/right-panel/views/transcript-view.tsx:575
 msgid "Start transcribing"
 msgstr "Start transcribing"
 
@@ -5601,7 +5350,7 @@ msgstr "Start transcribing"
 msgid "Start transcription"
 msgstr "Start transcription"
 
-#: src/components/right-panel/views/transcript-view.tsx:569
+#: src/components/right-panel/views/transcript-view.tsx:558
 msgid "Starting..."
 msgstr "Starting..."
 
@@ -5619,7 +5368,7 @@ msgstr "Stop and summarize transcript"
 msgid "Stop generating"
 msgstr "Stop generating"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:215
+#: src/components/transcript/actions/STTLanguageSelector.tsx:187
 msgid "Stop or pause recording to change transcription model"
 msgstr "Stop or pause recording to change transcription model"
 
@@ -5686,7 +5435,7 @@ msgstr "Summarized with Typr - Offline AI note-taking."
 msgid "Summarizing"
 msgstr "Summarizing"
 
-#: src/components/settings/views/general.tsx:407
+#: src/components/settings/views/general.tsx:434
 msgid "Summary language"
 msgstr "Summary language"
 
@@ -5695,17 +5444,9 @@ msgid "Summary not generated"
 msgstr "Summary not generated"
 
 #: src/components/editor-area/note-header/listen-button.tsx:543
-#: src/components/editor-area/note-header/transcription-bar.tsx:393
+#: src/components/editor-area/note-header/transcription-bar.tsx:400
 msgid "Summary template"
 msgstr "Summary template"
-
-#: src/components/settings/components/ai/stt-view.tsx:639
-msgid "Supported languages"
-msgstr "Supported languages"
-
-#: src/components/settings/components/ai/stt-view.tsx:362
-msgid "Supported languages by performance"
-msgstr "Supported languages by performance"
 
 #. placeholder {0}: AUDIO_EXTENSIONS.join(", ")
 #: src/components/audio-upload-dialog.tsx:116
@@ -5720,7 +5461,7 @@ msgstr "Swedish"
 msgid "Switched to cloud model"
 msgstr "Switched to cloud model"
 
-#: src/components/toast/shared.tsx:428
+#: src/components/toast/shared.tsx:430
 msgid "Switched to your new audio device. Transcription continues."
 msgstr "Switched to your new audio device. Transcription continues."
 
@@ -5739,8 +5480,8 @@ msgstr "System audio status changed"
 
 #: src/components/editor-area/note-header/listen-button.tsx:610
 #: src/components/editor-area/note-header/listen-button.tsx:611
-#: src/components/editor-area/note-header/transcription-bar.tsx:461
-#: src/components/editor-area/note-header/transcription-bar.tsx:462
+#: src/components/editor-area/note-header/transcription-bar.tsx:468
+#: src/components/editor-area/note-header/transcription-bar.tsx:469
 #: src/components/transcript/actions/MicrophoneSelector.tsx:146
 msgid "System Default (Auto)"
 msgstr "System Default (Auto)"
@@ -5791,6 +5532,15 @@ msgstr "Template for recurring one-on-one meetings between a manager and direct 
 msgid "Templates"
 msgstr "Templates"
 
+#: src/components/transcript/constants/languageData.ts:24
+#: src/components/transcript/constants/languageData.ts:60
+msgid "Text appears after you pause. English only."
+msgstr "Text appears after you pause. English only."
+
+#: src/components/transcript/constants/languageData.ts:25
+msgid "Text appears after you pause. Works offline in many languages."
+msgstr "Text appears after you pause. Works offline in many languages."
+
 #: src/components/projects/project-files-dropzone.tsx:109
 msgid "Text, Markdown, CSV, JSON, YAML, HTML, logs, PDF, and DOCX files are indexed locally for Ask."
 msgstr "Text, Markdown, CSV, JSON, YAML, HTML, logs, PDF, and DOCX files are indexed locally for Ask."
@@ -5834,7 +5584,7 @@ msgstr "The generated brief will summarize the current state, decisions, open qu
 msgid "The generated summary will appear from {sourceCountLabel} once the brief pipeline is connected."
 msgstr "The generated summary will appear from {sourceCountLabel} once the brief pipeline is connected."
 
-#: src/components/settings/components/ai/task-defaults.tsx:181
+#: src/components/settings/components/ai/task-defaults.tsx:179
 msgid "The model used when you ask questions or edit notes from chat."
 msgstr "The model used when you ask questions or edit notes from chat."
 
@@ -5842,7 +5592,7 @@ msgstr "The model used when you ask questions or edit notes from chat."
 msgid "The note stays in Notes and any other projects. It will no longer be used by this project’s brief or Ask, and the brief will refresh without it."
 msgstr "The note stays in Notes and any other projects. It will no longer be used by this project’s brief or Ask, and the brief will refresh without it."
 
-#: src/components/settings/components/ai/task-defaults.tsx:281
+#: src/components/settings/components/ai/task-defaults.tsx:279
 msgid "The speech-to-text model used when a recording or upload starts."
 msgstr "The speech-to-text model used when a recording or upload starts."
 
@@ -5908,7 +5658,7 @@ msgstr "this note"
 msgid "this project"
 msgstr "this project"
 
-#: src/components/settings/views/general.tsx:387
+#: src/components/settings/views/general.tsx:414
 msgid "This setting only affects offline transcription models."
 msgstr "This setting only affects offline transcription models."
 
@@ -5930,14 +5680,6 @@ msgstr "Time: {0}"
 #: src/components/toolbar/utils/share-session.ts:119
 msgid "Time: {0} - {1}"
 msgstr "Time: {0} - {1}"
-
-#: src/components/transcript/constants/languageData.ts:154
-msgid "Tiny"
-msgstr "Tiny"
-
-#: src/components/transcript/constants/languageData.ts:170
-msgid "Tiny - English"
-msgstr "Tiny - English"
 
 #: src/components/shortcuts-window.tsx:155
 msgid "Tips:"
@@ -5981,9 +5723,9 @@ msgstr "Too many requests, please try again later"
 #: src/components/audio-upload-dialog.tsx:372
 #: src/components/editor-area/note-header/listen-button.tsx:505
 #: src/components/editor-area/note-header/listen-button.tsx:523
-#: src/components/editor-area/note-header/transcription-bar.tsx:187
-#: src/components/editor-area/note-header/transcription-bar.tsx:334
-#: src/components/editor-area/note-header/transcription-bar.tsx:353
+#: src/components/editor-area/note-header/transcription-bar.tsx:194
+#: src/components/editor-area/note-header/transcription-bar.tsx:341
+#: src/components/editor-area/note-header/transcription-bar.tsx:360
 msgid "Transcribe"
 msgstr "Transcribe"
 
@@ -6035,14 +5777,14 @@ msgstr "Transcript imported successfully. AI summary is being generated..."
 msgid "Transcript imported successfully. Click 'Enhance' to generate summary."
 msgstr "Transcript imported successfully. Click 'Enhance' to generate summary."
 
-#: src/components/settings/components/ai/stt-view.tsx:172
-#: src/components/settings/components/ai/task-defaults.tsx:280
-#: src/components/settings/views/ai.tsx:149
+#: src/components/settings/components/ai/stt-view.tsx:89
+#: src/components/settings/components/ai/task-defaults.tsx:278
+#: src/components/settings/views/ai.tsx:144
 #: src/data/shortcuts.ts:15
 msgid "Transcription"
 msgstr "Transcription"
 
-#: src/components/welcome-modal/download-progress-view.tsx:230
+#: src/components/welcome-modal/download-progress-view.tsx:247
 msgid "Transcription and AI writing are ready to use."
 msgstr "Transcription and AI writing are ready to use."
 
@@ -6050,21 +5792,22 @@ msgstr "Transcription and AI writing are ready to use."
 msgid "Transcription complete"
 msgstr "Transcription complete"
 
-#: src/components/editor-area/note-header/transcription-bar.tsx:160
+#: src/components/editor-area/note-header/transcription-bar.tsx:167
 msgid "Transcription controls"
 msgstr "Transcription controls"
 
-#: src/components/settings/views/general.tsx:279
+#: src/components/settings/views/general.tsx:290
 msgid "Transcription languages (optional)"
 msgstr "Transcription languages (optional)"
 
-#: src/components/editor-area/note-header/transcription-bar.tsx:383
-#: src/components/right-panel/views/transcript-view.tsx:538
-#: src/components/transcript/actions/STTLanguageSelector.tsx:201
+#: src/components/editor-area/note-header/transcription-bar.tsx:390
+#: src/components/right-panel/views/transcript-view.tsx:527
+#: src/components/transcript/actions/STTLanguageSelector.tsx:173
+#: src/components/transcript/constants/languageData.ts:134
 msgid "Transcription model"
 msgstr "Transcription model"
 
-#: src/components/transcript/hooks/useSTTModel.ts:82
+#: src/components/transcript/hooks/useSTTModel.ts:80
 msgid "Transcription model changed"
 msgstr "Transcription model changed"
 
@@ -6072,7 +5815,7 @@ msgstr "Transcription model changed"
 msgid "Transcription reconnected"
 msgstr "Transcription reconnected"
 
-#: src/components/welcome-modal/download-progress-view.tsx:154
+#: src/components/welcome-modal/download-progress-view.tsx:155
 msgid "Transcription setup failed"
 msgstr "Transcription setup failed"
 
@@ -6123,7 +5866,7 @@ msgstr "Try another search."
 msgid "Try new capabilities currently in development. These features may have occasional issues and are refined based on your feedback."
 msgstr "Try new capabilities currently in development. These features may have occasional issues and are refined based on your feedback."
 
-#: src/components/right-panel/views/transcript-view.tsx:567
+#: src/components/right-panel/views/transcript-view.tsx:556
 msgid "Try the demo video above first!"
 msgstr "Try the demo video above first!"
 
@@ -6143,7 +5886,7 @@ msgstr "Type a message..."
 msgid "Type or paste email addresses below, separated by commas."
 msgstr "Type or paste email addresses below, separated by commas."
 
-#: src/components/settings/views/general.tsx:457
+#: src/components/settings/views/general.tsx:484
 msgid "Type terms separated by commas (e.g., Project Phoenix, OKR cadence)"
 msgstr "Type terms separated by commas (e.g., Project Phoenix, OKR cadence)"
 
@@ -6171,7 +5914,7 @@ msgstr "Typr transcribes audio directly from your device. Grant microphone and s
 msgid "Typr turns your meetings into organized, searchable notes. Focus on the conversation, we'll handle the rest."
 msgstr "Typr turns your meetings into organized, searchable notes. Focus on the conversation, we'll handle the rest."
 
-#: src/components/settings/components/ai/task-defaults.tsx:170
+#: src/components/settings/components/ai/task-defaults.tsx:168
 msgid "Typr uses these AI models by default for chat, project briefs, meeting summaries, and transcription. You can override them later by choosing a different model inside each feature."
 msgstr "Typr uses these AI models by default for chat, project briefs, meeting summaries, and transcription. You can override them later by choosing a different model inside each feature."
 
@@ -6183,7 +5926,7 @@ msgstr "Typr will build this from {sourceCountLabel} in this project."
 msgid "Ukrainian"
 msgstr "Ukrainian"
 
-#: src/components/right-panel/views/transcript-view.tsx:288
+#: src/components/right-panel/views/transcript-view.tsx:290
 msgid "Unable to access session data"
 msgstr "Unable to access session data"
 
@@ -6231,7 +5974,7 @@ msgid "Unsupported project knowledge job type: {0}"
 msgstr "Unsupported project knowledge job type: {0}"
 
 #: src/components/editor-area/note-header/listen-button.tsx:566
-#: src/components/editor-area/note-header/transcription-bar.tsx:416
+#: src/components/editor-area/note-header/transcription-bar.tsx:423
 msgid "Untitled"
 msgstr "Untitled"
 
@@ -6297,7 +6040,7 @@ msgstr "Update Available"
 msgid "Update now"
 msgstr "Update now"
 
-#: src/components/right-panel/views/transcript-view.tsx:430
+#: src/components/right-panel/views/transcript-view.tsx:432
 msgid "Upload audio file"
 msgstr "Upload audio file"
 
@@ -6325,8 +6068,8 @@ msgid "Usage analytics"
 msgstr "Usage analytics"
 
 #: src/components/settings/components/ai/llm-local-view.tsx:375
-#: src/components/settings/components/ai/stt-view.tsx:258
-#: src/components/settings/components/ai/stt-view.tsx:525
+#: src/components/settings/components/ai/stt-view.tsx:175
+#: src/components/settings/components/ai/stt-view.tsx:307
 msgid "Use"
 msgstr "Use"
 
@@ -6376,7 +6119,7 @@ msgstr "useReasoningContext must be used within a Reasoning provider"
 msgid "Uses connected cloud models first, then on-device models"
 msgstr "Uses connected cloud models first, then on-device models"
 
-#: src/components/settings/components/ai/task-defaults.tsx:243
+#: src/components/settings/components/ai/task-defaults.tsx:241
 msgid "Uses the chat default above"
 msgstr "Uses the chat default above"
 
@@ -6409,10 +6152,6 @@ msgstr "Video thumbnail"
 #: src/lib/language-labels.ts:48
 msgid "Vietnamese"
 msgstr "Vietnamese"
-
-#: src/components/settings/components/ai/stt-view.tsx:349
-msgid "View 50+ supported languages"
-msgstr "View 50+ supported languages"
 
 #: src/components/left-sidebar/projects-section.tsx:214
 msgid "View all projects"
@@ -6453,17 +6192,18 @@ msgstr "View source {0}"
 msgid "View source {label}"
 msgstr "View source {label}"
 
-#: src/components/settings/components/ai/stt-view.tsx:343
-#: src/components/settings/components/ai/stt-view.tsx:620
-#: src/components/settings/components/ai/stt-view.tsx:626
+#: src/components/settings/components/ai/stt-view.tsx:222
+#: src/components/settings/components/ai/stt-view.tsx:228
+#: src/components/settings/components/ai/stt-view.tsx:351
+#: src/components/settings/components/ai/stt-view.tsx:357
 msgid "View supported languages"
 msgstr "View supported languages"
 
-#: src/components/toast/shared.tsx:194
+#: src/components/toast/shared.tsx:196
 msgid "Voice transcription"
 msgstr "Voice transcription"
 
-#: src/components/toast/shared.tsx:193
+#: src/components/toast/shared.tsx:195
 msgid "Voice transcription · {modelSize}"
 msgstr "Voice transcription · {modelSize}"
 
@@ -6475,7 +6215,7 @@ msgstr "Wait..."
 msgid "Watch live transcription demo (30 secs)"
 msgstr "Watch live transcription demo (30 secs)"
 
-#: src/components/right-panel/views/transcript-view.tsx:610
+#: src/components/right-panel/views/transcript-view.tsx:599
 msgid "Watch the demo video above to see how Typr transcription works!"
 msgstr "Watch the demo video above to see how Typr transcription works!"
 
@@ -6540,11 +6280,6 @@ msgstr "Word Error Rate (WER) indicates transcription accuracy (lower is better)
 msgid "Words appear after pauses in speech. Keep talking naturally—the AI processes in batches for better accuracy."
 msgstr "Words appear after pauses in speech. Keep talking naturally—the AI processes in batches for better accuracy."
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:91
-#: src/components/transcript/constants/languageData.ts:77
-msgid "Works with any language automatically"
-msgstr "Works with any language automatically"
-
 #: src/components/audio-upload-dialog.tsx:329
 msgid "Works without internet"
 msgstr "Works without internet"
@@ -6553,7 +6288,7 @@ msgstr "Works without internet"
 msgid "Write and refine your notes by chatting with AI. Select Edit mode in the chat sidebar to start editing."
 msgstr "Write and refine your notes by chatting with AI. Select Edit mode in the chat sidebar to start editing."
 
-#: src/components/settings/components/ai/task-defaults.tsx:115
+#: src/components/settings/components/ai/task-defaults.tsx:113
 msgid "Writes AI notes after recordings, uploads, and imported videos."
 msgstr "Writes AI notes after recordings, uploads, and imported videos."
 
@@ -6635,12 +6370,12 @@ msgstr "Your templates"
 msgid "Your Templates"
 msgstr "Your Templates"
 
-#: src/components/toast/shared.tsx:433
+#: src/components/toast/shared.tsx:435
 msgid "Your transcription continues — still using the selected audio device."
 msgstr "Your transcription continues — still using the selected audio device."
 
 #: src/components/editor-area/note-header/listen-button.tsx:494
-#: src/components/editor-area/note-header/transcription-bar.tsx:323
+#: src/components/editor-area/note-header/transcription-bar.tsx:330
 msgid "Your voice"
 msgstr "Your voice"
 

@@ -1,5 +1,3 @@
-import { i18n } from "@lingui/core";
-import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { openPath } from "@tauri-apps/plugin-opener";
@@ -36,8 +34,7 @@ const getInitialSttModels = (
     return {
       key,
       name: metadata.name,
-      accuracy: metadata.intelligence,
-      speed: metadata.speed,
+
       size: nativeModel?.size_bytes
         ? `${Math.round(nativeModel.size_bytes / 1_000_000)} MB`
         : metadata.size,
@@ -47,14 +44,12 @@ const getInitialSttModels = (
   }),
   {
     key: "AssemblyAIUniversal",
-    name: i18n._(msg`Real-time multilingual`),
-    accuracy: 3,
-    speed: 3,
+    name: sttModelMetadata.AssemblyAIUniversal.name,
+
     size: "0 MB",
     downloaded: true, // Cloud models are always "available"
     fileName: "",
     isCloud: true,
-    supportedLanguages: "6 languages (EN, ES, FR, DE, IT, PT)", // AssemblyAI U3 Pro code-switching
   },
 ];
 

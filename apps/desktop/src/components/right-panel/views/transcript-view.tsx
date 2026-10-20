@@ -1,5 +1,6 @@
 import { useAudioUpload } from "@/contexts/audio-upload";
 import { transcriptionModelQueryOptions } from "@/lib/model-selection";
+import { sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { useAudioUploadStore } from "@/stores/audio-upload";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -29,8 +30,9 @@ import { Button } from "@typr/ui/components/ui/button";
 import { Spinner } from "@typr/ui/components/ui/spinner";
 import { useOngoingSession } from "@typr/utils/contexts";
 import { STTLanguageSelector } from "../../transcript/actions/STTLanguageSelector";
-import { LANGUAGE_OPTIONS, type LanguageOption } from "../../transcript/constants/languageData";
+import { getSttModelDescription, getSttModelLabel, LANGUAGE_OPTIONS } from "../../transcript/constants/languageData";
 import { useSTTModel } from "../../transcript/hooks/useSTTModel";
+import { STTProviderIcon } from "../../transcript/STTProviderIcon";
 import { SearchHeader } from "../components/search";
 import { useTranscriptWidget } from "../hooks/useTranscriptWidget";
 import { shouldPersistTranscriptUpdate } from "./transcript-persistence";
@@ -450,6 +452,7 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
   const { models } = useModelState();
   const isUploadProcessing = useAudioUploadStore((s) => s.progress.status === "processing");
   const { selectedLanguage, handleLanguageChange, isChanging } = useSTTModel();
+  const capabilities = useQuery(sttCapabilitiesQueryOptions());
 
   const supportedModelsQuery = useQuery({
     queryKey: ["supported-stt-models"],
@@ -488,19 +491,6 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
     ? t`Cloud`
     : t`On-device`;
 
-  const getSelectedModelLabel = (key: LanguageOption) => {
-    switch (key) {
-      case "balanced":
-        return t`Multilingual`;
-      case "english":
-        return t`English high accuracy`;
-      case "assemblyai-universal":
-        return t`Real-time multilingual`;
-      default:
-        return key;
-    }
-  };
-
   return (
     <motion.div
       className="group flex-1 flex flex-col items-center justify-center h-full px-8 py-6 text-center"
@@ -523,9 +513,7 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
           <Trans>Start a transcription</Trans>
         </h2>
         <p className="text-sm text-muted-foreground max-w-[280px] leading-relaxed">
-          <Trans>
-            Convert your audio to text in real-time.
-          </Trans>
+          {getSttModelDescription(selectedModel?.modelKey ?? "", capabilities.data)}
         </p>
       </motion.div>
 
@@ -534,8 +522,9 @@ function RenderEmpty({ sessionId, containerRef, layout }: {
           variants={BUTTON_VARIANTS}
           className="mb-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground"
         >
+          {selectedModel && <STTProviderIcon model={selectedModel.modelKey} />}
           <span className="font-medium text-foreground/80">
-            {selectedModel ? getSelectedModelLabel(selectedModel.key) : <Trans>Transcription model</Trans>}
+            {selectedModel ? getSttModelLabel(selectedModel.key) : <Trans>Transcription model</Trans>}
           </span>
           <span>·</span>
           <span>{selectedModelSource}</span>

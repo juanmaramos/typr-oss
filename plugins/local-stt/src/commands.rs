@@ -32,6 +32,8 @@ pub fn list_model_capabilities<R: tauri::Runtime>(
             realtime: model.backend() == crate::SttBackend::NemotronStreaming,
             recorded: model.backend() == crate::SttBackend::Whisper,
             available: model.backend() == crate::SttBackend::Whisper || nemotron_available,
+            supported_languages: model.supported_languages(),
+            supported_locales: model.supported_locales(),
         })
         .collect()
 }

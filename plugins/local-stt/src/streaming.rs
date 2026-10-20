@@ -345,23 +345,9 @@ pub(crate) async fn serve(
 }
 
 fn streaming_language(languages: &[typr_language::Language]) -> Result<&'static str, crate::Error> {
-    use typr_language::ISO639;
-    if languages
-        .iter()
-        .any(|language| !matches!(**language, ISO639::En | ISO639::Es))
-    {
-        return Err(crate::Error::NotSupported(
-            "Nemotron prototype supports English and Spanish".into(),
-        ));
-    }
-    if languages.len() != 1 {
-        return Ok("auto");
-    }
-    match *languages[0] {
-        ISO639::En => Ok("en-US"),
-        ISO639::Es => Ok("es-ES"),
-        _ => unreachable!("validated languages"),
-    }
+    crate::SupportedModel::Nemotron3p5Streaming
+        .streaming_locale(languages)
+        .map_err(crate::Error::NotSupported)
 }
 
 #[cfg(test)]
@@ -478,14 +464,41 @@ mod tests {
     }
 
     #[test]
-    fn language_policy_preserves_english_spanish_and_rejects_other_languages() {
+    fn language_policy_uses_the_shared_out_of_box_registry() {
         use typr_language::{Language, ISO639};
         let en = Language::from(ISO639::En);
         let es = Language::from(ISO639::Es);
         assert_eq!(streaming_language(&[en.clone()]).unwrap(), "en-US");
         assert_eq!(streaming_language(&[es.clone()]).unwrap(), "es-ES");
         assert_eq!(streaming_language(&[en, es]).unwrap(), "auto");
-        assert!(streaming_language(&[Language::from(ISO639::Fr)]).is_err());
+        assert_eq!(
+            streaming_language(&[Language::from(ISO639::Fr)]).unwrap(),
+            "fr-FR"
+        );
+        assert_eq!(
+            streaming_language(&[Language::from(ISO639::No)]).unwrap(),
+            "nb-NO"
+        );
+        assert!(streaming_language(&[Language::from(ISO639::El)]).is_err());
+        assert_eq!(
+            crate::SupportedModel::QuantizedBaseEn.supported_languages(),
+            Some(vec!["en".into()])
+        );
+        assert!(crate::SupportedModel::QuantizedLargeTurbo
+            .supported_languages()
+            .is_none());
+        assert!(crate::SupportedModel::QuantizedLargeTurbo
+            .supported_locales()
+            .is_none());
+        let model = crate::SupportedModel::Nemotron3p5Streaming;
+        assert_eq!(model.supported_languages().unwrap().len(), 28);
+        assert_eq!(model.supported_locales().unwrap().len(), 32);
+        for code in model.supported_languages().unwrap() {
+            let language: Language =
+                serde_json::from_value(serde_json::Value::String(code)).unwrap();
+            assert!(model.supports_languages(&[language.clone()]));
+            assert!(streaming_language(&[language]).is_ok());
+        }
         assert!(crate::STREAMING_WHISPER_FALLBACKS
             .iter()
             .all(|model| model.backend() == crate::SttBackend::Whisper

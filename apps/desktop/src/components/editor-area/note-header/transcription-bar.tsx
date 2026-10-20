@@ -1,3 +1,6 @@
+import { STTProviderIcon } from "@/components/transcript/STTProviderIcon";
+import { usePlatform } from "@/hooks/usePlatform";
+import { getAvailableSettingsSttModels, sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
 import { localizeDefaultTemplate } from "@/utils/default-templates";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -26,7 +29,11 @@ import { cn } from "@typr/ui/lib/utils";
 import { useOngoingSession, useSession } from "@typr/utils/contexts";
 
 // STT Components
-import { LANGUAGE_OPTIONS } from "../../transcript/constants/languageData";
+import {
+  getAvailableLanguageOptions,
+  getSttModelLabel,
+  LANGUAGE_OPTIONS,
+} from "../../transcript/constants/languageData";
 import { useSTTModel } from "../../transcript/hooks/useSTTModel";
 import { useTranscriptState } from "../../transcript/hooks/useTranscriptState";
 
@@ -524,30 +531,20 @@ function STTModelDropdown({
   disabled?: boolean;
 }) {
   const { selectedLanguage, handleLanguageChange } = useSTTModel();
+  const capabilities = useQuery(sttCapabilitiesQueryOptions());
+  const { supportsLocalModels } = usePlatform();
+  const availableOptions = getAvailableLanguageOptions(
+    supportsLocalModels,
+    getAvailableSettingsSttModels(capabilities.data),
+  );
   const { t } = useLingui();
-
-  // Helper function to get translated model labels
-  const getTranslatedLabel = (key: string) => {
-    switch (key) {
-      case "balanced":
-        return t`Multilingual`;
-      case "english":
-        return t`English high accuracy`;
-      case "multilingual":
-        return t`Multilingual high accuracy`;
-      case "assemblyai-universal":
-        return t`Real-time Universal`;
-      default:
-        return key;
-    }
-  };
 
   const handleSelect = (optionKey: string) => {
     handleLanguageChange(optionKey as any);
   };
 
   const selectedOption = LANGUAGE_OPTIONS.find(option => option.key === selectedLanguage);
-  const displayLabel = selectedOption ? getTranslatedLabel(selectedOption.key) : t`Select model`;
+  const displayLabel = selectedOption ? getSttModelLabel(selectedOption.key) : t`Select model`;
 
   return (
     <Select
@@ -558,17 +555,20 @@ function STTModelDropdown({
       <SelectTrigger size="sm" className="w-full">
         <SelectValue>
           <div className="flex items-center justify-between w-full">
-            <span className="truncate">{displayLabel}</span>
+            <span className="flex items-center gap-2 truncate">
+              {selectedOption && <STTProviderIcon model={selectedOption.modelKey} />}
+              {displayLabel}
+            </span>
           </div>
         </SelectValue>
       </SelectTrigger>
       <SelectContent className="max-h-48 overflow-y-auto" side="top">
-        {LANGUAGE_OPTIONS.filter(option => !("hidden" in option) || !option.hidden).map((option) => (
+        {availableOptions.map((option) => (
           <SelectItem key={option.key} value={option.key}>
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
-                <i className={option.iconClass} />
-                <span className="truncate">{getTranslatedLabel(option.key)}</span>
+                <STTProviderIcon model={option.modelKey} />
+                <span className="truncate">{getSttModelLabel(option.key)}</span>
               </div>
             </div>
           </SelectItem>
