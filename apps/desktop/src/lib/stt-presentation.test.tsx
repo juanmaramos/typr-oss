@@ -93,6 +93,13 @@ afterEach(async () => {
 });
 
 describe("canonical STT presentation", () => {
+  it("makes the icon-only model picker recognizable as a dropdown", async () => {
+    await render(<STTLanguageSelector value="nemotron-streaming" onChange={() => {}} isActive />);
+    const trigger = container.querySelector("button[title=\"Nemotron 3.5\"]")!;
+    expect(trigger.querySelector(".ri-arrow-down-s-line[aria-hidden=\"true\"]")).not.toBeNull();
+    expect(trigger.getAttribute("aria-haspopup")).toBe("dialog");
+  });
+
   it("formats native download sizes in decimal MB or GB from the shared presentation controller", () => {
     expect(getSttModelSize("Nemotron3p5Streaming", [native])).toBe("742 MB");
     const distil = { ...native, model: "DistilLargeV35En" as const, size_bytes: 1_500_000_000 };

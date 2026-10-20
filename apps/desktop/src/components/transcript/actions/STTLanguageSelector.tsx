@@ -79,14 +79,25 @@ export function STTLanguageSelector({
         isInlineTrigger
           ? "h-auto gap-0.5 px-0 py-0 text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground"
           : isActive
-          ? "h-7 w-7 transition-all"
+          ? "h-7 w-auto gap-0.5 px-1.5 transition-all"
           : "justify-between gap-1.5 h-7 px-2 text-sm transition-all",
         disabled && "opacity-50 cursor-not-allowed",
       )}
       onClick={() => !disabled && setIsOpen(!isOpen)}
     >
       {isActive
-        ? <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
+        ? (
+          <>
+            <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
+            <i
+              aria-hidden="true"
+              className={cn(
+                "ri-arrow-down-s-line text-xs text-muted-foreground transition-transform duration-200",
+                isOpen && "rotate-180",
+              )}
+            />
+          </>
+        )
         : (
           <>
             {showCustomTrigger

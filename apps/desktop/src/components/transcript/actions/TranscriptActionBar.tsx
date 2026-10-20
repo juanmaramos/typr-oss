@@ -1,9 +1,17 @@
-import { ResponsiveIconButton } from "@typr/ui";
-import { cn } from "@typr/ui/lib/utils";
 import { useLingui } from "@lingui/react/macro";
 import { IconArrowsDiagonalMinimize2 } from "@tabler/icons-react";
 import { writeText as writeTextToClipboard } from "@tauri-apps/plugin-clipboard-manager";
-import { useCallback, useState } from "react";
+import { ResponsiveIconButton } from "@typr/ui";
+import { Button } from "@typr/ui/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@typr/ui/components/ui/dropdown-menu";
+import { cn } from "@typr/ui/lib/utils";
+import { MoreHorizontal } from "lucide-react";
+import { useCallback, useLayoutEffect, useState } from "react";
 
 function FindReplaceIcon({ size = 16, className = "" }) {
   return <i className={`ri-find-replace-line ${className}`} style={{ fontSize: size }} />;
@@ -36,13 +44,11 @@ import { type TranscriptEditorRef } from "@typr/tiptap/transcript";
 
 import { useSTTModel } from "../hooks/useSTTModel";
 import type { TranscriptState } from "../hooks/useTranscriptState";
-import { AudioSettingsButton } from "./AudioSettingsButton";
 import { MicrophoneSelector } from "./MicrophoneSelector";
 import { STTLanguageSelector } from "./STTLanguageSelector";
 
 interface TranscriptActionBarProps {
   sessionId: string | null;
-  panelWidth: number;
   editorRef?: React.RefObject<TranscriptEditorRef | null>;
   onSearchToggle?: (active: boolean) => void;
   isSearchActive?: boolean;
@@ -55,8 +61,6 @@ interface TranscriptActionBarProps {
 }
 
 export function TranscriptActionBar({
-  sessionId,
-  panelWidth,
   editorRef,
   onSearchToggle,
   isSearchActive = false,
@@ -72,6 +76,22 @@ export function TranscriptActionBar({
   const { isRecordingActive } = useTranscriptionActive();
   const { selectedLanguage, handleLanguageChange, isChanging } = useSTTModel();
   const [copied, setCopied] = useState(false);
+  const [toolbarElement, setToolbarElement] = useState<HTMLDivElement | null>(null);
+  const [panelWidth, setPanelWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    if (!toolbarElement) {
+      return;
+    }
+    setPanelWidth(toolbarElement.getBoundingClientRect().width);
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width > 0) {
+        setPanelWidth(entry.contentRect.width);
+      }
+    });
+    observer.observe(toolbarElement);
+    return () => observer.disconnect();
+  }, [toolbarElement]);
 
   const handleCopyAll = useCallback(async () => {
     if (editorRef?.current?.editor) {
@@ -90,160 +110,143 @@ export function TranscriptActionBar({
     return null;
   }
 
-  const isCompact = panelWidth < 380;
+  const isFloating = layout === "floating";
+  const isCompact = panelWidth > 0 && panelWidth < 380;
+  const showOverflow = isFloating && isCompact;
+  const showTranscriptActions = transcriptState === "stopped";
+  const showAsk = isFloating && !showTabs;
+  const iconClass = cn(
+    "h-7 w-7 text-foreground hover:text-foreground",
+    isFloating ? "hover:bg-surface-400/70" : "hover:bg-background/50",
+  );
+  const copyLabel = copied ? t`Copied!` : t`Copy All`;
+  const findLabel = t`Find & Replace`;
 
   return (
-    <div className="relative">
+    <div className="relative" ref={setToolbarElement}>
       <div
-        className={layout === "floating"
-          ? "flex items-center justify-between border-b border-border/60 bg-muted/25 px-5 py-2.5"
-          : "flex items-center justify-between px-4 py-3 bg-background"}
-        style={{ gap: "8px" }}
+        className={cn(
+          "flex flex-nowrap items-center justify-between gap-2",
+          isFloating
+            ? "border-b border-border/60 bg-muted/25 px-5 py-2.5"
+            : "px-4 py-3 bg-background",
+        )}
       >
-        {showTabs
-          ? (
-            <div className="flex items-center gap-5 border-b border-border">
-              <Tab
-                text={t`Chat`}
-                value="chat"
-                selected={currentView === "chat"}
-                onSelect={(value) => switchView(value as "chat" | "transcript")}
-              />
-              <Tab
-                text={t`Transcript`}
-                value="transcript"
-                selected={currentView === "transcript"}
-                showRecordingIndicator={isRecordingActive}
-                onSelect={(value) => switchView(value as "chat" | "transcript")}
-              />
+        {showTabs && (
+          <div className="flex shrink-0 items-center gap-5 border-b border-border">
+            <Tab text={t`Chat`} value="chat" selected={currentView === "chat"} onSelect={() => switchView("chat")} />
+            <Tab
+              text={t`Transcript`}
+              value="transcript"
+              selected={currentView === "transcript"}
+              showRecordingIndicator={isRecordingActive}
+              onSelect={() => switchView("transcript")}
+            />
+          </div>
+        )}
+        <div className={cn("flex min-w-0 flex-nowrap items-center", isFloating ? "flex-1 gap-4" : "gap-2")}>
+          <div role="group" aria-label={t`Audio setup`} className="flex shrink-0 items-center gap-2">
+            <MicrophoneSelector size="compact" isActive />
+            <STTLanguageSelector
+              value={selectedLanguage}
+              onChange={handleLanguageChange}
+              disabled={isChanging || (transcriptState === "active" && !isLanguageChangeable)}
+              size="compact"
+              isActive
+            />
+          </div>
+          {(showTranscriptActions || showAsk) && (
+            <div
+              role="group"
+              aria-label={t`Transcript actions`}
+              className={cn("flex shrink-0 items-center gap-2", isFloating && "ml-auto")}
+            >
+              {showTranscriptActions && (showOverflow
+                ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={iconClass}
+                        aria-label={t`More transcript actions`}
+                        title={t`More transcript actions`}
+                      >
+                        <MoreHorizontal aria-hidden="true" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onSelect={handleSearchToggle}>
+                        <FindReplaceIcon />
+                        {findLabel}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => void handleCopyAll()}>
+                        <CopyIcon />
+                        {copyLabel}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )
+                : (
+                  <>
+                    <ResponsiveIconButton
+                      icon={FindReplaceIcon}
+                      text={findLabel}
+                      onClick={handleSearchToggle}
+                      displayMode="icon"
+                      variant="ghost"
+                      size="icon"
+                      className={iconClass}
+                    />
+                    <ResponsiveIconButton
+                      icon={copied ? CheckIcon : CopyIcon}
+                      text={copyLabel}
+                      onClick={handleCopyAll}
+                      displayMode="icon"
+                      variant="ghost"
+                      size="icon"
+                      className={cn(iconClass, copied && "text-success")}
+                    />
+                  </>
+                ))}
+              {showAsk && (
+                <ResponsiveIconButton
+                  icon={SparkleIcon}
+                  text={t`Ask AI`}
+                  onClick={() => switchView("chat")}
+                  displayMode="icon"
+                  variant="ghost"
+                  size="icon"
+                  className={iconClass}
+                />
+              )}
             </div>
-          )
-          : <div />}
-
-        <div className="flex items-center gap-2">
-          {transcriptState === "active" && (
-            <>
-              <MicrophoneSelector
-                size={isCompact ? "compact" : "full"}
-                isActive={true}
-              />
-              <STTLanguageSelector
-                value={selectedLanguage}
-                onChange={handleLanguageChange}
-                disabled={!isLanguageChangeable || isChanging}
-                size={isCompact ? "compact" : "full"}
-                isActive={true}
-              />
-              <div className="hidden">
-                <AudioSettingsButton
-                  displayMode={isCompact ? "icon" : "full"}
+          )}
+          {isFloating && (onMoveToSidebar || onClose) && (
+            <div role="group" aria-label={t`Window controls`} className="ml-auto flex shrink-0 items-center gap-2">
+              {onMoveToSidebar && (
+                <ResponsiveIconButton
+                  icon={SidebarIcon}
+                  text={t`Move to sidebar`}
+                  onClick={onMoveToSidebar}
+                  displayMode="icon"
                   variant="ghost"
-                  className="h-7 text-muted-foreground hover:text-foreground hover:bg-surface-400"
-                  size="sm"
+                  size="icon"
+                  className={iconClass}
                 />
-              </div>
-            </>
-          )}
-
-          {transcriptState === "empty" && (
-            <>
-              <MicrophoneSelector
-                size="compact"
-                isActive={false}
-              />
-              <STTLanguageSelector
-                value={selectedLanguage}
-                onChange={handleLanguageChange}
-                disabled={isChanging}
-                size="compact"
-                isActive={true}
-              />
-            </>
-          )}
-
-          {transcriptState === "stopped" && (
-            <>
-              <MicrophoneSelector
-                size={isCompact ? "compact" : "full"}
-                isActive={true}
-              />
-              <STTLanguageSelector
-                value={selectedLanguage}
-                onChange={handleLanguageChange}
-                disabled={isChanging}
-                size={isCompact ? "compact" : "full"}
-                isActive={true}
-              />
-              <div className="hidden">
-                <AudioSettingsButton
-                  displayMode={isCompact ? "icon" : "full"}
+              )}
+              {onClose && (
+                <ResponsiveIconButton
+                  icon={MinimizeIcon}
+                  text={t`Minimize`}
+                  onClick={onClose}
+                  displayMode="icon"
                   variant="ghost"
-                  className="h-7 text-muted-foreground hover:text-foreground hover:bg-surface-400"
-                  size="sm"
+                  size="icon"
+                  className={iconClass}
                 />
-              </div>
-              <ResponsiveIconButton
-                icon={FindReplaceIcon}
-                text={t`Find & Replace`}
-                onClick={handleSearchToggle}
-                displayMode="icon"
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "h-7 w-7 text-foreground hover:text-foreground",
-                  layout === "floating" ? "hover:bg-surface-400/70" : "hover:bg-background/50",
-                )}
-              />
-              <ResponsiveIconButton
-                icon={copied ? CheckIcon : CopyIcon}
-                text={copied ? t`Copied!` : t`Copy All`}
-                onClick={handleCopyAll}
-                displayMode="icon"
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "h-7 w-7 transition-all duration-200",
-                  layout === "floating" ? "hover:bg-surface-400/70" : "hover:bg-background/50",
-                  copied ? "text-success" : "text-foreground hover:text-foreground",
-                )}
-              />
-            </>
-          )}
-
-          {layout === "floating" && !showTabs && (
-            <ResponsiveIconButton
-              icon={SparkleIcon}
-              text={t`Ask AI`}
-              onClick={() => {
-                switchView("chat");
-              }}
-              displayMode="icon"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-            />
-          )}
-
-          {layout === "floating" && onMoveToSidebar && (
-            <ResponsiveIconButton
-              icon={SidebarIcon}
-              text={t`Move to sidebar`}
-              onClick={onMoveToSidebar}
-              displayMode="icon"
-              variant="ghost"
-              className="h-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-            />
-          )}
-
-          {layout === "floating" && onClose && (
-            <ResponsiveIconButton
-              icon={MinimizeIcon}
-              text={t`Minimize`}
-              onClick={onClose}
-              displayMode="icon"
-              variant="ghost"
-              className="h-7 text-foreground hover:text-foreground hover:bg-surface-400/70"
-            />
+              )}
+            </div>
           )}
         </div>
       </div>

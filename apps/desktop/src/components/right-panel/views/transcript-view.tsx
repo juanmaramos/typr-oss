@@ -332,7 +332,6 @@ export function TranscriptView({
 
       <TranscriptActionBar
         sessionId={sessionId}
-        panelWidth={containerRef.current?.getBoundingClientRect().width ?? 400}
         editorRef={editorRef}
         onSearchToggle={setIsSearchActive}
         isSearchActive={isSearchActive}
