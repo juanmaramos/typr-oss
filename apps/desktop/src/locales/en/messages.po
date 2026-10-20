@@ -1696,7 +1696,7 @@ msgstr "Changes rejected"
 #: src/components/right-panel/components/floating-view-toggle.tsx:28
 #: src/components/right-panel/views/chat-view.tsx:511
 #: src/components/settings/components/ai/llm-local-view.tsx:151
-#: src/components/settings/views/ai.tsx:123
+#: src/components/settings/views/ai.tsx:125
 #: src/components/transcript/actions/TranscriptActionBar.tsx:119
 msgid "Chat"
 msgstr "Chat"
@@ -1876,11 +1876,11 @@ msgstr "Cloud"
 msgid "Cloud · typically 1–3 min"
 msgstr "Cloud · typically 1–3 min"
 
-#: src/components/toast/model-download.tsx:76
+#: src/components/toast/model-download.tsx:81
 msgid "Cloud mode is already available. Download these only to use transcription and summaries offline."
 msgstr "Cloud mode is already available. Download these only to use transcription and summaries offline."
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:160
+#: src/components/transcript/actions/STTLanguageSelector.tsx:163
 #: src/components/ui/model-selector.tsx:402
 msgid "Cloud Models"
 msgstr "Cloud Models"
@@ -1889,7 +1889,7 @@ msgstr "Cloud Models"
 msgid "Cloud models unavailable, switching to local transcription"
 msgstr "Cloud models unavailable, switching to local transcription"
 
-#: src/components/toast/model-download.tsx:85
+#: src/components/toast/model-download.tsx:90
 msgid "Cloud summaries are already available. Download this model only if you want offline summaries."
 msgstr "Cloud summaries are already available. Download this model only if you want offline summaries."
 
@@ -1898,7 +1898,7 @@ msgstr "Cloud summaries are already available. Download this model only if you w
 msgid "Cloud transcription failed"
 msgstr "Cloud transcription failed"
 
-#: src/components/toast/model-download.tsx:81
+#: src/components/toast/model-download.tsx:86
 msgid "Cloud transcription is already available. Download this model only if you want offline transcription."
 msgstr "Cloud transcription is already available. Download this model only if you want offline transcription."
 
@@ -2454,7 +2454,7 @@ msgstr "Disconnecting..."
 #: src/components/audio-upload-toast.tsx:184
 #: src/components/audio-upload-toast.tsx:211
 #: src/components/toast/changelog.tsx:65
-#: src/components/toast/model-download.tsx:120
+#: src/components/toast/model-download.tsx:127
 msgid "Dismiss"
 msgstr "Dismiss"
 
@@ -2490,8 +2490,8 @@ msgstr "Don't transcribe"
 msgid "Download"
 msgstr "Download"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:200
-#: src/components/transcript/actions/STTLanguageSelector.tsx:201
+#: src/components/transcript/actions/STTLanguageSelector.tsx:205
+#: src/components/transcript/actions/STTLanguageSelector.tsx:206
 msgid "Download {size}"
 msgstr "Download {size}"
 
@@ -2511,24 +2511,24 @@ msgstr "Download a Whisper model to transcribe recordings."
 msgid "Download failed. Please try again."
 msgstr "Download failed. Please try again."
 
-#: src/components/toast/model-download.tsx:75
+#: src/components/toast/model-download.tsx:80
 msgid "Download offline AI models"
 msgstr "Download offline AI models"
 
-#: src/components/toast/model-download.tsx:82
-#: src/components/toast/model-download.tsx:86
+#: src/components/toast/model-download.tsx:87
+#: src/components/toast/model-download.tsx:91
 msgid "Download offline model"
 msgstr "Download offline model"
 
-#: src/components/toast/model-download.tsx:77
+#: src/components/toast/model-download.tsx:82
 msgid "Download offline models"
 msgstr "Download offline models"
 
-#: src/components/toast/model-download.tsx:84
+#: src/components/toast/model-download.tsx:89
 msgid "Download offline summary model"
 msgstr "Download offline summary model"
 
-#: src/components/toast/model-download.tsx:79
+#: src/components/toast/model-download.tsx:84
 msgid "Download offline transcription model"
 msgstr "Download offline transcription model"
 
@@ -2891,7 +2891,7 @@ msgstr "Failed to delete {0} notes"
 msgid "Failed to disconnect Claude integration"
 msgstr "Failed to disconnect Claude integration"
 
-#: src/components/toast/shared.tsx:405
+#: src/components/toast/shared.tsx:409
 msgid "Failed to enhance meeting notes"
 msgstr "Failed to enhance meeting notes"
 
@@ -2920,7 +2920,7 @@ msgstr "Failed to save profile"
 msgid "Failed to set up Claude integration"
 msgstr "Failed to set up Claude integration"
 
-#: src/components/toast/shared.tsx:455
+#: src/components/toast/shared.tsx:459
 msgid "Failed to start recording"
 msgstr "Failed to start recording"
 
@@ -3133,7 +3133,7 @@ msgstr "Generating title..."
 msgid "German"
 msgstr "German"
 
-#: src/components/toast/shared.tsx:409
+#: src/components/toast/shared.tsx:413
 msgid "Go to AI models settings to check the status."
 msgstr "Go to AI models settings to check the status."
 
@@ -3724,7 +3724,7 @@ msgstr "Nemotron could not start. Using Whisper for this recording."
 msgid "Network error, please check your connection"
 msgstr "Network error, please check your connection"
 
-#: src/components/toast/shared.tsx:424
+#: src/components/toast/shared.tsx:428
 msgid "New audio device detected"
 msgstr "New audio device detected"
 
@@ -4023,7 +4023,7 @@ msgstr "Older"
 #: src/components/right-panel/views/transcript-view.tsx:466
 #: src/components/settings/components/ai/llm-local-view.tsx:174
 #: src/components/settings/components/ai/stt-view.tsx:106
-#: src/components/transcript/actions/STTLanguageSelector.tsx:160
+#: src/components/transcript/actions/STTLanguageSelector.tsx:163
 #: src/components/ui/model-selector.tsx:367
 msgid "On-device"
 msgstr "On-device"
@@ -4123,11 +4123,11 @@ msgstr "Open settings"
 #: src/components/audio-upload-dialog.tsx:337
 #: src/components/editor-area/note-header/listen-button.tsx:151
 #: src/components/settings/views/sound.tsx:134
-#: src/components/toast/shared.tsx:412
-#: src/components/toast/shared.tsx:462
-#: src/components/transcript/actions/STTLanguageSelector.tsx:225
-#: src/components/transcript/actions/STTLanguageSelector.tsx:226
-#: src/components/transcript/actions/STTLanguageSelector.tsx:244
+#: src/components/toast/shared.tsx:416
+#: src/components/toast/shared.tsx:466
+#: src/components/transcript/actions/STTLanguageSelector.tsx:230
+#: src/components/transcript/actions/STTLanguageSelector.tsx:231
+#: src/components/transcript/actions/STTLanguageSelector.tsx:249
 #: src/components/welcome-modal/audio-permissions-view.tsx:137
 msgid "Open Settings"
 msgstr "Open Settings"
@@ -4625,7 +4625,7 @@ msgstr "Recent Notes"
 msgid "Recent updates"
 msgstr "Recent updates"
 
-#: src/components/toast/shared.tsx:459
+#: src/components/toast/shared.tsx:463
 msgid "Recording could not be started. Check your audio settings."
 msgstr "Recording could not be started. Check your audio settings."
 
@@ -4803,8 +4803,8 @@ msgstr "Resume Recording"
 #: src/components/settings/components/ai/task-defaults.tsx:349
 #: src/components/toast/shared.tsx:180
 #: src/components/toast/shared.tsx:261
-#: src/components/transcript/actions/STTLanguageSelector.tsx:212
-#: src/components/transcript/actions/STTLanguageSelector.tsx:213
+#: src/components/transcript/actions/STTLanguageSelector.tsx:217
+#: src/components/transcript/actions/STTLanguageSelector.tsx:218
 #: src/components/ui/ai-setup-indicator.tsx:32
 #: src/components/ui/model-selector.tsx:347
 #: src/components/welcome-modal/download-progress-view.tsx:166
@@ -5047,9 +5047,9 @@ msgstr "Select microphone..."
 #: src/components/settings/components/ai/task-defaults.tsx:176
 #: src/components/settings/components/ai/task-defaults.tsx:234
 #: src/components/settings/components/ai/task-defaults.tsx:294
-#: src/components/transcript/actions/STTLanguageSelector.tsx:77
-#: src/components/transcript/actions/STTLanguageSelector.tsx:113
-#: src/components/transcript/actions/STTLanguageSelector.tsx:126
+#: src/components/transcript/actions/STTLanguageSelector.tsx:80
+#: src/components/transcript/actions/STTLanguageSelector.tsx:116
+#: src/components/transcript/actions/STTLanguageSelector.tsx:129
 #: src/components/ui/model-selector.tsx:299
 #: src/components/ui/model-selector.tsx:311
 msgid "Select model"
@@ -5141,12 +5141,12 @@ msgstr "Set as default"
 msgid "Set up your profile to personalize your experience."
 msgstr "Set up your profile to personalize your experience."
 
-#: src/components/toast/shared.tsx:381
+#: src/components/toast/shared.tsx:385
 #: src/components/ui/model-download-banner.tsx:32
 msgid "Setting up AI assistant"
 msgstr "Setting up AI assistant"
 
-#: src/components/toast/shared.tsx:347
+#: src/components/toast/shared.tsx:351
 msgid "Setting up transcription"
 msgstr "Setting up transcription"
 
@@ -5401,7 +5401,7 @@ msgstr "Stop and summarize transcript"
 msgid "Stop generating"
 msgstr "Stop generating"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:136
+#: src/components/transcript/actions/STTLanguageSelector.tsx:139
 msgid "Stop or pause recording to change transcription model"
 msgstr "Stop or pause recording to change transcription model"
 
@@ -5494,7 +5494,7 @@ msgstr "Swedish"
 msgid "Switched to cloud model"
 msgstr "Switched to cloud model"
 
-#: src/components/toast/shared.tsx:429
+#: src/components/toast/shared.tsx:433
 msgid "Switched to your new audio device. Transcription continues."
 msgstr "Switched to your new audio device. Transcription continues."
 
@@ -5817,7 +5817,7 @@ msgstr "Transcript imported successfully. Click 'Enhance' to generate summary."
 
 #: src/components/settings/components/ai/stt-view.tsx:83
 #: src/components/settings/components/ai/task-defaults.tsx:289
-#: src/components/settings/views/ai.tsx:120
+#: src/components/settings/views/ai.tsx:122
 #: src/data/shortcuts.ts:15
 msgid "Transcription"
 msgstr "Transcription"
@@ -6412,7 +6412,7 @@ msgstr "Your templates"
 msgid "Your Templates"
 msgstr "Your Templates"
 
-#: src/components/toast/shared.tsx:434
+#: src/components/toast/shared.tsx:438
 msgid "Your transcription continues — still using the selected audio device."
 msgstr "Your transcription continues — still using the selected audio device."
 

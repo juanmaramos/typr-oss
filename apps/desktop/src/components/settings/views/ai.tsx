@@ -1,3 +1,5 @@
+import { formatModelSize } from "@/lib/model-metadata";
+import { transcriptionSetupSizeBytes } from "@/lib/stt-setup";
 import { useLingui } from "@lingui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { openPath } from "@tauri-apps/plugin-opener";
@@ -34,7 +36,7 @@ const getInitialSttModels = (
       key,
       name: metadata.name,
 
-      size: getSttModelSize(key, capabilities),
+      size: capabilities ? formatModelSize(transcriptionSetupSizeBytes(key, capabilities)) : getSttModelSize(key),
       downloaded: false,
       fileName: "",
     };

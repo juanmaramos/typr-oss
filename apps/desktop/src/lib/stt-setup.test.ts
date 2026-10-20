@@ -2,7 +2,12 @@ import { restoreOnboardingModelSetup } from "@/components/welcome-modal/model-se
 import { QueryClient } from "@tanstack/react-query";
 import { commands, type ModelCapabilities } from "@typr/plugin-local-stt";
 import { beforeEach, expect, it, vi } from "vitest";
-import { downloadTranscriptionSetup, transcriptionSetupModels, transcriptionSetupState } from "./stt-setup";
+import {
+  downloadTranscriptionSetup,
+  transcriptionSetupModels,
+  transcriptionSetupSizeBytes,
+  transcriptionSetupState,
+} from "./stt-setup";
 
 vi.mock("@typr/plugin-local-stt", () => ({
   commands: {
@@ -97,4 +102,9 @@ it("restores an in-progress streaming setup and preserves explicit Whisper choic
   expect(restoreOnboardingModelSetup({ stt_model: "QuantizedSmall" }, "Nemotron3p5Streaming").sttModel).toBe(
     "QuantizedSmall",
   );
+});
+
+it("includes the advertised recovery model in download button sizes", () => {
+  expect(transcriptionSetupSizeBytes("Nemotron3p5Streaming", capabilities)).toBe(1315548352);
+  expect(transcriptionSetupSizeBytes("QuantizedLargeTurbo", capabilities)).toBe(574000000);
 });

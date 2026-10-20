@@ -1,6 +1,9 @@
+import { formatModelSize } from "@/lib/model-metadata";
 import { getAvailableSettingsSttModels, sttCapabilitiesQueryOptions } from "@/lib/stt-capabilities";
+import { transcriptionSetupSizeBytes } from "@/lib/stt-setup";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
+import { type SupportedModel } from "@typr/plugin-local-stt";
 import { type ReactNode, useState } from "react";
 
 import { Button } from "@typr/ui/components/ui/button";
@@ -161,7 +164,9 @@ export function STTLanguageSelector({
                 </div>
                 {options.map(option => {
                   const availability = getModelAvailability(option.modelKey);
-                  const size = getSttModelSize(option.modelKey, capabilities.data);
+                  const size = option.isLocal && capabilities.data
+                    ? formatModelSize(transcriptionSetupSizeBytes(option.modelKey as SupportedModel, capabilities.data))
+                    : getSttModelSize(option.modelKey);
                   const isSelected = selectedOption?.modelKey === option.modelKey;
                   return (
                     <div

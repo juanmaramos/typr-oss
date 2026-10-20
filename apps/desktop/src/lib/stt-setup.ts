@@ -10,6 +10,13 @@ export function transcriptionSetupModels(model: SupportedModel, capabilities: re
   return fallback ? [model, fallback] : [model];
 }
 
+export function transcriptionSetupSizeBytes(model: SupportedModel, capabilities: readonly ModelCapabilities[]) {
+  return transcriptionSetupModels(model, capabilities).reduce(
+    (sum, id) => sum + (capabilities.find(item => item.model === id)?.size_bytes ?? 0),
+    0,
+  );
+}
+
 export function transcriptionSetupState(
   model: SupportedModel,
   capabilities: readonly ModelCapabilities[] | undefined,
@@ -23,7 +30,7 @@ export function transcriptionSetupState(
       ? records.reduce((sum, record) => sum + (record?.isDownloaded ? 100 : record?.progress ?? 0), 0) / records.length
       : 0,
     error: records.find(record => record?.error)?.error,
-    sizeBytes: required.reduce((sum, id) => sum + (capabilities?.find(item => item.model === id)?.size_bytes ?? 0), 0),
+    sizeBytes: capabilities ? transcriptionSetupSizeBytes(model, capabilities) : 0,
   };
 }
 
