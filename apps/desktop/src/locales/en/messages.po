@@ -444,6 +444,17 @@ msgid "Coming up"
 msgstr "Coming up"
 
 #. js-lingui-explicit-id
+#: ../../packages/tiptap/src/transcript/utils.ts:128
+msgid "You"
+msgstr "You"
+
+#. js-lingui-explicit-id
+#: ../../packages/tiptap/src/transcript/utils.ts:131
+#: ../../packages/tiptap/src/transcript/utils.ts:133
+msgid "Them"
+msgstr "Them"
+
+#. js-lingui-explicit-id
 #: ../../packages/utils/src/datetime.ts:30
 msgid "{days} day{plural} later"
 msgstr "{days} day{plural} later"
@@ -666,17 +677,6 @@ msgstr "This Week"
 #: ../../packages/utils/src/datetime.ts:432
 msgid "{month} {year}"
 msgstr "{month} {year}"
-
-#. js-lingui-explicit-id
-#: ../../packages/tiptap/src/transcript/utils.ts:128
-msgid "You"
-msgstr "You"
-
-#. js-lingui-explicit-id
-#: ../../packages/tiptap/src/transcript/utils.ts:131
-#: ../../packages/tiptap/src/transcript/utils.ts:133
-msgid "Them"
-msgstr "Them"
 
 #. js-lingui-explicit-id
 #: ../../packages/tiptap/src/shared/extensions.ts:46
@@ -2471,7 +2471,7 @@ msgstr "Disconnect failed"
 msgid "Disconnecting..."
 msgstr "Disconnecting..."
 
-#: ../../packages/ui/src/components/ui/toast.tsx:37
+#: ../../packages/ui/src/components/ui/toast.tsx:39
 #: src/components/audio-upload-toast.tsx:184
 #: src/components/audio-upload-toast.tsx:211
 #: src/components/toast/changelog.tsx:65
@@ -4053,7 +4053,7 @@ msgstr "notes"
 msgid "Notes"
 msgstr "Notes"
 
-#: ../../packages/ui/src/components/ui/toast.tsx:101
+#: ../../packages/ui/src/components/ui/toast.tsx:106
 #: src/components/settings-dialog/content.tsx:36
 #: src/components/settings-dialog/sidebar.tsx:32
 msgid "Notifications"
