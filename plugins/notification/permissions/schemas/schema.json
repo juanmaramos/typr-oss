@@ -295,6 +295,18 @@
       "type": "string",
       "oneOf": [
         {
+          "description": "Enables the associate_call command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-associate-call",
+          "markdownDescription": "Enables the associate_call command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the associate_call command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-associate-call",
+          "markdownDescription": "Denies the associate_call command without any pre-configured scope."
+        },
+        {
           "description": "Enables the check_notification_permission command without any pre-configured scope.",
           "type": "string",
           "const": "allow-check-notification-permission",
@@ -305,6 +317,30 @@
           "type": "string",
           "const": "deny-check-notification-permission",
           "markdownDescription": "Denies the check_notification_permission command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_call_end_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-call-end-enabled",
+          "markdownDescription": "Enables the get_call_end_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_call_end_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-call-end-enabled",
+          "markdownDescription": "Denies the get_call_end_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the get_call_end_status command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-get-call-end-status",
+          "markdownDescription": "Enables the get_call_end_status command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_call_end_status command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-get-call-end-status",
+          "markdownDescription": "Denies the get_call_end_status command without any pre-configured scope."
         },
         {
           "description": "Enables the get_detect_notification command without any pre-configured scope.",
@@ -331,6 +367,30 @@
           "markdownDescription": "Denies the get_event_notification command without any pre-configured scope."
         },
         {
+          "description": "Enables the keep_recording command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-keep-recording",
+          "markdownDescription": "Enables the keep_recording command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the keep_recording command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-keep-recording",
+          "markdownDescription": "Denies the keep_recording command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the open_call_detection_settings command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-open-call-detection-settings",
+          "markdownDescription": "Enables the open_call_detection_settings command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the open_call_detection_settings command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-open-call-detection-settings",
+          "markdownDescription": "Denies the open_call_detection_settings command without any pre-configured scope."
+        },
+        {
           "description": "Enables the open_notification_settings command without any pre-configured scope.",
           "type": "string",
           "const": "allow-open-notification-settings",
@@ -353,6 +413,18 @@
           "type": "string",
           "const": "deny-request-notification-permission",
           "markdownDescription": "Denies the request_notification_permission command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the set_call_end_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-call-end-enabled",
+          "markdownDescription": "Enables the set_call_end_enabled command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_call_end_enabled command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-call-end-enabled",
+          "markdownDescription": "Denies the set_call_end_enabled command without any pre-configured scope."
         },
         {
           "description": "Enables the set_detect_notification command without any pre-configured scope.",
@@ -379,6 +451,18 @@
           "markdownDescription": "Denies the set_event_notification command without any pre-configured scope."
         },
         {
+          "description": "Enables the show_call_end_notification command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-show-call-end-notification",
+          "markdownDescription": "Enables the show_call_end_notification command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the show_call_end_notification command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-show-call-end-notification",
+          "markdownDescription": "Denies the show_call_end_notification command without any pre-configured scope."
+        },
+        {
           "description": "Enables the start_detect_notification command without any pre-configured scope.",
           "type": "string",
           "const": "allow-start-detect-notification",
@@ -401,6 +485,18 @@
           "type": "string",
           "const": "deny-start-event-notification",
           "markdownDescription": "Denies the start_event_notification command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the stop_associated_recording command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-stop-associated-recording",
+          "markdownDescription": "Enables the stop_associated_recording command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the stop_associated_recording command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-stop-associated-recording",
+          "markdownDescription": "Denies the stop_associated_recording command without any pre-configured scope."
         },
         {
           "description": "Enables the stop_detect_notification command without any pre-configured scope.",
@@ -427,10 +523,10 @@
           "markdownDescription": "Denies the stop_event_notification command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-get-event-notification`\n- `allow-set-event-notification`\n- `allow-get-detect-notification`\n- `allow-set-detect-notification`\n- `allow-open-notification-settings`\n- `allow-request-notification-permission`\n- `allow-check-notification-permission`\n- `allow-start-detect-notification`\n- `allow-stop-detect-notification`\n- `allow-start-event-notification`\n- `allow-stop-event-notification`",
+          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-open-call-detection-settings`\n- `allow-show-call-end-notification`\n- `allow-get-call-end-enabled`\n- `allow-set-call-end-enabled`\n- `allow-get-call-end-status`\n- `allow-associate-call`\n- `allow-keep-recording`\n- `allow-stop-associated-recording`\n- `allow-get-event-notification`\n- `allow-set-event-notification`\n- `allow-get-detect-notification`\n- `allow-set-detect-notification`\n- `allow-open-notification-settings`\n- `allow-request-notification-permission`\n- `allow-check-notification-permission`\n- `allow-start-detect-notification`\n- `allow-stop-detect-notification`\n- `allow-start-event-notification`\n- `allow-stop-event-notification`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-get-event-notification`\n- `allow-set-event-notification`\n- `allow-get-detect-notification`\n- `allow-set-detect-notification`\n- `allow-open-notification-settings`\n- `allow-request-notification-permission`\n- `allow-check-notification-permission`\n- `allow-start-detect-notification`\n- `allow-stop-detect-notification`\n- `allow-start-event-notification`\n- `allow-stop-event-notification`"
+          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-open-call-detection-settings`\n- `allow-show-call-end-notification`\n- `allow-get-call-end-enabled`\n- `allow-set-call-end-enabled`\n- `allow-get-call-end-status`\n- `allow-associate-call`\n- `allow-keep-recording`\n- `allow-stop-associated-recording`\n- `allow-get-event-notification`\n- `allow-set-event-notification`\n- `allow-get-detect-notification`\n- `allow-set-detect-notification`\n- `allow-open-notification-settings`\n- `allow-request-notification-permission`\n- `allow-check-notification-permission`\n- `allow-start-detect-notification`\n- `allow-stop-detect-notification`\n- `allow-start-event-notification`\n- `allow-stop-event-notification`"
         }
       ]
     }

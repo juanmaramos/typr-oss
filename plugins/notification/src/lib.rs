@@ -1,6 +1,7 @@
 use std::sync::Mutex;
 use tauri::Manager;
 
+mod call_end;
 mod commands;
 mod error;
 mod ext;
@@ -29,6 +30,14 @@ fn make_specta_builder<R: tauri::Runtime>() -> tauri_specta::Builder<R> {
     tauri_specta::Builder::<R>::new()
         .plugin_name(PLUGIN_NAME)
         .commands(tauri_specta::collect_commands![
+            commands::open_call_detection_settings,
+            commands::show_call_end_notification::<tauri::Wry>,
+            commands::get_call_end_enabled::<tauri::Wry>,
+            commands::set_call_end_enabled::<tauri::Wry>,
+            commands::get_call_end_status::<tauri::Wry>,
+            commands::associate_call::<tauri::Wry>,
+            commands::keep_recording::<tauri::Wry>,
+            commands::stop_associated_recording::<tauri::Wry>,
             commands::get_event_notification::<tauri::Wry>,
             commands::set_event_notification::<tauri::Wry>,
             commands::get_detect_notification::<tauri::Wry>,
@@ -53,6 +62,15 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             tracing::info!("🚀 Notification plugin initializing...");
             let state = SharedState::default();
             app.manage(state);
+
+            let call_end_enabled = app.notification_store()
+                .get(crate::StoreKey::CallEndEnabled)
+                .unwrap_or_else(|error| {
+                    tracing::warn!(%error, "automatic call ending setting unavailable; disabled");
+                    None
+                })
+                .unwrap_or(false);
+            call_end::start(app.clone(), call_end_enabled);
 
             // Register the meeting notification category with action buttons (macOS).
             #[cfg(target_os = "macos")]
