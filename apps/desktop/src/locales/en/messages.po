@@ -680,11 +680,6 @@ msgid "{month} {year}"
 msgstr "{month} {year}"
 
 #. js-lingui-explicit-id
-#: ../../packages/tiptap/src/editor/mention.tsx:162
-msgid "Loading..."
-msgstr "Loading..."
-
-#. js-lingui-explicit-id
 #: ../../packages/tiptap/src/shared/extensions.ts:46
 msgid "Start taking notes..."
 msgstr "Start taking notes..."
@@ -708,6 +703,11 @@ msgstr "To-do"
 #: ../../packages/tiptap/src/shared/extensions.ts:62
 msgid "Empty quote"
 msgstr "Empty quote"
+
+#. js-lingui-explicit-id
+#: ../../packages/tiptap/src/editor/mention.tsx:162
+msgid "Loading..."
+msgstr "Loading..."
 
 #: src/routes/app.human.$id.tsx:181
 msgid " at "
@@ -1013,7 +1013,7 @@ msgstr "Access many model providers through one API key."
 msgid "Access multiple AI models through OpenRouter with your API key"
 msgstr "Access multiple AI models through OpenRouter with your API key"
 
-#: src/components/settings/views/integrations.tsx:196
+#: src/components/settings/views/integrations.tsx:195
 msgid "Access your meeting notes directly from ChatGPT."
 msgstr "Access your meeting notes directly from ChatGPT."
 
@@ -1404,6 +1404,10 @@ msgstr "Ask about your meeting content, transcript, and notes"
 msgid "Ask anything..."
 msgstr "Ask anything..."
 
+#: src/components/editor-area/note-header/share-menu.tsx:111
+msgid "Ask Claude Desktop"
+msgstr "Ask Claude Desktop"
+
 #: src/routes/app.ask.tsx:344
 msgid "Ask conversation"
 msgstr "Ask conversation"
@@ -1489,7 +1493,7 @@ msgstr "Audio permissions"
 msgid "Audio Settings"
 msgstr "Audio Settings"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:130
+#: src/components/transcript/actions/TranscriptActionBar.tsx:134
 msgid "Audio setup"
 msgstr "Audio setup"
 
@@ -1821,7 +1825,7 @@ msgstr "Chat Group {0}"
 msgid "Chat navigation"
 msgstr "Chat navigation"
 
-#: src/components/settings/views/integrations.tsx:189
+#: src/components/settings/views/integrations.tsx:188
 msgid "ChatGPT"
 msgstr "ChatGPT"
 
@@ -1876,15 +1880,16 @@ msgstr "Choose files"
 msgid "Choose whether to save your recordings locally."
 msgstr "Choose whether to save your recordings locally."
 
-#: src/components/settings/views/integrations.tsx:126
+#: src/components/editor-area/note-header/share-menu.tsx:103
+#: src/components/settings/views/integrations.tsx:123
 msgid "Claude Desktop"
 msgstr "Claude Desktop"
 
-#: src/components/settings/views/integrations.tsx:63
+#: src/components/settings/views/integrations.tsx:59
 msgid "Claude integration disabled"
 msgstr "Claude integration disabled"
 
-#: src/components/settings/views/integrations.tsx:37
+#: src/components/settings/views/integrations.tsx:28
 msgid "Claude integration enabled"
 msgstr "Claude integration enabled"
 
@@ -2005,7 +2010,7 @@ msgstr "Collapse projects"
 msgid "Coming soon"
 msgstr "Coming soon"
 
-#: src/components/settings/views/integrations.tsx:192
+#: src/components/settings/views/integrations.tsx:191
 #: src/components/settings/views/team.tsx:69
 msgid "Coming Soon"
 msgstr "Coming Soon"
@@ -2039,8 +2044,21 @@ msgstr "Company name"
 msgid "Completed"
 msgstr "Completed"
 
-#: src/components/settings/views/integrations.tsx:173
-#: src/components/settings/views/integrations.tsx:202
+#: src/components/editor-area/note-header/share-menu.tsx:116
+#: src/components/editor-area/note-header/share-menu.tsx:117
+msgid "Configure Claude Desktop integration"
+msgstr "Configure Claude Desktop integration"
+
+#: src/components/settings/views/integrations.tsx:140
+msgid "Configure the Typr Local connector to access your meeting notes in Claude Desktop."
+msgstr "Configure the Typr Local connector to access your meeting notes in Claude Desktop."
+
+#: src/components/settings/views/integrations.tsx:128
+msgid "Configured"
+msgstr "Configured"
+
+#: src/components/settings/views/integrations.tsx:167
+#: src/components/settings/views/integrations.tsx:201
 msgid "Connect"
 msgstr "Connect"
 
@@ -2052,17 +2070,13 @@ msgstr "Connect API key"
 msgid "Connect to a self-hosted or third-party LLM endpoint (OpenAI API compatible)"
 msgstr "Connect to a self-hosted or third-party LLM endpoint (OpenAI API compatible)"
 
-#: src/components/settings/views/integrations.tsx:111
+#: src/components/settings/views/integrations.tsx:108
 msgid "Connect Typr with AI assistants to access your meeting notes."
 msgstr "Connect Typr with AI assistants to access your meeting notes."
 
 #: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:105
 msgid "Connect your calendar to sync events"
 msgstr "Connect your calendar to sync events"
-
-#: src/components/settings/views/integrations.tsx:131
-msgid "Connected"
-msgstr "Connected"
 
 #: src/hooks/useTranscriptionFallback.ts:181
 msgid "Connection lost. Reconnecting transcription…"
@@ -2141,7 +2155,7 @@ msgstr "Convert your audio to text in real-time."
 msgid "Convert your meeting audio into written text in real-time"
 msgstr "Convert your meeting audio into written text in real-time"
 
-#: src/components/editor-area/note-header/share-menu.tsx:88
+#: src/components/editor-area/note-header/share-menu.tsx:133
 #: src/routes/app.ask.$threadId.tsx:570
 #: src/routes/app.ask.$threadId.tsx:577
 msgid "Copied"
@@ -2164,7 +2178,7 @@ msgstr "Copied!"
 msgid "Copy"
 msgstr "Copy"
 
-#: src/components/editor-area/note-header/share-menu.tsx:91
+#: src/components/editor-area/note-header/share-menu.tsx:136
 msgid "Copy AI notes"
 msgstr "Copy AI notes"
 
@@ -2193,13 +2207,21 @@ msgstr "Copy project brief"
 msgid "Copy to clipboard"
 msgstr "Copy to clipboard"
 
-#: src/components/editor-area/note-header/share-menu.tsx:90
+#: src/components/editor-area/note-header/share-menu.tsx:135
 msgid "Copying..."
 msgstr "Copying..."
+
+#: src/components/settings/views/integrations.tsx:173
+msgid "Could not check Claude Desktop configuration."
+msgstr "Could not check Claude Desktop configuration."
 
 #: src/components/settings/views/about.tsx:206
 msgid "Could not check for updates. Try again."
 msgstr "Could not check for updates. Try again."
+
+#: src/components/editor-area/note-header/share-menu.tsx:79
+msgid "Could not open Claude Desktop"
+msgstr "Could not open Claude Desktop"
 
 #: src/components/projects/project-notes-picker-dialog.tsx:114
 #: src/components/spaces/space-notes-picker-dialog.tsx:93
@@ -2525,19 +2547,19 @@ msgstr "Detects among {0} specified languages, with automatic fallback."
 msgid "Detects any language automatically. Specify languages for faster, more accurate transcription."
 msgstr "Detects any language automatically. Specify languages for faster, more accurate transcription."
 
-#: src/components/settings/views/integrations.tsx:211
+#: src/components/settings/views/integrations.tsx:210
 msgid "Direct access"
 msgstr "Direct access"
 
-#: src/components/settings/views/integrations.tsx:163
+#: src/components/settings/views/integrations.tsx:157
 msgid "Disconnect"
 msgstr "Disconnect"
 
-#: src/components/settings/views/integrations.tsx:73
+#: src/components/settings/views/integrations.tsx:70
 msgid "Disconnect failed"
 msgstr "Disconnect failed"
 
-#: src/components/settings/views/integrations.tsx:163
+#: src/components/settings/views/integrations.tsx:157
 msgid "Disconnecting..."
 msgstr "Disconnecting..."
 
@@ -2877,7 +2899,7 @@ msgstr "Enter your full name"
 msgid "Enter your job title"
 msgstr "Enter your job title"
 
-#: src/components/editor-area/note-header/share-menu.tsx:63
+#: src/components/editor-area/note-header/share-menu.tsx:85
 #: src/components/toolbar/buttons/share-button.tsx:210
 #: src/components/ui/tool.tsx:65
 msgid "Error"
@@ -2966,7 +2988,7 @@ msgstr "Experimental features"
 msgid "Export"
 msgstr "Export"
 
-#: src/components/editor-area/note-header/share-menu.tsx:102
+#: src/components/editor-area/note-header/share-menu.tsx:147
 msgid "Export as PDF"
 msgstr "Export as PDF"
 
@@ -2974,7 +2996,7 @@ msgstr "Export as PDF"
 msgid "Export to Obsidian"
 msgstr "Export to Obsidian"
 
-#: src/components/editor-area/note-header/share-menu.tsx:102
+#: src/components/editor-area/note-header/share-menu.tsx:147
 msgid "Exporting..."
 msgstr "Exporting..."
 
@@ -3009,7 +3031,7 @@ msgstr "Failed to delete {0} items"
 msgid "Failed to delete {0} notes"
 msgstr "Failed to delete {0} notes"
 
-#: src/components/settings/views/integrations.tsx:74
+#: src/components/settings/views/integrations.tsx:71
 msgid "Failed to disconnect Claude integration"
 msgstr "Failed to disconnect Claude integration"
 
@@ -3038,7 +3060,7 @@ msgstr "Failed to resolve target session for /app/new"
 msgid "Failed to save profile"
 msgstr "Failed to save profile"
 
-#: src/components/settings/views/integrations.tsx:48
+#: src/components/settings/views/integrations.tsx:44
 msgid "Failed to set up Claude integration"
 msgstr "Failed to set up Claude integration"
 
@@ -3464,7 +3486,7 @@ msgstr "Installing Update"
 
 #: src/components/settings-dialog/content.tsx:39
 #: src/components/settings-dialog/sidebar.tsx:35
-#: src/components/settings/views/integrations.tsx:108
+#: src/components/settings/views/integrations.tsx:105
 msgid "Integrations"
 msgstr "Integrations"
 
@@ -3713,6 +3735,10 @@ msgstr "Macedonian"
 msgid "Make it public"
 msgstr "Make it public"
 
+#: src/components/editor-area/note-header/share-menu.tsx:80
+msgid "Make sure Claude Desktop is installed, then try again."
+msgstr "Make sure Claude Desktop is installed, then try again."
+
 #: src/lib/language-labels.ts:30
 msgid "Malay"
 msgstr "Malay"
@@ -3768,7 +3794,7 @@ msgstr "Microphone Access"
 #: src/components/meeting-assistant/floating-assistant.tsx:209
 #: src/components/meeting-assistant/floating-dock-variant.tsx:332
 #: src/components/right-panel/views/chat-view.tsx:664
-#: src/components/transcript/actions/TranscriptActionBar.tsx:212
+#: src/components/transcript/actions/TranscriptActionBar.tsx:216
 msgid "Minimize"
 msgstr "Minimize"
 
@@ -3815,8 +3841,8 @@ msgstr "More models"
 msgid "More settings"
 msgstr "More settings"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:154
-#: src/components/transcript/actions/TranscriptActionBar.tsx:155
+#: src/components/transcript/actions/TranscriptActionBar.tsx:158
+#: src/components/transcript/actions/TranscriptActionBar.tsx:159
 msgid "More transcript actions"
 msgstr "More transcript actions"
 
@@ -3830,7 +3856,7 @@ msgid "Move chat to sidebar"
 msgstr "Move chat to sidebar"
 
 #: src/components/right-panel/views/chat-view.tsx:652
-#: src/components/transcript/actions/TranscriptActionBar.tsx:201
+#: src/components/transcript/actions/TranscriptActionBar.tsx:205
 msgid "Move to sidebar"
 msgstr "Move to sidebar"
 
@@ -4337,6 +4363,10 @@ msgstr "OpenAI"
 msgid "OpenRouter"
 msgstr "OpenRouter"
 
+#: src/components/editor-area/note-header/share-menu.tsx:107
+msgid "Opens a new chat in Claude Desktop to read this note using the Typr Local MCP connector."
+msgstr "Opens a new chat in Claude Desktop to read this note using the Typr Local MCP connector."
+
 #: src/components/projects/create-project-dialog.tsx:162
 msgid "optional"
 msgstr "optional"
@@ -4542,7 +4572,7 @@ msgstr "Preparing notes"
 msgid "Preparing transcription"
 msgstr "Preparing transcription"
 
-#: src/components/editor-area/note-header/share-menu.tsx:113
+#: src/components/editor-area/note-header/share-menu.tsx:158
 msgid "Preparing..."
 msgstr "Preparing..."
 
@@ -4979,6 +5009,18 @@ msgstr "Required to transcribe your voice during meetings"
 msgid "Resources"
 msgstr "Resources"
 
+#: src/components/settings/views/integrations.tsx:135
+msgid "Restart Claude Desktop after changing this integration. Select Typr Local in Claude to access your meeting notes."
+msgstr "Restart Claude Desktop after changing this integration. Select Typr Local in Claude to access your meeting notes."
+
+#: src/components/settings/views/integrations.tsx:29
+msgid "Restart Claude Desktop to activate Typr Local."
+msgstr "Restart Claude Desktop to activate Typr Local."
+
+#: src/components/settings/views/integrations.tsx:60
+msgid "Restart Claude Desktop to finish disconnecting Typr Local."
+msgstr "Restart Claude Desktop to finish disconnecting Typr Local."
+
 #: src/components/editor-area/note-header/listen-button.tsx:143
 #: src/components/editor-area/note-header/listen-button.tsx:232
 #: src/components/editor-area/note-header/transcription-bar.tsx:187
@@ -5073,10 +5115,6 @@ msgstr "Search"
 #: src/components/editor-area/note-header/chips/event-chip.tsx:268
 msgid "Search and link to past events..."
 msgstr "Search and link to past events..."
-
-#: src/components/settings/views/integrations.tsx:146
-msgid "Search and query your meeting notes from Claude Desktop."
-msgstr "Search and query your meeting notes from Claude Desktop."
 
 #: src/components/projects/project-notes-picker-dialog.tsx:165
 msgid "Search and select notes to add to this project."
@@ -5282,7 +5320,7 @@ msgstr "Selected template"
 msgid "Send"
 msgstr "Send"
 
-#: src/components/editor-area/note-header/share-menu.tsx:113
+#: src/components/editor-area/note-header/share-menu.tsx:158
 msgid "Send by email"
 msgstr "Send by email"
 
@@ -5342,7 +5380,7 @@ msgstr "Setting up offline AI models - you'll be able to chat soon"
 msgid "Setting up transcription"
 msgstr "Setting up transcription"
 
-#: src/components/settings/views/integrations.tsx:173
+#: src/components/settings/views/integrations.tsx:167
 msgid "Setting up..."
 msgstr "Setting up..."
 
@@ -5356,11 +5394,11 @@ msgstr "Setting up..."
 msgid "Settings"
 msgstr "Settings"
 
-#: src/components/settings/views/integrations.tsx:47
+#: src/components/settings/views/integrations.tsx:39
 msgid "Setup failed"
 msgstr "Setup failed"
 
-#: src/components/editor-area/note-header/share-menu.tsx:74
+#: src/components/editor-area/note-header/share-menu.tsx:97
 #: src/components/toolbar/buttons/share-button.tsx:225
 msgid "Share"
 msgstr "Share"
@@ -5847,6 +5885,10 @@ msgstr "The note stays in Notes and any other projects. It will no longer be use
 msgid "The speech-to-text model used when a recording or upload starts."
 msgstr "The speech-to-text model used when a recording or upload starts."
 
+#: src/components/settings/views/integrations.tsx:41
+msgid "The Typr Local name is already used by another MCP server. Rename that server in Claude Desktop, then try again."
+msgstr "The Typr Local name is already used by another MCP server. Rename that server in Claude Desktop, then try again."
+
 #: src/lib/validation-messages.ts:121
 msgid "The value is invalid."
 msgstr "The value is invalid."
@@ -6029,7 +6071,7 @@ msgstr "Transcribing your speech. Words appear after natural pauses."
 msgid "Transcript"
 msgstr "Transcript"
 
-#: src/components/transcript/actions/TranscriptActionBar.tsx:143
+#: src/components/transcript/actions/TranscriptActionBar.tsx:147
 msgid "Transcript actions"
 msgstr "Transcript actions"
 
@@ -6160,10 +6202,6 @@ msgstr "Type to search..."
 #: src/components/toolbar/utils/pdf-export.ts:297
 msgid "Typr - AI note taker"
 msgstr "Typr - AI note taker"
-
-#: src/components/settings/views/integrations.tsx:138
-msgid "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
-msgstr "Typr appears in your Claude connectors. Ask things like <0>\"Do I have any meeting notes about project updates?\"</0>"
 
 #: src/components/editor-area/index.tsx:889
 msgid "Typr needs at least {wordsThreshold} words to enhance your note"
@@ -6344,6 +6382,10 @@ msgstr "Use Google's Gemini models with your API key"
 msgid "Use Groq-hosted fast inference models with your API key."
 msgstr "Use Groq-hosted fast inference models with your API key."
 
+#: src/components/editor-area/note-header/share-menu.tsx:40
+msgid "Use only the Claude Desktop MCP connector named exactly \"Typr Local\". Read this meeting with get_session using id \"{sessionId}\". Use get_transcript from the same connector with the same id if needed. If the session is unavailable, stop and ask me to reconnect Typr Local in Integrations. Help me explore the meeting notes."
+msgstr "Use only the Claude Desktop MCP connector named exactly \"Typr Local\". Read this meeting with get_session using id \"{sessionId}\". Use get_transcript from the same connector with the same id if needed. If the session is unavailable, stop and ask me to reconnect Typr Local in Integrations. Help me explore the meeting notes."
+
 #: src/components/settings/components/ai/llm-local-view.tsx:95
 msgid "Use OpenAI models directly with your API key."
 msgstr "Use OpenAI models directly with your API key."
@@ -6352,7 +6394,7 @@ msgstr "Use OpenAI models directly with your API key."
 msgid "Use OpenAI's GPT models with your API key"
 msgstr "Use OpenAI's GPT models with your API key"
 
-#: src/components/settings/views/integrations.tsx:214
+#: src/components/settings/views/integrations.tsx:213
 msgid "Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
 msgstr "Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
 
@@ -6534,7 +6576,7 @@ msgid "Whole project"
 msgstr "Whole project"
 
 #: src/components/right-panel/views/chat-view.tsx:648
-#: src/components/transcript/actions/TranscriptActionBar.tsx:197
+#: src/components/transcript/actions/TranscriptActionBar.tsx:201
 msgid "Window controls"
 msgstr "Window controls"
 
@@ -6633,6 +6675,10 @@ msgstr "Your data is never used to train AI"
 #: src/components/welcome-modal/user-setup-view.tsx:101
 msgid "Your full name"
 msgstr "Your full name"
+
+#: src/components/settings/views/integrations.tsx:43
+msgid "Your legacy Typr MCP configurations have different settings. Keep one configuration in Claude Desktop, then try again."
+msgstr "Your legacy Typr MCP configurations have different settings. Keep one configuration in Claude Desktop, then try again."
 
 #: src/components/welcome-modal/user-setup-view.tsx:105
 msgid "Your name"

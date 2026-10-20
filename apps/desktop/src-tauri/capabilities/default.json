@@ -53,7 +53,7 @@
 
     {
       "identifier": "opener:allow-open-url",
-      "allow": [{ "url": "https://**" }, { "url": "mailto:*" }, { "url": "obsidian://**" }]
+      "allow": [{ "url": "https://**" }, { "url": "mailto:*" }, { "url": "obsidian://**" }, { "url": "claude://claude.ai/new[?]q=*" }]
     },
     {
       "identifier": "opener:allow-open-path",

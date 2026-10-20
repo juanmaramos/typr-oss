@@ -2,6 +2,9 @@ use crate::{AppExt, StoreKey};
 use serde::{Deserialize, Serialize};
 use std::{io::Read, path::PathBuf};
 use tauri::Manager;
+use tauri_plugin_db::DatabasePluginExt;
+
+mod claude_mcp;
 
 #[tauri::command]
 #[specta::specta]
@@ -617,7 +620,7 @@ fn get_claude_config_path() -> Result<PathBuf, String> {
 #[tauri::command]
 #[specta::specta]
 pub async fn setup_claude_mcp<R: tauri::Runtime>(
-    _app: tauri::AppHandle<R>,
+    app: tauri::AppHandle<R>,
 ) -> Result<String, String> {
     tracing::info!("Setting up Claude Desktop MCP integration");
 
@@ -657,28 +660,8 @@ pub async fn setup_claude_mcp<R: tauri::Runtime>(
         serde_json::json!({})
     };
 
-    // Ensure mcpServers object exists
-    if !config.is_object() {
-        config = serde_json::json!({});
-    }
-
-    let config_obj = config.as_object_mut().unwrap();
-    if !config_obj.contains_key("mcpServers") {
-        config_obj.insert("mcpServers".to_string(), serde_json::json!({}));
-    }
-
-    // Add typr server configuration
-    let mcp_servers = config_obj
-        .get_mut("mcpServers")
-        .and_then(|v| v.as_object_mut())
-        .ok_or("mcpServers is not an object")?;
-
-    mcp_servers.insert(
-        "Typr".to_string(),
-        serde_json::json!({
-            "command": mcp_binary.to_str().ok_or("Invalid MCP binary path")?,
-        }),
-    );
+    let database_path = app.db_local_path().map_err(|error| error.to_string())?;
+    claude_mcp::configure_server(&mut config, &mcp_binary, std::path::Path::new(&database_path))?;
 
     // Write config back
     let json_str = serde_json::to_string_pretty(&config)
@@ -699,7 +682,9 @@ pub async fn setup_claude_mcp<R: tauri::Runtime>(
 
 #[tauri::command]
 #[specta::specta]
-pub async fn check_claude_mcp_status() -> Result<bool, String> {
+pub async fn check_claude_mcp_status<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<bool, String> {
     let config_path = get_claude_config_path()?;
 
     if !config_path.exists() {
@@ -712,14 +697,11 @@ pub async fn check_claude_mcp_status() -> Result<bool, String> {
     let config: serde_json::Value = serde_json::from_str(&content)
         .map_err(|e| format!("Failed to parse config JSON: {}", e))?;
 
-    // Check if a Typr server is configured (support legacy "Typr" and canonical "typr").
-    let has_typr = config
-        .get("mcpServers")
-        .and_then(|v| v.as_object())
-        .map(|obj| obj.keys().any(|key| key.eq_ignore_ascii_case("typr")))
-        .unwrap_or(false);
-
-    Ok(has_typr)
+    let database_path = app.db_local_path().map_err(|error| error.to_string())?;
+    Ok(claude_mcp::is_configured(
+        &config,
+        std::path::Path::new(&database_path),
+    ))
 }
 
 #[tauri::command]
@@ -749,9 +731,9 @@ pub async fn remove_claude_mcp() -> Result<String, String> {
         .and_then(|v| v.as_object_mut())
     {
         let keys_to_remove: Vec<String> = mcp_servers
-            .keys()
-            .filter(|key| key.eq_ignore_ascii_case("typr"))
-            .cloned()
+            .iter()
+            .filter(|(name, server)| claude_mcp::is_owned_server(name, server))
+            .map(|(name, _)| name.clone())
             .collect();
 
         removed_count = keys_to_remove.len();
