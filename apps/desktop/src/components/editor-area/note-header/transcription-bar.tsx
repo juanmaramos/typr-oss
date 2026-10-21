@@ -513,5 +513,12 @@ function MicrophoneDropdown({
 
 function STTModelDropdown({ disabled }: { disabled?: boolean }) {
   const { selectedLanguage, handleLanguageChange } = useSTTModel();
-  return <STTLanguageSelector value={selectedLanguage} onChange={handleLanguageChange} disabled={disabled} />;
+  return (
+    <STTLanguageSelector
+      value={selectedLanguage}
+      onChange={handleLanguageChange}
+      disabled={disabled}
+      triggerVariant="field"
+    />
+  );
 }
