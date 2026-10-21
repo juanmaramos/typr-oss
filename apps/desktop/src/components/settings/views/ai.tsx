@@ -118,18 +118,18 @@ export default function LocalAI() {
         className="space-y-5"
       >
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="transcription">
-            <Trans>Transcription</Trans>
-          </TabsTrigger>
           <TabsTrigger value="chat">
             <Trans>Chat</Trans>
           </TabsTrigger>
+          <TabsTrigger value="transcription">
+            <Trans>Transcription</Trans>
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="transcription" className="mt-0">
-          <STTView {...sttProps} />
-        </TabsContent>
         <TabsContent value="chat" className="mt-0">
           <LLMLocalView {...localLlmProps} />
+        </TabsContent>
+        <TabsContent value="transcription" className="mt-0">
+          <STTView {...sttProps} />
         </TabsContent>
       </Tabs>
     </div>

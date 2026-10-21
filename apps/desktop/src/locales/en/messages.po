@@ -1722,7 +1722,7 @@ msgstr "Changes rejected"
 #: src/components/right-panel/components/floating-view-toggle.tsx:28
 #: src/components/right-panel/views/chat-view.tsx:511
 #: src/components/settings/components/ai/llm-local-view.tsx:151
-#: src/components/settings/views/ai.tsx:125
+#: src/components/settings/views/ai.tsx:122
 #: src/components/transcript/actions/TranscriptActionBar.tsx:119
 msgid "Chat"
 msgstr "Chat"
@@ -6006,7 +6006,7 @@ msgstr "Transcript imported successfully. Click 'Enhance' to generate summary."
 
 #: src/components/settings/components/ai/stt-view.tsx:83
 #: src/components/settings/components/ai/task-defaults.tsx:289
-#: src/components/settings/views/ai.tsx:122
+#: src/components/settings/views/ai.tsx:125
 #: src/data/shortcuts.ts:15
 msgid "Transcription"
 msgstr "Transcription"
