@@ -22,6 +22,12 @@ async windowDestroy(window: TyprWindow) : Promise<null> {
 async windowPosition(window: TyprWindow, pos: KnownPosition) : Promise<null> {
     return await TAURI_INVOKE("plugin:windows|window_position", { window, pos });
 },
+/**
+ * Align native controls with the shell chrome in the invoking webview only.
+ */
+async windowAlignTitlebarControls(centerY: number, viewportHeight: number) : Promise<null> {
+    return await TAURI_INVOKE("plugin:windows|window_align_titlebar_controls", { centerY, viewportHeight });
+},
 async windowGetFloating(window: TyprWindow) : Promise<boolean> {
     return await TAURI_INVOKE("plugin:windows|window_get_floating", { window });
 },
@@ -70,12 +76,12 @@ windowDestroyed: "plugin:windows:window-destroyed"
 
 /** user-defined types **/
 
-export type TyprWindow = { type: "main" } | { type: "note"; value: string } | { type: "human"; value: string } | { type: "organization"; value: string } | { type: "finder" } | { type: "video"; value: string } | { type: "control" } | { type: "transcriptionStatus" }
 export type JsonValue = null | boolean | number | string | JsonValue[] | Partial<{ [key in string]: JsonValue }>
 export type KnownPosition = "left-half" | "right-half" | "center"
 export type MainWindowState = { left_sidebar_expanded: boolean | null; right_panel_expanded: boolean | null }
 export type Navigate = { path: string; search: Partial<{ [key in string]: JsonValue }> | null }
 export type OverlayBound = { x: number; y: number; width: number; height: number }
+export type TyprWindow = { type: "main" } | { type: "note"; value: string } | { type: "human"; value: string } | { type: "organization"; value: string } | { type: "finder" } | { type: "video"; value: string } | { type: "control" } | { type: "transcriptionStatus" }
 export type WindowDestroyed = { window: TyprWindow }
 
 /** tauri-specta globals **/

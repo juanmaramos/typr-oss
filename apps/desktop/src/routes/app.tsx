@@ -8,10 +8,11 @@ import { commands as dbCommands } from "@typr/plugin-db";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { ContextPane } from "@/components/app-shell/context-pane";
-import { CallEndBridge } from "@/components/call-end-bridge";
 import { PrimaryRail } from "@/components/app-shell/primary-rail";
 import { SHELL_CHROME_MAC_LEADING_INSET_CLASS } from "@/components/app-shell/titlebar-layout";
 import { PANEL_HANDLE_TRANSITION } from "@/components/app-shell/transitions";
+import { useTitlebarAlignment } from "@/components/app-shell/useTitlebarAlignment";
+import { CallEndBridge } from "@/components/call-end-bridge";
 import { ProjectKnowledgeJobRunner } from "@/components/projects/project-knowledge-job-runner";
 import RightPanel from "@/components/right-panel";
 import { useShowRightSidebar } from "@/components/right-panel/hooks/useShowRightSidebar";
@@ -218,12 +219,14 @@ function ShellChrome() {
     queryFn: () => getOsType(),
     staleTime: Infinity,
   });
+  const titlebarRef = useTitlebarAlignment(osType.data === "macos");
   const isMain = getCurrentWebviewWindowLabel() === "main";
   const isNote = !!useMatch({ from: "/app/note/$id", shouldThrow: false });
   const isProject = !!useMatch({ from: "/app/projects/$projectId", shouldThrow: false });
 
   return (
     <div
+      ref={titlebarRef}
       data-tauri-drag-region
       className={cn(
         "pointer-events-none absolute left-[6px] right-[6px] top-[6px] z-20 flex h-11 items-center justify-between",
