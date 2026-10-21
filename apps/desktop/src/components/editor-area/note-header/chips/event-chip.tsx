@@ -262,7 +262,7 @@ export function EventChip({ sessionId }: EventChipProps) {
             className={cn(noteHeaderChipClassName, "cursor-pointer")}
           >
             <Icon name="ri-calendar-line" className="h-4 w-4 text-muted-foreground" />
-            {!isUnusedDraft && <span>{formatSimpleDateWithTime(date)}</span>}
+            <span>{isUnusedDraft ? t`Now` : formatSimpleDateWithTime(date)}</span>
           </button>
         </PopoverTrigger>
 

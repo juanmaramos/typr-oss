@@ -4137,6 +4137,10 @@ msgstr "Notas"
 msgid "Notifications"
 msgstr "Notificaciones"
 
+#: src/components/editor-area/note-header/chips/event-chip.tsx:265
+msgid "Now"
+msgstr "Ahora"
+
 #: src/components/editor-area/selection-actions.tsx:491
 msgid "Numbered list"
 msgstr "Lista numerada"
