@@ -2481,7 +2481,7 @@ msgstr "Description"
 msgid "Deselect note"
 msgstr "Deselect note"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:212
+#: src/components/editor-area/note-header/chips/event-chip.tsx:214
 msgid "Detach event"
 msgstr "Detach event"
 
@@ -3427,7 +3427,7 @@ msgstr "Job Title"
 msgid "John Doe"
 msgstr "John Doe"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:231
+#: src/components/editor-area/note-header/chips/event-chip.tsx:233
 msgid "Join meeting"
 msgstr "Join meeting"
 
@@ -3591,7 +3591,7 @@ msgstr "Loading available models..."
 msgid "Loading devices..."
 msgstr "Loading devices..."
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:279
+#: src/components/editor-area/note-header/chips/event-chip.tsx:281
 msgid "Loading events..."
 msgstr "Loading events..."
 
@@ -4019,7 +4019,7 @@ msgstr "No notes to brief"
 msgid "No organization"
 msgstr "No organization"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:304
+#: src/components/editor-area/note-header/chips/event-chip.tsx:306
 msgid "No past events found"
 msgstr "No past events found"
 
@@ -5052,7 +5052,7 @@ msgstr "Saving..."
 msgid "Search"
 msgstr "Search"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:268
+#: src/components/editor-area/note-header/chips/event-chip.tsx:270
 msgid "Search and link to past events..."
 msgstr "Search and link to past events..."
 
@@ -6395,7 +6395,7 @@ msgstr "View changelog"
 msgid "View Changelog"
 msgstr "View Changelog"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:236
+#: src/components/editor-area/note-header/chips/event-chip.tsx:238
 #: src/components/left-sidebar/events-list.tsx:283
 msgid "View in calendar"
 msgstr "View in calendar"

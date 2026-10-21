@@ -35,10 +35,12 @@ export function EventChip({ sessionId }: EventChipProps) {
 
   const {
     sessionCreatedAt,
+    recordStart,
     updateTitle,
     session: currentSessionDetails,
   } = useSession(sessionId, (s) => ({
     sessionCreatedAt: s.session.created_at,
+    recordStart: s.session.record_start,
     updateTitle: s.updateTitle,
     session: s.session,
   }));
@@ -167,7 +169,7 @@ export function EventChip({ sessionId }: EventChipProps) {
     });
   };
 
-  const date = event.data?.start_date ?? sessionCreatedAt;
+  const date = event.data?.start_date ?? recordStart ?? sessionCreatedAt;
 
   if (onboardingSessionId === sessionId) {
     return (
@@ -254,7 +256,7 @@ export function EventChip({ sessionId }: EventChipProps) {
         <PopoverTrigger asChild>
           <div className={cn(noteHeaderChipClassName, "cursor-pointer")}>
             <Icon name="ri-calendar-line" className="h-4 w-4 text-muted-foreground" />
-            <span>{formatSimpleDateWithTime(sessionCreatedAt)}</span>
+            <span>{formatSimpleDateWithTime(date)}</span>
           </div>
         </PopoverTrigger>
 
