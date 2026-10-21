@@ -16,8 +16,10 @@ import { showLlmModelDownloadToast } from "@/components/toast/shared";
 import {
   CloudProviderId,
   getCloudProviderIcon,
-  getCloudProviderIdFromModelId,
   getCloudProviderLabel,
+  getCloudProviderSection,
+  refreshCloudCatalogs,
+  useCloudCatalogLabel,
 } from "@/hooks/cloud-model-catalog";
 import { useAIAvailability } from "@/hooks/useAIAvailability";
 import { useModelAvailabilityLabel } from "@/hooks/useModelAvailabilityLabel";
@@ -48,6 +50,7 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
   const { allModels, selectedModel, isAutoMode, error } = useAllModels();
   const { availability, retry } = useAIAvailability();
   const statusLabel = useModelAvailabilityLabel();
+  const catalogLabel = useCloudCatalogLabel();
   const isChecking = availability.status === "checking";
 
   // Removed debug logging - even in development mode it causes performance issues
@@ -74,45 +77,10 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
   const customModels = useMemo(() => allModels.filter(model => model.type === ModelType.CLOUD), [allModels]);
   const cloudProviderSections = useMemo(() => {
     const providers: CloudProviderId[] = ["openrouter", "openai", "groq"];
-    const search = modelSearch.trim().toLowerCase();
-
-    return providers
-      .map((provider) => {
-        const providerModels = customModels.filter(model => getCloudProviderIdFromModelId(model.id) === provider);
-        const expanded = expandedCloudProvider === provider;
-        const collapsed = collapsedCloudProviders.has(provider);
-        const previewModels = Array.from(
-          new Map(
-            providerModels
-              .filter(model => model.isSelected || model.isRecommended)
-              .slice(0, 5)
-              .map(model => [model.id, model]),
-          ).values(),
-        );
-        const searchedModels = search
-          ? providerModels.filter((model) => {
-            const haystack = [
-              model.name,
-              model.vendor,
-              model.providerModelId,
-              model.description,
-            ].filter(Boolean).join(" ").toLowerCase();
-
-            return haystack.includes(search);
-          })
-          : providerModels;
-
-        return {
-          provider,
-          expanded,
-          collapsed,
-          selectedModel: providerModels.find(model => model.isSelected),
-          models: expanded ? searchedModels.slice(0, 40) : previewModels,
-          totalCount: providerModels.length,
-          hiddenCount: Math.max(providerModels.length - previewModels.length, 0),
-        };
-      })
-      .filter(section => section.totalCount > 0);
+    return providers.map(provider => ({
+      ...getCloudProviderSection(customModels, provider, expandedCloudProvider === provider, modelSearch),
+      collapsed: collapsedCloudProviders.has(provider),
+    })).filter(section => section.totalCount > 0);
   }, [collapsedCloudProviders, customModels, expandedCloudProvider, modelSearch]);
 
   const showNoModelState = !availability.canStart && availability.status !== "checking";
@@ -131,7 +99,9 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
 
   const handleIsOpenChange = (open: boolean) => {
     setIsOpen(open);
-    if (!open) {
+    if (open) {
+      void refreshCloudCatalogs(queryClient);
+    } else {
       setExpandedCloudProvider(null);
       setModelSearch("");
     }
@@ -425,6 +395,9 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
 
                         {!section.collapsed && (
                           <div className="space-y-0.5">
+                            <p className="px-2.5 py-1 text-ui-caption text-muted-foreground">
+                              {catalogLabel(section.provider)}
+                            </p>
                             {section.models.map((model) => (
                               <ModelItem
                                 key={model.id}

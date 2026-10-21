@@ -61,18 +61,21 @@ export function useLocalModels() {
 export function useCustomModels() {
   const {
     models: openaiModels,
+    catalog: openaiCatalog,
     isLoading: openaiLoading,
     error: openaiError,
     refetch: refetchOpenaiModels,
   } = useOpenAIModels();
   const {
     models: groqModels,
+    catalog: groqCatalog,
     isLoading: groqLoading,
     error: groqError,
     refetch: refetchGroqModels,
   } = useGroqModels();
   const {
     models: openRouterModels,
+    catalog: openrouterCatalog,
     isLoading: openRouterLoading,
     error: openRouterError,
     refetch: refetchOpenRouterModels,
@@ -80,6 +83,7 @@ export function useCustomModels() {
 
   return {
     models: [...openaiModels, ...groqModels, ...openRouterModels], // Cloud providers
+    catalogs: { openai: openaiCatalog, groq: groqCatalog, openrouter: openrouterCatalog },
     isEnabled: true, // Cloud models are always enabled
     isLoading: openaiLoading || groqLoading || openRouterLoading,
     error: openaiError || groqError || openRouterError,
@@ -124,6 +128,7 @@ export function useAllModels() {
   // Combine all model sources with proper sorting
   const allModels = useMemo((): ModelOption[] => {
     const combined = [...localModels, ...customModels];
+    const cloudOrder = new Map(customModels.map((model, index) => [model.id, index]));
 
     return combined.sort((a, b) => {
       // Sort by: selected first, then downloaded, then by vendor+name
@@ -145,12 +150,9 @@ export function useAllModels() {
       if (!a.isDownloaded && b.isDownloaded) {
         return 1;
       }
-      // Cloud models: sort by vendor first, then model name within vendor
+      // The shared catalogue already orders cloud models by their provider's policy.
       if (a.type === ModelType.CLOUD && b.type === ModelType.CLOUD) {
-        const vendorCmp = (a.vendor || "").localeCompare(b.vendor || "");
-        if (vendorCmp !== 0) {
-          return vendorCmp;
-        }
+        return cloudOrder.get(a.id)! - cloudOrder.get(b.id)!;
       }
       return (a.name || "").localeCompare(b.name || "");
     });
