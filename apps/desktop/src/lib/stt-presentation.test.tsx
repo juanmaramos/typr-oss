@@ -256,17 +256,23 @@ describe("canonical STT presentation", () => {
     expect(openSettings).toHaveBeenCalled();
   });
 
-  it("labels fallback readiness without making the missing selected artifact selectable", async () => {
-    availabilityState.local = modelAvailability("ready", "native-fallback", { canSelect: false, canDownload: true });
-    const onChange = vi.fn();
-    await render(<STTLanguageSelector value="nemotron-streaming" onChange={onChange} />);
-    await act(async () => container.querySelector("button")!.click());
-    const model = document.body.querySelector("[role=\"group\"][aria-label=\"Nemotron 3.5\"]")!;
-    expect(model.textContent).toContain("Ready with Whisper fallback");
-    expect(model.querySelector("button")!.disabled).toBe(true);
-    expect(model.querySelector("button[aria-label^=\"Download\"]")).not.toBeNull();
-    expect(onChange).not.toHaveBeenCalled();
-  });
+  it.each([["en", english, "Ready", "Download"], ["es", spanish, "Listo", "Descargar"]] as const)(
+    "uses plain readiness copy in %s without making a missing model selectable",
+    async (locale, messages, ready, download) => {
+      i18n.load(locale, messages);
+      i18n.activate(locale);
+      availabilityState.local = modelAvailability("ready", "native-fallback", { canSelect: false, canDownload: true });
+      const onChange = vi.fn();
+      await render(<STTLanguageSelector value="nemotron-streaming" onChange={onChange} />);
+      await act(async () => container.querySelector("button")!.click());
+      const model = document.body.querySelector("[role=\"group\"][aria-label=\"Nemotron 3.5\"]")!;
+      expect(model.textContent).toContain(ready);
+      expect(model.textContent).not.toMatch(/Whisper|fallback|alternativa/);
+      expect(model.querySelector("button")!.disabled).toBe(true);
+      expect(model.querySelector(`button[aria-label^="${download}"]`)).not.toBeNull();
+      expect(onChange).not.toHaveBeenCalled();
+    },
+  );
 
   it("preserves the model icon when switching models is disabled during recording", async () => {
     const onChange = vi.fn();

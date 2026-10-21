@@ -1443,7 +1443,7 @@ msgid "Audio"
 msgstr "Audio"
 
 #: src/components/editor-area/note-header/listen-button.tsx:522
-#: src/components/editor-area/note-header/transcription-bar.tsx:366
+#: src/components/editor-area/note-header/transcription-bar.tsx:365
 msgid "Audio input"
 msgstr "Entrada de audio"
 
@@ -1481,9 +1481,9 @@ msgstr "Subida de audio en curso. La transcripción en vivo no está disponible 
 #: src/components/editor-area/note-header/listen-button.tsx:540
 #: src/components/editor-area/note-header/listen-button.tsx:543
 #: src/components/editor-area/note-header/listen-button.tsx:552
-#: src/components/editor-area/note-header/transcription-bar.tsx:394
-#: src/components/editor-area/note-header/transcription-bar.tsx:397
-#: src/components/editor-area/note-header/transcription-bar.tsx:406
+#: src/components/editor-area/note-header/transcription-bar.tsx:393
+#: src/components/editor-area/note-header/transcription-bar.tsx:396
+#: src/components/editor-area/note-header/transcription-bar.tsx:405
 #: src/components/settings/components/ai/task-defaults.tsx:150
 #: src/components/settings/components/ai/task-defaults.tsx:186
 #: src/components/settings/components/ai/task-defaults.tsx:187
@@ -2540,8 +2540,8 @@ msgstr "No recordar de nuevo"
 
 #: src/components/editor-area/note-header/listen-button.tsx:495
 #: src/components/editor-area/note-header/listen-button.tsx:513
-#: src/components/editor-area/note-header/transcription-bar.tsx:328
-#: src/components/editor-area/note-header/transcription-bar.tsx:347
+#: src/components/editor-area/note-header/transcription-bar.tsx:327
+#: src/components/editor-area/note-header/transcription-bar.tsx:346
 msgid "Don't transcribe"
 msgstr "No transcribir"
 
@@ -2710,7 +2710,7 @@ msgstr "EN"
 msgid "Enable"
 msgstr "Activar"
 
-#: src/components/editor-area/note-header/transcription-bar.tsx:359
+#: src/components/editor-area/note-header/transcription-bar.tsx:358
 msgid "Enable at least one voice source to capture audio"
 msgstr "Activa al menos una fuente de voz para capturar audio"
 
@@ -3590,7 +3590,7 @@ msgid "Loading available models..."
 msgstr "Cargando modelos disponibles..."
 
 #: src/components/editor-area/note-header/listen-button.tsx:625
-#: src/components/editor-area/note-header/transcription-bar.tsx:491
+#: src/components/editor-area/note-header/transcription-bar.tsx:490
 #: src/components/transcript/actions/MicrophoneSelector.tsx:120
 msgid "Loading devices..."
 msgstr "Cargando dispositivos..."
@@ -3987,7 +3987,7 @@ msgid "No microphone selected"
 msgstr "No hay micrófono seleccionado"
 
 #: src/components/editor-area/note-header/listen-button.tsx:633
-#: src/components/editor-area/note-header/transcription-bar.tsx:499
+#: src/components/editor-area/note-header/transcription-bar.tsx:498
 #: src/components/transcript/actions/MicrophoneSelector.tsx:128
 msgid "No microphones found"
 msgstr "No se encontraron micrófonos"
@@ -4340,7 +4340,7 @@ msgid "Other"
 msgstr "Otro"
 
 #: src/components/editor-area/note-header/listen-button.tsx:503
-#: src/components/editor-area/note-header/transcription-bar.tsx:336
+#: src/components/editor-area/note-header/transcription-bar.tsx:335
 msgid "Other's voice"
 msgstr "Voz de otros"
 
@@ -4750,13 +4750,9 @@ msgstr "La fuente legible aún no tiene un resumen generado."
 #: src/components/ui/tool.tsx:59
 #: src/components/welcome-modal/download-progress-view.tsx:144
 #: src/components/welcome-modal/download-progress-view.tsx:201
-#: src/hooks/useModelAvailabilityLabel.ts:28
+#: src/hooks/useModelAvailabilityLabel.ts:26
 msgid "Ready"
 msgstr "Listo"
-
-#: src/hooks/useModelAvailabilityLabel.ts:27
-msgid "Ready with Whisper fallback"
-msgstr "Listo con Whisper como alternativa"
 
 #: src/lib/model-metadata.ts:11
 msgid "Reasoning-focused model for complex questions"
@@ -4959,7 +4955,7 @@ msgstr "Reanudar grabación"
 
 #: src/components/audio-upload-dialog.tsx:333
 #: src/components/editor-area/note-header/listen-button.tsx:143
-#: src/components/editor-area/note-header/transcription-bar.tsx:215
+#: src/components/editor-area/note-header/transcription-bar.tsx:214
 #: src/components/projects/project-brief-row.tsx:100
 #: src/components/projects/project-files-dropzone.tsx:176
 #: src/components/right-panel/views/transcript-view.tsx:296
@@ -5208,7 +5204,7 @@ msgid "Select languages used in your meetings. The model will automatically dete
 msgstr "Selecciona los idiomas de tus reuniones. El modelo detectará automáticamente cuál se está hablando."
 
 #: src/components/editor-area/note-header/listen-button.tsx:614
-#: src/components/editor-area/note-header/transcription-bar.tsx:478
+#: src/components/editor-area/note-header/transcription-bar.tsx:477
 msgid "Select microphone..."
 msgstr "Seleccionar micrófono..."
 
@@ -5485,7 +5481,7 @@ msgid "Source digest job is missing a valid source."
 msgstr "La tarea de resumen no tiene una fuente válida."
 
 #: src/components/editor-area/note-header/listen-button.tsx:478
-#: src/components/editor-area/note-header/transcription-bar.tsx:311
+#: src/components/editor-area/note-header/transcription-bar.tsx:310
 msgid "Sources"
 msgstr "Fuentes"
 
@@ -5658,7 +5654,7 @@ msgid "Summary not generated"
 msgstr "Resumen no generado"
 
 #: src/components/editor-area/note-header/listen-button.tsx:533
-#: src/components/editor-area/note-header/transcription-bar.tsx:387
+#: src/components/editor-area/note-header/transcription-bar.tsx:386
 msgid "Summary template"
 msgstr "Plantilla de resumen"
 
@@ -5694,8 +5690,8 @@ msgstr "Estado del audio del sistema cambiado"
 
 #: src/components/editor-area/note-header/listen-button.tsx:600
 #: src/components/editor-area/note-header/listen-button.tsx:601
+#: src/components/editor-area/note-header/transcription-bar.tsx:454
 #: src/components/editor-area/note-header/transcription-bar.tsx:455
-#: src/components/editor-area/note-header/transcription-bar.tsx:456
 #: src/components/transcript/actions/MicrophoneSelector.tsx:146
 msgid "System Default (Auto)"
 msgstr "Predeterminado del sistema (Auto)"
@@ -5950,8 +5946,8 @@ msgstr "Demasiadas solicitudes. Vuelve a intentarlo más tarde"
 #: src/components/editor-area/note-header/listen-button.tsx:495
 #: src/components/editor-area/note-header/listen-button.tsx:513
 #: src/components/editor-area/note-header/transcription-bar.tsx:169
-#: src/components/editor-area/note-header/transcription-bar.tsx:328
-#: src/components/editor-area/note-header/transcription-bar.tsx:347
+#: src/components/editor-area/note-header/transcription-bar.tsx:327
+#: src/components/editor-area/note-header/transcription-bar.tsx:346
 msgid "Transcribe"
 msgstr "Transcribir"
 
@@ -6031,7 +6027,7 @@ msgstr "Controles de transcripción"
 msgid "Transcription languages (optional)"
 msgstr "Idiomas de transcripción (opcional)"
 
-#: src/components/editor-area/note-header/transcription-bar.tsx:377
+#: src/components/editor-area/note-header/transcription-bar.tsx:376
 #: src/components/right-panel/views/transcript-view.tsx:503
 #: src/components/transcript/constants/languageData.ts:140
 msgid "Transcription model"
@@ -6204,7 +6200,7 @@ msgid "Unsupported project knowledge job type: {0}"
 msgstr "Tipo de tarea de conocimiento del proyecto no admitido: {0}"
 
 #: src/components/editor-area/note-header/listen-button.tsx:556
-#: src/components/editor-area/note-header/transcription-bar.tsx:410
+#: src/components/editor-area/note-header/transcription-bar.tsx:409
 msgid "Untitled"
 msgstr "Sin título"
 
@@ -6623,7 +6619,7 @@ msgid "Your transcription continues — still using the selected audio device."
 msgstr "Tu transcripción continúa — usando el dispositivo de audio seleccionado."
 
 #: src/components/editor-area/note-header/listen-button.tsx:484
-#: src/components/editor-area/note-header/transcription-bar.tsx:317
+#: src/components/editor-area/note-header/transcription-bar.tsx:316
 msgid "Your voice"
 msgstr "Tu voz"
 
