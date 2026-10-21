@@ -103,6 +103,12 @@ jobs:
           node-version: "20"
           cache: "pnpm"
 
+      - name: Read release changes
+        id: changes
+        env:
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: node scripts/release-notes.mjs
+
       - name: Install Rust
         run: |
           rustup toolchain install 1.88.0 --profile minimal --no-self-update
@@ -187,7 +193,7 @@ jobs:
           args: --target ${{ matrix.target }} --config ./src-tauri/tauri.conf.stable.json ${{ matrix.extra_args }} --verbose
           tagName: ${{ steps.release.outputs.tag }}
           releaseName: Typr OSS v${{ steps.release.outputs.version }}
-          releaseBody: Signed and notarized Typr OSS macOS builds, plus an unsigned Windows installer.
+          releaseBody: ${{ steps.changes.outputs.notes }}
           releaseDraft: true
           prerelease: ${{ steps.release.outputs.prerelease }}
           retryAttempts: 2
