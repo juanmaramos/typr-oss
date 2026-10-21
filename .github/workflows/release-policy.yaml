@@ -16,4 +16,4 @@ jobs:
           node-version: "22"
       - run: node scripts/release-notes.mjs
       - run: node --test scripts/check-release-updater.test.mjs
-      - run: python3 -m unittest discover -s scripts -p test_nemotron_bundle.py
+      - run: python3 -m unittest discover -s scripts -p 'test_*nemotron*.py'

@@ -24,6 +24,15 @@ def run(*args, cwd=None):
 
 
 def require_clean_source(directory):
+    if ROOT.resolve().is_relative_to(directory.resolve()):
+        raise RuntimeError(
+            f"Native source cannot contain the app checkout: {directory}"
+        )
+    top_level = subprocess.check_output(
+        ["git", "rev-parse", "--show-toplevel"], cwd=directory, text=True
+    ).strip()
+    if Path(top_level).resolve() != directory.resolve():
+        raise RuntimeError(f"Native source must be its own Git checkout: {directory}")
     dirty = subprocess.check_output(
         ["git", "status", "--porcelain", "--untracked-files=no"],
         cwd=directory,
@@ -40,7 +49,7 @@ def checkout(repository, revision, directory):
         run(
             "git", "clone", "--filter=blob:none", "--no-checkout", repository, directory
         )
-    run("git", "fetch", "--depth=1", "origin", revision, cwd=directory)
+    run("git", "fetch", "--depth=1", repository, revision, cwd=directory)
     run("git", "checkout", "--detach", revision, cwd=directory)
     actual = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=directory, text=True
@@ -55,7 +64,8 @@ def main():
     parser.add_argument(
         "--source", type=Path, help="Existing SDK checkout at the pinned revision"
     )
-    parser.add_argument("--work-dir", type=Path, default=ROOT / "target/nemotron")
+    # Rust cache cleanup removes files from non-Cargo trees inside target/.
+    parser.add_argument("--work-dir", type=Path, default=ROOT / "build/nemotron")
     args = parser.parse_args()
     if platform.system() not in ("Darwin", "Linux"):
         parser.error(
