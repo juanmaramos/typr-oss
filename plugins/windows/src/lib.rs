@@ -38,6 +38,8 @@ impl Default for WindowState {
 #[derive(Default)]
 pub struct State {
     windows: std::collections::HashMap<TyprWindow, WindowState>,
+    #[cfg(target_os = "macos")]
+    titlebar_centers: std::collections::HashMap<String, f64>,
 }
 
 fn make_specta_builder() -> tauri_specta::Builder<tauri::Wry> {
@@ -54,6 +56,7 @@ fn make_specta_builder() -> tauri_specta::Builder<tauri::Wry> {
             commands::window_hide,
             commands::window_destroy,
             commands::window_position,
+            commands::window_align_titlebar_controls,
             commands::window_get_floating,
             commands::window_set_floating,
             commands::window_navigate,

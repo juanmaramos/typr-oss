@@ -85,7 +85,9 @@ vi.mock("@/components/right-panel/hooks/useTranscriptWidget", () => ({
   useTranscriptWidget: () => ({ showEmptyMessage: true, hasTranscript: false, isLive: false, words: [], previews: {} }),
 }));
 vi.mock("@/components/transcript/actions/STTLanguageSelector", () => ({
-  STTLanguageSelector: ({ disabled }: { disabled?: boolean }) => <button disabled={disabled}>Select model</button>,
+  STTLanguageSelector: ({ disabled, triggerVariant }: { disabled?: boolean; triggerVariant?: string }) => (
+    <button disabled={disabled} data-trigger-variant={triggerVariant}>Select model</button>
+  ),
 }));
 vi.mock("@/components/transcript/actions/TranscriptActionBar", () => ({ TranscriptActionBar: () => null }));
 vi.mock("@/components/editor-area/note-header/player-controls", () => ({ PlayerControls: () => null }));
@@ -238,6 +240,9 @@ describe("transcription controls use central readiness", () => {
       const configure = document.querySelector("button[aria-label=\"More settings\"]") as HTMLButtonElement;
       expect(configure.disabled).toBe(false);
       expect(document.body.textContent).not.toContain("Not downloaded");
+      await act(async () => configure.click());
+      expect(button("Select model").getAttribute("data-trigger-variant")).toBe("field");
+      await act(async () => configure.click());
       if (status === "error") {
         await act(async () => button("Retry").click());
         expect(state.retry).toHaveBeenCalledOnce();

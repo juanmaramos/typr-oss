@@ -4,6 +4,7 @@ const COMMANDS: &[&str] = &[
     "window_hide",
     "window_destroy",
     "window_position",
+    "window_align_titlebar_controls",
     "window_get_floating",
     "window_set_floating",
     "window_navigate",

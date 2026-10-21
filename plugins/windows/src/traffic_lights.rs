@@ -1,18 +1,72 @@
 use objc2_app_kit::{NSView, NSWindow, NSWindowButton, NSWindowStyleMask};
-use tauri::{LogicalPosition, WebviewWindow, WindowEvent};
+use objc2_foundation::{NSPoint, NSRect};
+use tauri::{LogicalPosition, Manager, WebviewWindow, WindowEvent};
 
 pub(super) const INSET: LogicalPosition<f64> = LogicalPosition::new(18.0, 29.0);
 
 pub(super) fn install(window: &WebviewWindow) -> tauri::Result<()> {
     let event_window = window.clone();
     window.on_window_event(move |event| {
-        if resets_titlebar(event) {
+        if matches!(event, WindowEvent::Destroyed) {
+            event_window
+                .state::<crate::ManagedState>()
+                .lock()
+                .unwrap()
+                .titlebar_centers
+                .remove(event_window.label());
+        } else if resets_titlebar(event) {
             if let Err(error) = position(&event_window) {
                 tracing::warn!("failed to position native window controls: {error}");
             }
         }
     });
     position(window)
+}
+
+pub(super) fn align(
+    window: &WebviewWindow,
+    center_y: f64,
+    viewport_height: f64,
+) -> Result<(), String> {
+    if !valid_reference(center_y, viewport_height) {
+        return Err("Invalid titlebar alignment reference".into());
+    }
+    window
+        .state::<crate::ManagedState>()
+        .lock()
+        .unwrap()
+        .titlebar_centers
+        .insert(window.label().to_owned(), center_y);
+    position(window).map_err(|error| error.to_string())
+}
+
+fn valid_reference(center_y: f64, viewport_height: f64) -> bool {
+    center_y.is_finite()
+        && viewport_height.is_finite()
+        && center_y > 0.0
+        && center_y <= viewport_height
+}
+
+fn point_from_top(bounds: NSRect, flipped: bool, distance: f64) -> NSPoint {
+    NSPoint::new(
+        bounds.origin.x,
+        if flipped {
+            bounds.origin.y + distance
+        } else {
+            bounds.origin.y + bounds.size.height - distance
+        },
+    )
+}
+
+fn titlebar_frame(mut frame: NSRect, parent: &NSView, height: f64) -> NSRect {
+    frame.size.height = height;
+    let bounds = parent.bounds();
+    frame.origin.y = if parent.isFlipped() {
+        bounds.origin.y
+    } else {
+        bounds.origin.y + bounds.size.height - height
+    };
+    frame
 }
 
 fn resets_titlebar(event: &WindowEvent) -> bool {
@@ -26,14 +80,18 @@ fn position(window: &WebviewWindow) -> tauri::Result<()> {
     // AppKit resets the titlebar during native layout. In our pinned Tauri/Wry,
     // the inset is otherwise restored only when a webview parent draws, which
     // need not happen when its WKWebView covers it. Follow the window lifecycle.
-    let event_window = window.clone();
-    window.run_on_main_thread(move || {
-        let Ok(handle) = event_window.ns_window() else {
-            return;
-        };
-        // The Rust window handle keeps this borrowed NSWindow alive on the main thread.
+    let center = window
+        .state::<crate::ManagedState>()
+        .lock()
+        .unwrap()
+        .titlebar_centers
+        .get(window.label())
+        .copied();
+    window.with_webview(move |native| {
+        // Tauri keeps these borrowed native views alive on the main thread.
         unsafe {
-            let window = &*handle.cast::<NSWindow>();
+            let window = &*native.ns_window().cast::<NSWindow>();
+            let webview = &*native.inner().cast::<NSView>();
             if window.styleMask().contains(NSWindowStyleMask::FullScreen) {
                 return;
             }
@@ -48,14 +106,33 @@ fn position(window: &WebviewWindow) -> tauri::Result<()> {
                 return;
             };
 
-            // Match Tao 0.34.5/Wry 0.53.5: y extends the titlebar container;
-            // it is not the button's top edge or center. Keep native button spacing.
+            let Some(parent) = container.superview() else {
+                return;
+            };
             let close_frame = NSView::frame(&close);
             let spacing = NSView::frame(&minimize).origin.x - close_frame.origin.x;
-            let mut frame = container.frame();
-            frame.size.height = close_frame.size.height + INSET.y;
-            frame.origin.y = window.frame().size.height - frame.size.height;
-            container.setFrame(frame);
+            // WKWebView page zoom converts CSS pixels to AppKit points. Retina
+            // backing scale does not apply to either view's logical coordinates.
+            let target = center.and_then(|center| {
+                let zoom: f64 = objc2::msg_send![webview, pageZoom];
+                let distance = center * zoom;
+                if !valid_reference(distance, webview.bounds().size.height) {
+                    return None;
+                }
+                Some(point_from_top(
+                    webview.bounds(),
+                    webview.isFlipped(),
+                    distance,
+                ))
+            });
+            let height = target
+                .map(|point| {
+                    let target = parent.convertPoint_fromView(point, Some(webview));
+                    let top = point_from_top(parent.bounds(), parent.isFlipped(), 0.0);
+                    (target.y - top.y).abs() + close_frame.size.height
+                })
+                .unwrap_or(close_frame.size.height + INSET.y);
+            container.setFrame(titlebar_frame(container.frame(), &parent, height));
 
             for (index, button) in [
                 Some(close),
@@ -68,6 +145,10 @@ fn position(window: &WebviewWindow) -> tauri::Result<()> {
                 if let Some(button) = button {
                     let mut origin = NSView::frame(&button).origin;
                     origin.x = INSET.x + index as f64 * spacing;
+                    if let (Some(target), Some(parent)) = (target, button.superview()) {
+                        let center = parent.convertPoint_fromView(target, Some(webview));
+                        origin.y = center.y - NSView::frame(&button).size.height / 2.0;
+                    }
                     button.setFrameOrigin(origin);
                 }
             }
@@ -79,6 +160,35 @@ fn position(window: &WebviewWindow) -> tauri::Result<()> {
 mod tests {
     use super::*;
     use tauri::{PhysicalPosition, PhysicalSize};
+
+    #[test]
+    fn follows_the_measured_center_in_both_native_coordinate_directions() {
+        let bounds = NSRect::new(
+            NSPoint::new(0.0, 10.0),
+            objc2_foundation::NSSize::new(800.0, 600.0),
+        );
+        for zoom in [0.8, 1.0, 1.5, 2.0] {
+            let distance = 26.0 * zoom;
+            assert_eq!(point_from_top(bounds, true, distance).y, 10.0 + distance);
+            assert_eq!(point_from_top(bounds, false, distance).y, 610.0 - distance);
+        }
+    }
+
+    #[test]
+    fn rejects_invalid_or_outside_webview_references() {
+        assert!(valid_reference(26.0, 600.0));
+        assert!(valid_reference(600.0, 600.0));
+        for (center, viewport) in [
+            (0.0, 600.0),
+            (-1.0, 600.0),
+            (601.0, 600.0),
+            (f64::NAN, 600.0),
+            (26.0, f64::INFINITY),
+            (26.0, 0.0),
+        ] {
+            assert!(!valid_reference(center, viewport));
+        }
+    }
 
     #[test]
     fn restores_controls_after_native_resize_and_focus_changes() {

@@ -1,6 +1,6 @@
 [package]
 name = "desktop"
-version = "0.1.14"
+version = "0.1.15"
 authors = ["you"]
 edition = "2021"
 description = "Typr Desktop App"

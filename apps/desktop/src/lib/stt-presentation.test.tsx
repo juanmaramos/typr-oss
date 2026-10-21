@@ -18,6 +18,7 @@ import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ModelCapabilities } from "@typr/plugin-local-stt";
+import { Select, SelectTrigger, SelectValue } from "@typr/ui/components/ui/select";
 import { TooltipProvider } from "@typr/ui/components/ui/tooltip";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -93,6 +94,43 @@ afterEach(async () => {
 });
 
 describe("canonical STT presentation", () => {
+  it.each([false, true])(
+    "uses shared select-field styling and preserves picker behavior when disabled=%s",
+    async disabled => {
+      const onChange = vi.fn();
+      await render(
+        <>
+          <div data-reference-select>
+            <Select>
+              <SelectTrigger size="sm">
+                <SelectValue placeholder="Reference" />
+              </SelectTrigger>
+            </Select>
+          </div>
+          <STTLanguageSelector value="QuantizedBase" onChange={onChange} triggerVariant="field" disabled={disabled} />
+        </>,
+      );
+      const reference = container.querySelector<HTMLButtonElement>("[data-reference-select] button")!;
+      const trigger = container.querySelector<HTMLButtonElement>("button[title=\"Whisper Base\"]")!;
+      expect([...trigger.classList]).toEqual(expect.arrayContaining([...reference.classList]));
+      expect(trigger.disabled).toBe(disabled);
+      expect(trigger.textContent).toContain("Whisper Base");
+      expect(trigger.querySelector("[data-stt-provider]")?.getAttribute("data-stt-provider")).toBe("OpenAI");
+      await act(async () => trigger.click());
+      if (disabled) {
+        expect(document.body.querySelector("[role=\"dialog\"]")).toBeNull();
+        expect(onChange).not.toHaveBeenCalled();
+        return;
+      }
+      expect(trigger.getAttribute("aria-expanded")).toBe("true");
+      const cloud = [...document.body.querySelectorAll("button")].find(button =>
+        button.textContent?.includes("Universal Streaming Multilingual")
+      )!;
+      await act(async () => cloud.click());
+      expect(onChange).toHaveBeenCalledWith("assemblyai-universal");
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    },
+  );
   it("makes the icon-only model picker recognizable as a dropdown", async () => {
     await render(<STTLanguageSelector value="nemotron-streaming" onChange={() => {}} isActive />);
     const trigger = container.querySelector("button[title=\"Nemotron 3.5\"]")!;

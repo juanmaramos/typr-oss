@@ -11,9 +11,11 @@ import {
   type CloudApiKeys,
   CloudProviderId,
   getCloudProviderIcon,
-  getCloudProviderIdFromModelId,
   getCloudProviderLabel,
+  getCloudProviderSection,
+  refreshCloudCatalogs,
   useCloudApiKeys,
+  useCloudCatalogLabel,
 } from "@/hooks/cloud-model-catalog";
 import { commands as connectorCommands } from "@typr/plugin-connector";
 import { Button } from "@typr/ui/components/ui/button";
@@ -30,10 +32,11 @@ export function LLMLocalView({
 }: SharedLLMProps) {
   const { t } = useLingui();
   const statusLabel = useModelAvailabilityLabel();
+  const catalogLabel = useCloudCatalogLabel();
   const localErrorLabel = statusLabel(failedRead);
   const queryClient = useQueryClient();
   const { models, isLoading, error: localModelsError, refetch } = useModelRegistry();
-  const { models: cloudModels, isLoading: cloudModelsLoading } = useCustomModels();
+  const { models: cloudModels, isLoading: cloudModelsLoading, catalogs } = useCustomModels();
   const { selectModel } = useModelSelection();
   const { selectLocalChat } = useModelPreferences();
   const cloudApiKeyInputId = useId();
@@ -96,42 +99,9 @@ export function LLMLocalView({
   const visibleCloudModels = useMemo(() => cloudModels, [cloudModels]);
   const cloudProviderSections = useMemo(() => {
     const providers: CloudProviderId[] = ["openrouter", "openai", "groq"];
-    const search = modelSearch.trim().toLowerCase();
-
-    return providers
-      .map((provider) => {
-        const providerModels = visibleCloudModels.filter(model => getCloudProviderIdFromModelId(model.id) === provider);
-        const expanded = expandedCloudProvider === provider;
-        const collapsedModels = Array.from(
-          new Map(
-            providerModels
-              .filter(model => model.isSelected || model.isRecommended)
-              .slice(0, 5)
-              .map(model => [model.id, model]),
-          ).values(),
-        );
-        const searchedModels = search
-          ? providerModels.filter((model) => {
-            const haystack = [
-              model.name,
-              model.vendor,
-              model.providerModelId,
-              model.description,
-            ].filter(Boolean).join(" ").toLowerCase();
-
-            return haystack.includes(search);
-          })
-          : providerModels;
-
-        return {
-          provider,
-          expanded,
-          models: expanded ? searchedModels.slice(0, 80) : collapsedModels,
-          totalCount: providerModels.length,
-          hiddenCount: Math.max(providerModels.length - collapsedModels.length, 0),
-        };
-      })
-      .filter(section => section.totalCount > 0);
+    return providers.map(provider =>
+      getCloudProviderSection(visibleCloudModels, provider, expandedCloudProvider === provider, modelSearch)
+    );
   }, [expandedCloudProvider, modelSearch, visibleCloudModels]);
 
   const handleSelectCloudModel = async (model: typeof visibleCloudModels[number]) => {
@@ -285,187 +255,202 @@ export function LLMLocalView({
         </div>
       )}
 
-      {visibleCloudModels.length > 0 && (
-        <div>
-          {supportsLocalModels && (
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-              <Trans>Cloud</Trans>
-            </p>
-          )}
-          <div className="space-y-2">
-            {cloudModelsLoading
-              ? (
-                <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-                  <i className="ri-loader-4-line animate-spin text-base mr-2" />
-                  <Trans>Loading models…</Trans>
-                </div>
-              )
-              : cloudProviderSections.map((section) => {
-                const providerApiKey = cloudApiKeys[section.provider];
-                const hasProviderApiKey = (cloudApiKeysQuery.data?.[section.provider] ?? "").trim().length > 0;
-                const providerAvailability = cloudModelAvailability(cloudApiKeysQuery, hasProviderApiKey);
-                const providerApiKeyInputId = `${cloudApiKeyInputId}-${section.provider}`;
+      <div>
+        {supportsLocalModels && (
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+            <Trans>Cloud</Trans>
+          </p>
+        )}
+        <div className="space-y-2">
+          {cloudModelsLoading
+            ? (
+              <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                <i className="ri-loader-4-line animate-spin text-base mr-2" />
+                <Trans>Loading models…</Trans>
+              </div>
+            )
+            : cloudProviderSections.map((section) => {
+              const providerApiKey = cloudApiKeys[section.provider];
+              const hasProviderApiKey = (cloudApiKeysQuery.data?.[section.provider] ?? "").trim().length > 0;
+              const providerAvailability = cloudModelAvailability(cloudApiKeysQuery, hasProviderApiKey);
+              const providerApiKeyInputId = `${cloudApiKeyInputId}-${section.provider}`;
 
-                return (
-                  <div key={section.provider} className="rounded-lg border border-border bg-background p-3">
-                    <div className="mb-3 flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-2">
-                        <span className="flex size-7 items-center justify-center rounded-md bg-muted">
-                          <i className={cn("text-base text-foreground", getCloudProviderIcon(section.provider))} />
-                        </span>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">
-                            {getCloudProviderLabel(section.provider)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {renderCloudProviderDescription(section.provider)}
-                          </p>
-                        </div>
+              return (
+                <div key={section.provider} className="rounded-lg border border-border bg-background p-3">
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-2">
+                      <span className="flex size-7 items-center justify-center rounded-md bg-muted">
+                        <i className={cn("text-base text-foreground", getCloudProviderIcon(section.provider))} />
+                      </span>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">
+                          {getCloudProviderLabel(section.provider)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {renderCloudProviderDescription(section.provider)}
+                        </p>
                       </div>
-                      <span
-                        className={cn(
-                          "inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-ui-caption font-medium",
-                          providerAvailability.canSelect
-                            ? "border-success/20 bg-success/5 text-success"
-                            : "border-primary/20 bg-primary/5 text-primary",
-                        )}
-                      >
-                        {providerAvailability.canSelect
-                          ? <Trans>Key configured</Trans>
-                          : statusLabel(providerAvailability)}
+                    </div>
+                    <span
+                      className={cn(
+                        "inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-ui-caption font-medium",
+                        providerAvailability.canSelect
+                          ? "border-success/20 bg-success/5 text-success"
+                          : "border-primary/20 bg-primary/5 text-primary",
+                      )}
+                    >
+                      {providerAvailability.canSelect
+                        ? <Trans>Key configured</Trans>
+                        : statusLabel(providerAvailability)}
+                    </span>
+                  </div>
+
+                  <div className="mb-3 grid gap-1.5">
+                    <label htmlFor={providerApiKeyInputId} className="text-xs font-medium text-muted-foreground">
+                      <Trans>API key</Trans>
+                    </label>
+                    <Input
+                      id={providerApiKeyInputId}
+                      type="password"
+                      value={providerApiKey}
+                      placeholder={getCloudApiKeyPlaceholder(section.provider)}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        setCloudApiKeys((keys) => ({ ...keys, [section.provider]: value }));
+                      }}
+                      onBlur={(event) => void saveCloudApiKey(section.provider, event.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {cloudApiKeysQuery.isPending || cloudApiKeysQuery.isError
+                        ? statusLabel(providerAvailability)
+                        : hasProviderApiKey
+                        ? <Trans>Key stored locally and used directly with this provider.</Trans>
+                        : <Trans>Add a key to use this provider.</Trans>}
+                    </p>
+                  </div>
+
+                  {section.expanded && (
+                    <div className="mb-2 flex items-center gap-2">
+                      <Input
+                        value={modelSearch}
+                        placeholder={t`Search models`}
+                        className="h-8 text-xs"
+                        onChange={(event) => setModelSearch(event.target.value)}
+                      />
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        {section.totalCount}
                       </span>
                     </div>
+                  )}
 
-                    <div className="mb-3 grid gap-1.5">
-                      <label htmlFor={providerApiKeyInputId} className="text-xs font-medium text-muted-foreground">
-                        <Trans>API key</Trans>
-                      </label>
-                      <Input
-                        id={providerApiKeyInputId}
-                        type="password"
-                        value={providerApiKey}
-                        placeholder={getCloudApiKeyPlaceholder(section.provider)}
-                        onChange={(event) => {
-                          const value = event.target.value;
-                          setCloudApiKeys((keys) => ({ ...keys, [section.provider]: value }));
-                        }}
-                        onBlur={(event) => void saveCloudApiKey(section.provider, event.target.value)}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        {cloudApiKeysQuery.isPending || cloudApiKeysQuery.isError
-                          ? statusLabel(providerAvailability)
-                          : hasProviderApiKey
-                          ? <Trans>Key stored locally and used directly with this provider.</Trans>
-                          : <Trans>Add a key to use this provider.</Trans>}
+                  <div className="space-y-2">
+                    <p className="text-ui-caption text-muted-foreground">{catalogLabel(section.provider)}</p>
+                    {section.models.map((model) => {
+                      const availability = model.availability ?? modelAvailability("checking");
+                      const isReady = availability.canSelect;
+
+                      return (
+                        <div
+                          key={model.id}
+                          className={cn(
+                            "flex gap-3 rounded-md border border-border/70 px-3 py-2",
+                            model.isSelected && "border-primary/30 bg-primary/5",
+                            !isReady && "opacity-70",
+                          )}
+                        >
+                          <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted mt-0.5">
+                            <i className={cn("text-sm text-foreground", model.customIcon || "ri-robot-line")} />
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="truncate text-sm font-medium text-foreground">{model.name}</span>
+                              <span className="shrink-0 text-ui-caption text-muted-foreground">
+                                {model.vendor || model.provider}
+                              </span>
+                            </div>
+                            <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                              {isReady ? model.description : <Trans>Add API key above</Trans>}
+                            </p>
+                          </div>
+
+                          <div className="shrink-0">
+                            {isReady
+                              ? (
+                                <Button
+                                  size="sm"
+                                  variant={model.isSelected ? "secondary" : "outline"}
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    void handleSelectCloudModel(model);
+                                  }}
+                                  className="h-7 text-xs"
+                                >
+                                  {model.isSelected ? <Trans>Selected</Trans> : <Trans>Use</Trans>}
+                                </Button>
+                              )
+                              : availability.canRetry
+                              ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => void cloudApiKeysQuery.refetch()}
+                                  className="h-7 text-xs"
+                                >
+                                  <Trans>Retry</Trans>
+                                </Button>
+                              )
+                              : (
+                                <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-ui-caption font-medium text-primary">
+                                  {statusLabel(availability)}
+                                </span>
+                              )}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {section.models.length === 0 && (
+                      <p className="px-1 py-2 text-xs text-muted-foreground">
+                        {!hasProviderApiKey
+                          ? <Trans>Add an API key to load models.</Trans>
+                          : catalogs[section.provider].isError
+                          ? <Trans>Could not load models. Try again.</Trans>
+                          : <Trans>No models found</Trans>}
                       </p>
-                    </div>
-
-                    {section.expanded && (
-                      <div className="mb-2 flex items-center gap-2">
-                        <Input
-                          value={modelSearch}
-                          placeholder={t`Search models`}
-                          className="h-8 text-xs"
-                          onChange={(event) => setModelSearch(event.target.value)}
-                        />
-                        <span className="shrink-0 text-xs text-muted-foreground">
-                          {section.totalCount}
-                        </span>
-                      </div>
                     )}
 
-                    <div className="space-y-2">
-                      {section.models.map((model) => {
-                        const availability = model.availability ?? modelAvailability("checking");
-                        const isReady = availability.canSelect;
+                    {catalogs[section.provider].isError && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs"
+                        onClick={() => void catalogs[section.provider].refetch()}
+                      >
+                        <Trans>Retry</Trans>
+                      </Button>
+                    )}
 
-                        return (
-                          <div
-                            key={model.id}
-                            className={cn(
-                              "flex gap-3 rounded-md border border-border/70 px-3 py-2",
-                              model.isSelected && "border-primary/30 bg-primary/5",
-                              !isReady && "opacity-70",
-                            )}
-                          >
-                            <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted mt-0.5">
-                              <i className={cn("text-sm text-foreground", model.customIcon || "ri-robot-line")} />
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="truncate text-sm font-medium text-foreground">{model.name}</span>
-                                <span className="shrink-0 text-ui-caption text-muted-foreground">
-                                  {model.vendor || model.provider}
-                                </span>
-                              </div>
-                              <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                                {isReady ? model.description : <Trans>Add API key above</Trans>}
-                              </p>
-                            </div>
-
-                            <div className="shrink-0">
-                              {isReady
-                                ? (
-                                  <Button
-                                    size="sm"
-                                    variant={model.isSelected ? "secondary" : "outline"}
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      void handleSelectCloudModel(model);
-                                    }}
-                                    className="h-7 text-xs"
-                                  >
-                                    {model.isSelected ? <Trans>Selected</Trans> : <Trans>Use</Trans>}
-                                  </Button>
-                                )
-                                : availability.canRetry
-                                ? (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => void cloudApiKeysQuery.refetch()}
-                                    className="h-7 text-xs"
-                                  >
-                                    <Trans>Retry</Trans>
-                                  </Button>
-                                )
-                                : (
-                                  <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-ui-caption font-medium text-primary">
-                                    {statusLabel(availability)}
-                                  </span>
-                                )}
-                            </div>
-                          </div>
-                        );
-                      })}
-
-                      {section.models.length === 0 && (
-                        <p className="px-1 py-2 text-xs text-muted-foreground">
-                          <Trans>No models found</Trans>
-                        </p>
-                      )}
-
-                      {(section.hiddenCount > 0 || section.expanded) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-full justify-start text-xs text-muted-foreground"
-                          onClick={() => {
-                            setModelSearch("");
-                            setExpandedCloudProvider(section.expanded ? null : section.provider);
-                          }}
-                        >
-                          {section.expanded ? <Trans>Show fewer</Trans> : <Trans>More models</Trans>}
-                        </Button>
-                      )}
-                    </div>
+                    {(section.hiddenCount > 0 || section.expanded) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-full justify-start text-xs text-muted-foreground"
+                        onClick={() => {
+                          void refreshCloudCatalogs(queryClient);
+                          setModelSearch("");
+                          setExpandedCloudProvider(section.expanded ? null : section.provider);
+                        }}
+                      >
+                        {section.expanded ? <Trans>Show fewer</Trans> : <Trans>More models</Trans>}
+                      </Button>
+                    )}
                   </div>
-                );
-              })}
-          </div>
+                </div>
+              );
+            })}
         </div>
-      )}
+      </div>
     </div>
   );
 }

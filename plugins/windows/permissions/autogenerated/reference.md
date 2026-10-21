@@ -9,6 +9,7 @@ Default permissions for the plugin
 - `allow-window-hide`
 - `allow-window-destroy`
 - `allow-window-position`
+- `allow-window-align-titlebar-controls`
 - `allow-window-get-floating`
 - `allow-window-set-floating`
 - `allow-window-navigate`
@@ -76,6 +77,32 @@ Enables the set_fake_window_bounds command without any pre-configured scope.
 <td>
 
 Denies the set_fake_window_bounds command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`windows:allow-window-align-titlebar-controls`
+
+</td>
+<td>
+
+Enables the window_align_titlebar_controls command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`windows:deny-window-align-titlebar-controls`
+
+</td>
+<td>
+
+Denies the window_align_titlebar_controls command without any pre-configured scope.
 
 </td>
 </tr>

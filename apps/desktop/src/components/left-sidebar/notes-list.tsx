@@ -18,6 +18,7 @@ import { debugLog } from "@/components/utils/debug-logger";
 import { useTypr } from "@/contexts";
 import { useEnhancePendingState } from "@/hooks/enhance-pending";
 import { useMultiSelectKeyboard } from "@/hooks/useMultiSelectKeyboard";
+import { isReusableDraftSession } from "@/lib/note-draft";
 import { endNoteProjectDrag, startNoteProjectDrag } from "@/lib/note-project-drag";
 import { listProjects, projectQueryKeys } from "@/lib/projects";
 import { useMultiSelectNotes } from "@/stores/useMultiSelectNotes";
@@ -315,6 +316,7 @@ export function NoteItem({
     created_at: s.session.created_at,
     record_start: s.session.record_start,
     needs_enhance: s.session.needs_enhance,
+    isUnusedDraft: isReusableDraftSession(s.session),
   }));
 
   const isActive = activeSessionId === currentSessionId;
@@ -345,7 +347,7 @@ export function NoteItem({
   });
 
   const sessionDate = currentSessionEvent.data?.start_date ?? currentSession.record_start ?? currentSession.created_at;
-  const formattedSessionDate = formatSidebarSessionDate(sessionDate);
+  const formattedSessionDate = currentSession.isUnusedDraft ? null : formatSidebarSessionDate(sessionDate);
 
   const queryClient = useQueryClient();
 
@@ -446,14 +448,16 @@ export function NoteItem({
             actionMenuOpen && "w-7",
           )}
         >
-          <span
-            className={cn(
-              "absolute inset-y-0 right-1 flex items-center whitespace-nowrap text-right text-ui-caption text-muted-foreground transition-opacity duration-150",
-              cardHovered || actionMenuOpen ? "opacity-0" : "opacity-100",
-            )}
-          >
-            {formattedSessionDate}
-          </span>
+          {formattedSessionDate && (
+            <span
+              className={cn(
+                "absolute inset-y-0 right-1 flex items-center whitespace-nowrap text-right text-ui-caption text-muted-foreground transition-opacity duration-150",
+                cardHovered || actionMenuOpen ? "opacity-0" : "opacity-100",
+              )}
+            >
+              {formattedSessionDate}
+            </span>
+          )}
 
           <DropdownMenuTrigger asChild>
             <button

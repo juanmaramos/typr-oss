@@ -25,6 +25,7 @@ const testMocks = vi.hoisted(() => ({
   listSessions: vi.fn(),
   insertSession: vi.fn(),
   sessionState: { current: {} as Record<string, unknown> },
+  noteState: { current: {} as Record<string, unknown> },
   noteTitleRender: vi.fn(),
   noteRowMount: vi.fn(),
   noteRowUnmount: vi.fn(),
@@ -75,12 +76,7 @@ vi.mock("@/stores/useMultiSelectNotes", () => ({ useMultiSelectNotes: () => test
 vi.mock("@typr/utils/contexts", () => ({
   useSession: (_sessionId: string, selector: (state: unknown) => unknown) =>
     selector({
-      session: {
-        title: "Dragged note",
-        created_at: "2026-10-01T12:00:00.000Z",
-        record_start: null,
-        needs_enhance: false,
-      },
+      session: testMocks.noteState.current,
     }),
   useSessions: (selector: (state: unknown) => unknown) =>
     selector({
@@ -258,6 +254,19 @@ beforeEach(() => {
   testMocks.assignSessionToProject.mockResolvedValue(null);
   testMocks.markAndEnqueueProjectBriefRefresh.mockResolvedValue(undefined);
   testMocks.sessionGetEvent.mockResolvedValue(null);
+  testMocks.noteState.current = {
+    title: "Dragged note",
+    created_at: "2026-10-01T12:00:00.000Z",
+    record_start: null,
+    needs_enhance: false,
+    calendar_event_id: null,
+    raw_memo_html: "",
+    enhanced_memo_html: null,
+    pre_meeting_memo_html: null,
+    words: [],
+    conversations: [],
+    record_end: null,
+  };
   testMocks.listSessions.mockResolvedValue([{
     id: noteId,
     user_id: "user-1",
@@ -311,6 +320,29 @@ afterEach(async () => {
   root = undefined;
   queryClient = undefined;
   container = undefined;
+});
+
+describe("sidebar draft dates", () => {
+  it("hides a blank draft's age and restores it once the note is used", async () => {
+    testMocks.noteState.current.title = "";
+    await render(
+      createElement(NoteItem, { activeSessionId: noteId, currentSessionId: noteId, canDragToProject: false }),
+    );
+    expect(container!.textContent).toContain("New note");
+    const date = () => container!.querySelector("span.text-ui-caption");
+    expect(date()).toBeNull();
+    testMocks.noteState.current.raw_memo_html = "<p>First note</p>";
+    await act(async () =>
+      root?.render(
+        createHarness(
+          createElement(NoteItem, { activeSessionId: noteId, currentSessionId: noteId, canDragToProject: false }),
+        ),
+      )
+    );
+    expect(date()).not.toBeNull();
+    expect(date()?.textContent).not.toBe("");
+    expect(testMocks.noteState.current.created_at).toBe("2026-10-01T12:00:00.000Z");
+  });
 });
 
 describe("sidebar note to project drag and drop", () => {
