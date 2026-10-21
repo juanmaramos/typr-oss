@@ -4,6 +4,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { readReleaseNotes } from "./release-notes.mjs";
+
 const requiredPlatforms = {
   "darwin-aarch64": /_aarch64\.app\.tar\.gz$/,
   "darwin-x86_64": /_x64\.app\.tar\.gz$/,
@@ -11,10 +13,13 @@ const requiredPlatforms = {
 };
 
 /** A draft may become the updater's latest release only with every signed target present. */
-export function validateUpdaterRelease({ release, manifest, signatures, repository, version, tag }) {
+export function validateUpdaterRelease({ release, manifest, signatures, repository, version, tag, notes }) {
   assert.equal(release.draft, true, "Release must remain draft until verification finishes");
   assert.equal(release.tag_name, tag, "Release tag differs from the requested build");
   assert.equal(manifest.version, version, "Updater version differs from the app");
+  assert(notes?.trim(), "Release changes must be provided");
+  assert.equal(release.body?.trim(), notes.trim(), "Release body differs from the release changes");
+  assert.equal(manifest.notes?.trim(), notes.trim(), "Updater notes differ from the release changes");
   const assets = new Map(release.assets.map(asset => [asset.name, asset]));
   const payloads = new Set();
   for (const [platform, suffix] of Object.entries(requiredPlatforms)) {
@@ -72,7 +77,8 @@ function main() {
       asset => [asset.name, readFileSync(join(directory, asset.name), "utf8")],
     ),
   );
-  const payloads = validateUpdaterRelease({ release, manifest, signatures, repository, version, tag });
+  const notes = readReleaseNotes(version);
+  const payloads = validateUpdaterRelease({ release, manifest, signatures, repository, version, tag, notes });
   const config = JSON.parse(
     readFileSync(new URL("../apps/desktop/src-tauri/tauri.conf.json", import.meta.url), "utf8"),
   );

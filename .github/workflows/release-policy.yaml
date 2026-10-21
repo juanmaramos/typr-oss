@@ -14,5 +14,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - run: node scripts/release-notes.mjs
       - run: node --test scripts/check-release-updater.test.mjs
       - run: python3 -m unittest discover -s scripts -p test_nemotron_bundle.py

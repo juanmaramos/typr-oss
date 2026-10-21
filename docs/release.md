@@ -38,7 +38,7 @@ Then inspect the generated app metadata:
 
 ## Release Steps
 
-1. Confirm `apps/desktop/src-tauri/tauri.conf.json` has the intended version.
+1. Confirm `apps/desktop/src-tauri/tauri.conf.json` has the intended version and add `docs/releases/<version>.md` with a concise list of user-visible changes. This file supplies both the GitHub release body and the in-app updater notes. Release policy CI rejects missing or empty change lists; publication verifies both copies match.
 2. Confirm the updater public key in `tauri.conf.json` matches `TAURI_SIGNING_PRIVATE_KEY`.
 3. Run `gitleaks detect --source . --redact --no-banner` locally, or confirm the `Secret Scan` workflow is green.
 4. Run the `Validate Release Secrets` workflow manually and fix any reported secret or credential issues.
