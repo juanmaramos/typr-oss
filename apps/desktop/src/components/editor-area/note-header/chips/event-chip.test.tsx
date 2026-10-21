@@ -10,7 +10,19 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
-  session: { id: "note", created_at: "2026-05-15T15:00:43Z", record_start: "2026-10-21T09:00:55Z" as string | null },
+  session: {
+    id: "note",
+    created_at: "2026-05-15T15:00:43Z",
+    record_start: "2026-10-21T09:00:55Z" as string | null,
+    title: "",
+    calendar_event_id: null as string | null,
+    raw_memo_html: "",
+    enhanced_memo_html: null as string | null,
+    pre_meeting_memo_html: null as string | null,
+    words: [] as unknown[],
+    conversations: [] as unknown[],
+    record_end: null as string | null,
+  },
   event: null as { start_date: string; calendar_id: null; note: string } | null,
 }));
 vi.mock("@/contexts", () => ({ useTypr: () => ({ userId: "user", onboardingSessionId: "welcome" }) }));
@@ -18,7 +30,10 @@ vi.mock("@typr/utils/contexts", () => ({
   useSession: (_id: string, selector: (state: object) => unknown) =>
     selector({ session: state.session, updateTitle: vi.fn() }),
 }));
-vi.mock("@typr/plugin-db", () => ({ commands: { sessionGetEvent: async () => state.event } }));
+vi.mock(
+  "@typr/plugin-db",
+  () => ({ commands: { sessionGetEvent: async () => state.event, listEvents: async () => [] } }),
+);
 vi.mock("@typr/plugin-misc", () => ({ commands: { parseMeetingLink: async () => null } }));
 vi.mock("@typr/plugin-apple-calendar", () => ({ commands: {} }));
 import { EventChip } from "./event-chip";
@@ -29,15 +44,28 @@ let client: QueryClient;
 beforeEach(() => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   notifyManager.setScheduler(callback => callback());
-  state.session.record_start = "2026-10-21T09:00:55Z";
+  Object.assign(state.session, {
+    record_start: "2026-10-21T09:00:55Z",
+    record_end: null,
+    title: "",
+    calendar_event_id: null,
+    raw_memo_html: "",
+    enhanced_memo_html: null,
+    pre_meeting_memo_html: null,
+    words: [],
+    conversations: [],
+  });
   state.event = null;
   host = document.createElement("div");
+  document.body.append(host);
   root = createRoot(host);
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 });
 afterEach(() => {
   act(() => root.unmount());
   client.clear();
+  host.remove();
+  notifyManager.setScheduler(callback => setTimeout(callback, 0));
 });
 const render = async () => {
   await act(async () => {
@@ -63,6 +91,7 @@ describe.each([["en", english], ["es", spanish]] as const)("meeting date in %s",
   });
   it("keeps the creation date for a note without a recording", async () => {
     state.session.record_start = null;
+    state.session.raw_memo_html = "<p>Notes from today</p>";
     await render();
     expect(host.textContent).toContain(formatSimpleDateWithTime(state.session.created_at));
   });
@@ -70,5 +99,41 @@ describe.each([["en", english], ["es", spanish]] as const)("meeting date in %s",
     state.event = { start_date: "2026-10-22T14:00:00Z", calendar_id: null, note: "" };
     await render();
     expect(host.textContent).toContain(formatSimpleDateWithTime(state.event.start_date));
+  });
+  it("hides the date on a blank draft while keeping calendar linking accessible", async () => {
+    state.session.record_start = null;
+    state.session.raw_memo_html = " <p> </p> ";
+    await render();
+    expect(host.textContent).toBe("");
+    const button = host.querySelector<HTMLButtonElement>("button");
+    expect(button?.getAttribute("aria-label")).toBe(
+      locale === "es" ? "Vincular evento del calendario" : "Link calendar event",
+    );
+    await act(async () => button?.click());
+    expect(document.querySelector("input[placeholder]")).not.toBeNull();
+    expect(state.session.created_at).toBe("2026-05-15T15:00:43Z");
+  });
+  it("shows the existing date after the draft gains content without changing its timestamp", async () => {
+    state.session.record_start = null;
+    await render();
+    expect(host.textContent).toBe("");
+    state.session.raw_memo_html = "<p>First note</p>";
+    await render();
+    expect(host.textContent).toContain(formatSimpleDateWithTime(state.session.created_at));
+    expect(state.session.created_at).toBe("2026-05-15T15:00:43Z");
+  });
+  it.each([
+    { title: "Project notes" },
+    { enhanced_memo_html: "<p>Summary</p>" },
+    { pre_meeting_memo_html: "<p>Agenda</p>" },
+    { words: [{ text: "Hello" }] },
+    { conversations: [{ id: "chat" }] },
+    { record_end: "2026-10-21T09:30:00Z" },
+    { calendar_event_id: "calendar-event" },
+  ])("keeps a date on a used note with %j", async (fields) => {
+    state.session.record_start = null;
+    Object.assign(state.session, fields);
+    await render();
+    expect(host.textContent).toContain(formatSimpleDateWithTime(state.session.created_at));
   });
 });

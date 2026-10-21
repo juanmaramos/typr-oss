@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import { Icon } from "@/components/ui/icon";
 import { useTypr } from "@/contexts";
+import { isReusableDraftSession } from "@/lib/note-draft";
 import { commands as appleCalendarCommands } from "@typr/plugin-apple-calendar";
 import { commands as dbCommands, type Event } from "@typr/plugin-db";
 import { commands as miscCommands } from "@typr/plugin-misc";
@@ -170,6 +171,7 @@ export function EventChip({ sessionId }: EventChipProps) {
   };
 
   const date = event.data?.start_date ?? recordStart ?? sessionCreatedAt;
+  const isUnusedDraft = isReusableDraftSession(currentSessionDetails);
 
   if (onboardingSessionId === sessionId) {
     return (
@@ -254,10 +256,14 @@ export function EventChip({ sessionId }: EventChipProps) {
     return (
       <Popover open={isEventSelectorOpen} onOpenChange={setIsEventSelectorOpen}>
         <PopoverTrigger asChild>
-          <div className={cn(noteHeaderChipClassName, "cursor-pointer")}>
+          <button
+            type="button"
+            aria-label={isUnusedDraft ? t`Link calendar event` : undefined}
+            className={cn(noteHeaderChipClassName, "cursor-pointer")}
+          >
             <Icon name="ri-calendar-line" className="h-4 w-4 text-muted-foreground" />
-            <span>{formatSimpleDateWithTime(date)}</span>
-          </div>
+            {!isUnusedDraft && <span>{formatSimpleDateWithTime(date)}</span>}
+          </button>
         </PopoverTrigger>
 
         <PopoverContent align="start" className="w-80">
