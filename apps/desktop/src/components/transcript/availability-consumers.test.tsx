@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { type ModelAvailability, modelAvailability } from "@/lib/model-availability";
 import { messages as english } from "@/locales/en/messages.po";
+import { messages as spanish } from "@/locales/es/messages.po";
 import { i18n } from "@lingui/core";
 import { I18nProvider } from "@lingui/react";
 import { notifyManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -246,14 +247,25 @@ describe("transcription controls use central readiness", () => {
     },
   );
 
-  it("starts an unavailable-selected-model recovery only when the central policy permits it", async () => {
-    state.live = modelAvailability("ready", "native-fallback", { canSelect: false });
-    await render(<TranscriptionBar sessionId="note" />);
-    expect(document.body.textContent).toContain("Ready with Whisper fallback");
-    expect(button("Transcribe").disabled).toBe(false);
-    await act(async () => button("Transcribe").click());
-    expect(state.start).toHaveBeenCalledWith("note");
-  });
+  it.each(
+    [
+      ["en", english, "Transcribe", "Ready"],
+      ["es", spanish, "Transcribir", "Listo"],
+    ] as const,
+  )(
+    "keeps ready transcription quiet in %s while preserving permitted start",
+    async (locale, messages, label, ready) => {
+      i18n.load(locale, messages);
+      i18n.activate(locale);
+      state.live = modelAvailability("ready", "native-fallback", { canSelect: false });
+      await render(<TranscriptionBar sessionId="note" />);
+      expect(container.querySelector("[role=\"status\"]")).toBeNull();
+      expect(button(label).disabled).toBe(false);
+      expect(button(label).title).toBe(ready);
+      await act(async () => button(label).click());
+      expect(state.start).toHaveBeenCalledWith("note");
+    },
+  );
 
   it("keeps the transcript's picker and retry available after a failed readiness read", async () => {
     state.live = modelAvailability("error");
