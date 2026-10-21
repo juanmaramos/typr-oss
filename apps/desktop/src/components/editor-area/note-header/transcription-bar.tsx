@@ -202,8 +202,7 @@ export default function TranscriptionBar({
           </ButtonGroup>
         )}
 
-        {ongoingSessionStatus === "inactive"
-          && (availability.status !== "ready" || availability.reason === "native-fallback") && (
+        {ongoingSessionStatus === "inactive" && availability.status !== "ready" && (
           <span className="text-xs text-muted-foreground" role="status">
             {statusLabel(availability)}
             {availability.canRetry && (

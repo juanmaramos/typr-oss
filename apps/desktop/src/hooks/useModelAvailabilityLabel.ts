@@ -23,9 +23,7 @@ export function useModelAvailabilityLabel() {
           ? t`Download a Whisper model to transcribe recordings.`
           : t`Model unavailable`;
       case "ready":
-        return availability.reason === "native-fallback"
-          ? t`Ready with Whisper fallback`
-          : t`Ready`;
+        return t`Ready`;
     }
   };
 }
