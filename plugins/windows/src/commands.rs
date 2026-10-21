@@ -1,4 +1,4 @@
-use crate::{events, FakeWindowBounds, TyprWindow, KnownPosition, OverlayBound, WindowsPluginExt};
+use crate::{events, FakeWindowBounds, KnownPosition, OverlayBound, TyprWindow, WindowsPluginExt};
 
 #[tauri::command]
 #[specta::specta]
@@ -179,4 +179,21 @@ pub async fn remove_fake_window(
     state: tauri::State<'_, FakeWindowBounds>,
 ) -> Result<(), String> {
     remove_bounds(&window, &state, name).await
+}
+
+/// Align native controls with the shell chrome in the invoking webview only.
+#[tauri::command]
+#[specta::specta]
+pub async fn window_align_titlebar_controls(
+    window: tauri::WebviewWindow,
+    center_y: f64,
+    viewport_height: f64,
+) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    return crate::traffic_lights::align(&window, center_y, viewport_height);
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (window, center_y, viewport_height);
+        Ok(())
+    }
 }

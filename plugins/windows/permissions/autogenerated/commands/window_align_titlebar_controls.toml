@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-window-align-titlebar-controls"
+description = "Enables the window_align_titlebar_controls command without any pre-configured scope."
+commands.allow = ["window_align_titlebar_controls"]
+
+[[permission]]
+identifier = "deny-window-align-titlebar-controls"
+description = "Denies the window_align_titlebar_controls command without any pre-configured scope."
+commands.deny = ["window_align_titlebar_controls"]
