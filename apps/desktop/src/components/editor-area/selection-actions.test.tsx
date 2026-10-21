@@ -61,7 +61,7 @@ async function selectText(from = 1, to = 6) {
     editor.commands.setTextSelection({ from, to });
   });
   await act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await new Promise((resolve) => setTimeout(resolve, 220));
   });
 }
 
@@ -139,6 +139,41 @@ afterEach(async () => {
 });
 
 describe("contextual selection actions", () => {
+  it("waits for a stable selection and hides immediately when it is cleared", async () => {
+    await render();
+    vi.useFakeTimers();
+    const visible = () => document.querySelector<HTMLElement>("[data-tippy-root]")?.style.visibility === "visible";
+    const advance = async (milliseconds: number) => {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(milliseconds);
+      });
+    };
+    try {
+      await act(async () => {
+        editor.view.focus();
+        editor.commands.setTextSelection({ from: 1, to: 6 });
+      });
+      await advance(0);
+      expect(visible()).toBe(false);
+      await advance(150);
+      expect(visible()).toBe(false);
+      await act(async () => editor.commands.setTextSelection({ from: 2, to: 6 }));
+      await advance(100);
+      expect(visible()).toBe(false);
+      await advance(100);
+      expect(visible()).toBe(true);
+      await act(async () => editor.commands.setTextSelection(1));
+      expect(visible()).toBe(false);
+      await act(async () => editor.commands.setTextSelection({ from: 1, to: 6 }));
+      await advance(100);
+      await act(async () => editor.commands.setTextSelection(1));
+      await advance(300);
+      expect(visible()).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("formats without AI, updates pressed state on transactions, preserves the range and supports undo", async () => {
     await render();
     await selectText();
