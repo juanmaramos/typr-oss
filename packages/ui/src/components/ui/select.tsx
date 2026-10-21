@@ -31,6 +31,26 @@ const selectTriggerVariants = cva(
   },
 );
 
+const selectChevronClassName =
+  "size-4 shrink-0 opacity-50 transition-transform duration-200 ease-in-out group-data-[state=open]:rotate-180";
+
+/** Select styling for a custom picker that owns its own popover content. */
+const SelectFieldTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<"button"> & VariantProps<typeof selectTriggerVariants>
+>(({ className, children, size, variant, type = "button", ...props }, ref) => (
+  <button
+    ref={ref}
+    type={type}
+    className={cn(selectTriggerVariants({ size, variant }), className)}
+    {...props}
+  >
+    {children}
+    <ChevronDown aria-hidden="true" className={selectChevronClassName} />
+  </button>
+));
+SelectFieldTrigger.displayName = "SelectFieldTrigger";
+
 interface SelectTriggerProps
   extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>, VariantProps<typeof selectTriggerVariants>
 {}
@@ -46,7 +66,7 @@ const SelectTrigger = React.forwardRef<
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="size-4 shrink-0 opacity-50 transition-transform duration-200 ease-in-out group-data-[state=open]:rotate-180" />
+      <ChevronDown className={selectChevronClassName} />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ));
@@ -171,4 +191,14 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
-export { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue };
+export {
+  Select,
+  SelectContent,
+  SelectFieldTrigger,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+};

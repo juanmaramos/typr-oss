@@ -8,6 +8,7 @@ import { type ReactNode, useState } from "react";
 
 import { Button } from "@typr/ui/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@typr/ui/components/ui/popover";
+import { SelectFieldTrigger } from "@typr/ui/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@typr/ui/components/ui/tooltip";
 import { cn } from "@typr/ui/lib/utils";
 
@@ -32,7 +33,7 @@ export interface STTLanguageSelectorProps {
   size?: "compact" | "full";
   isActive?: boolean;
   triggerLabel?: ReactNode;
-  triggerVariant?: "button" | "inline";
+  triggerVariant?: "button" | "inline" | "field";
 }
 
 export function STTLanguageSelector({
@@ -72,64 +73,79 @@ export function STTLanguageSelector({
     setIsOpen(false);
   };
 
-  const selectorButton = (
-    <Button
-      variant="ghost"
-      size={isActive ? "icon" : undefined}
-      disabled={disabled}
-      title={selectedOption ? getSttModelLabel(selectedOption.key) : t`Select model`}
-      className={cn(
-        isInlineTrigger
-          ? "h-auto gap-0.5 px-0 py-0 text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground"
-          : isActive
-          ? "h-7 w-auto gap-0.5 px-1.5 transition-all"
-          : "justify-between gap-1.5 h-7 px-2 text-sm transition-all",
-        disabled && "opacity-50 cursor-not-allowed",
-      )}
-      onClick={() => !disabled && setIsOpen(!isOpen)}
-    >
-      {isActive
-        ? (
-          <>
-            <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
-            <i
-              aria-hidden="true"
-              className={cn(
-                "ri-arrow-down-s-line text-xs text-muted-foreground transition-transform duration-200",
-                isOpen && "rotate-180",
-              )}
-            />
-          </>
-        )
-        : (
-          <>
-            {showCustomTrigger
-              ? (
-                <span className={isCompact || isInlineTrigger ? "text-xs font-medium" : "text-sm font-medium"}>
-                  {triggerLabel}
-                </span>
-              )
-              : (
-                <span className="flex items-center gap-1.5">
-                  <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
-                  <span className={isCompact ? "text-xs" : "text-xs font-medium"}>
-                    {selectedOption ? getSttModelLabel(selectedOption.key) : <Trans>Select model</Trans>}
-                  </span>
-                </span>
-              )}
-            <i
-              className={cn(
-                "ri-arrow-down-s-line text-sm text-muted-foreground transition-transform duration-200",
-                isOpen && "rotate-180",
-              )}
-            />
-          </>
+  const selectorButton = triggerVariant === "field" && !isActive
+    ? (
+      <SelectFieldTrigger
+        size="sm"
+        disabled={disabled}
+        title={selectedOption ? getSttModelLabel(selectedOption.key) : t`Select model`}
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
+          <span className="truncate">
+            {selectedOption ? getSttModelLabel(selectedOption.key) : <Trans>Select model</Trans>}
+          </span>
+        </span>
+      </SelectFieldTrigger>
+    )
+    : (
+      <Button
+        variant="ghost"
+        size={isActive ? "icon" : undefined}
+        disabled={disabled}
+        title={selectedOption ? getSttModelLabel(selectedOption.key) : t`Select model`}
+        className={cn(
+          isInlineTrigger
+            ? "h-auto gap-0.5 px-0 py-0 text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground"
+            : isActive
+            ? "h-7 w-auto gap-0.5 px-1.5 transition-all"
+            : "justify-between gap-1.5 h-7 px-2 text-sm transition-all",
+          disabled && "opacity-50 cursor-not-allowed",
         )}
-      <span className="sr-only">
-        {selectedOption ? getSttModelLabel(selectedOption.key) : <Trans>Select model</Trans>}
-      </span>
-    </Button>
-  );
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+      >
+        {isActive
+          ? (
+            <>
+              <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
+              <i
+                aria-hidden="true"
+                className={cn(
+                  "ri-arrow-down-s-line text-xs text-muted-foreground transition-transform duration-200",
+                  isOpen && "rotate-180",
+                )}
+              />
+            </>
+          )
+          : (
+            <>
+              {showCustomTrigger
+                ? (
+                  <span className={isCompact || isInlineTrigger ? "text-xs font-medium" : "text-sm font-medium"}>
+                    {triggerLabel}
+                  </span>
+                )
+                : (
+                  <span className="flex items-center gap-1.5">
+                    <STTProviderIcon model={selectedOption?.modelKey ?? ""} />
+                    <span className={isCompact ? "text-xs" : "text-xs font-medium"}>
+                      {selectedOption ? getSttModelLabel(selectedOption.key) : <Trans>Select model</Trans>}
+                    </span>
+                  </span>
+                )}
+              <i
+                className={cn(
+                  "ri-arrow-down-s-line text-sm text-muted-foreground transition-transform duration-200",
+                  isOpen && "rotate-180",
+                )}
+              />
+            </>
+          )}
+        <span className="sr-only">
+          {selectedOption ? getSttModelLabel(selectedOption.key) : <Trans>Select model</Trans>}
+        </span>
+      </Button>
+    );
 
   if (disabled) {
     return (

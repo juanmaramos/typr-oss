@@ -1903,7 +1903,7 @@ msgstr "Cloud · typically 1–3 min"
 msgid "Cloud mode is already available. Download these only to use transcription and summaries offline."
 msgstr "Cloud mode is already available. Download these only to use transcription and summaries offline."
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:163
+#: src/components/transcript/actions/STTLanguageSelector.tsx:179
 #: src/components/ui/model-selector.tsx:372
 msgid "Cloud Models"
 msgstr "Cloud Models"
@@ -2542,8 +2542,8 @@ msgstr "Don't transcribe"
 msgid "Download"
 msgstr "Download"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:205
-#: src/components/transcript/actions/STTLanguageSelector.tsx:206
+#: src/components/transcript/actions/STTLanguageSelector.tsx:221
+#: src/components/transcript/actions/STTLanguageSelector.tsx:222
 msgid "Download {size}"
 msgstr "Download {size}"
 
@@ -4080,7 +4080,7 @@ msgstr "Older"
 #: src/components/right-panel/views/transcript-view.tsx:466
 #: src/components/settings/components/ai/llm-local-view.tsx:144
 #: src/components/settings/components/ai/stt-view.tsx:106
-#: src/components/transcript/actions/STTLanguageSelector.tsx:163
+#: src/components/transcript/actions/STTLanguageSelector.tsx:179
 #: src/components/ui/model-selector.tsx:337
 msgid "On-device"
 msgstr "On-device"
@@ -4186,9 +4186,9 @@ msgstr "Open settings"
 #: src/components/settings/views/sound.tsx:134
 #: src/components/toast/shared.tsx:416
 #: src/components/toast/shared.tsx:466
-#: src/components/transcript/actions/STTLanguageSelector.tsx:230
-#: src/components/transcript/actions/STTLanguageSelector.tsx:231
-#: src/components/transcript/actions/STTLanguageSelector.tsx:249
+#: src/components/transcript/actions/STTLanguageSelector.tsx:246
+#: src/components/transcript/actions/STTLanguageSelector.tsx:247
+#: src/components/transcript/actions/STTLanguageSelector.tsx:265
 #: src/components/welcome-modal/audio-permissions-view.tsx:137
 msgid "Open Settings"
 msgstr "Open Settings"
@@ -4893,8 +4893,8 @@ msgstr "Resume Recording"
 #: src/components/settings/components/ai/task-defaults.tsx:349
 #: src/components/toast/shared.tsx:180
 #: src/components/toast/shared.tsx:261
-#: src/components/transcript/actions/STTLanguageSelector.tsx:217
-#: src/components/transcript/actions/STTLanguageSelector.tsx:218
+#: src/components/transcript/actions/STTLanguageSelector.tsx:233
+#: src/components/transcript/actions/STTLanguageSelector.tsx:234
 #: src/components/ui/ai-setup-indicator.tsx:32
 #: src/components/ui/model-selector.tsx:317
 #: src/components/welcome-modal/download-progress-view.tsx:166
@@ -5137,9 +5137,11 @@ msgstr "Select microphone..."
 #: src/components/settings/components/ai/task-defaults.tsx:176
 #: src/components/settings/components/ai/task-defaults.tsx:234
 #: src/components/settings/components/ai/task-defaults.tsx:294
-#: src/components/transcript/actions/STTLanguageSelector.tsx:80
-#: src/components/transcript/actions/STTLanguageSelector.tsx:116
-#: src/components/transcript/actions/STTLanguageSelector.tsx:129
+#: src/components/transcript/actions/STTLanguageSelector.tsx:81
+#: src/components/transcript/actions/STTLanguageSelector.tsx:86
+#: src/components/transcript/actions/STTLanguageSelector.tsx:96
+#: src/components/transcript/actions/STTLanguageSelector.tsx:132
+#: src/components/transcript/actions/STTLanguageSelector.tsx:145
 #: src/components/ui/model-selector.tsx:269
 #: src/components/ui/model-selector.tsx:281
 msgid "Select model"
@@ -5495,7 +5497,7 @@ msgstr "Stop generating"
 msgid "Stop now"
 msgstr "Stop now"
 
-#: src/components/transcript/actions/STTLanguageSelector.tsx:139
+#: src/components/transcript/actions/STTLanguageSelector.tsx:155
 msgid "Stop or pause recording to change transcription model"
 msgstr "Stop or pause recording to change transcription model"
 
