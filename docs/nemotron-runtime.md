@@ -193,8 +193,9 @@ bash scripts/build_mcp_sidecar.sh aarch64-apple-darwin
 pnpm -F @typr/desktop tauri dev --features nemotron,macos-default --config src-tauri/tauri.nemotron.conf.json
 ```
 
-The helper builds the pinned SDK and its private SentencePiece dependency,
-builds Typr's worker, copies the runtime and license notices into ignored
+The helper keeps native source checkouts and CMake builds in ignored
+`build/nemotron`, outside the Rust cache's `target` cleanup. It builds the pinned
+SDK and its private SentencePiece dependency, builds Typr's worker, copies the runtime and license notices into ignored
 `target/nemotron/runtime`, and stages development resources beside the Cargo
 executable. It rejects modified tracked upstream source and mismatched submodule
 revisions. Python, Git, CMake and compilers are build tools; the running app
