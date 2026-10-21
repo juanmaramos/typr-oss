@@ -107,7 +107,7 @@ describe.each([["en", english], ["es", spanish]] as const)("meeting date in %s",
     expect(host.textContent).toBe(locale === "es" ? "Ahora" : "Now");
     const button = host.querySelector<HTMLButtonElement>("button");
     expect(button?.getAttribute("aria-label")).toBe(
-      locale === "es" ? "Vincular evento del calendario" : "Link calendar event",
+      locale === "es" ? "Ahora: vincular evento del calendario" : "Now: link calendar event",
     );
     await act(async () => button?.click());
     expect(document.querySelector("input[placeholder]")).not.toBeNull();

@@ -258,7 +258,7 @@ export function EventChip({ sessionId }: EventChipProps) {
         <PopoverTrigger asChild>
           <button
             type="button"
-            aria-label={isUnusedDraft ? t`Link calendar event` : undefined}
+            aria-label={isUnusedDraft ? t`Now: link calendar event` : undefined}
             className={cn(noteHeaderChipClassName, "cursor-pointer")}
           >
             <Icon name="ri-calendar-line" className="h-4 w-4 text-muted-foreground" />

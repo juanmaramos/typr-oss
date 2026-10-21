@@ -3531,10 +3531,6 @@ msgstr "Link"
 msgid "Link a recording to Zoom, Teams, or Google Meet. Recording stops two minutes after the call ends, unless you rejoin. If we’re unsure the call ended, we’ll ask before stopping."
 msgstr "Link a recording to Zoom, Teams, or Google Meet. Recording stops two minutes after the call ends, unless you rejoin. If we’re unsure the call ended, we’ll ask before stopping."
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:261
-msgid "Link calendar event"
-msgstr "Link calendar event"
-
 #: src/components/call-end-bridge.tsx:36
 #: src/components/call-end-bridge.tsx:73
 msgid "Link this recording to a call?"
@@ -4140,6 +4136,10 @@ msgstr "Notifications"
 #: src/components/editor-area/note-header/chips/event-chip.tsx:265
 msgid "Now"
 msgstr "Now"
+
+#: src/components/editor-area/note-header/chips/event-chip.tsx:261
+msgid "Now: link calendar event"
+msgstr "Now: link calendar event"
 
 #: src/components/editor-area/selection-actions.tsx:491
 msgid "Numbered list"
