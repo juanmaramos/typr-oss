@@ -20,9 +20,8 @@ export interface ModelOption {
   customIcon?: string; // Custom Remix icon class (e.g., "ri-meta-fill")
   vendor?: string; // Vendor name for grouping/sorting (e.g., "Anthropic", "Google", "OpenAI")
   isCloud?: boolean; // Cloud model flag
-  isRecommended?: boolean; // Recommended model shown before the full provider catalog
   providerModelId?: string; // Raw provider model ID without app prefix
-  source?: "recommended" | "provider" | "manual";
+  source?: "provider" | "manual";
 }
 
 /**

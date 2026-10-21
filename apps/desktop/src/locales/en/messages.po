@@ -786,7 +786,7 @@ msgid "{0, plural, one {Use at most # character.} other {Use at most # character
 msgstr "{0, plural, one {Use at most # character.} other {Use at most # characters.}}"
 
 #. placeholder {0}: displayModel.name
-#: src/components/ui/model-selector.tsx:324
+#: src/components/ui/model-selector.tsx:294
 msgid "{0} - Click to change"
 msgstr "{0} - Click to change"
 
@@ -984,7 +984,7 @@ msgstr "Access granted"
 msgid "Access Granted"
 msgstr "Access Granted"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:84
+#: src/components/settings/components/ai/llm-local-view.tsx:87
 msgid "Access many model providers through one API key."
 msgstr "Access many model providers through one API key."
 
@@ -1042,11 +1042,15 @@ msgstr "Add a few related notes, then Typr can keep a brief for this project."
 msgid "Add a key to use AssemblyAI cloud transcription."
 msgstr "Add a key to use AssemblyAI cloud transcription."
 
-#: src/components/settings/components/ai/llm-local-view.tsx:359
+#: src/components/settings/components/ai/llm-local-view.tsx:328
 msgid "Add a key to use this provider."
 msgstr "Add a key to use this provider."
 
-#: src/components/settings/components/ai/llm-local-view.tsx:403
+#: src/components/settings/components/ai/llm-local-view.tsx:416
+msgid "Add an API key to load models."
+msgstr "Add an API key to load models."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:373
 msgid "Add API key above"
 msgstr "Add API key above"
 
@@ -1058,7 +1062,7 @@ msgstr "Add languages to improve accuracy. Leave empty for automatic detection."
 msgid "Add members"
 msgstr "Add members"
 
-#: src/components/ui/model-selector.tsx:475
+#: src/components/ui/model-selector.tsx:448
 msgid "Add Models"
 msgstr "Add Models"
 
@@ -1164,7 +1168,7 @@ msgstr "AI models"
 msgid "AI models are ready"
 msgstr "AI models are ready"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:154
+#: src/components/settings/components/ai/llm-local-view.tsx:124
 msgid "AI models for answering questions and summarizing your meetings"
 msgstr "AI models for answering questions and summarizing your meetings"
 
@@ -1294,7 +1298,7 @@ msgstr "Anyone with the link can view this page"
 msgid "API Base URL"
 msgstr "API Base URL"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:341
+#: src/components/settings/components/ai/llm-local-view.tsx:310
 #: src/components/settings/components/ai/stt-view.tsx:325
 msgid "API key"
 msgstr "API key"
@@ -1492,12 +1496,12 @@ msgstr "Audio upload in progress. Live transcription is unavailable until it fin
 #: src/components/settings/components/ai/task-defaults.tsx:254
 #: src/components/transcript/actions/MicrophoneSelector.tsx:83
 #: src/components/transcript/actions/MicrophoneSelector.tsx:84
-#: src/components/ui/model-selector.tsx:255
-#: src/components/ui/model-selector.tsx:595
+#: src/components/ui/model-selector.tsx:225
+#: src/components/ui/model-selector.tsx:568
 msgid "Auto"
 msgstr "Auto"
 
-#: src/components/ui/model-selector.tsx:125
+#: src/components/ui/model-selector.tsx:93
 msgid "Auto - Best available configured model"
 msgstr "Auto - Best available configured model"
 
@@ -1532,26 +1536,14 @@ msgstr "Back to {0}"
 msgid "Back to Ask"
 msgstr "Back to Ask"
 
-#: src/hooks/cloud-model-catalog.ts:452
-msgid "Balanced speed and quality"
-msgstr "Balanced speed and quality"
-
 #: src/components/settings/components/ai/task-defaults.tsx:187
 #: src/components/settings/components/ai/task-defaults.tsx:254
 msgid "Best available model"
 msgstr "Best available model"
 
-#: src/hooks/cloud-model-catalog.ts:444
-msgid "Best default balance of speed and quality"
-msgstr "Best default balance of speed and quality"
-
 #: src/lib/model-metadata.ts:8
 msgid "Best for meeting Q&A and chat"
 msgstr "Best for meeting Q&A and chat"
-
-#: src/hooks/cloud-model-catalog.ts:436
-msgid "Best quality for complex work"
-msgstr "Best quality for complex work"
 
 #: src/components/settings/views/lab.tsx:45
 #: src/components/settings/views/lab.tsx:61
@@ -1721,7 +1713,7 @@ msgstr "Changes rejected"
 
 #: src/components/right-panel/components/floating-view-toggle.tsx:28
 #: src/components/right-panel/views/chat-view.tsx:511
-#: src/components/settings/components/ai/llm-local-view.tsx:151
+#: src/components/settings/components/ai/llm-local-view.tsx:121
 #: src/components/settings/views/ai.tsx:122
 #: src/components/transcript/actions/TranscriptActionBar.tsx:119
 msgid "Chat"
@@ -1898,7 +1890,7 @@ msgid "Close project brief"
 msgstr "Close project brief"
 
 #: src/components/right-panel/views/transcript-view.tsx:465
-#: src/components/settings/components/ai/llm-local-view.tsx:292
+#: src/components/settings/components/ai/llm-local-view.tsx:261
 #: src/components/settings/components/ai/stt-view.tsx:251
 msgid "Cloud"
 msgstr "Cloud"
@@ -1912,7 +1904,7 @@ msgid "Cloud mode is already available. Download these only to use transcription
 msgstr "Cloud mode is already available. Download these only to use transcription and summaries offline."
 
 #: src/components/transcript/actions/STTLanguageSelector.tsx:163
-#: src/components/ui/model-selector.tsx:402
+#: src/components/ui/model-selector.tsx:372
 msgid "Cloud Models"
 msgstr "Cloud Models"
 
@@ -2001,7 +1993,7 @@ msgstr "Configured"
 msgid "Connect"
 msgstr "Connect"
 
-#: src/components/ui/model-selector.tsx:660
+#: src/components/ui/model-selector.tsx:633
 msgid "Connect API key"
 msgstr "Connect API key"
 
@@ -2149,6 +2141,10 @@ msgstr "Could not check Claude Desktop configuration."
 #: src/components/settings/views/about.tsx:206
 msgid "Could not check for updates. Try again."
 msgstr "Could not check for updates. Try again."
+
+#: src/components/settings/components/ai/llm-local-view.tsx:418
+msgid "Could not load models. Try again."
+msgstr "Could not load models. Try again."
 
 #: src/components/editor-area/note-header/share-menu.tsx:80
 msgid "Could not open Claude Desktop"
@@ -2407,10 +2403,6 @@ msgstr "Date"
 msgid "Date: {0}"
 msgstr "Date: {0}"
 
-#: src/hooks/cloud-model-catalog.ts:427
-msgid "DeepSeek V4 Flash"
-msgstr "DeepSeek V4 Flash"
-
 #: src/components/settings/views/templates.tsx:560
 #: src/components/toolbar/buttons/share-button.tsx:487
 #: src/components/toolbar/buttons/share-button.tsx:499
@@ -2606,11 +2598,11 @@ msgstr "Downloading update {0}"
 msgid "Downloading update {0}%."
 msgstr "Downloading update {0}%."
 
-#: src/components/ui/model-selector.tsx:287
+#: src/components/ui/model-selector.tsx:257
 msgid "Downloading..."
 msgstr "Downloading..."
 
-#: src/components/settings/components/ai/llm-local-view.tsx:254
+#: src/components/settings/components/ai/llm-local-view.tsx:224
 #: src/hooks/useModelAvailabilityLabel.ts:16
 msgid "Downloading…"
 msgstr "Downloading…"
@@ -2677,10 +2669,6 @@ msgstr "Edited"
 #: src/data/shortcuts.ts:17
 msgid "Editing"
 msgstr "Editing"
-
-#: src/hooks/cloud-model-catalog.ts:460
-msgid "Efficient reasoning model through OpenRouter"
-msgstr "Efficient reasoning model through OpenRouter"
 
 #: src/components/finder/views/contact-view.tsx:517
 #: src/components/toolbar/buttons/share-button.tsx:92
@@ -2997,26 +2985,6 @@ msgstr "Failed to start recording"
 msgid "Fast and reliable for simple tasks"
 msgstr "Fast and reliable for simple tasks"
 
-#: src/hooks/cloud-model-catalog.ts:456
-msgid "Fast long-context model through OpenRouter"
-msgstr "Fast long-context model through OpenRouter"
-
-#: src/hooks/cloud-model-catalog.ts:458
-msgid "Fast, low-cost model through OpenRouter"
-msgstr "Fast, low-cost model through OpenRouter"
-
-#: src/hooks/cloud-model-catalog.ts:440
-msgid "Fastest Groq text model for everyday tasks"
-msgstr "Fastest Groq text model for everyday tasks"
-
-#: src/hooks/cloud-model-catalog.ts:450
-msgid "Fastest responses, great for quick tasks"
-msgstr "Fastest responses, great for quick tasks"
-
-#: src/hooks/cloud-model-catalog.ts:438
-msgid "Fastest, lowest-cost OpenAI option"
-msgstr "Fastest, lowest-cost OpenAI option"
-
 #: src/components/settings-dialog/sidebar.tsx:110
 msgid "Features"
 msgstr "Features"
@@ -3156,14 +3124,6 @@ msgstr "Full name"
 msgid "Galician"
 msgstr "Galician"
 
-#: src/hooks/cloud-model-catalog.ts:423
-msgid "Gemini 3.1 Flash Lite"
-msgstr "Gemini 3.1 Flash Lite"
-
-#: src/hooks/cloud-model-catalog.ts:421
-msgid "Gemini 3.1 Pro"
-msgstr "Gemini 3.1 Pro"
-
 #: src/components/settings-dialog/content.tsx:31
 #: src/components/settings-dialog/sidebar.tsx:27
 #: src/components/settings-dialog/sidebar.tsx:62
@@ -3230,26 +3190,6 @@ msgstr "Good for writing and conversation"
 msgid "Google Gemini"
 msgstr "Google Gemini"
 
-#: src/hooks/cloud-model-catalog.ts:411
-msgid "GPT-5.4 Mini"
-msgstr "GPT-5.4 Mini"
-
-#: src/hooks/cloud-model-catalog.ts:405
-msgid "GPT-5.4 Nano"
-msgstr "GPT-5.4 Nano"
-
-#: src/hooks/cloud-model-catalog.ts:403
-msgid "GPT-5.5"
-msgstr "GPT-5.5"
-
-#: src/hooks/cloud-model-catalog.ts:409
-msgid "GPT-OSS 120B"
-msgstr "GPT-OSS 120B"
-
-#: src/hooks/cloud-model-catalog.ts:407
-msgid "GPT-OSS 20B"
-msgstr "GPT-OSS 20B"
-
 #: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:116
 #: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:182
 msgid "Grant Access"
@@ -3266,10 +3206,6 @@ msgstr "Greek"
 #: src/components/projects/create-project-dialog.tsx:113
 msgid "Group related notes around a client, topic, initiative, or area of work."
 msgstr "Group related notes around a client, topic, initiative, or area of work."
-
-#: src/hooks/cloud-model-catalog.ts:417
-msgid "Haiku 4.5"
-msgstr "Haiku 4.5"
 
 #: src/components/editor-area/selection-actions.tsx:482
 msgid "Heading 2"
@@ -3435,7 +3371,7 @@ msgstr "Join meeting"
 msgid "Keep recording"
 msgstr "Keep recording"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:334
+#: src/components/settings/components/ai/llm-local-view.tsx:303
 msgid "Key configured"
 msgstr "Key configured"
 
@@ -3443,7 +3379,7 @@ msgstr "Key configured"
 msgid "Key decisions"
 msgstr "Key decisions"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:358
+#: src/components/settings/components/ai/llm-local-view.tsx:327
 msgid "Key stored locally and used directly with this provider."
 msgstr "Key stored locally and used directly with this provider."
 
@@ -3564,14 +3500,6 @@ msgstr "Live text in {count} languages. Requires an API key."
 msgid "Live transcription stopped"
 msgstr "Live transcription stopped"
 
-#: src/hooks/cloud-model-catalog.ts:415
-msgid "Llama 3.1 8B"
-msgstr "Llama 3.1 8B"
-
-#: src/hooks/cloud-model-catalog.ts:413
-msgid "Llama 3.3 70B"
-msgstr "Llama 3.3 70B"
-
 #: ../../packages/ui/src/components/ui/spinner.tsx:10
 msgid "Loading"
 msgstr "Loading"
@@ -3607,8 +3535,8 @@ msgstr "Loading model languages..."
 msgid "Loading model…"
 msgstr "Loading model…"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:198
-#: src/components/settings/components/ai/llm-local-view.tsx:300
+#: src/components/settings/components/ai/llm-local-view.tsx:168
+#: src/components/settings/components/ai/llm-local-view.tsx:269
 msgid "Loading models…"
 msgstr "Loading models…"
 
@@ -3628,7 +3556,7 @@ msgstr "Loading transcription..."
 #: src/components/settings/components/calendar/calendar-selector.tsx:96
 #: src/components/transcript/actions/MicrophoneSelector.tsx:80
 #: src/components/ui/loader.tsx:192
-#: src/components/ui/model-selector.tsx:235
+#: src/components/ui/model-selector.tsx:205
 msgid "Loading..."
 msgstr "Loading..."
 
@@ -3643,14 +3571,6 @@ msgstr "Local and BYOK"
 #: src/routes/app.control.tsx:107
 msgid "Logo"
 msgstr "Logo"
-
-#: src/hooks/cloud-model-catalog.ts:454
-msgid "Long context, strong at analysis"
-msgstr "Long context, strong at analysis"
-
-#: src/hooks/cloud-model-catalog.ts:448
-msgid "Lowest-latency Groq option"
-msgstr "Lowest-latency Groq option"
 
 #: src/lib/language-labels.ts:29
 msgid "Macedonian"
@@ -3759,8 +3679,8 @@ msgstr "More"
 msgid "More chat actions"
 msgstr "More chat actions"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:459
-#: src/components/ui/model-selector.tsx:453
+#: src/components/settings/components/ai/llm-local-view.tsx:445
+#: src/components/ui/model-selector.tsx:426
 msgid "More models"
 msgstr "More models"
 
@@ -3896,6 +3816,10 @@ msgstr "New Note"
 msgid "New template"
 msgstr "New template"
 
+#: src/hooks/cloud-model-catalog.ts:430
+msgid "Newest available"
+msgstr "Newest available"
+
 #: src/components/right-panel/components/search/chat-search-header.tsx:150
 #: src/components/right-panel/components/search/search-header.tsx:156
 msgid "Next (Enter)"
@@ -3988,8 +3912,8 @@ msgstr "No microphone selected"
 msgid "No microphones found"
 msgstr "No microphones found"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:445
-#: src/components/ui/model-selector.tsx:439
+#: src/components/settings/components/ai/llm-local-view.tsx:419
+#: src/components/ui/model-selector.tsx:412
 msgid "No models found"
 msgstr "No models found"
 
@@ -4154,10 +4078,10 @@ msgid "Older"
 msgstr "Older"
 
 #: src/components/right-panel/views/transcript-view.tsx:466
-#: src/components/settings/components/ai/llm-local-view.tsx:174
+#: src/components/settings/components/ai/llm-local-view.tsx:144
 #: src/components/settings/components/ai/stt-view.tsx:106
 #: src/components/transcript/actions/STTLanguageSelector.tsx:163
-#: src/components/ui/model-selector.tsx:367
+#: src/components/ui/model-selector.tsx:337
 msgid "On-device"
 msgstr "On-device"
 
@@ -4177,7 +4101,7 @@ msgstr "One-time download, {sttSize}"
 msgid "One-time download, 5.0 GB"
 msgstr "One-time download, 5.0 GB"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:177
+#: src/components/settings/components/ai/llm-local-view.tsx:147
 msgid "Only GGUF chat models are supported locally."
 msgstr "Only GGUF chat models are supported locally."
 
@@ -4205,7 +4129,7 @@ msgstr "Open AI models"
 msgid "Open finder view"
 msgstr "Open finder view"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:165
+#: src/components/settings/components/ai/llm-local-view.tsx:135
 #: src/components/settings/components/ai/stt-view.tsx:97
 #: src/components/settings/components/data-path-block.tsx:74
 msgid "Open folder"
@@ -4480,6 +4404,10 @@ msgstr "Polish"
 msgid "Poor"
 msgstr "Poor"
 
+#: src/hooks/cloud-model-catalog.ts:430
+msgid "Popular this week on OpenRouter"
+msgstr "Popular this week on OpenRouter"
+
 #: src/lib/language-labels.ts:35
 msgid "Portuguese"
 msgstr "Portuguese"
@@ -4730,10 +4658,6 @@ msgstr "Publish Publicly"
 msgid "Publish your note"
 msgstr "Publish your note"
 
-#: src/hooks/cloud-model-catalog.ts:425
-msgid "Qwen3.6 Flash"
-msgstr "Qwen3.6 Flash"
-
 #: src/components/meeting-assistant/floating-assistant.tsx:494
 msgid "rail"
 msgstr "rail"
@@ -4750,7 +4674,7 @@ msgstr "Readable source changed after its compiled digest was generated."
 msgid "Readable source has no compiled digest yet."
 msgstr "Readable source has no compiled digest yet."
 
-#: src/components/settings/components/ai/llm-local-view.tsx:247
+#: src/components/settings/components/ai/llm-local-view.tsx:217
 #: src/components/ui/tool.tsx:59
 #: src/components/welcome-modal/download-progress-view.tsx:144
 #: src/components/welcome-modal/download-progress-view.tsx:201
@@ -4831,10 +4755,6 @@ msgstr "Rejected"
 #: src/components/finder/views/contact-view.tsx:318
 msgid "Related Notes"
 msgstr "Related Notes"
-
-#: src/hooks/cloud-model-catalog.ts:446
-msgid "Reliable general-purpose Groq model"
-msgstr "Reliable general-purpose Groq model"
 
 #: src/components/settings/views/general.tsx:307
 msgid "Reload language list"
@@ -4964,8 +4884,9 @@ msgstr "Resume Recording"
 #: src/components/projects/project-files-dropzone.tsx:176
 #: src/components/right-panel/views/transcript-view.tsx:296
 #: src/components/right-panel/views/transcript-view.tsx:569
-#: src/components/settings/components/ai/llm-local-view.tsx:189
-#: src/components/settings/components/ai/llm-local-view.tsx:240
+#: src/components/settings/components/ai/llm-local-view.tsx:159
+#: src/components/settings/components/ai/llm-local-view.tsx:210
+#: src/components/settings/components/ai/llm-local-view.tsx:400
 #: src/components/settings/components/ai/llm-local-view.tsx:430
 #: src/components/settings/components/ai/stt-view.tsx:159
 #: src/components/settings/components/ai/stt-view.tsx:290
@@ -4975,7 +4896,7 @@ msgstr "Resume Recording"
 #: src/components/transcript/actions/STTLanguageSelector.tsx:217
 #: src/components/transcript/actions/STTLanguageSelector.tsx:218
 #: src/components/ui/ai-setup-indicator.tsx:32
-#: src/components/ui/model-selector.tsx:347
+#: src/components/ui/model-selector.tsx:317
 #: src/components/welcome-modal/download-progress-view.tsx:166
 #: src/components/welcome-modal/download-progress-view.tsx:213
 #: src/routes/app.ask.$threadId.tsx:530
@@ -5073,8 +4994,8 @@ msgstr "Search conversations"
 msgid "Search languages..."
 msgstr "Search languages..."
 
-#: src/components/settings/components/ai/llm-local-view.tsx:367
-#: src/components/ui/model-selector.tsx:420
+#: src/components/settings/components/ai/llm-local-view.tsx:336
+#: src/components/ui/model-selector.tsx:390
 msgid "Search models"
 msgstr "Search models"
 
@@ -5167,7 +5088,7 @@ msgstr "See whether a newer version is available."
 msgid "Select a model from the dropdown (if available) or manually enter the model name required by your endpoint."
 msgstr "Select a model from the dropdown (if available) or manually enter the model name required by your endpoint."
 
-#: src/components/ui/model-selector.tsx:326
+#: src/components/ui/model-selector.tsx:296
 msgid "Select a model to enable AI features"
 msgstr "Select a model to enable AI features"
 
@@ -5179,7 +5100,7 @@ msgstr "Select a person to view details"
 msgid "Select a valid option."
 msgstr "Select a valid option."
 
-#: src/components/ui/model-selector.tsx:327
+#: src/components/ui/model-selector.tsx:297
 msgid "Select AI model"
 msgstr "Select AI model"
 
@@ -5219,8 +5140,8 @@ msgstr "Select microphone..."
 #: src/components/transcript/actions/STTLanguageSelector.tsx:80
 #: src/components/transcript/actions/STTLanguageSelector.tsx:116
 #: src/components/transcript/actions/STTLanguageSelector.tsx:129
-#: src/components/ui/model-selector.tsx:299
-#: src/components/ui/model-selector.tsx:311
+#: src/components/ui/model-selector.tsx:269
+#: src/components/ui/model-selector.tsx:281
 msgid "Select model"
 msgstr "Select model"
 
@@ -5249,7 +5170,7 @@ msgstr "Select organization"
 msgid "Select tags"
 msgstr "Select tags"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:419
+#: src/components/settings/components/ai/llm-local-view.tsx:389
 msgid "Selected"
 msgstr "Selected"
 
@@ -5390,8 +5311,8 @@ msgid "Show chat history"
 msgstr "Show chat history"
 
 #: src/components/projects/project-files-dropzone.tsx:209
-#: src/components/settings/components/ai/llm-local-view.tsx:459
-#: src/components/ui/model-selector.tsx:453
+#: src/components/settings/components/ai/llm-local-view.tsx:445
+#: src/components/ui/model-selector.tsx:426
 msgid "Show fewer"
 msgstr "Show fewer"
 
@@ -5458,10 +5379,6 @@ msgstr "Some shortcuts may vary based on your operating system"
 #: src/components/error-modal.tsx:41
 msgid "Something went wrong"
 msgstr "Something went wrong"
-
-#: src/hooks/cloud-model-catalog.ts:419
-msgid "Sonnet 4.6"
-msgstr "Sonnet 4.6"
 
 #: src/components/right-panel/hooks/chat-errors.ts:26
 msgid "Sorry, I encountered an error: {errorDetails}. Please try again."
@@ -5610,10 +5527,6 @@ msgstr "Stopped"
 #: src/routes/transcription-status.tsx:132
 msgid "Stopping transcription"
 msgstr "Stopping transcription"
-
-#: src/hooks/cloud-model-catalog.ts:442
-msgid "Stronger open-weight reasoning on Groq"
-msgstr "Stronger open-weight reasoning on Groq"
 
 #: src/components/settings/views/templates.tsx:473
 msgid "Structured candidate assessment from interview conversations"
@@ -6297,7 +6210,7 @@ msgstr "Urdu"
 msgid "Usage analytics"
 msgstr "Usage analytics"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:419
+#: src/components/settings/components/ai/llm-local-view.tsx:389
 #: src/components/settings/components/ai/stt-view.tsx:177
 #: src/components/settings/components/ai/stt-view.tsx:316
 msgid "Use"
@@ -6307,7 +6220,7 @@ msgstr "Use"
 msgid "Use Google's Gemini models with your API key"
 msgstr "Use Google's Gemini models with your API key"
 
-#: src/components/settings/components/ai/llm-local-view.tsx:88
+#: src/components/settings/components/ai/llm-local-view.tsx:91
 msgid "Use Groq-hosted fast inference models with your API key."
 msgstr "Use Groq-hosted fast inference models with your API key."
 
@@ -6315,7 +6228,7 @@ msgstr "Use Groq-hosted fast inference models with your API key."
 msgid "Use only the Claude Desktop MCP connector named exactly \"Typr Local\". Read this meeting with get_session using id \"{sessionId}\". Use get_transcript from the same connector with the same id if needed. If the session is unavailable, stop and ask me to reconnect Typr Local in Integrations. Help me explore the meeting notes."
 msgstr "Use only the Claude Desktop MCP connector named exactly \"Typr Local\". Read this meeting with get_session using id \"{sessionId}\". Use get_transcript from the same connector with the same id if needed. If the session is unavailable, stop and ask me to reconnect Typr Local in Integrations. Help me explore the meeting notes."
 
-#: src/components/settings/components/ai/llm-local-view.tsx:91
+#: src/components/settings/components/ai/llm-local-view.tsx:94
 msgid "Use OpenAI models directly with your API key."
 msgstr "Use OpenAI models directly with your API key."
 
@@ -6349,7 +6262,7 @@ msgstr "User"
 msgid "useReasoningContext must be used within a Reasoning provider"
 msgstr "useReasoningContext must be used within a Reasoning provider"
 
-#: src/components/ui/model-selector.tsx:124
+#: src/components/ui/model-selector.tsx:92
 msgid "Uses connected cloud models first, then on-device models"
 msgstr "Uses connected cloud models first, then on-device models"
 

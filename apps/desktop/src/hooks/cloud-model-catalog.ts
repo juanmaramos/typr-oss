@@ -1,9 +1,10 @@
 import { cloudModelAvailability } from "@/lib/model-availability";
 import { useLingui } from "@lingui/react/macro";
-import { useQuery } from "@tanstack/react-query";
+import { type QueryClient, useQuery } from "@tanstack/react-query";
 import { isTauri } from "@tauri-apps/api/core";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { useMemo } from "react";
+import { z } from "zod";
 
 import { commands as connectorCommands } from "@typr/plugin-connector";
 
@@ -22,25 +23,22 @@ type ProviderCatalogConfig = {
   icon: string;
 };
 
-type ProviderApiModel = {
-  id?: string;
-  name?: string;
-  description?: string;
-  owned_by?: string;
-  context_length?: number;
-  architecture?: {
-    modality?: string;
-    input_modalities?: string[];
-    output_modalities?: string[];
-  };
-};
-
-type RecommendedModel = {
-  id: string;
-  slug: string;
-  vendor: string;
-  icon: string;
-};
+const providerModelSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  owned_by: z.string().optional(),
+  created: z.number().finite().optional(),
+  active: z.boolean().optional(),
+  architecture: z.object({
+    modality: z.string().optional(),
+    input_modalities: z.array(z.string()).optional(),
+    output_modalities: z.array(z.string()).optional(),
+  }).optional(),
+});
+type ProviderApiModel = z.infer<typeof providerModelSchema>;
+const providerCatalogSchema = z.object({ data: z.array(providerModelSchema) });
+export const CLOUD_CATALOG_STALE_MS = 10 * 60 * 1000;
 
 const PROVIDER_CONFIG: Record<CloudProviderId, ProviderCatalogConfig> = {
   openai: {
@@ -61,111 +59,13 @@ const PROVIDER_CONFIG: Record<CloudProviderId, ProviderCatalogConfig> = {
     provider: ModelProvider.OPENROUTER,
     label: "OpenRouter",
     prefix: "openrouter-",
-    modelsUrl: "https://openrouter.ai/api/v1/models",
+    modelsUrl: "https://openrouter.ai/api/v1/models?sort=top-weekly&output_modalities=text",
     icon: "ri-openrouter-fill",
   },
 };
 
-const RECOMMENDED_MODELS: Record<CloudProviderId, RecommendedModel[]> = {
-  openai: [
-    {
-      id: "gpt-5.5",
-      slug: "gpt-5.5",
-      vendor: "OpenAI",
-      icon: "ri-openai-fill",
-    },
-    {
-      id: "gpt-5.4-mini",
-      slug: "gpt-5.4-mini",
-      vendor: "OpenAI",
-      icon: "ri-openai-fill",
-    },
-    {
-      id: "gpt-5.4-nano",
-      slug: "gpt-5.4-nano",
-      vendor: "OpenAI",
-      icon: "ri-openai-fill",
-    },
-  ],
-  groq: [
-    {
-      id: "openai/gpt-oss-20b",
-      slug: "gpt-oss-20b",
-      vendor: "OpenAI",
-      icon: "ri-openai-fill",
-    },
-    {
-      id: "openai/gpt-oss-120b",
-      slug: "gpt-oss-120b",
-      vendor: "OpenAI",
-      icon: "ri-openai-fill",
-    },
-    {
-      id: "llama-3.3-70b-versatile",
-      slug: "llama-3.3-70b",
-      vendor: "Meta",
-      icon: "ri-meta-fill",
-    },
-    {
-      id: "llama-3.1-8b-instant",
-      slug: "llama-3.1-8b",
-      vendor: "Meta",
-      icon: "ri-meta-fill",
-    },
-  ],
-  openrouter: [
-    {
-      id: "openai/gpt-5.4-mini",
-      slug: "gpt-5.4-mini",
-      vendor: "OpenAI",
-      icon: "ri-openai-fill",
-    },
-    {
-      id: "openai/gpt-5.5",
-      slug: "gpt-5.5",
-      vendor: "OpenAI",
-      icon: "ri-openai-fill",
-    },
-    {
-      id: "anthropic/claude-haiku-4.5",
-      slug: "claude-haiku-4.5",
-      vendor: "Anthropic",
-      icon: "ri-anthropic-fill",
-    },
-    {
-      id: "anthropic/claude-sonnet-4.6",
-      slug: "claude-sonnet-4.6",
-      vendor: "Anthropic",
-      icon: "ri-anthropic-fill",
-    },
-    {
-      id: "google/gemini-3.1-pro-preview",
-      slug: "gemini-3.1-pro",
-      vendor: "Google",
-      icon: "ri-google-fill",
-    },
-    {
-      id: "google/gemini-3.1-flash-lite",
-      slug: "gemini-3.1-flash-lite",
-      vendor: "Google",
-      icon: "ri-google-fill",
-    },
-    {
-      id: "qwen/qwen3.6-flash",
-      slug: "qwen3.6-flash",
-      vendor: "Qwen",
-      icon: "ri-sparkling-fill",
-    },
-    {
-      id: "deepseek/deepseek-v4-flash",
-      slug: "deepseek-v4-flash",
-      vendor: "DeepSeek",
-      icon: "ri-sparkling-fill",
-    },
-  ],
-};
-
 const MODEL_ID_EXCLUSIONS = [
+  ":batch",
   "audio",
   "clip",
   "dall-e",
@@ -198,7 +98,9 @@ function titleCaseModelId(modelId: string): string {
 
   return leaf
     .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+    .replace(/^Gpt (\d+(?:\.\d+)?)/, "GPT-$1")
+    .replace(/^O(\d)/, "o$1");
 }
 
 function vendorFromModelId(provider: CloudProviderId, modelId: string, ownedBy?: string): string {
@@ -239,11 +141,23 @@ function iconForVendor(provider: CloudProviderId, vendor: string): string {
 
 function isTextModel(provider: CloudProviderId, model: ProviderApiModel): boolean {
   const id = model.id?.toLowerCase() ?? "";
-  if (!id) {
+  if (!id || model.active === false) {
     return false;
   }
 
   if (MODEL_ID_EXCLUSIONS.some((pattern) => id.includes(pattern))) {
+    return false;
+  }
+
+  // /models omits endpoint support. These direct-OpenAI families require Responses
+  // or legacy Completions; OpenRouter can expose its own chat-compatible routes.
+  if (
+    provider === "openai" && (
+      /-instruct(?:-|$)/.test(id)
+      || /^(?:gpt-5(?:\.\d+)?-pro|o[13]-pro)(?:-|$)/.test(id)
+      || ["babbage", "davinci", "deep-research", "computer-use", "codex", "sora"].some(part => id.includes(part))
+    )
+  ) {
     return false;
   }
 
@@ -262,7 +176,7 @@ function isTextModel(provider: CloudProviderId, model: ProviderApiModel): boolea
   return true;
 }
 
-async function providerFetch(url: string, apiKey?: string): Promise<Response> {
+async function providerFetch(url: string, apiKey: string, signal: AbortSignal): Promise<Response> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -271,39 +185,60 @@ async function providerFetch(url: string, apiKey?: string): Promise<Response> {
   }
 
   if (isTauri()) {
-    return tauriFetch(url, { method: "GET", headers });
+    return tauriFetch(url, { method: "GET", headers, signal });
   }
 
-  return fetch(url, { method: "GET", headers });
+  return fetch(url, { method: "GET", headers, signal });
 }
 
-async function fetchProviderModels(provider: CloudProviderId, apiKey: string): Promise<ProviderApiModel[]> {
+async function fetchProviderModels(
+  provider: CloudProviderId,
+  apiKey: string,
+  signal: AbortSignal,
+): Promise<ProviderApiModel[]> {
   const normalizedKey = normalizeApiKey(apiKey);
   if (!normalizedKey && provider !== "openrouter") {
     return [];
   }
 
-  const response = await providerFetch(PROVIDER_CONFIG[provider].modelsUrl, normalizedKey);
+  const response = await providerFetch(PROVIDER_CONFIG[provider].modelsUrl, normalizedKey, signal);
   if (!response.ok) {
     throw new Error(`models_${provider}_${response.status}`);
   }
 
-  const payload = await response.json() as { data?: ProviderApiModel[] };
-  return (payload.data ?? []).filter((model) => isTextModel(provider, model));
+  const payload = providerCatalogSchema.parse(await response.json());
+  const models = payload.data.filter(model => isTextModel(provider, model));
+  // OpenRouter supplies weekly usage ordering. Direct providers expose creation dates.
+  return provider === "openrouter" ? models : models.sort((a, b) => (b.created ?? 0) - (a.created ?? 0));
 }
 
-export async function getCloudApiKeys(): Promise<CloudApiKeys> {
+// Separate account-specific catalogues without putting API keys into query identifiers.
+async function catalogScope(apiKey: string) {
+  if (!apiKey) {
+    return "public";
+  }
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(apiKey));
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+export async function getCloudApiKeys(): Promise<CloudApiKeys & { catalogScopes: Record<CloudProviderId, string> }> {
   const [openai, groq, openrouter] = await Promise.all([
     connectorCommands.getOpenaiApiKey(),
     connectorCommands.getGroqApiKey(),
     connectorCommands.getOpenrouterApiKey(),
   ]);
 
-  return {
+  const keys = {
     openai: normalizeApiKey(openai),
     groq: normalizeApiKey(groq),
     openrouter: normalizeApiKey(openrouter),
   };
+  const [openaiScope, groqScope, openrouterScope] = await Promise.all([
+    catalogScope(keys.openai),
+    catalogScope(keys.groq),
+    catalogScope(keys.openrouter),
+  ]);
+  return { ...keys, catalogScopes: { openai: openaiScope, groq: groqScope, openrouter: openrouterScope } };
 }
 
 export function hasCloudApiKey(keys: CloudApiKeys | undefined, provider: CloudProviderId): boolean {
@@ -355,7 +290,6 @@ function createModelOption(
     icon: string;
     hasApiKey: boolean;
     selectedCloudModelId?: string;
-    isRecommended?: boolean;
     source: ModelOption["source"];
   },
 ): ModelOption {
@@ -377,7 +311,6 @@ function createModelOption(
     customIcon: options.icon,
     vendor: options.vendor,
     isCloud: true,
-    isRecommended: options.isRecommended,
     source: options.source,
   };
 }
@@ -391,101 +324,24 @@ export function useCloudApiKeys() {
 }
 
 export function useCloudProviderModels(provider: CloudProviderId) {
-  const { t } = useLingui();
   const { selectedCloudModelId } = useCloudModelSelection();
   const cloudApiKeysQuery = useCloudApiKeys();
   const apiKey = cloudApiKeysQuery.data?.[provider] ?? "";
   const hasApiKey = hasText(apiKey);
 
-  const getRecommendedName = (slug: string): string => {
-    switch (slug) {
-      case "gpt-5.5":
-        return t`GPT-5.5`;
-      case "gpt-5.4-nano":
-        return t`GPT-5.4 Nano`;
-      case "gpt-oss-20b":
-        return t`GPT-OSS 20B`;
-      case "gpt-oss-120b":
-        return t`GPT-OSS 120B`;
-      case "gpt-5.4-mini":
-        return t`GPT-5.4 Mini`;
-      case "llama-3.3-70b":
-        return t`Llama 3.3 70B`;
-      case "llama-3.1-8b":
-        return t`Llama 3.1 8B`;
-      case "claude-haiku-4.5":
-        return t`Haiku 4.5`;
-      case "claude-sonnet-4.6":
-        return t`Sonnet 4.6`;
-      case "gemini-3.1-pro":
-        return t`Gemini 3.1 Pro`;
-      case "gemini-3.1-flash-lite":
-        return t`Gemini 3.1 Flash Lite`;
-      case "qwen3.6-flash":
-        return t`Qwen3.6 Flash`;
-      case "deepseek-v4-flash":
-        return t`DeepSeek V4 Flash`;
-      default:
-        return slug;
-    }
-  };
-
-  const getRecommendedDescription = (slug: string): string => {
-    switch (slug) {
-      case "gpt-5.5":
-        return t`Best quality for complex work`;
-      case "gpt-5.4-nano":
-        return t`Fastest, lowest-cost OpenAI option`;
-      case "gpt-oss-20b":
-        return t`Fastest Groq text model for everyday tasks`;
-      case "gpt-oss-120b":
-        return t`Stronger open-weight reasoning on Groq`;
-      case "gpt-5.4-mini":
-        return t`Best default balance of speed and quality`;
-      case "llama-3.3-70b":
-        return t`Reliable general-purpose Groq model`;
-      case "llama-3.1-8b":
-        return t`Lowest-latency Groq option`;
-      case "claude-haiku-4.5":
-        return t`Fastest responses, great for quick tasks`;
-      case "claude-sonnet-4.6":
-        return t`Balanced speed and quality`;
-      case "gemini-3.1-pro":
-        return t`Long context, strong at analysis`;
-      case "gemini-3.1-flash-lite":
-        return t`Fast long-context model through OpenRouter`;
-      case "qwen3.6-flash":
-        return t`Fast, low-cost model through OpenRouter`;
-      case "deepseek-v4-flash":
-        return t`Efficient reasoning model through OpenRouter`;
-      default:
-        return "";
-    }
-  };
-
   const providerModelsQuery = useQuery({
-    queryKey: ["cloud-provider-models", provider, hasApiKey],
-    queryFn: () => fetchProviderModels(provider, apiKey),
-    enabled: hasApiKey || provider === "openrouter",
-    staleTime: 10 * 60 * 1000,
+    queryKey: ["cloud-provider-models", provider, cloudApiKeysQuery.data?.catalogScopes[provider]],
+    queryFn: ({ signal }) => fetchProviderModels(provider, apiKey, signal),
+    enabled: cloudApiKeysQuery.isSuccess && (hasApiKey || provider === "openrouter"),
+    staleTime: CLOUD_CATALOG_STALE_MS,
+    gcTime: 24 * 60 * 60 * 1000,
+    refetchInterval: CLOUD_CATALOG_STALE_MS,
+    refetchOnReconnect: "always",
     retry: 1,
   });
 
   const models = useMemo((): ModelOption[] => {
-    const recommended = RECOMMENDED_MODELS[provider].map((model) =>
-      createModelOption(provider, model.id, {
-        name: getRecommendedName(model.slug),
-        description: getRecommendedDescription(model.slug),
-        vendor: model.vendor,
-        icon: model.icon,
-        hasApiKey,
-        selectedCloudModelId,
-        isRecommended: true,
-        source: "recommended",
-      })
-    );
-
-    const byId = new Map(recommended.map((model) => [model.providerModelId, model]));
+    const byId = new Map<string, ModelOption>();
 
     for (const liveModel of providerModelsQuery.data ?? []) {
       if (!liveModel.id || byId.has(liveModel.id)) {
@@ -538,25 +394,13 @@ export function useCloudProviderModels(provider: CloudProviderId) {
       if (!a.isSelected && b.isSelected) {
         return 1;
       }
-      if (a.isRecommended && !b.isRecommended) {
-        return -1;
-      }
-      if (!a.isRecommended && b.isRecommended) {
-        return 1;
-      }
-      const vendorComparison = (a.vendor ?? "").localeCompare(b.vendor ?? "");
-      if (vendorComparison !== 0) {
-        return vendorComparison;
-      }
-
-      return a.name.localeCompare(b.name);
+      return 0;
     });
   }, [
     hasApiKey,
     provider,
     providerModelsQuery.data,
     selectedCloudModelId,
-    t,
     cloudApiKeysQuery.isPending,
     cloudApiKeysQuery.isError,
   ]);
@@ -568,5 +412,47 @@ export function useCloudProviderModels(provider: CloudProviderId) {
     isLoading: cloudApiKeysQuery.isLoading || providerModelsQuery.isLoading,
     error: cloudApiKeysQuery.error ?? providerModelsQuery.error,
     refetch: providerModelsQuery.refetch,
+    catalog: providerModelsQuery,
+  };
+}
+
+export function refreshCloudCatalogs(queryClient: QueryClient) {
+  return queryClient.refetchQueries({
+    queryKey: ["cloud-provider-models"],
+    type: "active",
+    predicate: query => query.isStaleByTime(CLOUD_CATALOG_STALE_MS),
+  });
+}
+
+export function useCloudCatalogLabel() {
+  const { t } = useLingui();
+  return (provider: CloudProviderId) =>
+    provider === "openrouter" ? t`Popular this week on OpenRouter` : t`Newest available`;
+}
+
+/** Both pickers preserve provider order and pin the saved choice outside the five-model preview. */
+export function getCloudProviderSection(
+  models: ModelOption[],
+  provider: CloudProviderId,
+  expanded: boolean,
+  search = "",
+) {
+  const providerModels = models.filter(model => getCloudProviderIdFromModelId(model.id) === provider);
+  const selectedModel = providerModels.find(model => model.isSelected);
+  const others = providerModels.filter(model => !model.isSelected);
+  const query = search.trim().toLowerCase();
+  const matches = expanded
+    ? others.filter(model =>
+      [model.name, model.vendor, model.providerModelId, model.description].filter(Boolean).join(" ").toLowerCase()
+        .includes(query)
+    )
+    : others.slice(0, 5);
+  return {
+    provider,
+    expanded,
+    selectedModel,
+    models: selectedModel ? [selectedModel, ...matches] : matches,
+    totalCount: providerModels.length,
+    hiddenCount: Math.max(others.length - 5, 0),
   };
 }

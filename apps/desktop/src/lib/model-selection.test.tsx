@@ -202,9 +202,20 @@ vi.mock("@/hooks/useModelRegistry", () => ({
     };
   },
 }));
-vi.mock("@/hooks/useOpenAIModels", () => ({ useOpenAIModels: () => ({ models: [], isLoading: false }) }));
-vi.mock("@/hooks/useGroqModels", () => ({ useGroqModels: () => ({ models: [], isLoading: false }) }));
-vi.mock("@/hooks/useOpenRouterModels", () => ({ useOpenRouterModels: () => ({ models: [], isLoading: false }) }));
+vi.mock(
+  "@/hooks/useOpenAIModels",
+  () => ({ useOpenAIModels: () => ({ models: [], isLoading: false, catalog: { isError: false, refetch: vi.fn() } }) }),
+);
+vi.mock(
+  "@/hooks/useGroqModels",
+  () => ({ useGroqModels: () => ({ models: [], isLoading: false, catalog: { isError: false, refetch: vi.fn() } }) }),
+);
+vi.mock(
+  "@/hooks/useOpenRouterModels",
+  () => ({
+    useOpenRouterModels: () => ({ models: [], isLoading: false, catalog: { isError: false, refetch: vi.fn() } }),
+  }),
+);
 vi.mock("@/components/settings/components/wer-modal", () => ({ WERPerformanceModal: () => null }));
 vi.mock("@typr/ui/components/ui/toast", () => ({
   toast: vi.fn(),
