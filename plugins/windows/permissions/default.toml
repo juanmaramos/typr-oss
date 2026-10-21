@@ -6,6 +6,7 @@ permissions = [
     "allow-window-hide", 
     "allow-window-destroy",
     "allow-window-position",
+    "allow-window-align-titlebar-controls",
     "allow-window-get-floating",
     "allow-window-set-floating",
     "allow-window-navigate",
