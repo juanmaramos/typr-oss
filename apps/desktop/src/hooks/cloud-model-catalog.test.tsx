@@ -76,6 +76,20 @@ function AllProbe() {
   all = useAllModels();
   return null;
 }
+async function waitForRendered(check: () => void) {
+  await vi.waitFor(async () => {
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    check();
+  }, { timeout: 3000 });
+}
+async function waitForCatalog() {
+  await waitForRendered(() => {
+    expect(result.isLoading).toBe(false);
+    expect(result.catalog.isFetching).toBe(false);
+  });
+}
 async function render(provider: CloudProviderId = "openai", combined = false) {
   await act(async () =>
     root.render(
@@ -86,9 +100,7 @@ async function render(provider: CloudProviderId = "openai", combined = false) {
       </QueryClientProvider>,
     )
   );
-  await act(async () => {
-    await new Promise(resolve => setTimeout(resolve, 0));
-  });
+  await waitForCatalog();
 }
 beforeEach(() => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
@@ -118,6 +130,10 @@ afterEach(async () => {
 
 describe("live cloud model catalogue", () => {
   it("surfaces new OpenAI versions by provider creation date without a release allowlist", async () => {
+    fetchMock.mockImplementationOnce(async () => {
+      await new Promise(resolve => setTimeout(resolve, 25));
+      return new Response(JSON.stringify({ data: models }), { status: 200 });
+    });
     await render();
     expect(result.models.map(model => model.providerModelId)).toEqual(["gpt-6.1-sol", "gpt-6-astra", "gpt-5.4"]);
     expect(fetchMock).toHaveBeenCalledWith(
@@ -229,9 +245,7 @@ describe("live cloud model catalogue", () => {
     await act(async () => {
       await client.invalidateQueries({ queryKey: ["cloud-api-keys"] });
     });
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
-    });
+    await waitForCatalog();
     expect(result.models.map(model => model.providerModelId)).toEqual(["gpt-account-two"]);
     const identifiers = JSON.stringify(client.getQueryCache().getAll().map(query => query.queryKey));
     expect(identifiers).not.toContain("test-openai-key");
@@ -317,16 +331,7 @@ describe("live cloud model catalogue", () => {
         </QueryClientProvider>,
       )
     );
-    for (
-      let attempt = 0;
-      attempt < 100 && !host.textContent?.includes("Could not load models. Try again.");
-      attempt++
-    ) {
-      await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 25));
-      });
-    }
-    expect(host.textContent).toContain("Could not load models. Try again.");
+    await waitForRendered(() => expect(host.textContent).toContain("Could not load models. Try again."));
     expect(host.textContent).not.toContain("GPT-6.1 Sol");
     const keyInput = host.querySelector<HTMLInputElement>("input[placeholder=\"sk-...\"]");
     expect(keyInput?.value).toBe("test-openai-key");
@@ -335,11 +340,8 @@ describe("live cloud model catalogue", () => {
     );
     expect(retry).not.toBeUndefined();
     failing = false;
-    await act(async () => {
-      retry!.click();
-      await new Promise(resolve => setTimeout(resolve, 5));
-    });
-    expect(host.textContent).toContain("GPT-6.1 Sol");
+    await act(async () => retry!.click());
+    await waitForRendered(() => expect(host.textContent).toContain("GPT-6.1 Sol"));
     expect(host.textContent).not.toContain("Could not load models. Try again.");
     expect(keyInput?.value).toBe("test-openai-key");
   });
