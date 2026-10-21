@@ -1,0 +1,18 @@
+name: Release policy
+on:
+  push:
+  pull_request:
+  merge_group:
+permissions:
+  contents: read
+jobs:
+  policy:
+    name: Release policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test scripts/check-release-updater.test.mjs
+      - run: python3 -m unittest discover -s scripts -p test_nemotron_bundle.py

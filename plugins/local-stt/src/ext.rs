@@ -534,7 +534,12 @@ impl<R: Runtime, T: Manager<R> + Emitter<R>> LocalSttPluginExt<R> for T {
         // Fallback to local store for backward compatibility
         let store = self.local_stt_store();
         let model = store.get(crate::StoreKey::DefaultModel)?;
-        Ok(model.unwrap_or(crate::SupportedModel::QuantizedBaseEn))
+        Ok(model.unwrap_or_else(|| {
+            crate::model::default_model(
+                cfg!(all(target_os = "macos", target_arch = "aarch64"))
+                    && crate::streaming::WorkerPaths::resolve(self.app_handle()).is_ok(),
+            )
+        }))
     }
 
     #[tracing::instrument(skip_all)]

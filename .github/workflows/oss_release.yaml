@@ -26,7 +26,11 @@ jobs:
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+      version: ${{ steps.release.outputs.version }}
     strategy:
+      max-parallel: 1
       fail-fast: false
       matrix:
         include:
@@ -34,6 +38,8 @@ jobs:
             platform: macos
             runner: macos-14
             target: aarch64-apple-darwin
+            nemotron: true
+            extra_args: --features nemotron --config ./src-tauri/tauri.nemotron.conf.json
           - name: macOS Intel
             platform: macos
             runner: macos-14
@@ -61,11 +67,11 @@ jobs:
               exit 1
             fi
             echo "tag=${TAG_NAME}" >> "$GITHUB_OUTPUT"
-            echo "draft=false" >> "$GITHUB_OUTPUT"
+            echo "draft=true" >> "$GITHUB_OUTPUT"
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
           elif [[ "${DISPATCH_PUBLISH}" == "true" ]]; then
             echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
-            echo "draft=false" >> "$GITHUB_OUTPUT"
+            echo "draft=true" >> "$GITHUB_OUTPUT"
             echo "prerelease=false" >> "$GITHUB_OUTPUT"
           else
             echo "tag=oss-test-v${VERSION}-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
@@ -73,6 +79,14 @@ jobs:
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Refuse overwriting a published release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        shell: bash
+        run: |
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/releases?per_page=100" | jq --exit-status --arg tag "$RELEASE_TAG" '[.[][] | select(.tag_name == $tag)] | all(.draft)' > /dev/null
 
       - uses: arduino/setup-protoc@v3
         with:
@@ -134,6 +148,18 @@ jobs:
           APPLE_API_KEY_P8_B64: ${{ secrets.APPLE_API_KEY_P8_B64 }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
 
+      - name: Prepare portable Nemotron runtime
+        if: matrix.nemotron
+        run: python3 scripts/build_nemotron_runtime.py
+        shell: bash
+
+      - name: Sign Nemotron runtime
+        if: matrix.nemotron
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: python3 scripts/verify_nemotron_bundle.py sign target/nemotron/runtime
+        shell: bash
+
       - name: Build signed and notarized app
         uses: tauri-apps/tauri-action@v0.6.2
         env:
@@ -158,11 +184,11 @@ jobs:
         with:
           projectPath: apps/desktop
           tauriScript: pnpm tauri
-          args: --target ${{ matrix.target }} --config ./src-tauri/tauri.conf.stable.json --verbose
+          args: --target ${{ matrix.target }} --config ./src-tauri/tauri.conf.stable.json ${{ matrix.extra_args }} --verbose
           tagName: ${{ steps.release.outputs.tag }}
           releaseName: Typr OSS v${{ steps.release.outputs.version }}
           releaseBody: Signed and notarized Typr OSS macOS builds, plus an unsigned Windows installer.
-          releaseDraft: ${{ steps.release.outputs.draft }}
+          releaseDraft: true
           prerelease: ${{ steps.release.outputs.prerelease }}
           retryAttempts: 2
           includeUpdaterJson: true
@@ -175,6 +201,14 @@ jobs:
           spctl --assess --type execute --verbose "$APP_PATH"
         shell: bash
 
+      - name: Verify bundled Nemotron and bilingual transcription
+        if: matrix.nemotron
+        env:
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        run: |
+          python3 scripts/verify_nemotron_bundle.py verify "./apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/macos/Typr OSS.app"
+        shell: bash
+
       - name: Verify Windows installer
         if: ${{ matrix.platform == 'windows' }}
         run: |
@@ -183,3 +217,30 @@ jobs:
           ls -la "$NSIS_DIR"
           test -n "$(find "$NSIS_DIR" -maxdepth 1 -name '*.exe' -print -quit)"
         shell: bash
+
+  publish:
+    name: Validate updater and publish
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check complete signed updater manifest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ needs.build.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/updater-check"
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/releases?per_page=100" | jq --arg tag "$RELEASE_TAG" '[.[][] | select(.tag_name == $tag and .draft)] | if length == 1 then .[0] else error("Expected one matching draft release") end' > "$RUNNER_TEMP/updater-check/release.json"
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern latest.json --pattern '*.sig' --pattern '*.app.tar.gz' --pattern '*.exe' --dir "$RUNNER_TEMP/updater-check"
+          sudo apt-get update -qq && sudo apt-get install -y minisign
+          node scripts/check-release-updater.mjs "$RUNNER_TEMP/updater-check" "$GITHUB_REPOSITORY" "$RELEASE_VERSION" "$RELEASE_TAG"
+      - name: Publish verified official release
+        if: github.event_name == 'push' || github.event.inputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ needs.build.outputs.tag }}
+        run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease=false --latest

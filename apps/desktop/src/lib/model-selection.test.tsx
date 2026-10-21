@@ -84,6 +84,7 @@ vi.mock("@typr/plugin-local-stt", () => ({
       native.stt = model;
     }),
     isModelDownloaded: vi.fn(async () => true),
+    isModelDownloading: vi.fn(async () => false),
     isServerRunning: vi.fn(async () => native.runningStt),
     startServer: vi.fn(async () => "local"),
     restartServer: vi.fn(async () => "local"),
@@ -156,6 +157,9 @@ vi.mock("@/hooks/useModelState", () => ({
     };
   },
   useModelState: () => ({
+    stt: { models: [{ isDownloaded: !native.noDownloadedModels }] },
+    llm: { models: [{ isDownloaded: !native.noDownloadedModels }] },
+    models: [],
     isLoading: false,
     getModel: (id: string) => ({
       isDownloaded: !native.noDownloadedModels && !native.unavailableStt.has(id),

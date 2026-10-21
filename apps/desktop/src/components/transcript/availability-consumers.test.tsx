@@ -112,7 +112,16 @@ vi.mock("@typr/plugin-listener", () => ({
 }));
 vi.mock(
   "@typr/plugin-local-stt",
-  () => ({ commands: { listModelCapabilities: vi.fn(async () => []), downloadModelBackground: state.download } }),
+  () => ({
+    commands: {
+      listModelCapabilities: vi.fn(
+        async () => [{ model: "QuantizedLargeTurbo", available: true, live_fallback_models: [] }],
+      ),
+      isModelDownloaded: vi.fn(async () => false),
+      isModelDownloading: vi.fn(async () => false),
+      downloadModelBackground: state.download,
+    },
+  }),
 );
 vi.mock("@tauri-apps/plugin-dialog", () => ({ open: state.pickFile }));
 vi.mock("@tauri-apps/plugin-fs", () => ({ mkdir: vi.fn(), writeFile: vi.fn() }));

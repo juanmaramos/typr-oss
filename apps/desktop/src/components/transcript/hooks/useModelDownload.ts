@@ -1,11 +1,13 @@
+import { useModelPreferences } from "@/hooks/useModelPreferences";
 import { useCallback } from "react";
 
 import { useTranscriptionAvailability } from "@/hooks/useTranscriptionAvailability";
-import { commands as localSttCommands, type SupportedModel } from "@typr/plugin-local-stt";
+import { type SupportedModel } from "@typr/plugin-local-stt";
 import { LANGUAGE_OPTIONS } from "../constants/languageData";
 
 /** UI option names map to native IDs; the shared policy owns all action gates. */
 export function useModelDownload() {
+  const preferences = useModelPreferences();
   const { getAvailability, retry } = useTranscriptionAvailability();
 
   const getModelAvailability = useCallback((languageKey: string) => {
@@ -19,12 +21,12 @@ export function useModelDownload() {
       return;
     }
     try {
-      await localSttCommands.downloadModelBackground(option.modelKey as SupportedModel);
+      await preferences.downloadTranscription(option.modelKey as SupportedModel);
     } catch (error) {
       console.error("Download failed:", error);
       await retry();
     }
-  }, [getAvailability, retry]);
+  }, [getAvailability, retry, preferences]);
 
   return { getModelAvailability, downloadModel, retry };
 }

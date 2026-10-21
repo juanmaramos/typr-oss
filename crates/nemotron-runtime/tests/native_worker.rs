@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
     process::{Child, Command, Stdio},
     sync::mpsc,
-    time::Duration,
+    time::{Duration, Instant},
 };
 use typr_nemotron_runtime::protocol::{
     read_frame, write_frame, Channel, Request, Response, PROTOCOL_VERSION,
@@ -48,7 +48,7 @@ fn bilingual_dual_channel_worker_streams_and_finishes_over_framed_ipc() {
         .arg(sdk)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .stderr(Stdio::null())
+        .stderr(Stdio::inherit())
         .spawn()
         .unwrap(),
     );
@@ -69,12 +69,13 @@ fn bilingual_dual_channel_worker_streams_and_finishes_over_framed_ipc() {
             }
         }
     });
-    let response = || {
+    let response = |deadline, phase: &str| {
         receiver
-            .recv_timeout(Duration::from_secs(30))
-            .expect("worker response deadline")
+            .recv_timeout(deadline)
+            .unwrap_or_else(|error| panic!("worker {phase} response deadline: {error}"))
             .unwrap()
     };
+    let startup = Instant::now();
     write_frame(
         &mut input,
         &Request::Start {
@@ -87,11 +88,13 @@ fn bilingual_dual_channel_worker_streams_and_finishes_over_framed_ipc() {
     )
     .unwrap();
     assert_eq!(
-        response(),
+        // Match the app startup budget; model initialization precedes Ready.
+        response(Duration::from_secs(60), "startup"),
         Response::Ready {
             protocol_version: PROTOCOL_VERSION
         }
     );
+    eprintln!("Packaged worker ready after {:?}", startup.elapsed());
     // Exercise every out-of-box locale through the actual worker and pinned
     // C ABI. This verifies configuration compatibility, not language accuracy.
     let mut configured_locales = 0;
@@ -103,7 +106,11 @@ fn bilingual_dual_channel_worker_streams_and_finishes_over_framed_ipc() {
             },
         )
         .unwrap();
-        assert_eq!(response(), Response::Configured, "locale {locale}");
+        assert_eq!(
+            response(Duration::from_secs(30), &format!("configure {locale}")),
+            Response::Configured,
+            "locale {locale}"
+        );
         configured_locales += 1;
     }
     assert_eq!(configured_locales, 32);
@@ -117,7 +124,10 @@ fn bilingual_dual_channel_worker_streams_and_finishes_over_framed_ipc() {
         },
     )
     .unwrap();
-    assert_eq!(response(), Response::Configured);
+    assert_eq!(
+        response(Duration::from_secs(30), "configure auto"),
+        Response::Configured
+    );
     let mic = samples("TYPR_NEMOTRON_AUDIO_EN");
     let speaker = samples("TYPR_NEMOTRON_AUDIO_ES");
     for offset in (0..mic.len().max(speaker.len())).step_by(5120) {
@@ -151,7 +161,7 @@ fn bilingual_dual_channel_worker_streams_and_finishes_over_framed_ipc() {
     let mut previews: HashMap<Channel, usize> = HashMap::new();
     let mut finished = Vec::new();
     while finished.len() < 2 {
-        match response() {
+        match response(Duration::from_secs(30), "transcription") {
             Response::Result {
                 channel,
                 is_final,
