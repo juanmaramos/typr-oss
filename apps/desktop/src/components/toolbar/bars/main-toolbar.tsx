@@ -18,7 +18,7 @@ import { cn } from "@typr/ui/lib/utils";
 
 export function MainToolbar() {
   const noteMatch = useMatch({ from: "/app/note/$id", shouldThrow: false });
-  const askThreadMatch = useMatch({ from: "/app/ask/$threadId", shouldThrow: false });
+  const askThreadMatch = useMatch({ from: "/app/projects/$projectId/chats/$threadId", shouldThrow: false });
   const projectsIndexMatch = useMatch({ from: "/app/projects", shouldThrow: false });
   const projectDetailMatch = useMatch({ from: "/app/projects/$projectId", shouldThrow: false });
   const organizationMatch = useMatch({
@@ -43,7 +43,9 @@ export function MainToolbar() {
     : COLLAPSED_MAIN_PANEL_MAC_TITLEBAR_INSET_CLASS;
 
   if (askThreadMatch) {
-    return <AskConversationToolbar threadId={askThreadMatch.params.threadId} />;
+    return (
+      <AskConversationToolbar threadId={askThreadMatch.params.threadId} projectId={askThreadMatch.params.projectId} />
+    );
   }
 
   return (

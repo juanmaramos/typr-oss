@@ -4,10 +4,10 @@ import { useAllModels } from "@/hooks/useModels";
 import { askQueryKeys, createAskThreadWithUserMessage } from "@/lib/ask";
 import { getProjectActionErrorMessage, type Project } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
-import { toast } from "@typr/ui/components/ui/toast";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "@typr/ui/components/ui/toast";
 import { useState } from "react";
 
 interface ProjectAskLauncherProps {
@@ -46,7 +46,10 @@ export function ProjectAskLauncher({ project, sourceCount }: ProjectAskLauncherP
       });
       setPrompt("");
       await queryClient.invalidateQueries({ queryKey: [askQueryKeys.threads] });
-      navigate({ to: "/app/ask/$threadId", params: { threadId: thread.id } });
+      navigate({
+        to: "/app/projects/$projectId/chats/$threadId",
+        params: { projectId: project.id, threadId: thread.id },
+      });
     },
     onError: (error) => {
       toast({

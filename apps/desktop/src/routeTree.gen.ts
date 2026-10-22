@@ -26,6 +26,7 @@ import { Route as AppNoteIdRouteImport } from './routes/app.note.$id'
 import { Route as AppHumanIdRouteImport } from './routes/app.human.$id'
 import { Route as AppAskThreadIdRouteImport } from './routes/app.ask.$threadId'
 import { Route as AppNoteEventIdRouteImport } from './routes/app.note.event.$id'
+import { Route as AppProjectsProjectIdChatsThreadIdRouteImport } from './routes/app.projects.$projectId.chats.$threadId'
 
 const VideoRoute = VideoRouteImport.update({
   id: '/video',
@@ -112,6 +113,12 @@ const AppNoteEventIdRoute = AppNoteEventIdRouteImport.update({
   path: '/note/event/$id',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProjectsProjectIdChatsThreadIdRoute =
+  AppProjectsProjectIdChatsThreadIdRouteImport.update({
+    id: '/chats/$threadId',
+    path: '/chats/$threadId',
+    getParentRoute: () => AppProjectsProjectIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
@@ -128,9 +135,10 @@ export interface FileRoutesByFullPath {
   '/app/human/$id': typeof AppHumanIdRoute
   '/app/note/$id': typeof AppNoteIdRoute
   '/app/organization/$id': typeof AppOrganizationIdRoute
-  '/app/projects/$projectId': typeof AppProjectsProjectIdRoute
+  '/app/projects/$projectId': typeof AppProjectsProjectIdRouteWithChildren
   '/app/spaces/$spaceId': typeof AppSpacesSpaceIdRoute
   '/app/note/event/$id': typeof AppNoteEventIdRoute
+  '/app/projects/$projectId/chats/$threadId': typeof AppProjectsProjectIdChatsThreadIdRoute
 }
 export interface FileRoutesByTo {
   '/transcription-status': typeof TranscriptionStatusRoute
@@ -146,9 +154,10 @@ export interface FileRoutesByTo {
   '/app/human/$id': typeof AppHumanIdRoute
   '/app/note/$id': typeof AppNoteIdRoute
   '/app/organization/$id': typeof AppOrganizationIdRoute
-  '/app/projects/$projectId': typeof AppProjectsProjectIdRoute
+  '/app/projects/$projectId': typeof AppProjectsProjectIdRouteWithChildren
   '/app/spaces/$spaceId': typeof AppSpacesSpaceIdRoute
   '/app/note/event/$id': typeof AppNoteEventIdRoute
+  '/app/projects/$projectId/chats/$threadId': typeof AppProjectsProjectIdChatsThreadIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -166,9 +175,10 @@ export interface FileRoutesById {
   '/app/human/$id': typeof AppHumanIdRoute
   '/app/note/$id': typeof AppNoteIdRoute
   '/app/organization/$id': typeof AppOrganizationIdRoute
-  '/app/projects/$projectId': typeof AppProjectsProjectIdRoute
+  '/app/projects/$projectId': typeof AppProjectsProjectIdRouteWithChildren
   '/app/spaces/$spaceId': typeof AppSpacesSpaceIdRoute
   '/app/note/event/$id': typeof AppNoteEventIdRoute
+  '/app/projects/$projectId/chats/$threadId': typeof AppProjectsProjectIdChatsThreadIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/app/projects/$projectId'
     | '/app/spaces/$spaceId'
     | '/app/note/event/$id'
+    | '/app/projects/$projectId/chats/$threadId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/transcription-status'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/app/projects/$projectId'
     | '/app/spaces/$spaceId'
     | '/app/note/event/$id'
+    | '/app/projects/$projectId/chats/$threadId'
   id:
     | '__root__'
     | '/app'
@@ -227,6 +239,7 @@ export interface FileRouteTypes {
     | '/app/projects/$projectId'
     | '/app/spaces/$spaceId'
     | '/app/note/event/$id'
+    | '/app/projects/$projectId/chats/$threadId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -356,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNoteEventIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/projects/$projectId/chats/$threadId': {
+      id: '/app/projects/$projectId/chats/$threadId'
+      path: '/chats/$threadId'
+      fullPath: '/app/projects/$projectId/chats/$threadId'
+      preLoaderRoute: typeof AppProjectsProjectIdChatsThreadIdRouteImport
+      parentRoute: typeof AppProjectsProjectIdRoute
+    }
   }
 }
 
@@ -370,12 +390,24 @@ const AppAskRouteChildren: AppAskRouteChildren = {
 const AppAskRouteWithChildren =
   AppAskRoute._addFileChildren(AppAskRouteChildren)
 
+interface AppProjectsProjectIdRouteChildren {
+  AppProjectsProjectIdChatsThreadIdRoute: typeof AppProjectsProjectIdChatsThreadIdRoute
+}
+
+const AppProjectsProjectIdRouteChildren: AppProjectsProjectIdRouteChildren = {
+  AppProjectsProjectIdChatsThreadIdRoute:
+    AppProjectsProjectIdChatsThreadIdRoute,
+}
+
+const AppProjectsProjectIdRouteWithChildren =
+  AppProjectsProjectIdRoute._addFileChildren(AppProjectsProjectIdRouteChildren)
+
 interface AppProjectsRouteChildren {
-  AppProjectsProjectIdRoute: typeof AppProjectsProjectIdRoute
+  AppProjectsProjectIdRoute: typeof AppProjectsProjectIdRouteWithChildren
 }
 
 const AppProjectsRouteChildren: AppProjectsRouteChildren = {
-  AppProjectsProjectIdRoute: AppProjectsProjectIdRoute,
+  AppProjectsProjectIdRoute: AppProjectsProjectIdRouteWithChildren,
 }
 
 const AppProjectsRouteWithChildren = AppProjectsRoute._addFileChildren(

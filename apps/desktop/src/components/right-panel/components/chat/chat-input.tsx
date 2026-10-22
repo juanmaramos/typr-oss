@@ -243,7 +243,7 @@ export function ChatInput(
                       minHeight={promptTextareaContracts.floatingInline.minHeight}
                       placeholder={editMode === "edit"
                         ? t`Describe the changes you want to make...`
-                        : t`Ask about this meeting...`}
+                        : t`Ask this note...`}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" && !event.shiftKey) {
                           logFloatingChatInput("enter_submit", {
@@ -337,7 +337,7 @@ export function ChatInput(
                       minHeight={promptTextareaContracts.sidebar.minHeight}
                       placeholder={editMode === "edit"
                         ? t`Describe the changes you want to make...`
-                        : t`Ask about this meeting...`}
+                        : t`Ask this note...`}
                       onKeyDown={keyDownWhenReady}
                       className={promptTextareaContracts.sidebar.className}
                       disabled={isGenerating}

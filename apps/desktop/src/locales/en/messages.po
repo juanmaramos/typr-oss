@@ -752,11 +752,11 @@ msgstr ""
 "- Add context snapshots for Project Ask answers.\n"
 "- Define document ingestion states before files become first-class project sources."
 
-#: src/routes/app.ask.$threadId.tsx:507
+#: src/components/ask/project-chat.tsx:534
 msgid "· Failed"
 msgstr "· Failed"
 
-#: src/routes/app.ask.$threadId.tsx:508
+#: src/components/ask/project-chat.tsx:535
 msgid "· Interrupted"
 msgstr "· Interrupted"
 
@@ -801,7 +801,7 @@ msgid "{0} Copy"
 msgstr "{0} Copy"
 
 #. placeholder {0}: files.length
-#: src/components/projects/project-notes-panel.tsx:169
+#: src/components/projects/project-notes-panel.tsx:175
 msgid "{0} files"
 msgstr "{0} files"
 
@@ -816,6 +816,11 @@ msgstr "{0} note"
 #: src/components/projects/project-summary-tab.tsx:40
 msgid "{0} notes"
 msgstr "{0} notes"
+
+#. placeholder {0}: chatsQuery.data?.length ?? 0
+#: src/components/projects/project-notes-panel.tsx:188
+msgid "{0} project chats"
+msgstr "{0} project chats"
 
 #. placeholder {0}: selectedTags.length
 #: src/components/left-sidebar/tag-filter-bar.tsx:154
@@ -844,7 +849,7 @@ msgstr "{count, plural, one {Select exactly # item.} other {Select exactly # ite
 msgid "{count, plural, one {Use exactly # character.} other {Use exactly # characters.}}"
 msgstr "{count, plural, one {Use exactly # character.} other {Use exactly # characters.}}"
 
-#: src/components/projects/project-notes-panel.tsx:160
+#: src/components/projects/project-notes-panel.tsx:166
 msgid "{count} notes"
 msgstr "{count} notes"
 
@@ -1072,7 +1077,7 @@ msgid "Add note"
 msgstr "Add note"
 
 #: src/components/projects/project-empty-state.tsx:23
-#: src/components/projects/project-notes-panel.tsx:177
+#: src/components/projects/project-notes-panel.tsx:197
 #: src/components/projects/project-notes-picker-dialog.tsx:162
 #: src/components/spaces/project-notes-panel.tsx:36
 #: src/components/spaces/space-empty-state.tsx:25
@@ -1080,7 +1085,7 @@ msgstr "Add note"
 msgid "Add notes"
 msgstr "Add notes"
 
-#: src/components/projects/project-ask-launcher.tsx:75
+#: src/components/projects/project-ask-launcher.tsx:78
 msgid "Add notes or indexed files before asking this project"
 msgstr "Add notes or indexed files before asking this project"
 
@@ -1241,11 +1246,6 @@ msgstr "All Participants"
 msgid "All People"
 msgstr "All People"
 
-#: src/routes/app.ask.tsx:232
-#: src/routes/app.ask.tsx:236
-msgid "All projects"
-msgstr "All projects"
-
 #: src/components/editor-area/floating-button.tsx:305
 #: src/components/editor-area/floating-button.tsx:532
 #: src/components/editor-area/note-header/index.tsx:293
@@ -1286,7 +1286,7 @@ msgstr "Another audio upload is already in progress"
 msgid "Answer now"
 msgstr "Answer now"
 
-#: src/routes/app.ask.$threadId.tsx:693
+#: src/components/ask/project-chat.tsx:720
 msgid "Answering from project notes"
 msgstr "Answering from project notes"
 
@@ -1335,6 +1335,11 @@ msgstr "Apply link"
 msgid "Arabic"
 msgstr "Arabic"
 
+#: src/components/projects/project-chat-history.tsx:85
+#: src/components/projects/project-chat-history.tsx:86
+msgid "Archive {title}"
+msgstr "Archive {title}"
+
 #: src/hooks/useNoteSelection.ts:71
 msgid "Are you sure you want to delete {count} notes?"
 msgstr "Are you sure you want to delete {count} notes?"
@@ -1350,11 +1355,13 @@ msgstr "Are you sure you want to delete {selectedCount} notes?"
 msgid "Are you sure you want to delete this note?"
 msgstr "Are you sure you want to delete this note?"
 
-#: src/components/left-sidebar/index.tsx:199
 #: src/components/right-panel/components/chat/mode-selector.tsx:24
-#: src/routes/app.ask.tsx:199
 msgid "Ask"
 msgstr "Ask"
+
+#: src/components/projects/project-chat-history.tsx:59
+msgid "Ask a question above to start a chat using this project’s notes and files."
+msgstr "Ask a question above to start a chat using this project’s notes and files."
 
 #: src/components/meeting-assistant/floating-assistant.tsx:229
 #: src/components/meeting-assistant/floating-dock-variant.tsx:106
@@ -1362,11 +1369,6 @@ msgstr "Ask"
 #: src/components/meeting-assistant/floating-dock-variant.tsx:351
 msgid "Ask about this meeting"
 msgstr "Ask about this meeting"
-
-#: src/components/right-panel/components/chat/chat-input.tsx:246
-#: src/components/right-panel/components/chat/chat-input.tsx:340
-msgid "Ask about this meeting..."
-msgstr "Ask about this meeting..."
 
 #: src/components/spaces/scoped-prompt-composer.tsx:23
 msgid "Ask about this project..."
@@ -1376,19 +1378,11 @@ msgstr "Ask about this project..."
 msgid "Ask about your meeting content, transcript, and notes"
 msgstr "Ask about your meeting content, transcript, and notes"
 
-#: src/routes/app.ask.$threadId.tsx:434
-msgid "Ask anything..."
-msgstr "Ask anything..."
-
 #: src/components/editor-area/note-header/share-menu.tsx:112
 msgid "Ask Claude Desktop"
 msgstr "Ask Claude Desktop"
 
-#: src/routes/app.ask.tsx:344
-msgid "Ask conversation"
-msgstr "Ask conversation"
-
-#: src/lib/ask.ts:192
+#: src/lib/ask.ts:201
 msgid "Ask generation requires at least one user message"
 msgstr "Ask generation requires at least one user message"
 
@@ -1404,30 +1398,27 @@ msgstr "Ask questions"
 msgid "Ask questions about your meeting or try one of these suggestions to get started."
 msgstr "Ask questions about your meeting or try one of these suggestions to get started."
 
-#: src/components/projects/project-ask-launcher.tsx:63
+#: src/components/right-panel/components/chat/chat-input.tsx:246
+#: src/components/right-panel/components/chat/chat-input.tsx:340
+msgid "Ask this note..."
+msgstr "Ask this note..."
+
+#: src/components/projects/project-ask-launcher.tsx:66
 msgid "Ask this project"
 msgstr "Ask this project"
 
-#: src/components/projects/project-ask-launcher.tsx:74
-#: src/routes/app.ask.$threadId.tsx:434
+#: src/components/ask/project-chat.tsx:457
+#: src/components/projects/project-ask-launcher.tsx:77
 msgid "Ask this project..."
 msgstr "Ask this project..."
 
-#: src/lib/ask.ts:185
+#: src/lib/ask.ts:194
 msgid "Ask thread not found"
 msgstr "Ask thread not found"
-
-#: src/components/app-shell/context-pane.tsx:22
-msgid "Ask Typr"
-msgstr "Ask Typr"
 
 #: src/components/spaces/scoped-prompt-composer.tsx:46
 msgid "Ask Typr about this project"
 msgstr "Ask Typr about this project"
-
-#: src/routes/app.ask.tsx:202
-msgid "Ask uses project knowledge. Start from a project, or choose one here, to chat with its notes and files."
-msgstr "Ask uses project knowledge. Start from a project, or choose one here, to chat with its notes and files."
 
 #: src/components/settings/views/lab.tsx:59
 msgid "Assign formal tags to notes and filter related notes from the sidebar."
@@ -1524,17 +1515,17 @@ msgid "Back"
 msgstr "Back"
 
 #. placeholder {0}: projectQuery.data.name
-#: src/components/toolbar/bars/main-toolbar.tsx:92
-#: src/components/toolbar/bars/main-toolbar.tsx:105
+#: src/components/toolbar/bars/main-toolbar.tsx:94
+#: src/components/toolbar/bars/main-toolbar.tsx:107
 msgid "Back to {0}"
 msgstr "Back to {0}"
 
-#: src/components/ask/ask-conversation-toolbar.tsx:130
-#: src/components/ask/ask-conversation-toolbar.tsx:131
-#: src/routes/app.ask.$threadId.tsx:380
-#: src/routes/app.ask.$threadId.tsx:398
-msgid "Back to Ask"
-msgstr "Back to Ask"
+#: src/components/ask/ask-conversation-toolbar.tsx:118
+#: src/components/ask/ask-conversation-toolbar.tsx:119
+#: src/components/ask/project-chat.tsx:398
+#: src/components/ask/project-chat.tsx:421
+msgid "Back to project chats"
+msgstr "Back to project chats"
 
 #: src/components/settings/components/ai/task-defaults.tsx:187
 #: src/components/settings/components/ai/task-defaults.tsx:254
@@ -1595,13 +1586,13 @@ msgstr "Build"
 
 #: src/components/projects/project-brief-building-status.tsx:11
 #: src/components/projects/project-brief-row.tsx:30
-#: src/routes/app.projects.$projectId.tsx:227
+#: src/routes/app.projects.$projectId.tsx:236
 msgid "Building"
 msgstr "Building"
 
 #. placeholder {0}: buildingProgress.ready
 #. placeholder {1}: buildingProgress.total
-#: src/routes/app.projects.$projectId.tsx:228
+#: src/routes/app.projects.$projectId.tsx:237
 msgid "Building {0}/{1}"
 msgstr "Building {0}/{1}"
 
@@ -1649,11 +1640,11 @@ msgstr "Call ended"
 #: src/components/finder/views/contact-view.tsx:443
 #: src/components/left-sidebar/selection-toolbar.tsx:47
 #: src/components/projects/create-project-dialog.tsx:178
-#: src/components/projects/project-notes-panel.tsx:232
+#: src/components/projects/project-notes-panel.tsx:264
 #: src/components/spaces/space-notes-picker-dialog.tsx:233
 #: src/components/youtube-import-dialog.tsx:77
-#: src/routes/app.projects.$projectId.tsx:524
-#: src/routes/app.projects.$projectId.tsx:564
+#: src/routes/app.projects.$projectId.tsx:536
+#: src/routes/app.projects.$projectId.tsx:576
 #: src/routes/app.projects.tsx:257
 msgid "Cancel"
 msgstr "Cancel"
@@ -1752,6 +1743,10 @@ msgstr "Chat navigation"
 msgid "ChatGPT"
 msgstr "ChatGPT"
 
+#: src/components/projects/project-notes-panel.tsx:179
+msgid "Chats"
+msgstr "Chats"
+
 #: src/components/settings/views/about.tsx:192
 msgid "Check for Updates"
 msgstr "Check for Updates"
@@ -1799,10 +1794,6 @@ msgstr "Choose a date on or before {date}."
 msgid "Choose a model to turn speech into text."
 msgstr "Choose a model to turn speech into text."
 
-#: src/routes/app.ask.tsx:75
-msgid "Choose a project before starting a new Ask chat."
-msgstr "Choose a project before starting a new Ask chat."
-
 #: src/components/projects/project-icon-picker.tsx:59
 msgid "Choose a simple marker for this project."
 msgstr "Choose a simple marker for this project."
@@ -1839,10 +1830,6 @@ msgstr "Clear"
 #: ../../packages/ui/src/components/ui/multi-select.tsx:514
 msgid "Clear all"
 msgstr "Clear all"
-
-#: src/routes/app.ask.tsx:184
-msgid "Clear filters"
-msgstr "Clear filters"
 
 #: src/components/finder/views/table-view.tsx:347
 msgid "Clear search"
@@ -2037,7 +2024,7 @@ msgstr "content"
 msgid "Content inserted"
 msgstr "Content inserted"
 
-#: src/routes/app.ask.$threadId.tsx:614
+#: src/components/ask/project-chat.tsx:641
 msgid "Context"
 msgstr "Context"
 
@@ -2066,21 +2053,13 @@ msgstr "Contradictions / changes"
 msgid "Control how your data is used and stored"
 msgstr "Control how your data is used and stored"
 
-#: src/routes/app.ask.tsx:365
-msgid "Conversation actions"
-msgstr "Conversation actions"
-
-#: src/routes/app.ask.$threadId.tsx:377
+#: src/components/ask/project-chat.tsx:390
 msgid "Conversation not found"
 msgstr "Conversation not found"
 
-#: src/components/app-shell/context-pane.tsx:22
-msgid "Conversations"
-msgstr "Conversations"
-
+#: src/components/ask/project-chat.tsx:597
+#: src/components/ask/project-chat.tsx:604
 #: src/components/editor-area/note-header/share-menu.tsx:134
-#: src/routes/app.ask.$threadId.tsx:570
-#: src/routes/app.ask.$threadId.tsx:577
 msgid "Copied"
 msgstr "Copied"
 
@@ -2113,8 +2092,8 @@ msgstr "Copy All"
 msgid "Copy database path"
 msgstr "Copy database path"
 
-#: src/routes/app.ask.$threadId.tsx:570
-#: src/routes/app.ask.$threadId.tsx:577
+#: src/components/ask/project-chat.tsx:597
+#: src/components/ask/project-chat.tsx:604
 msgid "Copy message"
 msgstr "Copy message"
 
@@ -2164,9 +2143,13 @@ msgstr "Couldn’t add notes"
 msgid "Couldn’t add project"
 msgstr "Couldn’t add project"
 
-#: src/routes/app.ask.$threadId.tsx:172
+#: src/components/ask/project-chat.tsx:173
 msgid "Couldn’t answer"
 msgstr "Couldn’t answer"
+
+#: src/components/projects/project-chat-history.tsx:28
+msgid "Couldn’t archive chat"
+msgstr "Couldn’t archive chat"
 
 #: src/components/settings/views/notifications.tsx:165
 msgid "Couldn’t change this setting. Try again."
@@ -2176,7 +2159,7 @@ msgstr "Couldn’t change this setting. Try again."
 msgid "Couldn’t copy brief"
 msgstr "Couldn’t copy brief"
 
-#: src/routes/app.ask.$threadId.tsx:259
+#: src/components/ask/project-chat.tsx:259
 msgid "Couldn’t copy message"
 msgstr "Couldn’t copy message"
 
@@ -2185,12 +2168,16 @@ msgstr "Couldn’t copy message"
 msgid "Couldn’t create project"
 msgstr "Couldn’t create project"
 
-#: src/routes/app.projects.$projectId.tsx:190
+#: src/routes/app.projects.$projectId.tsx:199
 #: src/routes/app.projects.tsx:83
 msgid "Couldn’t delete project"
 msgstr "Couldn’t delete project"
 
-#: src/routes/app.ask.$threadId.tsx:232
+#: src/components/projects/project-chat-history.tsx:44
+msgid "Couldn’t load project chats."
+msgstr "Couldn’t load project chats."
+
+#: src/components/ask/project-chat.tsx:232
 msgid "Couldn’t open file source"
 msgstr "Couldn’t open file source"
 
@@ -2202,15 +2189,11 @@ msgstr "Couldn’t open permission settings. Open System Settings and allow Typr
 msgid "Couldn’t refresh brief"
 msgstr "Couldn’t refresh brief"
 
-#: src/routes/app.ask.tsx:116
-msgid "Couldn’t remove conversation"
-msgstr "Couldn’t remove conversation"
-
-#: src/components/projects/project-notes-panel.tsx:118
+#: src/components/projects/project-notes-panel.tsx:124
 msgid "Couldn’t remove file"
 msgstr "Couldn’t remove file"
 
-#: src/routes/app.projects.$projectId.tsx:325
+#: src/routes/app.projects.$projectId.tsx:334
 msgid "Couldn’t remove note"
 msgstr "Couldn’t remove note"
 
@@ -2218,24 +2201,23 @@ msgstr "Couldn’t remove note"
 msgid "Couldn’t remove project"
 msgstr "Couldn’t remove project"
 
-#: src/components/projects/project-notes-panel.tsx:142
+#: src/components/projects/project-notes-panel.tsx:148
 msgid "Couldn’t retry indexing"
 msgstr "Couldn’t retry indexing"
 
-#: src/components/projects/project-notes-panel.tsx:92
+#: src/components/projects/project-notes-panel.tsx:98
 msgid "Couldn’t save files"
 msgstr "Couldn’t save files"
 
-#: src/routes/app.ask.$threadId.tsx:121
+#: src/components/ask/project-chat.tsx:122
 msgid "Couldn’t send message"
 msgstr "Couldn’t send message"
 
-#: src/components/projects/project-ask-launcher.tsx:54
+#: src/components/projects/project-ask-launcher.tsx:57
 msgid "Couldn’t start Ask"
 msgstr "Couldn’t start Ask"
 
-#: src/components/ask/ask-conversation-toolbar.tsx:99
-#: src/routes/app.ask.tsx:97
+#: src/components/ask/ask-conversation-toolbar.tsx:86
 msgid "Couldn’t start new chat"
 msgstr "Couldn’t start new chat"
 
@@ -2243,11 +2225,11 @@ msgstr "Couldn’t start new chat"
 msgid "Couldn’t update call controls. Try again."
 msgstr "Couldn’t update call controls. Try again."
 
-#: src/routes/app.projects.$projectId.tsx:170
+#: src/routes/app.projects.$projectId.tsx:179
 msgid "Couldn’t update project"
 msgstr "Couldn’t update project"
 
-#: src/routes/app.projects.$projectId.tsx:299
+#: src/routes/app.projects.$projectId.tsx:308
 msgid "Couldn’t update source"
 msgstr "Couldn’t update source"
 
@@ -2335,10 +2317,6 @@ msgstr "Created: {0}"
 msgid "Croatian"
 msgstr "Croatian"
 
-#: src/components/app-shell/context-pane.tsx:27
-msgid "Cross-meeting conversations will live here. The main canvas shows the active thread."
-msgstr "Cross-meeting conversations will live here. The main canvas shows the active thread."
-
 #: src/components/font-switcher.tsx:156
 msgid "current"
 msgstr "current"
@@ -2425,7 +2403,7 @@ msgid "Delete"
 msgstr "Delete"
 
 #. placeholder {0}: project.name
-#: src/routes/app.projects.$projectId.tsx:553
+#: src/routes/app.projects.$projectId.tsx:565
 msgid "Delete “{0}”?"
 msgstr "Delete “{0}”?"
 
@@ -2447,7 +2425,7 @@ msgstr "Delete Note"
 
 #: src/components/projects/project-header.tsx:116
 #: src/components/spaces/project-header.tsx:82
-#: src/routes/app.projects.$projectId.tsx:574
+#: src/routes/app.projects.$projectId.tsx:586
 #: src/routes/app.projects.tsx:222
 #: src/routes/app.projects.tsx:269
 msgid "Delete project"
@@ -2877,11 +2855,11 @@ msgstr "Everything stays on your device. Use this path with apps like Claude, Cu
 msgid "Excellent"
 msgstr "Excellent"
 
-#: src/routes/app.projects.$projectId.tsx:721
+#: src/routes/app.projects.$projectId.tsx:733
 msgid "Exclude from brief"
 msgstr "Exclude from brief"
 
-#: src/routes/app.projects.$projectId.tsx:684
+#: src/routes/app.projects.$projectId.tsx:696
 msgid "Excluded from brief"
 msgstr "Excluded from brief"
 
@@ -3000,7 +2978,7 @@ msgid "File"
 msgstr "File"
 
 #: src/components/projects/project-files-dropzone.tsx:120
-#: src/components/projects/project-notes-panel.tsx:163
+#: src/components/projects/project-notes-panel.tsx:169
 msgid "Files"
 msgstr "Files"
 
@@ -3174,7 +3152,7 @@ msgstr "Go to AI models settings to check the status."
 msgid "Go to home"
 msgstr "Go to home"
 
-#: src/routes/app.ask.$threadId.tsx:416
+#: src/components/ask/project-chat.tsx:439
 msgid "Go to latest message"
 msgstr "Go to latest message"
 
@@ -3236,7 +3214,7 @@ msgstr "Hide languages"
 msgid "Hindi"
 msgstr "Hindi"
 
-#: src/components/ask/ask-conversation-toolbar.tsx:216
+#: src/components/ask/ask-conversation-toolbar.tsx:208
 #: src/components/right-panel/views/chat-view.tsx:566
 #: src/components/right-panel/views/chat-view.tsx:593
 msgid "History"
@@ -3246,7 +3224,7 @@ msgstr "History"
 msgid "Hungarian"
 msgstr "Hungarian"
 
-#: src/lib/ask.ts:261
+#: src/lib/ask.ts:270
 msgid "I couldn’t answer this project question: {message}"
 msgstr "I couldn’t answer this project question: {message}"
 
@@ -3282,7 +3260,7 @@ msgstr "Improve selected text"
 msgid "Improve writing"
 msgstr "Improve writing"
 
-#: src/routes/app.projects.$projectId.tsx:715
+#: src/routes/app.projects.$projectId.tsx:727
 msgid "Include in brief"
 msgstr "Include in brief"
 
@@ -3540,6 +3518,10 @@ msgstr "Loading model…"
 msgid "Loading models…"
 msgstr "Loading models…"
 
+#: src/components/projects/project-chat-history.tsx:35
+msgid "Loading project chats"
+msgstr "Loading project chats"
+
 #: src/components/editor-area/note-header/chips/project-chip.tsx:192
 #: src/components/left-sidebar/bulk-delete-button.tsx:91
 msgid "Loading projects…"
@@ -3596,10 +3578,6 @@ msgstr "Mandarin"
 msgid "Mandarin Chinese"
 msgstr "Mandarin Chinese"
 
-#: src/components/app-shell/context-pane.tsx:26
-msgid "Meeting chat threads will live here while the note stays visible in the main canvas."
-msgstr "Meeting chat threads will live here while the note stays visible in the main canvas."
-
 #: src/components/editor-area/floating-button.tsx:65
 #: src/components/settings/components/template-list.tsx:37
 #: src/components/settings/components/templates-sidebar.tsx:33
@@ -3644,7 +3622,6 @@ msgid "Minimize"
 msgstr "Minimize"
 
 #: src/components/projects/project-ask-launcher.tsx:29
-#: src/routes/app.ask.tsx:71
 msgid "Missing user"
 msgstr "Missing user"
 
@@ -3753,7 +3730,7 @@ msgstr "Navigation"
 msgid "Needs refresh"
 msgstr "Needs refresh"
 
-#: src/routes/app.projects.$projectId.tsx:689
+#: src/routes/app.projects.$projectId.tsx:701
 msgid "Needs review"
 msgstr "Needs review"
 
@@ -3769,14 +3746,13 @@ msgstr "Network error, please check your connection"
 msgid "New audio device detected"
 msgstr "New audio device detected"
 
-#: src/components/ask/ask-conversation-toolbar.tsx:162
-#: src/components/ask/ask-conversation-toolbar.tsx:163
+#: src/components/ask/ask-conversation-toolbar.tsx:154
+#: src/components/ask/ask-conversation-toolbar.tsx:155
 #: src/components/right-panel/views/chat-view.tsx:552
-#: src/routes/app.ask.tsx:216
 msgid "New chat"
 msgstr "New chat"
 
-#: src/components/ask/ask-conversation-toolbar.tsx:77
+#: src/components/ask/ask-conversation-toolbar.tsx:64
 msgid "New chat is only available for project-scoped Ask threads."
 msgstr "New chat is only available for project-scoped Ask threads."
 
@@ -3788,7 +3764,7 @@ msgstr "New Design"
 #: src/components/editor-area/note-header/title-input.tsx:32
 #: src/components/finder/views/contact-view.tsx:333
 #: src/components/finder/views/table-view.tsx:50
-#: src/components/left-sidebar/index.tsx:181
+#: src/components/left-sidebar/index.tsx:177
 #: src/components/left-sidebar/notes-list.tsx:433
 #: src/components/left-sidebar/ongoing-session.tsx:45
 #: src/components/left-sidebar/search-list.tsx:188
@@ -3829,14 +3805,6 @@ msgstr "Next (Enter)"
 msgid "Next slide"
 msgstr "Next slide"
 
-#: src/routes/app.ask.tsx:283
-msgid "No Ask conversations yet"
-msgstr "No Ask conversations yet"
-
-#: src/components/ask/ask-conversation-toolbar.tsx:231
-msgid "No Ask conversations yet."
-msgstr "No Ask conversations yet."
-
 #: src/components/settings/components/calendar/calendar-selector.tsx:102
 msgid "No calendars found"
 msgstr "No calendars found"
@@ -3856,10 +3824,6 @@ msgstr "No content available"
 #: src/components/projects/project-brief-preview.ts:115
 msgid "No contradictions are visible in the current mock brief. In the real pipeline, this section should appear only when newer sources change or challenge older guidance."
 msgstr "No contradictions are visible in the current mock brief. In the real pipeline, this section should appear only when newer sources change or challenge older guidance."
-
-#: src/components/app-shell/context-pane.tsx:38
-msgid "No conversations yet"
-msgstr "No conversations yet"
 
 #: src/components/settings/views/templates.tsx:409
 msgid "No default template selected. Auto mode lets the AI structure your notes freely, which works great for most use cases."
@@ -3889,14 +3853,6 @@ msgstr "No items found"
 #: src/components/welcome-modal/language-selection-view.tsx:152
 msgid "No language found."
 msgstr "No language found."
-
-#: src/routes/app.ask.tsx:282
-msgid "No matching conversations"
-msgstr "No matching conversations"
-
-#: src/components/app-shell/context-pane.tsx:38
-msgid "No meeting chats yet"
-msgstr "No meeting chats yet"
 
 #: src/components/settings/views/team.tsx:175
 msgid "No members found"
@@ -3946,6 +3902,11 @@ msgstr "No organization"
 #: src/components/editor-area/note-header/chips/event-chip.tsx:312
 msgid "No past events found"
 msgstr "No past events found"
+
+#: src/components/ask/ask-conversation-toolbar.tsx:223
+#: src/components/projects/project-chat-history.tsx:56
+msgid "No project chats yet"
+msgstr "No project chats yet"
 
 #: src/routes/app.projects.tsx:143
 msgid "No projects found"
@@ -4042,10 +4003,10 @@ msgstr "notes"
 #: src/components/command-palette.tsx:478
 #: src/components/editor-area/editor-mode-indicator.tsx:49
 #: src/components/finder/views/table-view.tsx:208
-#: src/components/left-sidebar/index.tsx:221
+#: src/components/left-sidebar/index.tsx:199
 #: src/components/left-sidebar/search-list.tsx:83
 #: src/components/left-sidebar/tag-filter-bar.tsx:85
-#: src/components/projects/project-notes-panel.tsx:155
+#: src/components/projects/project-notes-panel.tsx:161
 #: src/components/spaces/project-notes-panel.tsx:23
 #: src/data/shortcuts.ts:14
 msgid "Notes"
@@ -4089,7 +4050,7 @@ msgstr "On-device"
 msgid "On-device model"
 msgstr "On-device model"
 
-#: src/routes/app.ask.$threadId.tsx:542
+#: src/components/ask/project-chat.tsx:569
 msgid "One answer was interrupted. Retry it from the message above."
 msgstr "One answer was interrupted. Retry it from the message above."
 
@@ -4109,17 +4070,13 @@ msgstr "Only GGUF chat models are supported locally."
 msgid "Only invited people can access"
 msgstr "Only invited people can access"
 
-#: src/lib/ask.ts:289
+#: src/lib/ask.ts:298
 msgid "Only project-scoped Ask generation is implemented."
 msgstr "Only project-scoped Ask generation is implemented."
 
 #: src/components/control.tsx:19
 msgid "Oops! Nothing here."
 msgstr "Oops! Nothing here."
-
-#: src/routes/app.ask.tsx:288
-msgid "Open a project and ask a question grounded in its notes and files."
-msgstr "Open a project and ask a question grounded in its notes and files."
 
 #: src/components/toast/model-select.tsx:40
 msgid "Open AI models"
@@ -4154,8 +4111,8 @@ msgstr "Open note actions menu"
 msgid "Open permission settings"
 msgstr "Open permission settings"
 
-#: src/components/ask/ask-conversation-toolbar.tsx:176
-#: src/components/ask/ask-conversation-toolbar.tsx:177
+#: src/components/ask/ask-conversation-toolbar.tsx:168
+#: src/components/ask/ask-conversation-toolbar.tsx:169
 msgid "Open project"
 msgstr "Open project"
 
@@ -4164,10 +4121,6 @@ msgstr "Open project"
 #: src/components/toolbar/buttons/project-brief-sidebar-button.tsx:43
 msgid "Open project brief"
 msgstr "Open project brief"
-
-#: src/routes/app.ask.tsx:185
-msgid "Open projects"
-msgstr "Open projects"
 
 #: src/components/projects/project-brief-preview.ts:94
 msgid "Open questions"
@@ -4549,6 +4502,10 @@ msgstr "Project brief will appear after Typr reviews these sources."
 msgid "Project briefs"
 msgstr "Project briefs"
 
+#: src/components/ask/ask-conversation-toolbar.tsx:125
+msgid "Project chat"
+msgstr "Project chat"
+
 #: src/components/spaces/scoped-prompt-composer.tsx:89
 msgid "Project chat is coming next."
 msgstr "Project chat is coming next."
@@ -4556,6 +4513,10 @@ msgstr "Project chat is coming next."
 #: src/components/spaces/scoped-prompt-composer.tsx:22
 msgid "Project chat will use notes added here as context."
 msgstr "Project chat will use notes added here as context."
+
+#: src/components/projects/project-chat-history.tsx:66
+msgid "Project chats"
+msgstr "Project chats"
 
 #: src/lib/project-knowledge.ts:463
 msgid "Project file failed to save."
@@ -4609,16 +4570,16 @@ msgstr "Project knowledge synthesis is still building."
 msgid "Project name"
 msgstr "Project name"
 
-#: src/routes/app.ask.$threadId.tsx:392
+#: src/components/ask/project-chat.tsx:410
 msgid "Project no longer available"
 msgstr "Project no longer available"
 
-#: src/lib/ask.ts:294
+#: src/lib/ask.ts:303
 #: src/lib/project-briefs.ts:164
 msgid "Project not found"
 msgstr "Project not found"
 
-#: src/routes/app.projects.$projectId.tsx:473
+#: src/routes/app.projects.$projectId.tsx:485
 msgid "Project notes"
 msgstr "Project notes"
 
@@ -4769,11 +4730,11 @@ msgstr "remaining"
 msgid "Remove"
 msgstr "Remove"
 
-#: src/components/projects/project-notes-panel.tsx:221
+#: src/components/projects/project-notes-panel.tsx:253
 msgid "Remove “{fileToRemoveName}”?"
 msgstr "Remove “{fileToRemoveName}”?"
 
-#: src/routes/app.projects.$projectId.tsx:513
+#: src/routes/app.projects.$projectId.tsx:525
 msgid "Remove “{sourceToRemoveTitle}” from this project?"
 msgstr "Remove “{sourceToRemoveTitle}” from this project?"
 
@@ -4786,16 +4747,12 @@ msgstr "Remove {0}"
 msgid "Remove {tag}"
 msgstr "Remove {tag}"
 
-#: src/routes/app.ask.tsx:377
-msgid "Remove conversation"
-msgstr "Remove conversation"
-
-#: src/components/projects/project-notes-panel.tsx:244
+#: src/components/projects/project-notes-panel.tsx:276
 msgid "Remove file"
 msgstr "Remove file"
 
-#: src/routes/app.projects.$projectId.tsx:536
-#: src/routes/app.projects.$projectId.tsx:729
+#: src/routes/app.projects.$projectId.tsx:548
+#: src/routes/app.projects.$projectId.tsx:741
 msgid "Remove from project"
 msgstr "Remove from project"
 
@@ -4877,6 +4834,8 @@ msgstr "Resume"
 msgid "Resume Recording"
 msgstr "Resume Recording"
 
+#: src/components/ask/project-chat.tsx:557
+#: src/components/ask/project-chat.tsx:748
 #: src/components/audio-upload-dialog.tsx:333
 #: src/components/editor-area/note-header/listen-button.tsx:143
 #: src/components/editor-area/note-header/transcription-bar.tsx:214
@@ -4899,8 +4858,6 @@ msgstr "Resume Recording"
 #: src/components/ui/model-selector.tsx:317
 #: src/components/welcome-modal/download-progress-view.tsx:166
 #: src/components/welcome-modal/download-progress-view.tsx:213
-#: src/routes/app.ask.$threadId.tsx:530
-#: src/routes/app.ask.$threadId.tsx:719
 msgid "Retry"
 msgstr "Retry"
 
@@ -4969,7 +4926,7 @@ msgstr "Saving the rest of your transcript."
 msgid "Saving..."
 msgstr "Saving..."
 
-#: src/components/app-shell/primary-rail.tsx:108
+#: src/components/app-shell/primary-rail.tsx:103
 #: src/components/right-panel/components/chat/chat-input.tsx:293
 #: src/components/right-panel/components/chat/chat-input.tsx:378
 #: src/components/right-panel/views/chat-view.tsx:600
@@ -4984,10 +4941,6 @@ msgstr "Search and link to past events..."
 #: src/components/projects/project-notes-picker-dialog.tsx:165
 msgid "Search and select notes to add to this project."
 msgstr "Search and select notes to add to this project."
-
-#: src/routes/app.ask.tsx:224
-msgid "Search conversations"
-msgstr "Search conversations"
 
 #: src/components/settings/views/general.tsx:361
 #: src/components/welcome-modal/language-selection-view.tsx:150
@@ -5303,10 +5256,6 @@ msgstr "Show a small recording status control while transcription is active, wit
 msgid "Show all {0} files"
 msgstr "Show all {0} files"
 
-#: src/components/ask/ask-conversation-toolbar.tsx:215
-msgid "Show Ask history"
-msgstr "Show Ask history"
-
 #: src/components/meeting-assistant/floating-assistant.tsx:194
 #: src/components/meeting-assistant/floating-dock-variant.tsx:315
 msgid "Show chat history"
@@ -5325,6 +5274,10 @@ msgstr "Show keyboard shortcuts"
 #: src/components/settings/components/calendar/apple-calendar-integration-details.tsx:140
 msgid "Show notes from upcoming calendar events above your notes list."
 msgstr "Show notes from upcoming calendar events above your notes list."
+
+#: src/components/ask/ask-conversation-toolbar.tsx:207
+msgid "Show project chats"
+msgstr "Show project chats"
 
 #: src/components/right-panel/components/chat/message-wrapper.tsx:94
 msgid "Show reasoning"
@@ -5395,7 +5348,7 @@ msgstr "Sound"
 msgid "Source"
 msgstr "Source"
 
-#: src/routes/app.projects.$projectId.tsx:706
+#: src/routes/app.projects.$projectId.tsx:718
 msgid "Source actions for {sourceTitle}"
 msgstr "Source actions for {sourceTitle}"
 
@@ -5424,17 +5377,9 @@ msgstr "Speech-to-Text Model Mismatch"
 msgid "Stale"
 msgstr "Stale"
 
-#: src/components/app-shell/context-pane.tsx:43
-msgid "Start a chat from the sidebar assistant and your note-specific threads will appear in this list."
-msgstr "Start a chat from the sidebar assistant and your note-specific threads will appear in this list."
-
 #: src/components/right-panel/components/chat/empty-chat-state.tsx:71
 msgid "Start a conversation"
 msgstr "Start a conversation"
-
-#: src/components/app-shell/context-pane.tsx:48
-msgid "Start a cross-meeting query from the main canvas and your threads will appear in this list."
-msgstr "Start a cross-meeting query from the main canvas and your threads will appear in this list."
 
 #: src/components/right-panel/views/transcript-view.tsx:487
 msgid "Start a transcription"
@@ -5686,7 +5631,7 @@ msgstr "Thai"
 msgid "The AI model returned an empty project brief."
 msgstr "The AI model returned an empty project brief."
 
-#: src/lib/ask.ts:248
+#: src/lib/ask.ts:257
 msgid "The AI model returned an empty response."
 msgstr "The AI model returned an empty response."
 
@@ -5721,7 +5666,7 @@ msgstr "The generated summary will appear from {sourceCountLabel} once the brief
 msgid "The model used when you ask questions or edit notes from chat."
 msgstr "The model used when you ask questions or edit notes from chat."
 
-#: src/routes/app.projects.$projectId.tsx:516
+#: src/routes/app.projects.$projectId.tsx:528
 msgid "The note stays in Notes and any other projects. It will no longer be used by this project’s brief or Ask, and the brief will refresh without it."
 msgstr "The note stays in Notes and any other projects. It will no longer be used by this project’s brief or Ask, and the brief will refresh without it."
 
@@ -5742,12 +5687,12 @@ msgstr "The value is invalid."
 msgid "Thinking"
 msgstr "Thinking"
 
-#: src/routes/app.ask.$threadId.tsx:180
-#: src/routes/app.ask.$threadId.tsx:709
+#: src/components/ask/project-chat.tsx:181
+#: src/components/ask/project-chat.tsx:738
 msgid "This answer was interrupted before it finished."
 msgstr "This answer was interrupted before it finished."
 
-#: src/routes/app.ask.$threadId.tsx:395
+#: src/components/ask/project-chat.tsx:413
 msgid "This conversation belonged to a project that has been deleted."
 msgstr "This conversation belonged to a project that has been deleted."
 
@@ -5755,19 +5700,19 @@ msgstr "This conversation belonged to a project that has been deleted."
 msgid "This deletes the project, its brief, source membership, and local project file copies. Notes stay in Notes and can be added to another project later."
 msgstr "This deletes the project, its brief, source membership, and local project file copies. Notes stay in Notes and can be added to another project later."
 
-#: src/routes/app.projects.$projectId.tsx:556
+#: src/routes/app.projects.$projectId.tsx:568
 msgid "This deletes the project, its brief, source membership, and local project file copies. Notes stay in Typr and can be added to another project later."
 msgstr "This deletes the project, its brief, source membership, and local project file copies. Notes stay in Typr and can be added to another project later."
 
-#: src/components/projects/project-notes-panel.tsx:224
+#: src/components/projects/project-notes-panel.tsx:256
 msgid "This deletes the project’s local copy and indexed text from this device. The original file outside Typr is unchanged, and the project brief will refresh without this source."
 msgstr "This deletes the project’s local copy and indexed text from this device. The original file outside Typr is unchanged, and the project brief will refresh without this source."
 
-#: src/components/projects/project-notes-panel.tsx:63
+#: src/components/projects/project-notes-panel.tsx:69
 msgid "this file"
 msgstr "this file"
 
-#: src/routes/app.ask.$threadId.tsx:233
+#: src/components/ask/project-chat.tsx:233
 msgid "This file is no longer available in the project."
 msgstr "This file is no longer available in the project."
 
@@ -5787,13 +5732,17 @@ msgstr "This may take a few seconds..."
 msgid "This might take a few minutes depending on your Internet speed"
 msgstr "This might take a few minutes depending on your Internet speed"
 
-#: src/routes/app.projects.$projectId.tsx:397
+#: src/routes/app.projects.$projectId.tsx:406
 msgid "this note"
 msgstr "this note"
 
 #: src/routes/app.projects.tsx:102
 msgid "this project"
 msgstr "this project"
+
+#: src/components/ask/project-chat.tsx:457
+msgid "This project chat is archived"
+msgstr "This project chat is archived"
 
 #: src/components/settings/views/general.tsx:414
 msgid "This setting only affects offline transcription models."
@@ -5977,10 +5926,6 @@ msgstr "Transcription status notch"
 msgid "Transcription status: {0}"
 msgstr "Transcription status: {0}"
 
-#: src/routes/app.ask.tsx:287
-msgid "Try a different search or project filter."
-msgstr "Try a different search or project filter."
-
 #: src/components/finder/views/table-view.tsx:337
 msgid "Try a different search term"
 msgstr "Try a different search term"
@@ -5989,16 +5934,19 @@ msgstr "Try a different search term"
 msgid "Try a different search."
 msgstr "Try a different search."
 
+#: src/components/projects/project-chat-history.tsx:47
+msgid "Try again"
+msgstr "Try again"
+
 #: src/lib/projects.ts:73
 msgid "Try again in a moment."
 msgstr "Try again in a moment."
 
-#: src/components/ask/ask-conversation-toolbar.tsx:100
-#: src/routes/app.ask.$threadId.tsx:122
-#: src/routes/app.ask.$threadId.tsx:173
-#: src/routes/app.ask.$threadId.tsx:260
-#: src/routes/app.ask.tsx:98
-#: src/routes/app.ask.tsx:117
+#: src/components/ask/ask-conversation-toolbar.tsx:87
+#: src/components/ask/project-chat.tsx:123
+#: src/components/ask/project-chat.tsx:174
+#: src/components/ask/project-chat.tsx:260
+#: src/components/projects/project-chat-history.tsx:29
 msgid "Try again."
 msgstr "Try again."
 
@@ -6123,9 +6071,9 @@ msgstr "Unsupported project knowledge job type: {0}"
 msgid "Untitled"
 msgstr "Untitled"
 
-#: src/components/ask/ask-conversation-toolbar.tsx:137
-#: src/components/ask/ask-conversation-toolbar.tsx:277
-#: src/routes/app.ask.tsx:327
+#: src/components/ask/ask-conversation-toolbar.tsx:129
+#: src/components/ask/ask-conversation-toolbar.tsx:268
+#: src/components/projects/project-chat-history.tsx:68
 msgid "Untitled conversation"
 msgstr "Untitled conversation"
 
@@ -6138,8 +6086,8 @@ msgstr "Untitled Event"
 #: src/components/projects/project-notes-picker-dialog.tsx:230
 #: src/components/spaces/space-notes-picker-dialog.tsx:198
 #: src/lib/project-context-sources.ts:64
-#: src/routes/app.projects.$projectId.tsx:661
-#: src/routes/app.projects.$projectId.tsx:678
+#: src/routes/app.projects.$projectId.tsx:673
+#: src/routes/app.projects.$projectId.tsx:690
 msgid "Untitled note"
 msgstr "Untitled note"
 
@@ -6416,8 +6364,7 @@ msgstr "What languages are your meetings in?"
 msgid "Whisper Model Language Performance (WER)"
 msgstr "Whisper Model Language Performance (WER)"
 
-#: src/routes/app.ask.$threadId.tsx:594
-#: src/routes/app.ask.tsx:253
+#: src/components/ask/project-chat.tsx:621
 msgid "Whole project"
 msgstr "Whole project"
 
