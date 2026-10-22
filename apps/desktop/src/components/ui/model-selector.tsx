@@ -299,7 +299,7 @@ export function ModelSelector({ className, compact = false, onOpenChange }: Mode
         </Tooltip>
 
         <PopoverContent
-          className="w-80 max-h-[min(70vh,560px)] overflow-y-auto border-border p-3"
+          className="w-80 max-w-[var(--radix-popover-content-available-width)] max-h-[min(70vh,560px,var(--radix-popover-content-available-height))] overflow-y-auto overscroll-contain border-border p-3"
           side="top"
           align="start"
           sideOffset={8}
