@@ -6,6 +6,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ProfileAvatar } from "@/components/profile-avatar";
 import { ProfileAvatarPicker } from "@/components/settings/components/profile-avatar-picker";
 import { profileAvatarSource, profileInitials } from "@/lib/profile-avatar";
 import { messages as en } from "@/locales/en/messages.po";
@@ -43,6 +44,7 @@ beforeEach(() => {
 afterEach(async () => {
   await act(async () => root.unmount());
   container.remove();
+  vi.restoreAllMocks();
 });
 
 async function renderPicker(userId = "first-user") {
@@ -73,6 +75,32 @@ async function restartPreferences() {
 }
 
 describe("profile avatar preferences", () => {
+  it("shows sidebar initials after switching away from a loaded avatar image", async () => {
+    vi.spyOn(window, "Image").mockImplementation(function() {
+      const image = document.createElement("img");
+      Object.defineProperties(image, { complete: { value: true }, naturalWidth: { value: 80 } });
+      return image;
+    });
+    const renderAvatar = async (choice: string) => {
+      await act(async () =>
+        root.render(
+          <button type="button">
+            <ProfileAvatar name="Juanma" choice={choice} />
+          </button>,
+        )
+      );
+    };
+    await renderAvatar("marble-03");
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/avatars/marble-03.svg");
+    await renderAvatar("initials");
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelector("button")?.textContent).toBe("J");
+    await renderAvatar("marble-07");
+    expect(container.querySelector("img")?.getAttribute("src")).toBe("/avatars/marble-07.svg");
+    await renderAvatar("initials");
+    expect(container.querySelector("button")?.textContent).toBe("J");
+  });
+
   it("defaults to initials and retains a selected preset after rehydration", async () => {
     await renderPicker();
     expect(radio("initials").getAttribute("aria-checked")).toBe("true");

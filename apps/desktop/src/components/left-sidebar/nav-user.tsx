@@ -78,7 +78,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
     <ProfileAvatar
       name={userProfile.data?.full_name}
       choice={avatarChoice}
-      className={variant === "rail" ? "size-9" : "size-8"}
+      className={variant === "rail" ? "size-9" : "size-6 text-xs"}
     />
   );
   const trigger = variant === "rail"
