@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use std::path::PathBuf;
-use typr_db_core::DatabaseBuilder;
+use typr_db_core::{libsql, Database};
 use typr_db_user::{Session, UserDatabase};
 
 const SESSION_SELECT_COLUMNS: &str = "SELECT DISTINCT s.id, s.created_at, s.visited_at, s.user_id, s.calendar_event_id, s.title, s.raw_memo_html, s.enhanced_memo_html, s.conversations, s.words, s.record_start, s.record_end, s.pre_meeting_memo_html, s.source_type, s.source_metadata, s.space_id, s.auto_enhanced_memo_html, s.needs_enhance FROM sessions s";
@@ -23,15 +23,25 @@ pub struct SessionSearchFilters {
 pub async fn open_local_db() -> Result<UserDatabase> {
     let db_path = get_db_path()?;
 
-    eprintln!("Opening database at: {}", db_path.display());
+    open_db_at(&db_path).await
+}
 
-    let db = DatabaseBuilder::default()
-        .local(db_path.to_string_lossy().to_string())
+async fn open_db_at(db_path: &std::path::Path) -> Result<UserDatabase> {
+    anyhow::ensure!(
+        db_path.is_file(),
+        "Typr database not found; open Typr first or check TYPR_DB_PATH"
+    );
+    let db = libsql::Builder::new_local(db_path)
+        .flags(libsql::OpenFlags::SQLITE_OPEN_READ_ONLY)
         .build()
         .await
-        .context("Failed to open Typr database")?;
-
-    Ok(UserDatabase::from(db))
+        .context("Failed to open Typr database read-only")?;
+    let conn = db.connect()?;
+    // Fail during initialization for an unrelated or outdated database, before advertising tools.
+    conn.query(&format!("{} LIMIT 0", SESSION_SELECT_COLUMNS), ())
+        .await
+        .context("Typr database schema is unavailable; open the current Typr app first")?;
+    Ok(UserDatabase::from(Database::StaticConnection(conn)))
 }
 
 fn get_db_path() -> Result<PathBuf> {
@@ -229,6 +239,40 @@ fn placeholders(count: usize) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn opens_existing_database_read_only_and_rejects_missing_paths() {
+        let directory = std::env::temp_dir().join(format!(
+            "typr-readonly-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir(&directory).unwrap();
+        let path = directory.join("fixture.sqlite");
+        let writable = typr_db_core::DatabaseBuilder::default()
+            .local(&path)
+            .build()
+            .await
+            .unwrap();
+        let db = UserDatabase::from(writable);
+        typr_db_user::migrate(&db).await.unwrap();
+        let reader = open_db_at(&path).await.unwrap();
+        assert!(reader
+            .conn()
+            .unwrap()
+            .execute("CREATE TABLE forbidden (id TEXT)", ())
+            .await
+            .is_err());
+        let missing = directory.join("missing.sqlite");
+        assert!(open_db_at(&missing).await.is_err());
+        assert!(!missing.exists());
+        drop(reader);
+        drop(db);
+        std::fs::remove_dir_all(directory).unwrap();
+    }
 
     #[test]
     fn builds_combined_keyword_tag_and_project_query() {

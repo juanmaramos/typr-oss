@@ -1,157 +1,134 @@
-# Typr MCP Server
+# Typr local MCP server
 
-Model Context Protocol server that exposes Typr meeting transcripts to AI assistants like Claude Desktop and ChatGPT.
+`typr-mcp` exposes eight retrieval tools over local stdio. It reads the existing
+Typr SQLite database with a read-only connection; it does not migrate, create,
+modify, or upload notes. The selected AI client can send retrieved content to its
+provider. Enable this connection only in clients you trust.
 
-## Features
+## Connect AI tools
 
-- **8 MCP Tools:**
-  - `list_sessions` - List recent meeting sessions
-  - `get_session` - Get full session details with summary
-  - `get_transcript` - Get raw transcript with speaker attribution
-  - `search_sessions` - Search sessions by keyword, tag, or project
-  - `list_tags` - List available note tags
-  - `list_projects` - List available projects/spaces
-  - `list_sessions_by_tags` - Retrieve notes by tag name or ID
-  - `list_sessions_by_project` - Retrieve notes by project name or ID
+In Typr, open **Settings → Integrations → Connect AI tools**:
 
-- **Zero Auth Required:** Runs as local process reading local SQLite database
-- **Works With:**
-  - Claude Desktop (stdio MCP)
-  - Cursor / Windsurf (stdio MCP)
-  - ChatGPT Desktop (if it supports MCP)
-  - Any MCP-compatible client
+- **Claude Desktop:** Connect updates the existing Claude configuration using the
+  bundled sidecar and Typr's active database path. Restart Claude Desktop, enable
+  **Typr Local**, then complete the retrieval check below. A **Configured** label
+  means the configuration exists, not that Claude has loaded it. Alternatively,
+  copy the generated Claude JSON and merge its entry into `mcpServers` in Claude's
+  configuration; preserve your other servers.
+- **Codex / ChatGPT desktop:** Copy the generated TOML into the Codex host's
+  `~/.codex/config.toml` (or `$CODEX_HOME/config.toml`). Preserve existing settings
+  and replace an existing `typr_local` table instead of duplicating it. Restart
+  the client and check that the tools are enabled. These local clients share MCP
+  configuration, as described in [OpenAI's MCP documentation](https://developers.openai.com/codex/mcp).
+- **ChatGPT web:** Local stdio configuration does not connect the web client.
+  Web access needs a separately packaged remote MCP plugin, authentication, and
+  an approved secure route to the local service. Typr does not supply this path.
+  Do not expose the notes database or an unauthenticated server publicly.
 
-## Quick Start
+**Check local server** launches the bundled executable, completes MCP
+initialization and tool discovery, and reads one session locally. It returns
+only pass/fail to the UI, never note content. This proves the local server can
+read the active database. It cannot confirm that another application loaded its
+configuration, enabled tools, or retrieved a note.
 
-### 1. Build the Server
+### Complete a retrieval check in each client
 
-```bash
-cargo build --release
-# Binary at: ../../target/release/typr-mcp
+1. Ask the client to use Typr's `list_sessions` tool with limit 5.
+2. Ask it to use `search_sessions` with a phrase from a known note.
+3. Ask it to call `get_session` using the returned ID and quote one known detail.
+4. If the note has a transcript, ask for `get_transcript` with that ID.
+
+If the tools do not appear, check the absolute executable and database paths,
+restart the client fully, and enable the server/tools in that client. In Codex
+CLI, `codex mcp list` shows configuration and `/mcp` shows active MCP servers.
+A server appearing in the configuration alone is not retrieval evidence.
+
+## Manual configuration
+
+Build from the repository root:
+
+```sh
+cargo build -p typr-mcp-server --bin typr-mcp
+# target/debug/typr-mcp (typr-mcp.exe on Windows)
 ```
 
-### 2. Test Locally
+Use absolute paths. Do not use `~` inside a JSON or TOML path. The app-generated
+configuration is preferred because it includes custom/development database paths.
 
-```bash
-# Run test script
-./test-mcp.sh
-
-# Or test manually with your database
-TYPR_DB_PATH=~/Library/Application\ Support/typr/typr.db \
-  ../../target/release/typr-mcp
-
-# Then send JSON-RPC via stdin:
-{"jsonrpc":"2.0","id":1,"method":"tools/list"}
-```
-
-### 3. Configure Claude Desktop
-
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+Claude Desktop JSON (`~/Library/Application Support/Claude/claude_desktop_config.json`
+on macOS; `%APPDATA%\Claude\claude_desktop_config.json` on Windows):
 
 ```json
 {
   "mcpServers": {
-    "typr": {
-      "command": "/absolute/path/to/typr-mcp"
+    "Typr Local": {
+      "command": "/absolute/path/to/typr-mcp",
+      "env": { "TYPR_DB_PATH": "/absolute/path/to/db.sqlite" }
     }
   }
 }
 ```
 
-Restart Claude Desktop. You'll see a hammer icon showing the typr server is connected.
+Codex / ChatGPT desktop TOML:
 
-### 4. Try It Out
+```toml
+[mcp_servers.typr_local]
+command = "/absolute/path/to/typr-mcp"
 
-In Claude Desktop:
-- "What meetings did I have this week?"
-- "Summarize my standup from yesterday"
-- "Search my meetings for discussions about the new feature"
-- "Show notes tagged hiring"
-- "Find notes in the Workforce project about onboarding"
-
-## Architecture
-
-```
-Claude Desktop
-    ↓ (spawns subprocess)
-typr-mcp (this binary)
-    ↓ (reads via libsql)
-~/Library/Application Support/typr/typr.db
+[mcp_servers.typr_local.env]
+TYPR_DB_PATH = "/absolute/path/to/db.sqlite"
 ```
 
-- **Protocol:** JSON-RPC 2.0 over stdio
-- **Transport:** stdin/stdout
-- **Database:** Read-only access to local SQLite via libsql
-- **Concurrent Access:** Safe (libsql WAL mode supports multiple readers)
+Without `TYPR_DB_PATH`, the server uses the production app data directory:
 
-## Environment Variables
+| Platform | Database |
+| --- | --- |
+| macOS | `~/Library/Application Support/com.typr.oss/db.sqlite` |
+| Windows | `%LOCALAPPDATA%\com.typr.oss\db.sqlite` |
+| Linux | `$XDG_DATA_HOME/com.typr.oss/db.sqlite` (default `~/.local/share/com.typr.oss/db.sqlite`) |
 
-- `TYPR_DB_PATH` - Override database location (default: platform-specific)
-  - macOS: `~/Library/Application Support/typr/typr.db`
-  - Windows: `%APPDATA%\typr\typr.db`
-  - Linux: `~/.local/share/typr/typr.db`
+Open Typr first to create/migrate its database. An absent database or incompatible
+schema fails at initialization. In development, build the sidecar next to the
+Tauri executable; packaged apps already include it. App moves/updates that change
+the executable location require regenerating the configuration.
 
-## Logging
+## Tools
 
-All logs go to stderr (never stdout, which would break JSON-RPC).
+| Tool | Purpose |
+| --- | --- |
+| `list_sessions` | Recent sessions, capped at 250 |
+| `search_sessions` | Search titles, notes, summaries, participants; optional tag/project filters |
+| `get_session` | Notes and summaries by session ID |
+| `get_transcript` | Stored transcript by session ID |
+| `list_tags` | Available tag names and IDs |
+| `list_projects` | Available project names and IDs |
+| `list_sessions_by_tags` | Sessions matching tag names or IDs |
+| `list_sessions_by_project` | Sessions matching project names or IDs |
 
-To see logs:
-```bash
-TYPR_DB_PATH=... ../../target/release/typr-mcp 2>mcp-server.log
+`search_sessions` does not search transcript text. Retrieve the transcript after
+finding the session. Logs go to stderr; stdout is reserved for MCP protocol
+messages (except the explicit `--check` diagnostic mode).
+
+## Verification
+
+```sh
+cargo test -p typr-mcp-server
+cargo build -p typr-mcp-server --bin typr-mcp
+./crates/mcp-server/test-mcp.sh
+# Optional: also verify the installed Codex app-server client, without inference:
+./crates/mcp-server/test-mcp.sh /absolute/path/to/typr-mcp --codex
 ```
 
-## Development
+The Python 3 fixture test creates a temporary database from Typr's real migration
+files. It performs the full initialize/initialized handshake, discovers the exact
+eight tools, searches and retrieves synthetic notes/transcripts, covers Unicode
+and parameterized search, runs `--check`, verifies unchanged database bytes, and
+checks that a missing database is never created. It does not use private notes
+or call an external model. This is server/transport evidence; client UI retrieval
+must also be confirmed before claiming a particular installed client works.
 
-### Project Structure
+To diagnose your own local connection without displaying note content:
 
+```sh
+TYPR_DB_PATH=/absolute/path/to/db.sqlite /absolute/path/to/typr-mcp --check
 ```
-src/
-├── main.rs        # Entry point, MCP server setup
-├── tools.rs       # 4 MCP tool implementations
-├── formatters.rs  # Markdown formatters for output
-└── db.rs          # Database access helpers
-```
-
-### Key Dependencies
-
-- `rmcp` - Official Rust MCP SDK
-- `typr-db-user` - Typr database access layer (workspace)
-- `tokio` - Async runtime
-
-### Adding New Tools
-
-1. Add function to `impl TyprMcp` in `tools.rs`
-2. Annotate with `#[tool(description = "...")]`
-3. Define request type struct with `schemars::JsonSchema`
-4. Add formatter function if needed in `formatters.rs`
-
-## Troubleshooting
-
-**Server doesn't show up in Claude Desktop:**
-- Check config file syntax (`claude_desktop_config.json`)
-- Use absolute path, not relative
-- Restart Claude Desktop completely (Cmd+Q on Mac)
-- Check logs: `~/Library/Logs/Claude/mcp-server-typr.log`
-
-**"Database not found" error:**
-- Verify database exists: `ls ~/Library/Application\ Support/typr/typr.db`
-- Or set `TYPR_DB_PATH` explicitly in config
-
-**No sessions returned:**
-- Confirm you have recorded meetings in the desktop app
-- Check database with: `sqlite3 ~/Library/Application\ Support/typr/typr.db "SELECT COUNT(*) FROM sessions;"`
-
-## Testing Concurrent DB Access
-
-1. Start desktop app (it reads/writes to DB)
-2. In another terminal: `TYPR_DB_PATH=... ../../target/release/typr-mcp`
-3. Send requests via stdin
-4. Both should work without conflicts (lib sql WAL mode)
-
-## Next Steps
-
-- [ ] Bundle as Tauri sidecar binary
-- [ ] Add one-click "Enable Claude Integration" button in desktop app
-- [ ] Test with ChatGPT Desktop (when MCP support is stable)
-- [ ] Add MCP Resources for browsable session list
-- [ ] Enhance search with FTS (full-text search)

@@ -11,10 +11,11 @@ path = "src/main.rs"
 # Use stable rmcp 0.3 (simpler API)
 anyhow = "1.0"
 dirs = "5.0"
-rmcp = { version = "0.3", features = ["server", "macros", "transport-io"] }
+rmcp = { version = "0.3", features = ["server", "macros", "transport-io", "client"] }
 # Match schemars version that rmcp 0.3 uses
 schemars = "1.0"
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
 
 # Reuse existing crates from workspace

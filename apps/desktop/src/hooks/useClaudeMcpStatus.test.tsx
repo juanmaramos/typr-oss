@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Integrations from "@/components/settings/views/integrations";
 import { claudeMcpStatusQueryKey, useClaudeMcpStatus } from "./useClaudeMcpStatus";
 
+vi.mock("@/components/settings/components/ai-mcp-setup", () => ({ AiMcpSetup: () => null }));
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
 vi.mock("@/contexts", () => ({ useTypr: () => ({ userId: "test-user" }) }));
 vi.mock("@typr/plugin-analytics", () => ({ commands: { event: vi.fn() } }));

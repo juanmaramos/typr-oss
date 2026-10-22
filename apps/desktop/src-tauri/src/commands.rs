@@ -4,7 +4,20 @@ use std::{io::Read, path::PathBuf};
 use tauri::Manager;
 use tauri_plugin_db::DatabasePluginExt;
 
+mod ai_mcp;
 mod claude_mcp;
+
+#[tauri::command]
+pub async fn get_ai_mcp_setup<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<ai_mcp::McpSetup, String> {
+    ai_mcp::get_ai_mcp_setup(app).await
+}
+
+#[tauri::command]
+pub async fn check_ai_mcp_connection<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> Result<(), String> {
+    ai_mcp::check_ai_mcp_connection(app).await
+}
 
 #[tauri::command]
 #[specta::specta]
@@ -624,19 +637,7 @@ pub async fn setup_claude_mcp<R: tauri::Runtime>(
 ) -> Result<String, String> {
     tracing::info!("Setting up Claude Desktop MCP integration");
 
-    // Sidecar binaries (externalBin) are placed alongside the main executable
-    // in Contents/MacOS/ on macOS. Tauri strips the target triple suffix when bundling.
-    let exe_dir = std::env::current_exe()
-        .map_err(|e| format!("Failed to get executable path: {}", e))?
-        .parent()
-        .ok_or_else(|| "Failed to get executable directory".to_string())?
-        .to_path_buf();
-
-    #[cfg(target_os = "windows")]
-    let mcp_binary = exe_dir.join("typr-mcp.exe");
-
-    #[cfg(not(target_os = "windows"))]
-    let mcp_binary = exe_dir.join("typr-mcp");
+    let mcp_binary = ai_mcp::sidecar_path()?;
 
     if !mcp_binary.exists() {
         return Err(format!("MCP binary not found at: {}", mcp_binary.display()));

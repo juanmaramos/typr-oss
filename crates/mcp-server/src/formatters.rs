@@ -18,8 +18,8 @@ pub fn sessions_to_markdown(sessions: Vec<Session>) -> String {
         if let Some(memo) = &session.enhanced_memo_html {
             // Simple HTML strip for brief display (take first 150 chars)
             let brief = strip_html_simple(memo);
-            let truncated = if brief.len() > 150 {
-                format!("{}...", &brief[..150])
+            let truncated = if brief.chars().count() > 150 {
+                format!("{}...", brief.chars().take(150).collect::<String>())
             } else {
                 brief
             };
