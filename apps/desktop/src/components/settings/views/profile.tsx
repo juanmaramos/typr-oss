@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { ProfileAvatarPicker } from "@/components/settings/components/profile-avatar-picker";
 import { useTypr } from "@/contexts";
 import { commands as dbCommands, type Human, type Organization } from "@typr/plugin-db";
 import { Button } from "@typr/ui/components/ui/button";
@@ -148,6 +149,9 @@ export default function ProfileComponent() {
 
   return (
     <div>
+      <div className="mb-6">
+        <ProfileAvatarPicker userId={userId} name={form.watch("fullName") ?? ""} />
+      </div>
       <Form {...form}>
         <form className="flex flex-col gap-4">
           <FormField

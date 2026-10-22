@@ -2,6 +2,7 @@ import { ensureProjectSourceDigests } from "@/lib/project-knowledge";
 import { getProject } from "@/lib/projects";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
+import { queryOptions } from "@tanstack/react-query";
 import {
   type AskContextSnapshot,
   type AskMessage,
@@ -151,6 +152,14 @@ export async function appendAskUserMessage({
 
 export function listAskThreads(userId: string, scopeType?: AskScopeType | null, scopeId?: string | null) {
   return dbCommands.listAskThreads(userId, scopeType ?? null, scopeId ?? null);
+}
+
+export function projectAskThreadsQueryOptions(userId: string | null, projectId: string) {
+  return queryOptions({
+    queryKey: [askQueryKeys.threads, userId, "Project", projectId],
+    queryFn: () => listAskThreads(userId!, "Project", projectId),
+    enabled: Boolean(userId && projectId),
+  });
 }
 
 export function archiveAskThread(threadId: string) {

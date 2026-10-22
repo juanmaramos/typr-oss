@@ -35,7 +35,8 @@ import {
 import { trackEvent } from "@/utils/analytics-events";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useMatch } from "@tanstack/react-router";
+import { zodValidator } from "@tanstack/zod-adapter";
 import type { ProjectSourceStatus, Session } from "@typr/plugin-db";
 import {
   AlertDialog,
@@ -59,8 +60,10 @@ import { toast } from "@typr/ui/components/ui/toast";
 import { format } from "date-fns";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { type KeyboardEvent, useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 
 export const Route = createFileRoute("/app/projects/$projectId")({
+  validateSearch: zodValidator(z.object({ tab: z.enum(["notes", "files", "chats"]).optional() })),
   component: Component,
 });
 
@@ -69,8 +72,14 @@ function debugProjectBrief(event: string, payload?: Record<string, unknown>) {
 }
 
 function Component() {
+  const chat = useMatch({ from: "/app/projects/$projectId/chats/$threadId", shouldThrow: false });
+  return chat ? <Outlet /> : <ProjectOverview />;
+}
+
+function ProjectOverview() {
   const { t } = useLingui();
   const { projectId } = Route.useParams();
+  const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const { userId } = useTypr();
@@ -455,6 +464,9 @@ function Component() {
               <ProjectAskLauncher project={project} sourceCount={usableProjectSourceCount} />
 
               <ProjectNotesPanel
+                key={projectId}
+                selectedTab={tab}
+                onTabChange={tab => navigate({ search: { tab }, replace: true })}
                 count={sortedSessions.length}
                 onAddNotes={() => setIsNotesPickerOpen(true)}
                 projectId={projectId}

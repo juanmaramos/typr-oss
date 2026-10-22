@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useLocation, useMatch, useNavigate } from "@tanstack/react-router";
+import { useMatch } from "@tanstack/react-router";
 import { addDays, subHours } from "date-fns";
 import { AnimatePresence, LayoutGroup } from "motion/react";
 import { useMemo, useState } from "react";
@@ -12,7 +12,6 @@ import { Trans } from "@lingui/react/macro";
 import { commands as configCommands } from "@typr/plugin-config";
 import { type Calendar, commands as dbCommands } from "@typr/plugin-db";
 import { getCurrentWebviewWindowLabel } from "@typr/plugin-windows";
-import { cn } from "@typr/ui/lib/utils";
 import { useOngoingSession, useSessions } from "@typr/utils/contexts";
 import { BulkActionBar } from "./bulk-delete-button";
 import EventsList from "./events-list";
@@ -36,8 +35,6 @@ const getSessionDate = (session: any): string => {
 export default function LeftSidebar() {
   const { userId } = useTypr();
   const { createNewNote } = useNewNote();
-  const navigate = useNavigate();
-  const location = useLocation();
   const [showEvents, setShowEvents] = useState(true);
   const { isMultiSelectMode, getSelectedCount } = useMultiSelectNotes();
 
@@ -151,7 +148,6 @@ export default function LeftSidebar() {
   }, [events.data]);
 
   const showBulkActionBar = isMultiSelectMode && getSelectedCount() > 0;
-  const isAskActive = location.pathname.startsWith("/app/ask");
 
   if (windowLabel !== "main") {
     return null;
@@ -179,24 +175,6 @@ export default function LeftSidebar() {
             >
               <i className="ri-edit-box-line shrink-0 text-sm text-muted-foreground" />
               <Trans>New note</Trans>
-            </button>
-            <button
-              type="button"
-              className={cn(
-                "relative mt-1 flex h-8 w-full items-center gap-2 rounded-control px-2 text-left text-ui font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                isAskActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:rounded-l-md before:bg-primary"
-                  : "text-sidebar-foreground",
-              )}
-              onClick={() => navigate({ to: "/app/ask" })}
-            >
-              <i
-                className={cn(
-                  "ri-chat-ai-line shrink-0 text-sm",
-                  isAskActive ? "text-sidebar-accent-foreground/80" : "text-muted-foreground",
-                )}
-              />
-              <Trans>Ask</Trans>
             </button>
           </div>
           <ProjectsSection />
