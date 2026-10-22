@@ -1,14 +1,15 @@
+import { ProfileAvatar } from "@/components/profile-avatar";
 import { ShortcutById } from "@/components/shortcut-by-id";
 import { Icon } from "@/components/ui/icon";
 import { useTypr } from "@/contexts";
 import { useSettingsDialog } from "@/contexts/settings-dialog";
 import { useAppInfo } from "@/hooks/use-app-info";
 import { cn } from "@/lib/utils";
+import { useProfileAvatarChoice } from "@/stores/profile-avatar";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { commands as dbCommands } from "@typr/plugin-db";
-import { Avatar, AvatarFallback } from "@typr/ui/components/ui/avatar";
 import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import {
@@ -60,16 +61,6 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
     select: (data) => data.human,
   });
 
-  const getInitials = (name: string | null) => {
-    if (!name) {
-      return "?";
-    }
-    const parts = name.trim().split(" ");
-    return parts.length === 1
-      ? parts[0][0]?.toUpperCase()
-      : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  };
-
   const { openDialog } = useSettingsDialog();
 
   const handleClickSettings = () => {
@@ -82,24 +73,14 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
 
   const { openShortcuts } = useShortcuts();
   const railTooltipLabel = t`Account & settings`;
-  const avatar = userProfile.data?.full_name
-    ? (
-      <Avatar className={cn("bg-secondary", variant === "rail" ? "h-9 w-9" : "h-8 w-8")}>
-        <AvatarFallback className="bg-muted text-foreground font-medium">
-          {getInitials(userProfile.data.full_name)}
-        </AvatarFallback>
-      </Avatar>
-    )
-    : (
-      <Avatar
-        variant="rounded"
-        className={cn("bg-secondary", variant === "rail" ? "h-9 w-9" : "h-8 w-8")}
-      >
-        <AvatarFallback variant="rounded" className="text-sm">
-          <Icon name="ri-settings-3-line" className="size-4" />
-        </AvatarFallback>
-      </Avatar>
-    );
+  const avatarChoice = useProfileAvatarChoice(userId);
+  const avatar = (
+    <ProfileAvatar
+      name={userProfile.data?.full_name}
+      choice={avatarChoice}
+      className={variant === "rail" ? "size-9" : "size-8"}
+    />
+  );
   const trigger = variant === "rail"
     ? (
       <Button

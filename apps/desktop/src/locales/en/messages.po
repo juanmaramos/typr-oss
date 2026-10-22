@@ -1004,7 +1004,7 @@ msgstr "Accessibility permission needed"
 msgid "Account"
 msgstr "Account"
 
-#: src/components/left-sidebar/nav-user.tsx:84
+#: src/components/left-sidebar/nav-user.tsx:75
 msgid "Account & settings"
 msgstr "Account & settings"
 
@@ -1513,6 +1513,10 @@ msgstr "Auto-detect"
 msgid "Auto-detect meetings"
 msgstr "Auto-detect meetings"
 
+#: src/components/settings/components/profile-avatar-picker.tsx:21
+msgid "Avatar"
+msgstr "Avatar"
+
 #: src/lib/language-labels.ts:6
 msgid "Azerbaijani"
 msgstr "Azerbaijani"
@@ -1815,6 +1819,10 @@ msgstr "Choose a transcription model."
 msgid "Choose files"
 msgstr "Choose files"
 
+#: src/components/settings/components/profile-avatar-picker.tsx:24
+msgid "Choose initials or a Marble avatar. Changes save automatically on this device."
+msgstr "Choose initials or a Marble avatar. Changes save automatically on this device."
+
 #: src/components/settings/views/general.tsx:229
 msgid "Choose whether to save your recordings locally."
 msgstr "Choose whether to save your recordings locally."
@@ -1967,7 +1975,7 @@ msgstr "Company"
 msgid "Company description"
 msgstr "Company description"
 
-#: src/components/settings/views/profile.tsx:204
+#: src/components/settings/views/profile.tsx:208
 msgid "Company name"
 msgstr "Company name"
 
@@ -2793,7 +2801,7 @@ msgstr "Enter a value less than {maximum}."
 msgid "Enter a value less than or equal to {maximum}."
 msgstr "Enter a value less than or equal to {maximum}."
 
-#: src/components/settings/views/profile.tsx:211
+#: src/components/settings/views/profile.tsx:215
 msgid "Enter company name"
 msgstr "Enter company name"
 
@@ -2809,11 +2817,11 @@ msgstr "Enter the API key for your custom LLM endpoint"
 msgid "Enter the base URL for your custom LLM endpoint"
 msgstr "Enter the base URL for your custom LLM endpoint"
 
-#: src/components/settings/views/profile.tsx:163
+#: src/components/settings/views/profile.tsx:167
 msgid "Enter your full name"
 msgstr "Enter your full name"
 
-#: src/components/settings/views/profile.tsx:187
+#: src/components/settings/views/profile.tsx:191
 msgid "Enter your job title"
 msgstr "Enter your job title"
 
@@ -2969,7 +2977,7 @@ msgstr "Failed to load transcription"
 msgid "Failed to resolve target session for /app/new"
 msgstr "Failed to resolve target session for /app/new"
 
-#: src/components/settings/views/profile.tsx:323
+#: src/components/settings/views/profile.tsx:327
 msgid "Failed to save profile"
 msgstr "Failed to save profile"
 
@@ -2989,7 +2997,7 @@ msgstr "Fast and reliable for simple tasks"
 msgid "Features"
 msgstr "Features"
 
-#: src/components/left-sidebar/nav-user.tsx:188
+#: src/components/left-sidebar/nav-user.tsx:169
 #: src/components/settings-dialog/content.tsx:40
 #: src/components/settings-dialog/sidebar.tsx:36
 msgid "Feedback"
@@ -3116,7 +3124,7 @@ msgstr ""
 msgid "French"
 msgstr "French"
 
-#: src/components/settings/views/profile.tsx:159
+#: src/components/settings/views/profile.tsx:163
 msgid "Full name"
 msgstr "Full name"
 
@@ -3215,7 +3223,7 @@ msgstr "Heading 2"
 msgid "Heading 3"
 msgstr "Heading 3"
 
-#: src/components/settings/views/profile.tsx:183
+#: src/components/settings/views/profile.tsx:187
 msgid "Helps AI provide better context in meeting summaries"
 msgstr "Helps AI provide better context in meeting summaries"
 
@@ -3294,6 +3302,10 @@ msgstr "Indonesian"
 msgid "Initializing model..."
 msgstr "Initializing model..."
 
+#: src/components/settings/components/profile-avatar-picker.tsx:47
+msgid "Initials"
+msgstr "Initials"
+
 #: src/components/ui/tool.tsx:121
 msgid "Input:"
 msgstr "Input:"
@@ -3349,7 +3361,7 @@ msgstr "Italic selected text"
 msgid "Japanese"
 msgstr "Japanese"
 
-#: src/components/settings/views/profile.tsx:180
+#: src/components/settings/views/profile.tsx:184
 msgid "Job title"
 msgstr "Job title"
 
@@ -3595,6 +3607,10 @@ msgstr "Mandarin"
 #: src/lib/language-labels.ts:32
 msgid "Mandarin Chinese"
 msgstr "Mandarin Chinese"
+
+#: src/components/settings/components/profile-avatar-picker.tsx:47
+msgid "Marble avatar {index}"
+msgstr "Marble avatar {index}"
 
 #: src/components/app-shell/context-pane.tsx:26
 msgid "Meeting chat threads will live here while the note stays visible in the main canvas."
@@ -4229,7 +4245,7 @@ msgstr "optional"
 msgid "Optional for participant suggestions"
 msgstr "Optional for participant suggestions"
 
-#: src/components/left-sidebar/nav-user.tsx:170
+#: src/components/left-sidebar/nav-user.tsx:151
 msgid "Options"
 msgstr "Options"
 
@@ -4255,7 +4271,7 @@ msgstr "Organizations"
 msgid "Original"
 msgstr "Original"
 
-#: src/components/left-sidebar/nav-user.tsx:173
+#: src/components/left-sidebar/nav-user.tsx:154
 msgid "OSS"
 msgstr "OSS"
 
@@ -4484,7 +4500,7 @@ msgstr "Processing..."
 msgid "Profile"
 msgstr "Profile"
 
-#: src/components/settings/views/profile.tsx:317
+#: src/components/settings/views/profile.tsx:321
 msgid "Profile saved"
 msgstr "Profile saved"
 
@@ -4646,7 +4662,7 @@ msgstr "Project synthesis requires at least one readable source."
 msgid "Projects"
 msgstr "Projects"
 
-#: src/components/settings/views/profile.tsx:207
+#: src/components/settings/views/profile.tsx:211
 msgid "Provides business context for AI-generated notes"
 msgstr "Provides business context for AI-generated notes"
 
@@ -4943,7 +4959,7 @@ msgstr "Save as PDF document"
 msgid "Save organization"
 msgstr "Save organization"
 
-#: src/components/settings/views/profile.tsx:301
+#: src/components/settings/views/profile.tsx:305
 msgid "Save Profile"
 msgstr "Save Profile"
 
@@ -4964,8 +4980,8 @@ msgid "Saving the rest of your transcript."
 msgstr "Saving the rest of your transcript."
 
 #: src/components/projects/project-files-dropzone.tsx:112
-#: src/components/settings/views/profile.tsx:298
-#: src/components/settings/views/profile.tsx:311
+#: src/components/settings/views/profile.tsx:302
+#: src/components/settings/views/profile.tsx:315
 msgid "Saving..."
 msgstr "Saving..."
 
@@ -5246,9 +5262,9 @@ msgstr "Setting up transcription"
 msgid "Setting up..."
 msgstr "Setting up..."
 
-#: src/components/left-sidebar/nav-user.tsx:125
-#: src/components/left-sidebar/nav-user.tsx:128
-#: src/components/left-sidebar/nav-user.tsx:202
+#: src/components/left-sidebar/nav-user.tsx:106
+#: src/components/left-sidebar/nav-user.tsx:109
+#: src/components/left-sidebar/nav-user.tsx:183
 #: src/components/left-sidebar/top-area/settings-button.tsx:83
 #: src/components/settings-dialog/content.tsx:55
 #: src/components/settings-dialog/index.tsx:15
@@ -5290,7 +5306,7 @@ msgstr "Short recap"
 msgid "Shortcut"
 msgstr "Shortcut"
 
-#: src/components/left-sidebar/nav-user.tsx:195
+#: src/components/left-sidebar/nav-user.tsx:176
 msgid "Shortcuts"
 msgstr "Shortcuts"
 

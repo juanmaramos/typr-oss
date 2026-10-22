@@ -1004,7 +1004,7 @@ msgstr "Se necesita permiso de Accesibilidad"
 msgid "Account"
 msgstr "Cuenta"
 
-#: src/components/left-sidebar/nav-user.tsx:84
+#: src/components/left-sidebar/nav-user.tsx:75
 msgid "Account & settings"
 msgstr "Cuenta y ajustes"
 
@@ -1513,6 +1513,10 @@ msgstr "Auto-detectar"
 msgid "Auto-detect meetings"
 msgstr "Detectar reuniones automáticamente"
 
+#: src/components/settings/components/profile-avatar-picker.tsx:21
+msgid "Avatar"
+msgstr "Avatar"
+
 #: src/lib/language-labels.ts:6
 msgid "Azerbaijani"
 msgstr "Azerí"
@@ -1815,6 +1819,10 @@ msgstr "Elige un modelo de transcripción."
 msgid "Choose files"
 msgstr "Elegir archivos"
 
+#: src/components/settings/components/profile-avatar-picker.tsx:24
+msgid "Choose initials or a Marble avatar. Changes save automatically on this device."
+msgstr "Elige iniciales o un avatar Marble. Los cambios se guardan automáticamente en este dispositivo."
+
 #: src/components/settings/views/general.tsx:229
 msgid "Choose whether to save your recordings locally."
 msgstr "Elige si quieres guardar tus grabaciones localmente."
@@ -1967,7 +1975,7 @@ msgstr "Empresa"
 msgid "Company description"
 msgstr "Descripción de la empresa"
 
-#: src/components/settings/views/profile.tsx:204
+#: src/components/settings/views/profile.tsx:208
 msgid "Company name"
 msgstr "Nombre de la empresa"
 
@@ -2793,7 +2801,7 @@ msgstr "Introduce un valor menor que {maximum}."
 msgid "Enter a value less than or equal to {maximum}."
 msgstr "Introduce un valor menor o igual que {maximum}."
 
-#: src/components/settings/views/profile.tsx:211
+#: src/components/settings/views/profile.tsx:215
 msgid "Enter company name"
 msgstr "Añade el nombre de tu empresa"
 
@@ -2809,11 +2817,11 @@ msgstr "Añade la clave API para tu punto final LLM personalizado"
 msgid "Enter the base URL for your custom LLM endpoint"
 msgstr "Añade la URL base para tu punto final LLM personalizado"
 
-#: src/components/settings/views/profile.tsx:163
+#: src/components/settings/views/profile.tsx:167
 msgid "Enter your full name"
 msgstr "Añade tu nombre completo"
 
-#: src/components/settings/views/profile.tsx:187
+#: src/components/settings/views/profile.tsx:191
 msgid "Enter your job title"
 msgstr "Añade tu puesto de trabajo"
 
@@ -2969,7 +2977,7 @@ msgstr "Error al cargar la transcripción"
 msgid "Failed to resolve target session for /app/new"
 msgstr "No se pudo determinar la sesión de destino para /app/new"
 
-#: src/components/settings/views/profile.tsx:323
+#: src/components/settings/views/profile.tsx:327
 msgid "Failed to save profile"
 msgstr "Error al guardar perfil"
 
@@ -2989,7 +2997,7 @@ msgstr "Rápido y fiable para tareas sencillas"
 msgid "Features"
 msgstr "Funciones"
 
-#: src/components/left-sidebar/nav-user.tsx:188
+#: src/components/left-sidebar/nav-user.tsx:169
 #: src/components/settings-dialog/content.tsx:40
 #: src/components/settings-dialog/sidebar.tsx:36
 msgid "Feedback"
@@ -3116,7 +3124,7 @@ msgstr ""
 msgid "French"
 msgstr "Francés"
 
-#: src/components/settings/views/profile.tsx:159
+#: src/components/settings/views/profile.tsx:163
 msgid "Full name"
 msgstr "Nombre completo"
 
@@ -3215,7 +3223,7 @@ msgstr "Encabezado 2"
 msgid "Heading 3"
 msgstr "Encabezado 3"
 
-#: src/components/settings/views/profile.tsx:183
+#: src/components/settings/views/profile.tsx:187
 msgid "Helps AI provide better context in meeting summaries"
 msgstr "Ayuda a la IA a proporcionar mejor contexto en los resúmenes de reuniones"
 
@@ -3294,6 +3302,10 @@ msgstr "Indonesio"
 msgid "Initializing model..."
 msgstr "Inicializando modelo..."
 
+#: src/components/settings/components/profile-avatar-picker.tsx:47
+msgid "Initials"
+msgstr "Iniciales"
+
 #: src/components/ui/tool.tsx:121
 msgid "Input:"
 msgstr "Entrada:"
@@ -3349,7 +3361,7 @@ msgstr "Poner el texto seleccionado en cursiva"
 msgid "Japanese"
 msgstr "Japonés"
 
-#: src/components/settings/views/profile.tsx:180
+#: src/components/settings/views/profile.tsx:184
 msgid "Job title"
 msgstr "Cargo"
 
@@ -3595,6 +3607,10 @@ msgstr "Mandarín"
 #: src/lib/language-labels.ts:32
 msgid "Mandarin Chinese"
 msgstr "Chino mandarín"
+
+#: src/components/settings/components/profile-avatar-picker.tsx:47
+msgid "Marble avatar {index}"
+msgstr "Avatar Marble {index}"
 
 #: src/components/app-shell/context-pane.tsx:26
 msgid "Meeting chat threads will live here while the note stays visible in the main canvas."
@@ -4229,7 +4245,7 @@ msgstr "opcional"
 msgid "Optional for participant suggestions"
 msgstr "Opcional para sugerencias de participantes"
 
-#: src/components/left-sidebar/nav-user.tsx:170
+#: src/components/left-sidebar/nav-user.tsx:151
 msgid "Options"
 msgstr "Opciones"
 
@@ -4255,7 +4271,7 @@ msgstr "Organizaciones"
 msgid "Original"
 msgstr "Original"
 
-#: src/components/left-sidebar/nav-user.tsx:173
+#: src/components/left-sidebar/nav-user.tsx:154
 msgid "OSS"
 msgstr "OSS"
 
@@ -4484,7 +4500,7 @@ msgstr "Procesando..."
 msgid "Profile"
 msgstr "Perfil"
 
-#: src/components/settings/views/profile.tsx:317
+#: src/components/settings/views/profile.tsx:321
 msgid "Profile saved"
 msgstr "Perfil guardado"
 
@@ -4646,7 +4662,7 @@ msgstr "La síntesis del proyecto necesita al menos una fuente legible."
 msgid "Projects"
 msgstr "Proyectos"
 
-#: src/components/settings/views/profile.tsx:207
+#: src/components/settings/views/profile.tsx:211
 msgid "Provides business context for AI-generated notes"
 msgstr "Proporciona contexto empresarial para notas generadas por IA"
 
@@ -4943,7 +4959,7 @@ msgstr "Guardar como documento PDF"
 msgid "Save organization"
 msgstr "Guardar organización"
 
-#: src/components/settings/views/profile.tsx:301
+#: src/components/settings/views/profile.tsx:305
 msgid "Save Profile"
 msgstr "Guardar perfil"
 
@@ -4964,8 +4980,8 @@ msgid "Saving the rest of your transcript."
 msgstr "Guardando el resto de la transcripción."
 
 #: src/components/projects/project-files-dropzone.tsx:112
-#: src/components/settings/views/profile.tsx:298
-#: src/components/settings/views/profile.tsx:311
+#: src/components/settings/views/profile.tsx:302
+#: src/components/settings/views/profile.tsx:315
 msgid "Saving..."
 msgstr "Guardando..."
 
@@ -5246,9 +5262,9 @@ msgstr "Configurando transcripción"
 msgid "Setting up..."
 msgstr "Configurando..."
 
-#: src/components/left-sidebar/nav-user.tsx:125
-#: src/components/left-sidebar/nav-user.tsx:128
-#: src/components/left-sidebar/nav-user.tsx:202
+#: src/components/left-sidebar/nav-user.tsx:106
+#: src/components/left-sidebar/nav-user.tsx:109
+#: src/components/left-sidebar/nav-user.tsx:183
 #: src/components/left-sidebar/top-area/settings-button.tsx:83
 #: src/components/settings-dialog/content.tsx:55
 #: src/components/settings-dialog/index.tsx:15
@@ -5290,7 +5306,7 @@ msgstr "Resumen breve"
 msgid "Shortcut"
 msgstr "Atajo"
 
-#: src/components/left-sidebar/nav-user.tsx:195
+#: src/components/left-sidebar/nav-user.tsx:176
 msgid "Shortcuts"
 msgstr "Atajos"
 
