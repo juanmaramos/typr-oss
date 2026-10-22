@@ -1,6 +1,6 @@
 import { useLocation } from "@tanstack/react-router";
 
-export type ShellMode = "notes" | "ask" | "projects";
+export type ShellMode = "notes" | "projects";
 
 export function useShellMode(): ShellMode {
   const location = useLocation();
@@ -11,7 +11,7 @@ export function useShellMode(): ShellMode {
   }
 
   if (pathname.startsWith("/app/ask")) {
-    return "ask";
+    return "projects";
   }
 
   return "notes";

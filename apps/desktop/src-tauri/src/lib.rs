@@ -1,6 +1,7 @@
 mod commands;
 mod deeplink;
 mod ext;
+mod recordings;
 mod store;
 
 use ext::*;
@@ -210,6 +211,11 @@ pub async fn main() {
             // Setup database and other async operations after app is ready
             let app_clone = app.clone();
             tokio::spawn(async move {
+                use tauri::Manager;
+                // Block recording starts until config migration and cleanup finish.
+                let listener = app_clone.state::<tauri_plugin_listener::SharedState>();
+                let listener_guard = listener.lock().await;
+
                 // Setup database BEFORE showing window (avoid race condition)
                 if let Err(e) = app_clone.setup_db_for_local().await {
                     tracing::error!("failed_to_setup_db_for_local: {}", e);
@@ -226,14 +232,54 @@ pub async fn main() {
                     return;
                 }
 
-                // Show main window only after database is attached and ready.
-                if let Err(e) = TyprWindow::Main.show(&app_clone) {
-                    tracing::error!("failed_to_show_main_window: {}", e);
+                // Migrate config from database to store (one-time migration)
+                let config_migration = app_clone.migrate_config_to_store().await;
+                if let Err(e) = &config_migration {
+                    tracing::warn!("config_migration_skipped: {}", e);
                 }
 
-                // Migrate config from database to store (one-time migration)
-                if let Err(e) = app_clone.migrate_config_to_store().await {
-                    tracing::warn!("config_migration_skipped: {}", e);
+                // Finish recording cleanup before exposing the main window.
+                {
+                    let cleanup_app = app_clone.clone();
+                    let cleanup = tokio::task::spawn_blocking(move || {
+                        let config = tauri_plugin_config::commands::get_general_config(
+                            cleanup_app.clone(),
+                        )?;
+                        let app_data = cleanup_app
+                            .path()
+                            .app_data_dir()
+                            .map_err(|error| error.to_string())?;
+                        recordings::cleanup_recordings(
+                            &app_data,
+                            // A failed migration may hide an explicit opt-in in the DB.
+                            config_migration.is_err() || config.save_recordings.unwrap_or(false),
+                        )
+                        .map_err(|error| error.to_string())
+                    })
+                    .await;
+                    match cleanup {
+                        Ok(Ok(report)) => {
+                            tracing::info!(removed = report.removed, "recording cleanup completed");
+                            if report.failed > 0 {
+                                tracing::warn!(
+                                    failed = report.failed,
+                                    "recording cleanup will retry next launch"
+                                );
+                            }
+                        }
+                        Ok(Err(error)) => {
+                            tracing::warn!(%error, "recording cleanup will retry next launch");
+                        }
+                        Err(error) => {
+                            tracing::warn!(%error, "recording cleanup task failed; will retry next launch");
+                        }
+                    }
+                }
+                drop(listener_guard);
+
+                // Show main window only after database and recording cleanup are ready.
+                if let Err(e) = TyprWindow::Main.show(&app_clone) {
+                    tracing::error!("failed_to_show_main_window: {}", e);
                 }
 
                 {

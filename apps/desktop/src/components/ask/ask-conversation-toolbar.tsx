@@ -4,8 +4,8 @@ import {
 } from "@/components/app-shell/titlebar-layout";
 import { ProjectIcon } from "@/components/projects/project-icon";
 import { useLeftSidebar, useTypr } from "@/contexts";
-import { askQueryKeys, createAskThread, getAskThread, listAskThreads } from "@/lib/ask";
-import { getProject, listProjects, type Project, projectQueryKeys } from "@/lib/projects";
+import { askQueryKeys, createAskThread, getAskThread, projectAskThreadsQueryOptions } from "@/lib/ask";
+import { getProject, type Project, projectQueryKeys } from "@/lib/projects";
 import { trackEvent } from "@/utils/analytics-events";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,12 +23,13 @@ import { useMemo, useState } from "react";
 
 interface AskConversationToolbarProps {
   threadId: string;
+  projectId: string;
 }
 
 const toolbarIconButtonClassName = "size-8 rounded-md text-muted-foreground hover:bg-surface-400 hover:text-foreground";
 const toolbarTitleClassName = "min-w-0 truncate text-xs font-semibold text-foreground";
 
-export function AskConversationToolbar({ threadId }: AskConversationToolbarProps) {
+export function AskConversationToolbar({ threadId, projectId }: AskConversationToolbarProps) {
   const { t } = useLingui();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -55,21 +56,7 @@ export function AskConversationToolbar({ threadId }: AskConversationToolbarProps
     enabled: thread?.scope_type === "Project" && Boolean(thread.scope_id),
   });
 
-  const threadsQuery = useQuery({
-    queryKey: [askQueryKeys.threads, userId],
-    queryFn: () => listAskThreads(userId!, null, null),
-    enabled: Boolean(userId),
-  });
-
-  const projectsQuery = useQuery({
-    queryKey: [projectQueryKeys.all],
-    queryFn: listProjects,
-  });
-
-  const projectById = useMemo(
-    () => new Map((projectsQuery.data ?? []).map(project => [project.id, project])),
-    [projectsQuery.data],
-  );
+  const threadsQuery = useQuery(projectAskThreadsQueryOptions(userId, projectId));
 
   const createScopedThreadMutation = useMutation({
     mutationFn: async () => {
@@ -91,7 +78,7 @@ export function AskConversationToolbar({ threadId }: AskConversationToolbarProps
         });
       }
       await queryClient.invalidateQueries({ queryKey: [askQueryKeys.threads] });
-      navigate({ to: "/app/ask/$threadId", params: { threadId: nextThread.id } });
+      navigate({ to: "/app/projects/$projectId/chats/$threadId", params: { projectId, threadId: nextThread.id } });
     },
     onError: (error) => {
       toast({
@@ -124,15 +111,20 @@ export function AskConversationToolbar({ threadId }: AskConversationToolbarProps
           className={cn(toolbarIconButtonClassName, "shrink-0")}
           onClick={() =>
             navigate({
-              to: "/app/ask",
-              search: project ? { projectId: project.id } : {},
+              to: "/app/projects/$projectId",
+              params: { projectId },
+              search: { tab: "chats" },
             })}
-          aria-label={t`Back to Ask`}
-          title={t`Back to Ask`}
+          aria-label={t`Back to project chats`}
+          title={t`Back to project chats`}
         >
           <i className="ri-arrow-left-line text-lg" />
         </Button>
 
+        <span className="min-w-0 truncate text-xs text-muted-foreground">
+          <Trans>Project chat</Trans>
+          {project && <>· {project.name}</>}
+        </span>
         <h1 className={toolbarTitleClassName}>
           {thread?.title || <Trans>Untitled conversation</Trans>}
         </h1>
@@ -142,12 +134,12 @@ export function AskConversationToolbar({ threadId }: AskConversationToolbarProps
         <AskHistoryPopover
           currentThreadId={threadId}
           isLoading={threadsQuery.isLoading}
-          projectById={projectById}
+          project={project}
           threads={threadsQuery.data ?? []}
           onSelectThread={(nextThreadId) =>
             navigate({
-              to: "/app/ask/$threadId",
-              params: { threadId: nextThreadId },
+              to: "/app/projects/$projectId/chats/$threadId",
+              params: { projectId, threadId: nextThreadId },
             })}
         />
 
@@ -188,13 +180,13 @@ function AskHistoryPopover({
   currentThreadId,
   isLoading,
   onSelectThread,
-  projectById,
+  project,
   threads,
 }: {
   currentThreadId: string;
   isLoading: boolean;
   onSelectThread: (threadId: string) => void;
-  projectById: Map<string, Project>;
+  project: Project | null | undefined;
   threads: AskThread[];
 }) {
   const { t } = useLingui();
@@ -212,7 +204,7 @@ function AskHistoryPopover({
             toolbarIconButtonClassName,
             "data-[state=open]:bg-surface-400 data-[state=open]:text-foreground",
           )}
-          aria-label={t`Show Ask history`}
+          aria-label={t`Show project chats`}
           title={t`History`}
         >
           <i className="ri-history-line text-base" />
@@ -228,7 +220,7 @@ function AskHistoryPopover({
 
         {!isLoading && groupedThreads.length === 0 && (
           <div className="px-3 py-8 text-center text-sm text-muted-foreground">
-            <Trans>No Ask conversations yet.</Trans>
+            <Trans>No project chats yet</Trans>
           </div>
         )}
 
@@ -242,7 +234,6 @@ function AskHistoryPopover({
                 <div className="space-y-0.5">
                   {group.threads.map(thread => {
                     const isSelected = thread.id === currentThreadId;
-                    const project = thread.scope_id ? projectById.get(thread.scope_id) : null;
 
                     return (
                       <button

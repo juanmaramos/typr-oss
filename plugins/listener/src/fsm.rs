@@ -504,10 +504,6 @@ struct AudioChannels {
     speaker_rx: flume::Receiver<Vec<f32>>,
     save_mixed_tx: flume::Sender<Vec<f32>>,
     save_mixed_rx: flume::Receiver<Vec<f32>>,
-    save_mic_raw_tx: Option<flume::Sender<Vec<f32>>>,
-    save_mic_raw_rx: Option<flume::Receiver<Vec<f32>>>,
-    save_speaker_raw_tx: Option<flume::Sender<Vec<f32>>>,
-    save_speaker_raw_rx: Option<flume::Receiver<Vec<f32>>>,
     process_mic_tx: flume::Sender<Vec<f32>>,
     process_mic_rx: flume::Receiver<Vec<f32>>,
     process_speaker_tx: flume::Sender<Vec<f32>>,
@@ -527,20 +523,6 @@ impl AudioChannels {
         let (process_speaker_tx, process_speaker_rx) =
             flume::bounded::<Vec<f32>>(CHUNK_BUFFER_SIZE);
 
-        let (save_mic_raw_tx, save_mic_raw_rx) = if cfg!(debug_assertions) {
-            let (tx, rx) = flume::bounded::<Vec<f32>>(CHUNK_BUFFER_SIZE);
-            (Some(tx), Some(rx))
-        } else {
-            (None, None)
-        };
-
-        // Always save speaker audio for async diarization (needed for AssemblyAI)
-        // Small memory overhead (~2MB for 2min recording) but enables speaker labels
-        let (save_speaker_raw_tx, save_speaker_raw_rx) = {
-            let (tx, rx) = flume::bounded::<Vec<f32>>(CHUNK_BUFFER_SIZE);
-            (Some(tx), Some(rx))
-        };
-
         Self {
             mic_tx,
             mic_rx,
@@ -548,10 +530,6 @@ impl AudioChannels {
             speaker_rx,
             save_mixed_tx,
             save_mixed_rx,
-            save_mic_raw_tx,
-            save_mic_raw_rx,
-            save_speaker_raw_tx,
-            save_speaker_raw_rx,
             process_mic_tx,
             process_mic_rx,
             process_speaker_tx,
@@ -1498,8 +1476,6 @@ impl Session {
             let mic_rx = channels.mic_rx.clone();
             let speaker_rx = channels.speaker_rx.clone();
             let save_mixed_tx = channels.save_mixed_tx.clone();
-            let save_mic_raw_tx = channels.save_mic_raw_tx.clone();
-            let save_speaker_raw_tx = channels.save_speaker_raw_tx.clone();
             let process_mic_tx = channels.process_mic_tx.clone();
             let process_speaker_tx = channels.process_speaker_tx.clone();
             async move {
@@ -1680,13 +1656,6 @@ impl Session {
                         last_broadcast = now;
                     }
 
-                    if let Some(ref tx) = save_mic_raw_tx {
-                        let _ = tx.send_async(mic_chunk_raw.clone()).await;
-                    }
-                    if let Some(ref tx) = save_speaker_raw_tx {
-                        let _ = tx.send_async(speaker_chunk.clone()).await;
-                    }
-
                     if let Err(e) = process_mic_tx.send_async(processed_mic).await {
                         tracing::error!("❌ process_mic_tx_send_error: {:?} - Receiver dropped or channel closed", e);
                         tracing::error!("💡 Likely cause: Transcription service connection failed or was terminated");
@@ -1744,49 +1713,6 @@ impl Session {
                     .await
                     {
                         tracing::error!("failed_to_save_mixed_audio: {:?}", e);
-                    }
-                }
-            });
-        }
-
-        if let Some(save_mic_raw_rx) = channels.save_mic_raw_rx.clone() {
-            tasks.spawn({
-                let session_id = session_id.clone();
-                let app_dir = app_dir.clone();
-
-                async move {
-                    if let Err(e) = AudioSaver::save_to_wav(
-                        save_mic_raw_rx,
-                        &session_id,
-                        &app_dir,
-                        "audio_mic.wav",
-                        false,
-                    )
-                    .await
-                    {
-                        tracing::error!("failed_to_save_raw_mic_audio: {:?}", e);
-                    }
-                }
-            });
-        }
-
-        // Save speaker audio for async diarization (built-in speakers mode)
-        if let Some(save_speaker_raw_rx) = channels.save_speaker_raw_rx.clone() {
-            tasks.spawn({
-                let session_id = session_id.clone();
-                let app_dir = app_dir.clone();
-
-                async move {
-                    if let Err(e) = AudioSaver::save_to_wav(
-                        save_speaker_raw_rx,
-                        &session_id,
-                        &app_dir,
-                        "audio_speaker.wav",
-                        false,
-                    )
-                    .await
-                    {
-                        tracing::error!("[AUDIO_SAVE] failed_to_save_raw_speaker_audio: {:?}", e);
                     }
                 }
             });

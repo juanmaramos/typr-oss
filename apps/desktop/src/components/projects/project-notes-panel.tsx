@@ -1,6 +1,8 @@
+import { ProjectChatHistory } from "@/components/projects/project-chat-history";
 import { ProjectFilesDropzone } from "@/components/projects/project-files-dropzone";
 import { Tab } from "@/components/ui/tab";
 import { useTypr } from "@/contexts";
+import { projectAskThreadsQueryOptions } from "@/lib/ask";
 import { projectBriefQueryKeys } from "@/lib/project-briefs";
 import {
   addProjectFiles,
@@ -37,15 +39,19 @@ interface ProjectNotesPanelProps {
   count: number;
   onAddNotes: () => void;
   projectId: string;
+  selectedTab?: ProjectNotesTab;
+  onTabChange: (tab: ProjectNotesTab) => void;
 }
 
-type ProjectNotesTab = "notes" | "files";
+export type ProjectNotesTab = "notes" | "files" | "chats";
 
-export function ProjectNotesPanel({ children, count, onAddNotes, projectId }: ProjectNotesPanelProps) {
+export function ProjectNotesPanel(
+  { children, count, onAddNotes, projectId, selectedTab, onTabChange }: ProjectNotesPanelProps,
+) {
   const { t } = useLingui();
   const queryClient = useQueryClient();
   const { userId } = useTypr();
-  const [selectedTab, setSelectedTab] = useState<ProjectNotesTab | null>(null);
+  const chatsQuery = useQuery(projectAskThreadsQueryOptions(userId, projectId));
   const [fileToRemove, setFileToRemove] = useState<ProjectFile | null>(null);
   const hasNotes = count > 0;
   const filesQuery = useQuery({
@@ -62,8 +68,8 @@ export function ProjectNotesPanel({ children, count, onAddNotes, projectId }: Pr
   const activeTab = selectedTab ?? defaultTab;
   const fileToRemoveName = fileToRemove?.name ?? t`this file`;
   const handleTabSelect = (value: string) => {
-    if (value === "notes" || value === "files") {
-      setSelectedTab(value);
+    if (value === "notes" || value === "files" || value === "chats") {
+      onTabChange(value);
     }
   };
 
@@ -169,6 +175,20 @@ export function ProjectNotesPanel({ children, count, onAddNotes, projectId }: Pr
                   <NumberBadge value={files.length} variant="secondary" aria-label={t`${files.length} files`} />
                 }
               />
+              <Tab
+                text={t`Chats`}
+                value="chats"
+                selected={activeTab === "chats"}
+                onSelect={handleTabSelect}
+                iconClassName="ri-chat-3-line"
+                trailing={
+                  <NumberBadge
+                    value={chatsQuery.data?.length ?? 0}
+                    variant="secondary"
+                    aria-label={t`${chatsQuery.data?.length ?? 0} project chats`}
+                  />
+                }
+              />
             </div>
 
             {activeTab === "notes" && hasNotes && (
@@ -188,6 +208,18 @@ export function ProjectNotesPanel({ children, count, onAddNotes, projectId }: Pr
             >
               {children}
             </div>
+          )}
+
+          {activeTab === "chats" && (
+            <ProjectChatHistory
+              projectId={projectId}
+              threads={chatsQuery.data ?? []}
+              isLoading={chatsQuery.isLoading}
+              isError={chatsQuery.isError}
+              onRetry={() => {
+                void chatsQuery.refetch();
+              }}
+            />
           )}
 
           {activeTab === "files" && (
