@@ -9,9 +9,9 @@ export function ProfileAvatar({ name, choice, className }: {
 }) {
   const src = profileAvatarSource(choice);
   return (
-    <Avatar className={cn("bg-muted", className)} aria-hidden="true">
+    <Avatar className={cn("bg-primary text-primary-foreground", className)} aria-hidden="true">
       {src && <AvatarImage src={src} alt="" />}
-      <AvatarFallback className="bg-muted text-foreground font-medium">
+      <AvatarFallback className="bg-primary text-primary-foreground font-medium">
         {profileInitials(name)}
       </AvatarFallback>
     </Avatar>
