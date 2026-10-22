@@ -163,6 +163,8 @@ pub async fn main() {
             commands::set_autostart,
             commands::extract_project_file_text,
             commands::extract_youtube_transcript,
+            commands::get_ai_mcp_setup,
+            commands::check_ai_mcp_connection,
             commands::setup_claude_mcp,
             commands::check_claude_mcp_status,
             commands::remove_claude_mcp,

@@ -1,3 +1,4 @@
+mod check;
 mod db;
 mod formatters;
 mod tools;
@@ -7,6 +8,13 @@ use tokio::io::{stdin, stdout};
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    if std::env::args().nth(1).as_deref() == Some("--check") {
+        tokio::time::timeout(std::time::Duration::from_secs(10), check::check())
+            .await
+            .map_err(|_| anyhow::anyhow!("MCP check timed out"))??;
+        println!("Typr MCP: initialization, tool discovery, and database read passed.");
+        return Ok(());
+    }
     // CRITICAL: Never use println! - it writes to stdout and breaks JSON-RPC
     // Use eprintln! for logging instead
     eprintln!("Starting Typr MCP server...");

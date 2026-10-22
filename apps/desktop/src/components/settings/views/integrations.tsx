@@ -6,7 +6,7 @@ import { useTypr } from "@/contexts";
 import { claudeMcpStatusQueryKey, useClaudeMcpStatus } from "@/hooks/useClaudeMcpStatus";
 import { invoke } from "@tauri-apps/api/core";
 import { commands as analyticsCommands } from "@typr/plugin-analytics";
-import { Badge } from "@typr/ui/components/ui/badge";
+import { AiMcpSetup } from "@/components/settings/components/ai-mcp-setup";
 import { Button } from "@typr/ui/components/ui/button";
 import { toast } from "@typr/ui/components/ui/toast";
 
@@ -102,7 +102,7 @@ export default function IntegrationsComponent() {
     <div>
       <div className="mb-6">
         <h3 className="text-lg font-medium mb-2">
-          <Trans>Integrations</Trans>
+          <Trans>Connect AI tools</Trans>
         </h3>
         <p className="text-sm text-muted-foreground">
           <Trans>Connect Typr with AI assistants to access your meeting notes.</Trans>
@@ -176,33 +176,7 @@ export default function IntegrationsComponent() {
           )}
         </div>
 
-        {/* ChatGPT Integration - Coming Soon */}
-        <div className="rounded-xl border bg-card/40 p-4 opacity-60">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex min-w-0 items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-muted-foreground">
-                <i className="ri-openai-fill text-[20px]" aria-hidden="true" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-medium">
-                    <Trans>ChatGPT</Trans>
-                  </h4>
-                  <Badge variant="secondary" className="text-xs">
-                    <Trans>Coming Soon</Trans>
-                  </Badge>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  <Trans>Access your meeting notes directly from ChatGPT.</Trans>
-                </p>
-              </div>
-            </div>
-
-            <Button disabled size="sm" className="shrink-0">
-              <Trans>Connect</Trans>
-            </Button>
-          </div>
-        </div>
+        <AiMcpSetup />
       </div>
 
       {/* Direct Access */}

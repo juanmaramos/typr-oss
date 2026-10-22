@@ -997,10 +997,6 @@ msgstr "Access many model providers through one API key."
 msgid "Access multiple AI models through OpenRouter with your API key"
 msgstr "Access multiple AI models through OpenRouter with your API key"
 
-#: src/components/settings/views/integrations.tsx:196
-msgid "Access your meeting notes directly from ChatGPT."
-msgstr "Access your meeting notes directly from ChatGPT."
-
 #: src/components/call-end-bridge.tsx:52
 msgid "Accessibility permission needed"
 msgstr "Accessibility permission needed"
@@ -1127,6 +1123,10 @@ msgstr "Add specific terms or jargon that are used in your company. Used to impr
 #: src/components/editor-area/note-header/chips/tag-chip.tsx:48
 msgid "Add tags"
 msgstr "Add tags"
+
+#: src/components/settings/components/ai-mcp-setup.tsx:38
+msgid "Add this configuration to your Codex host's ~/.codex/config.toml, or use the location set by CODEX_HOME. Codex and ChatGPT desktop share this local configuration. Keep your existing servers and replace any existing typr_local entry instead of adding a duplicate. Restart your client afterward."
+msgstr "Add this configuration to your Codex host's ~/.codex/config.toml, or use the location set by CODEX_HOME. Codex and ChatGPT desktop share this local configuration. Keep your existing servers and replace any existing typr_local entry instead of adding a duplicate. Restart your client afterward."
 
 #: src/components/editor-area/note-header/chips/project-chip.tsx:184
 msgid "Add this note to one or more projects."
@@ -1743,9 +1743,9 @@ msgstr "Chat Group {0}"
 msgid "Chat navigation"
 msgstr "Chat navigation"
 
-#: src/components/settings/views/integrations.tsx:189
-msgid "ChatGPT"
-msgstr "ChatGPT"
+#: src/components/settings/components/ai-mcp-setup.tsx:83
+msgid "ChatGPT web needs a separate authenticated remote MCP plugin or secure tunnel. This local connection does not enable web access."
+msgstr "ChatGPT web needs a separate authenticated remote MCP plugin or secure tunnel. This local connection does not enable web access."
 
 #: src/components/projects/project-notes-panel.tsx:179
 msgid "Chats"
@@ -1754,6 +1754,10 @@ msgstr "Chats"
 #: src/components/settings/views/about.tsx:192
 msgid "Check for Updates"
 msgstr "Check for Updates"
+
+#: src/components/settings/components/ai-mcp-setup.tsx:71
+msgid "Check local server"
+msgstr "Check local server"
 
 #: src/components/toast/changelog.tsx:47
 msgid "Check out what's new in this release"
@@ -1769,6 +1773,10 @@ msgstr "Check your connection and retry."
 #: src/components/settings/views/about.tsx:198
 msgid "Checking for a newer version..."
 msgstr "Checking for a newer version..."
+
+#: src/components/settings/components/ai-mcp-setup.tsx:71
+msgid "Checking local server..."
+msgstr "Checking local server..."
 
 #: src/hooks/useModelAvailabilityLabel.ts:10
 msgid "Checking model availability…"
@@ -1920,6 +1928,14 @@ msgstr "Cloud transcription failed"
 msgid "Cloud transcription is already available. Download this model only if you want offline transcription."
 msgstr "Cloud transcription is already available. Download this model only if you want offline transcription."
 
+#: src/components/settings/components/ai-mcp-setup.tsx:36
+msgid "Codex and ChatGPT desktop"
+msgstr "Codex and ChatGPT desktop"
+
+#: src/components/settings/components/ai-mcp-setup.tsx:47
+msgid "Codex MCP configuration"
+msgstr "Codex MCP configuration"
+
 #: src/components/left-sidebar/events-list.tsx:97
 msgid "Collapse Coming up"
 msgstr "Collapse Coming up"
@@ -1932,7 +1948,6 @@ msgstr "Collapse projects"
 msgid "Coming soon"
 msgstr "Coming soon"
 
-#: src/components/settings/views/integrations.tsx:192
 #: src/components/settings/views/team.tsx:69
 msgid "Coming Soon"
 msgstr "Coming Soon"
@@ -1970,6 +1985,10 @@ msgstr "Company name"
 msgid "Completed"
 msgstr "Completed"
 
+#: src/components/settings/components/ai-mcp-setup.tsx:66
+msgid "Configuration copied."
+msgstr "Configuration copied."
+
 #: src/components/editor-area/note-header/share-menu.tsx:117
 #: src/components/editor-area/note-header/share-menu.tsx:118
 msgid "Configure Claude Desktop integration"
@@ -1984,9 +2003,12 @@ msgid "Configured"
 msgstr "Configured"
 
 #: src/components/settings/views/integrations.tsx:168
-#: src/components/settings/views/integrations.tsx:202
 msgid "Connect"
 msgstr "Connect"
+
+#: src/components/settings/views/integrations.tsx:105
+msgid "Connect AI tools"
+msgstr "Connect AI tools"
 
 #: src/components/ui/model-selector.tsx:633
 msgid "Connect API key"
@@ -2096,6 +2118,14 @@ msgstr "Copy AI notes"
 msgid "Copy All"
 msgstr "Copy All"
 
+#: src/components/settings/components/ai-mcp-setup.tsx:55
+msgid "Copy Claude configuration"
+msgstr "Copy Claude configuration"
+
+#: src/components/settings/components/ai-mcp-setup.tsx:52
+msgid "Copy Codex configuration"
+msgstr "Copy Codex configuration"
+
 #: src/components/settings/components/data-path-block.tsx:61
 msgid "Copy database path"
 msgstr "Copy database path"
@@ -2128,6 +2158,14 @@ msgstr "Could not check Claude Desktop configuration."
 #: src/components/settings/views/about.tsx:206
 msgid "Could not check for updates. Try again."
 msgstr "Could not check for updates. Try again."
+
+#: src/components/settings/components/ai-mcp-setup.tsx:66
+msgid "Could not copy configuration."
+msgstr "Could not copy configuration."
+
+#: src/components/settings/components/ai-mcp-setup.tsx:63
+msgid "Could not generate MCP configuration."
+msgstr "Could not generate MCP configuration."
 
 #: src/components/settings/components/ai/llm-local-view.tsx:418
 msgid "Could not load models. Try again."
@@ -2472,7 +2510,7 @@ msgstr "Detects among {0} specified languages, with automatic fallback."
 msgid "Detects supported languages automatically. Choose languages to guide transcription."
 msgstr "Detects supported languages automatically. Choose languages to guide transcription."
 
-#: src/components/settings/views/integrations.tsx:211
+#: src/components/settings/views/integrations.tsx:185
 msgid "Direct access"
 msgstr "Direct access"
 
@@ -3098,6 +3136,10 @@ msgstr ""
 "\n"
 "Would you like me to help improve the content instead?"
 
+#: src/components/settings/components/ai-mcp-setup.tsx:59
+msgid "For manual Claude setup, merge the copied mcpServers entry into Claude Desktop's configuration."
+msgstr "For manual Claude setup, merge the copied mcpServers entry into Claude Desktop's configuration."
+
 #: src/lib/language-labels.ts:18
 msgid "French"
 msgstr "French"
@@ -3294,7 +3336,6 @@ msgstr "Installing Update"
 
 #: src/components/settings-dialog/content.tsx:39
 #: src/components/settings-dialog/sidebar.tsx:35
-#: src/components/settings/views/integrations.tsx:105
 msgid "Integrations"
 msgstr "Integrations"
 
@@ -3561,6 +3602,14 @@ msgstr "Local · typically 5–15 min"
 #: src/components/left-sidebar/top-area/settings-button.tsx:132
 msgid "Local and BYOK"
 msgstr "Local and BYOK"
+
+#: src/components/settings/components/ai-mcp-setup.tsx:74
+msgid "Local MCP check failed. Confirm the MCP sidecar is installed and open Typr once to prepare the database, then retry."
+msgstr "Local MCP check failed. Confirm the MCP sidecar is installed and open Typr once to prepare the database, then retry."
+
+#: src/components/settings/components/ai-mcp-setup.tsx:73
+msgid "Local MCP initialization, tool discovery, and database read passed."
+msgstr "Local MCP initialization, tool discovery, and database read passed."
 
 #: src/routes/app.control.tsx:107
 msgid "Logo"
@@ -5699,6 +5748,10 @@ msgstr "Thinking"
 msgid "This answer was interrupted before it finished."
 msgstr "This answer was interrupted before it finished."
 
+#: src/components/settings/components/ai-mcp-setup.tsx:76
+msgid "This check runs locally and does not confirm that your AI client has loaded Typr. In your client, enable Typr's tools and ask it to list recent sessions, search for a known note, and retrieve it by ID. Retrieved notes are shared with the AI provider you choose."
+msgstr "This check runs locally and does not confirm that your AI client has loaded Typr. In your client, enable Typr's tools and ask it to list recent sessions, search for a known note, and retrieve it by ID. Retrieved notes are shared with the AI provider you choose."
+
 #: src/components/ask/project-chat.tsx:413
 msgid "This conversation belonged to a project that has been deleted."
 msgstr "This conversation belonged to a project that has been deleted."
@@ -6193,7 +6246,7 @@ msgstr "Use OpenAI models directly with your API key."
 msgid "Use OpenAI's GPT models with your API key"
 msgstr "Use OpenAI's GPT models with your API key"
 
-#: src/components/settings/views/integrations.tsx:214
+#: src/components/settings/views/integrations.tsx:188
 msgid "Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
 msgstr "Use this path with apps like Claude, Cursor, VS Code, or Codex to read your notes directly."
 

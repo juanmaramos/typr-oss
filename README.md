@@ -38,6 +38,10 @@ If you are looking for a privacy-first Granola alternative, Typr OSS gives you a
 - Connect cloud models directly with your own API keys.
 - Export notes to Obsidian or share them as local artifacts.
 
+## Connect AI tools
+
+Typr includes a local MCP server for retrieving notes and transcripts. Settings → Integrations provides Claude Desktop setup, copied configuration for Codex/ChatGPT desktop, and a local server check. See the [MCP setup and retrieval checks](crates/mcp-server/README.md) for client verification and the separate requirements for ChatGPT web.
+
 ## Models
 
 Typr OSS supports local models and BYOK cloud providers.
