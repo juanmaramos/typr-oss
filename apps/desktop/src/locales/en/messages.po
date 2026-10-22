@@ -1004,7 +1004,7 @@ msgstr "Accessibility permission needed"
 msgid "Account"
 msgstr "Account"
 
-#: src/components/left-sidebar/nav-user.tsx:84
+#: src/components/left-sidebar/nav-user.tsx:82
 msgid "Account & settings"
 msgstr "Account & settings"
 
@@ -2989,7 +2989,7 @@ msgstr "Fast and reliable for simple tasks"
 msgid "Features"
 msgstr "Features"
 
-#: src/components/left-sidebar/nav-user.tsx:188
+#: src/components/left-sidebar/nav-user.tsx:175
 #: src/components/settings-dialog/content.tsx:40
 #: src/components/settings-dialog/sidebar.tsx:36
 msgid "Feedback"
@@ -4229,10 +4229,6 @@ msgstr "optional"
 msgid "Optional for participant suggestions"
 msgstr "Optional for participant suggestions"
 
-#: src/components/left-sidebar/nav-user.tsx:170
-msgid "Options"
-msgstr "Options"
-
 #: src/components/finder/views/contact-view.tsx:675
 #: src/routes/app.human.$id.tsx:498
 msgid "Organization"
@@ -4254,10 +4250,6 @@ msgstr "Organizations"
 #: src/components/editor-area/note-header/listen-button.tsx:312
 msgid "Original"
 msgstr "Original"
-
-#: src/components/left-sidebar/nav-user.tsx:173
-msgid "OSS"
-msgstr "OSS"
 
 #: src/components/left-sidebar/top-area/settings-button.tsx:129
 msgid "OSS Edition"
@@ -5246,9 +5238,8 @@ msgstr "Setting up transcription"
 msgid "Setting up..."
 msgstr "Setting up..."
 
-#: src/components/left-sidebar/nav-user.tsx:125
-#: src/components/left-sidebar/nav-user.tsx:128
-#: src/components/left-sidebar/nav-user.tsx:202
+#: src/components/left-sidebar/nav-user.tsx:124
+#: src/components/left-sidebar/nav-user.tsx:189
 #: src/components/left-sidebar/top-area/settings-button.tsx:83
 #: src/components/settings-dialog/content.tsx:55
 #: src/components/settings-dialog/index.tsx:15
@@ -5290,7 +5281,7 @@ msgstr "Short recap"
 msgid "Shortcut"
 msgstr "Shortcut"
 
-#: src/components/left-sidebar/nav-user.tsx:195
+#: src/components/left-sidebar/nav-user.tsx:182
 msgid "Shortcuts"
 msgstr "Shortcuts"
 
@@ -6271,6 +6262,11 @@ msgstr "Uses connected cloud models first, then on-device models"
 #: src/components/settings/components/ai/task-defaults.tsx:250
 msgid "Uses the chat default above"
 msgstr "Uses the chat default above"
+
+#. placeholder {0}: appInfo.data.version
+#: src/components/left-sidebar/nav-user.tsx:198
+msgid "v{0}"
+msgstr "v{0}"
 
 #: src/components/settings/views/about.tsx:102
 msgid "Version"
