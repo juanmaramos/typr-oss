@@ -1,23 +1,21 @@
 import { ProfileAvatar } from "@/components/profile-avatar";
+import { useProfileAvatarChoice } from "@/stores/profile-avatar";
 import { ShortcutById } from "@/components/shortcut-by-id";
 import { Icon } from "@/components/ui/icon";
 import { useTypr } from "@/contexts";
 import { useSettingsDialog } from "@/contexts/settings-dialog";
 import { useAppInfo } from "@/hooks/use-app-info";
 import { cn } from "@/lib/utils";
-import { useProfileAvatarChoice } from "@/stores/profile-avatar";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { commands as dbCommands } from "@typr/plugin-db";
-import { Badge } from "@typr/ui/components/ui/badge";
 import { Button } from "@typr/ui/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@typr/ui/components/ui/dropdown-menu";
@@ -72,7 +70,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
   };
 
   const { openShortcuts } = useShortcuts();
-  const railTooltipLabel = t`Account & settings`;
+  const accountMenuLabel = t`Account & settings`;
   const avatarChoice = useProfileAvatarChoice(userId);
   const avatar = (
     <ProfileAvatar
@@ -87,7 +85,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
         variant="ghost"
         size="icon"
         className="h-11 w-11 text-muted-foreground"
-        aria-label={railTooltipLabel}
+        aria-label={accountMenuLabel}
       >
         {avatar}
       </Button>
@@ -97,6 +95,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
         variant="ghost"
         size="sm"
         className="min-w-0 flex-1 justify-between p-2"
+        aria-label={accountMenuLabel}
       >
         {avatar}
         <div className="ml-2 min-w-0 flex-1 text-left">
@@ -104,9 +103,6 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
             {userProfile.data?.full_name
               ? userProfile.data.full_name
               : <Trans>Settings</Trans>}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            <Trans>Settings</Trans>
           </p>
         </div>
       </Button>
@@ -130,7 +126,7 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
                   </DropdownMenuTrigger>
                 </TooltipTrigger>
                 <TooltipContent side="right" className="text-xs">
-                  {railTooltipLabel}
+                  {accountMenuLabel}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -141,20 +137,11 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
             </DropdownMenuTrigger>
           )}
         <DropdownMenuContent
-          className="z-[120] w-56 border-border/50 bg-background/85 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-background/75"
+          className="w-56"
           side="top"
           align="start"
           sideOffset={8}
         >
-          <DropdownMenuLabel className="flex items-center justify-between">
-            <span>
-              <Trans>Options</Trans>
-            </span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-ui-tiny">
-              <Trans>OSS</Trans>
-            </Badge>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
           <DropdownMenuGroup>
             {/* Temporarily hidden - keeping for future use */}
             {
@@ -185,10 +172,14 @@ export function NavUser({ variant = "sidebar" }: { variant?: "sidebar" | "rail" 
               <ShortcutById shortcutId="open-settings" />
             </DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <div className="px-2 py-1.5 text-ui-caption text-muted-foreground">
-            <span>{appInfo.data ? `${appInfo.data.name} ${appInfo.data.version}` : "Typr"}</span>
-          </div>
+          {appInfo.data && (
+            <>
+              <DropdownMenuSeparator />
+              <div className="px-2 py-1.5 text-ui-caption text-muted-foreground">
+                <Trans>v{appInfo.data.version}</Trans>
+              </div>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 

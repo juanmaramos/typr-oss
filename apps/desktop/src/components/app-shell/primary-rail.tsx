@@ -11,8 +11,8 @@ import { ShortcutById } from "../shortcut-by-id";
 import { useShellMode } from "./use-shell-mode";
 
 type NavItem = {
-  id: "notes" | "ask" | "projects";
-  to: "/app" | "/app/ask" | "/app/projects";
+  id: "notes" | "projects";
+  to: "/app" | "/app/projects";
   iconName: string;
 };
 
@@ -21,11 +21,6 @@ const NAV_ITEMS: NavItem[] = [
     id: "notes",
     to: "/app",
     iconName: "ri-sticky-note-line",
-  },
-  {
-    id: "ask",
-    to: "/app/ask",
-    iconName: "ri-chat-3-line",
   },
   {
     id: "projects",
@@ -119,8 +114,6 @@ export function PrimaryRail() {
 
 function getNavItemLabel(id: NavItem["id"], t: ReturnType<typeof useLingui>["t"]) {
   switch (id) {
-    case "ask":
-      return t`Ask`;
     case "projects":
       return t`Projects`;
     case "notes":
