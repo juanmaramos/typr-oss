@@ -27,5 +27,10 @@ jobs:
         run: rustup toolchain install 1.93.0 --profile minimal
       - name: Check routing, fallback, previews, and shutdown
         run: cargo +1.93.0 test --locked -p tauri-plugin-local-stt -p tauri-plugin-connector -p tauri-plugin-listener --lib
+      - name: Check recording retention cleanup
+        env:
+          # Unit tests do not launch or package the MCP sidecar.
+          TAURI_CONFIG: '{"bundle":{"externalBin":[]}}'
+        run: cargo +1.93.0 test --locked -p desktop --lib recordings::tests
       - name: Check native titlebar alignment
         run: cargo +1.93.0 test --locked -p tauri-plugin-windows --lib traffic_lights::tests
