@@ -1,17 +1,27 @@
 #!/usr/bin/env python3
 """Real stdio MCP regression test. Creates only a temporary synthetic database."""
+import argparse
 import json
 import os
 from pathlib import Path
 import queue
+import shutil
 import threading
 import sqlite3
 import subprocess
 import sys
 import tempfile
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[3]
-BINARY = Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / 'target/debug/typr-mcp').resolve()
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('binary', nargs='?', type=Path, default=ROOT / 'target/debug/typr-mcp')
+parser.add_argument('--codex', action='store_true')
+parser.add_argument('--plugin', type=Path, help='Packaged marketplace root; install its ZIP through Codex before retrieval')
+args = parser.parse_args()
+if args.plugin and sys.platform == 'win32':
+    parser.error('--plugin HOME isolation is supported on macOS/Linux; use the stdio fixture on Windows')
+BINARY = args.binary.resolve()
 
 
 def read_response(process, request_id):
@@ -29,6 +39,8 @@ def read_response(process, request_id):
             raise AssertionError('MCP response timed out')
         assert line, 'MCP closed before responding'
         response = json.loads(line)
+        if 'method' in response:
+            process._mcp_notifications = getattr(process, '_mcp_notifications', []) + [response]
         if response.get('id') == request_id:
             assert 'error' not in response, response
             return response['result']
@@ -97,32 +109,84 @@ with tempfile.TemporaryDirectory(prefix='typr-mcp-fixture-') as directory:
     assert checked.returncode == 0, checked.stderr.decode()
     assert b'database read passed' in checked.stdout
     assert database.read_bytes() == before, 'MCP modified fixture database'
-    if "--codex" in sys.argv[2:]:
+    if args.codex or args.plugin:
         # Exercise installed Codex's own MCP client using an isolated synthetic configuration.
         codex_home = Path(directory) / 'codex-home'
         codex_home.mkdir()
-        (codex_home / 'config.toml').write_text('[mcp_servers.typr_local]\ncommand = ' + json.dumps(str(BINARY)) + '\n[mcp_servers.typr_local.env]\nTYPR_DB_PATH = ' + json.dumps(str(database)) + '\n')
-        codex = subprocess.Popen(['codex', 'app-server'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-                                 env={**os.environ, 'CODEX_HOME': str(codex_home)})
+        if not args.plugin:
+            (codex_home / 'config.toml').write_text('[mcp_servers.typr_local]\ncommand = ' + json.dumps(str(BINARY)) + '\n[mcp_servers.typr_local.env]\nTYPR_DB_PATH = ' + json.dumps(str(database)) + '\n')
+        isolated_home = Path(directory) / 'home'
+        isolated_home.mkdir()
+        client_env = {**env, 'CODEX_HOME': str(codex_home), 'HOME': str(isolated_home),
+                      'USERPROFILE': str(isolated_home), 'LOCALAPPDATA': str(isolated_home / 'local'),
+                      'APPDATA': str(isolated_home / 'roaming'), 'XDG_DATA_HOME': str(isolated_home / 'data')}
+        # The portable host filters nonstandard env vars. Exercise production path
+        # discovery inside an isolated HOME, never the user's app data directory.
+        default_data = (isolated_home / 'Library/Application Support' if sys.platform == 'darwin'
+                        else isolated_home / ('local' if sys.platform == 'win32' else 'data'))
+        default_database = default_data / 'com.typr.oss/db.sqlite'
+        default_database.parent.mkdir(parents=True)
+        shutil.copyfile(database, default_database)
+        if args.plugin:
+            client_env.pop('TYPR_DB_PATH', None)
+        client_log = open(Path(directory) / 'client.log', 'w+b')
+        if args.plugin:
+            # Install the actual ZIP into a clean marketplace, preserving executable modes.
+            marketplace = Path(directory) / 'marketplace with spaces'
+            marketplace.mkdir()
+            shutil.copytree(args.plugin / '.agents', marketplace / '.agents')
+            plugin = marketplace / 'typr-local'
+            plugin.mkdir()
+            archives = list(args.plugin.glob('typr-local-*.zip'))
+            assert len(archives) == 1, archives
+            with zipfile.ZipFile(archives[0]) as bundle:
+                for entry in bundle.infolist():
+                    path = Path(entry.filename)
+                    assert not path.is_absolute() and '..' not in path.parts and '\\' not in entry.filename, entry.filename
+                bundle.extractall(plugin)
+                for entry in bundle.infolist():
+                    (plugin / entry.filename).chmod((entry.external_attr >> 16) & 0o777)
+            for command in [
+                ['codex', 'plugin', 'marketplace', 'add', str(marketplace), '--json'],
+                ['codex', 'plugin', 'add', 'typr-local@typr-desktop', '--json'],
+            ]:
+                installed = subprocess.run(command, env=client_env, capture_output=True, timeout=30)
+                assert installed.returncode == 0, installed.stderr.decode()
+            assert 'mcp_servers' not in (codex_home / 'config.toml').read_text(), 'Test bypassed plugin wiring'
+        codex = subprocess.Popen(['codex', 'app-server'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=client_log,
+                                 env=client_env)
         try:
             send(codex, 'initialize', {'clientInfo': {'name': 'typr_fixture_verification', 'version': '1'}, 'capabilities': {'experimentalApi': True}}, 100)
             send(codex, 'initialized')
             thread = send(codex, 'thread/start', {'cwd': directory, 'approvalPolicy': 'never', 'sandbox': 'read-only'}, 101)
             thread_id = thread['thread']['id']
             status = send(codex, 'mcpServerStatus/list', {'threadId': thread_id}, 102)
-            assert any(server['name'] == 'typr_local' and len(server.get('tools', {})) == 8 for server in status['data']), status
+            servers = [server for server in status['data'] if len(server.get('tools', {})) == 8]
+            if len(servers) != 1:
+                client_log.seek(0)
+                raise AssertionError((status, getattr(codex, '_mcp_notifications', []), client_log.read().decode()))
+            assert {tool['name'] for tool in servers[0]['tools'].values()} == expected, status
+            server_name = servers[0]['name']
+            if args.plugin:
+                assert server_name == 'typr', status
+                if 'pluginId' in servers[0]:
+                    assert servers[0]['pluginId'] == 'typr-local@typr-desktop', status
             for request_id, tool, arguments, marker in [
                 (103, 'list_sessions', {'limit': 1}, 'fixture-session'),
                 (104, 'search_sessions', {'query': 'ship safely'}, 'fixture-session'),
                 (105, 'get_session', {'id': 'fixture-session'}, 'Fixture decision: ship safely'),
                 (106, 'get_transcript', {'id': 'fixture-session'}, 'Synthetic transcript retrieval'),
             ]:
-                result = send(codex, 'mcpServer/tool/call', {'threadId': thread_id, 'server': 'typr_local', 'tool': tool, 'arguments': arguments}, request_id)
+                result = send(codex, 'mcpServer/tool/call', {'threadId': thread_id, 'server': server_name, 'tool': tool, 'arguments': arguments}, request_id)
                 assert marker in json.dumps(result), (tool, result)
             print('PASS: installed Codex app-server discovered all 8 tools and retrieved synthetic notes/transcript; no inference or user-config writes')
+            if args.plugin:
+                assert default_database.read_bytes() == before, 'Plugin modified the default database'
+                print('PASS: clean plugin ZIP installation, manifest loading, relative paths with spaces, and bundled Rust MCP retrieval')
         finally:
             codex.terminate()
             codex.communicate(timeout=5)
+            client_log.close()
 
     conn.close()
     missing = Path(directory) / 'missing.sqlite'

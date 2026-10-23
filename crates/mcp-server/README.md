@@ -43,6 +43,13 @@ restart the client fully, and enable the server/tools in that client. In Codex
 CLI, `codex mcp list` shows configuration and `/mcp` shows active MCP servers.
 A server appearing in the configuration alone is not retrieval evidence.
 
+## Desktop plugin package
+
+The [Typr Local package](../../integrations/openai/README.md) bundles this same Rust
+server in the official OpenAI desktop plugin format. It supports the standard
+production database location and includes a clean plugin installation/retrieval
+fixture. Public directory eligibility requires separate OpenAI partner approval.
+
 ## Manual configuration
 
 Build from the repository root:

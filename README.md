@@ -40,7 +40,7 @@ If you are looking for a privacy-first Granola alternative, Typr OSS gives you a
 
 ## Connect AI tools
 
-Typr includes a local MCP server for retrieving notes and transcripts. Settings → Integrations provides Claude Desktop setup, copied configuration for Codex/ChatGPT desktop, and a local server check. See the [MCP setup and retrieval checks](crates/mcp-server/README.md) for client verification and the separate requirements for ChatGPT web.
+Typr includes a local MCP server for retrieving notes and transcripts. Settings → Integrations provides Claude Desktop setup, copied configuration for Codex/ChatGPT desktop, and a local server check. See the [MCP setup and retrieval checks](crates/mcp-server/README.md) for client verification and the separate requirements for ChatGPT web. The [desktop plugin package](integrations/openai/README.md) bundles the same Rust server for official local plugin installation and testing.
 
 ## Models
 
