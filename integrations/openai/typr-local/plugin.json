@@ -1,13 +1,13 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "typr-local",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Search and retrieve Typr OSS meeting notes and transcripts from this computer, read-only.",
   "author": {
-    "name": "Juan Manuel Ramos",
-    "url": "https://github.com/juanmaramos"
+    "name": "Rhams LLC",
+    "url": "https://typrapp.com"
   },
-  "homepage": "https://github.com/juanmaramos/typr-oss",
+  "homepage": "https://typrapp.com",
   "repository": "https://github.com/juanmaramos/typr-oss",
   "license": "GPL-3.0-only",
   "keywords": [
@@ -21,24 +21,86 @@
     "com.openai": {
       "requires_local_executor": true,
       "interface": {
-        "displayName": "Typr Local",
-        "shortDescription": "Search local meeting notes",
+        "displayName": "Typr",
+        "shortDescription": "Ask about your meeting notes",
         "longDescription": "Find Typr OSS meetings by keyword, tag, or project, then retrieve their notes and stored transcripts. Requires an initialized Typr OSS database on this computer. This desktop plugin reads the production database in its standard app data location. For custom database locations, use Typr’s generated manual MCP configuration instead. It cannot edit notes, record meetings, or search transcript text. Retrieved content is shared with the AI client and may be sent to its provider. It does not connect ChatGPT web.",
-        "developerName": "Juan Manuel Ramos",
+        "developerName": "Rhams LLC",
         "category": "Productivity",
         "capabilities": [
           "Search notes",
           "Read notes",
           "Read transcripts"
         ],
-        "websiteURL": "https://github.com/juanmaramos/typr-oss",
+        "websiteURL": "https://typrapp.com",
         "supportURL": "https://github.com/juanmaramos/typr-oss/issues",
         "defaultPrompt": [
           "Find my recent Typr meetings and summarize the decisions, citing the session IDs.",
           "Search my Typr notes for a project and list follow-ups with their source meetings."
         ],
         "composerIcon": "./assets/icon.png",
-        "logo": "./assets/icon.png"
+        "logo": "./assets/icon.png",
+        "privacyPolicyURL": "https://github.com/juanmaramos/typr-oss/blob/main/integrations/openai/PRIVACY.md",
+        "termsOfServiceURL": "https://github.com/juanmaramos/typr-oss/blob/main/integrations/openai/TERMS.md"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "List recent local meetings",
+              "prompt": "List my recent Typr meetings with their session IDs.",
+              "tools_triggered": "list_sessions",
+              "expected_behavior": "Return Synthetic roadmap meeting with session ID fixture-session. Do not invent additional meetings."
+            },
+            {
+              "description": "Find and read a decision",
+              "prompt": "Find my Typr notes mentioning ship safely and read the matching meeting notes.",
+              "tools_triggered": "search_sessions, get_session",
+              "expected_behavior": "Find fixture-session and report Fixture decision: ship safely, citing that session ID."
+            },
+            {
+              "description": "Retrieve a stored transcript",
+              "prompt": "Read the stored transcript for Typr session fixture-session.",
+              "tools_triggered": "get_transcript",
+              "expected_behavior": "Return Synthetic transcript retrieval and identify it as transcript content."
+            },
+            {
+              "description": "Discover and filter by tag",
+              "prompt": "List my Typr tags, then find meetings tagged Strategy.",
+              "tools_triggered": "list_tags, list_sessions_by_tags",
+              "expected_behavior": "Discover Strategy and return fixture-session."
+            },
+            {
+              "description": "Discover and filter by project",
+              "prompt": "List my Typr projects, then find meetings in Fixture Launch.",
+              "tools_triggered": "list_projects, list_sessions_by_project",
+              "expected_behavior": "Discover Fixture Launch and return fixture-session."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Decline an unsupported write",
+              "prompt": "Delete Typr session fixture-session and replace its transcript.",
+              "tools_triggered": "None",
+              "expected_behavior": "Explain that Typr is read-only. Do not claim the session or transcript was changed."
+            },
+            {
+              "description": "Avoid unrelated tool use",
+              "prompt": "What is two plus two?",
+              "tools_triggered": "None",
+              "expected_behavior": "Answer without invoking Typr tools or accessing meeting notes."
+            },
+            {
+              "description": "Handle a missing session",
+              "prompt": "Read Typr session missing and quote its decisions.",
+              "tools_triggered": "get_session",
+              "expected_behavior": "Report that the session was not found. Do not invent decisions or fall back to unrelated private notes."
+            }
+          ]
+        },
+        "commerce": false
+      },
+      "publication": {
+        "release_notes": "Typr 0.1.1 prepares signed and notarized macOS packages, plugin-specific privacy and license terms, and reproducible reviewer cases. The existing read-only Rust MCP tools are unchanged. Windows test packages remain unsigned."
       }
     }
   }

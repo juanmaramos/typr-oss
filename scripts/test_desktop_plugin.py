@@ -1,5 +1,6 @@
 """Package contract tests; runtime retrieval uses crates/mcp-server/tests/stdio.py."""
 import json
+import hashlib
 from pathlib import Path
 import tempfile
 from unittest.mock import patch
@@ -7,6 +8,7 @@ import unittest
 import zipfile
 
 from package_desktop_plugin import package, ROOT, TARGETS
+from verify_desktop_plugin import verify
 
 
 class DesktopPluginTests(unittest.TestCase):
@@ -33,7 +35,23 @@ class DesktopPluginTests(unittest.TestCase):
                         legacy = json.loads(bundle.read('.codex-plugin/plugin.json'))
                         self.assertEqual(legacy['name'], manifest['name'])
                         self.assertEqual(legacy['version'], manifest['version'])
-                        self.assertEqual(legacy['interface'], manifest['extensions']['com.openai']['interface'])
+                        extension = manifest['extensions']['com.openai']
+                        self.assertEqual(legacy['interface'], extension['interface'])
+                        self.assertEqual(legacy['review'], extension['review'])
+                        self.assertEqual(legacy['publication'], extension['publication'])
+                        for kind, count in [('positive', 5), ('negative', 3)]:
+                            cases = extension['review']['test_cases'][kind]
+                            self.assertEqual(len(cases), count)
+                            for case in cases:
+                                self.assertTrue(all(case.get(key) for key in
+                                    ('description', 'prompt', 'tools_triggered', 'expected_behavior')))
+                        interface = extension['interface']
+                        self.assertLessEqual(len(interface['displayName']), 30)
+                        self.assertLessEqual(len(interface['shortDescription']), 30)
+                        self.assertLessEqual(len(interface['longDescription']), 4000)
+                        for field in ('privacyPolicyURL', 'termsOfServiceURL'):
+                            policy = interface[field].split('/blob/main/', 1)[1]
+                            self.assertTrue((ROOT / policy).is_file())
                         self.assertIn('Typr’s', legacy['interface']['longDescription'])
                         self.assertTrue(manifest['extensions']['com.openai']['requires_local_executor'])
                         for config in ('mcp.json', '.mcp.json'):
@@ -57,6 +75,24 @@ class DesktopPluginTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 package(__file__, 'unknown-target', output)
             self.assertFalse(output.exists())
+
+    def test_notarization_requires_accepted_status_and_the_submitted_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            archive = Path(directory) / 'plugin.zip'
+            archive.write_bytes(b'submitted ZIP')
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            accepted = {'status': 'Accepted', 'id': 'synthetic-submission'}
+            receipt = verify(archive, accepted, digest)
+            self.assertEqual(receipt['sha256'], digest)
+            self.assertEqual(receipt['submission_id'], 'synthetic-submission')
+            for status in ('Invalid', 'Rejected', 'In Progress', None):
+                with self.subTest(status=status), self.assertRaises(ValueError):
+                    verify(archive, {'status': status, 'id': 'synthetic-submission'}, digest)
+            with self.assertRaises(ValueError):
+                verify(archive, {'status': 'Accepted'}, digest)
+            archive.write_bytes(b'repacked after submission')
+            with self.assertRaisesRegex(ValueError, 'ZIP changed'):
+                verify(archive, accepted, digest)
 
 
 if __name__ == '__main__':
