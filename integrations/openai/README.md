@@ -49,9 +49,13 @@ Use an archive tool that preserves executable permissions, such as macOS
 `unzip`. The inner ZIP preserves those permissions; GitHub artifact downloads
 do not preserve them for unpacked executable files.
 
-CI packages are unsigned test artifacts. Signing/notarization and clean desktop
-UI acceptance remain publication gates; do not bypass OS security warnings to
-install an artifact. This workflow does not replace Typr's signed app release.
+PR builds and ordinary manual runs produce unsigned test artifacts. An explicit
+manual run with `sign_macos=true` signs and notarizes both macOS packages,
+verifies the accepted ZIP digest and Gatekeeper assessment, and labels the
+artifacts `signed-notarized`. Windows remains unsigned. See the
+[submission preparation](SUBMISSION.md) for verification, synthetic reviewer
+setup, and remaining publication gates. This workflow does not replace Typr's
+signed app release.
 
 ## Install for local testing
 
@@ -122,8 +126,10 @@ Checked against OpenAI's official documentation on 2026-10-23:
   approval before submitting; this is distinct from a remote web MCP plugin.
 - [Submission prerequisites](https://developers.openai.com/plugins/deploy/submission)
   include submission access, verified publisher identity, and complete review
-  information. This draft metadata does not assert identity verification or
-  supply unverified privacy/terms URLs, reviewer access, or a demo recording.
+  information. The package includes plugin-specific privacy/terms URLs and review
+  cases. The new URLs become live after merge; a real demo recording and
+  executed desktop prompt cases are still required. No account eligibility or
+  directory approval is asserted.
 
 This package does not establish partner eligibility, organization allowlisting,
 or a verified publisher identity. A maintainer must confirm those prerequisites

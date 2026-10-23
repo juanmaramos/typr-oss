@@ -18,6 +18,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('binary', nargs='?', type=Path, default=ROOT / 'target/debug/typr-mcp')
 parser.add_argument('--codex', action='store_true')
 parser.add_argument('--plugin', type=Path, help='Packaged marketplace root; install its ZIP through Codex before retrieval')
+parser.add_argument('--export-fixture', type=Path, help='Save synthetic review database to a new file; never overwrites')
 args = parser.parse_args()
 if args.plugin and sys.platform == 'win32':
     parser.error('--plugin HOME isolation is supported on macOS/Linux; use the stdio fixture on Windows')
@@ -78,7 +79,11 @@ with tempfile.TemporaryDirectory(prefix='typr-mcp-fixture-') as directory:
                  ('fixture-session', 'fixture-user', 'Synthetic roadmap meeting', '<p>Fixture decision: ship safely</p>', summary, '[]', words, 'fixture-project'))
     conn.execute("INSERT INTO tags_sessions VALUES ('fixture-tag', 'fixture-session')")
     conn.commit()
+    conn.close()
     before = database.read_bytes()
+    if args.export_fixture:
+        with args.export_fixture.open('xb') as exported:
+            exported.write(before)
     env = {**os.environ, 'TYPR_DB_PATH': str(database)}
     process = subprocess.Popen([str(BINARY)], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env)
     try:
