@@ -119,8 +119,8 @@ Checked against OpenAI's official documentation on 2026-10-23:
   information. This draft metadata does not assert identity verification or
   supply unverified privacy/terms URLs, reviewer access, or a demo recording.
 
-The submission portal redirected this session to sign-in, so organization
-allowlisting and publisher verification could not be inspected. Their status is
-**unverified**, not approved or rejected. No submission was created. A maintainer
-must confirm those account prerequisites with OpenAI and complete the publication
-metadata and signed installation/UI checks before public submission.
+This package does not establish partner eligibility, organization allowlisting,
+or a verified publisher identity. A maintainer must confirm those prerequisites
+with OpenAI and complete the publication metadata and signed installation/UI
+checks before public submission. The portal can require developer identity
+verification before it allows a plugin upload.
