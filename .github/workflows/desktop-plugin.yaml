@@ -1,0 +1,79 @@
+name: Desktop plugin
+
+on:
+  pull_request:
+    paths:
+      - 'integrations/openai/**'
+      - 'scripts/*desktop_plugin.py'
+      - 'crates/mcp-server/**'
+      - 'crates/db-core/**'
+      - 'crates/db-user/**'
+      - 'plugins/listener-interface/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/desktop-plugin.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Plugin ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: aarch64-apple-darwin
+            binary: typr-mcp
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+            binary: typr-mcp
+          - runner: windows-2022
+            target: x86_64-pc-windows-msvc
+            binary: typr-mcp.exe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: arduino/setup-protoc@v3
+        with:
+          version: '25.7'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Rust
+        run: rustup toolchain install 1.93.0 --profile minimal --target ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: desktop-plugin-${{ matrix.target }}
+      - name: Check package contract
+        run: python scripts/test_desktop_plugin.py
+      - name: Test and build the existing Rust server
+        shell: bash
+        run: |
+          cargo +1.93.0 test --locked -p typr-mcp-server
+          cargo +1.93.0 build --locked --release --target ${{ matrix.target }} -p typr-mcp-server --bin typr-mcp
+      - name: Package and verify native retrieval
+        shell: bash
+        run: |
+          python scripts/package_desktop_plugin.py --binary target/${{ matrix.target }}/release/${{ matrix.binary }} --target ${{ matrix.target }} --output target/desktop-plugin/${{ matrix.target }}
+          python crates/mcp-server/tests/stdio.py target/desktop-plugin/${{ matrix.target }}/typr-local/bin/${{ matrix.binary }}
+      - uses: actions/setup-node@v4
+        if: runner.os == 'macOS'
+        with:
+          node-version: '22'
+      - name: Install pinned Codex test host
+        if: runner.os == 'macOS'
+        run: npm install --global --ignore-scripts @openai/codex@0.146.0
+      - name: Install ZIP in clean host and retrieve fixture notes
+        if: runner.os == 'macOS'
+        run: python crates/mcp-server/tests/stdio.py target/desktop-plugin/${{ matrix.target }}/typr-local/bin/${{ matrix.binary }} --plugin target/desktop-plugin/${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: typr-desktop-plugin-${{ matrix.target }}
+          path: target/desktop-plugin/${{ matrix.target }}
+          include-hidden-files: true
+          retention-days: 14

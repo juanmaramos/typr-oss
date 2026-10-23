@@ -1,0 +1,45 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "typr-local",
+  "version": "0.1.0",
+  "description": "Search and retrieve Typr OSS meeting notes and transcripts from this computer, read-only.",
+  "author": {
+    "name": "Juan Manuel Ramos",
+    "url": "https://github.com/juanmaramos"
+  },
+  "homepage": "https://github.com/juanmaramos/typr-oss",
+  "repository": "https://github.com/juanmaramos/typr-oss",
+  "license": "GPL-3.0-only",
+  "keywords": [
+    "meetings",
+    "notes",
+    "transcripts",
+    "local",
+    "read-only"
+  ],
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "interface": {
+        "displayName": "Typr Local",
+        "shortDescription": "Search local meeting notes",
+        "longDescription": "Find Typr OSS meetings by keyword, tag, or project, then retrieve their notes and stored transcripts. Requires an initialized Typr OSS database on this computer. This desktop plugin reads the production database in its standard app data location. For custom database locations, use Typr’s generated manual MCP configuration instead. It cannot edit notes, record meetings, or search transcript text. Retrieved content is shared with the AI client and may be sent to its provider. It does not connect ChatGPT web.",
+        "developerName": "Juan Manuel Ramos",
+        "category": "Productivity",
+        "capabilities": [
+          "Search notes",
+          "Read notes",
+          "Read transcripts"
+        ],
+        "websiteURL": "https://github.com/juanmaramos/typr-oss",
+        "supportURL": "https://github.com/juanmaramos/typr-oss/issues",
+        "defaultPrompt": [
+          "Find my recent Typr meetings and summarize the decisions, citing the session IDs.",
+          "Search my Typr notes for a project and list follow-ups with their source meetings."
+        ],
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/icon.png"
+      }
+    }
+  }
+}
