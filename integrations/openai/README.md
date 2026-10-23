@@ -43,6 +43,12 @@ On both macOS architectures it also installs the ZIP into a clean Codex host and
 retrieves synthetic notes. The workflow has read-only repository permissions and
 does not create tags, GitHub releases, or directory submissions.
 
+After downloading a CI artifact, extract its inner `typr-local-<target>.zip` into
+a `typr-local/` folder beside `.agents/` before registering that marketplace.
+Use an archive tool that preserves executable permissions, such as macOS
+`unzip`. The inner ZIP preserves those permissions; GitHub artifact downloads
+do not preserve them for unpacked executable files.
+
 CI packages are unsigned test artifacts. Signing/notarization and clean desktop
 UI acceptance remain publication gates; do not bypass OS security warnings to
 install an artifact. This workflow does not replace Typr's signed app release.

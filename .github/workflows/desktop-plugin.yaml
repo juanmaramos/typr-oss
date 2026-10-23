@@ -49,6 +49,10 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: desktop-plugin-${{ matrix.target }}
+      - name: Set temporary package output
+        shell: bash
+        # Generated packages must not be restored by the Cargo target cache.
+        run: echo "TYPR_PLUGIN_OUTPUT=$RUNNER_TEMP/typr-desktop-plugin-${{ matrix.target }}" >> "$GITHUB_ENV"
       - name: Check package contract
         run: python scripts/test_desktop_plugin.py
       - name: Test and build the existing Rust server
@@ -59,8 +63,8 @@ jobs:
       - name: Package and verify native retrieval
         shell: bash
         run: |
-          python scripts/package_desktop_plugin.py --binary target/${{ matrix.target }}/release/${{ matrix.binary }} --target ${{ matrix.target }} --output target/desktop-plugin/${{ matrix.target }}
-          python crates/mcp-server/tests/stdio.py target/desktop-plugin/${{ matrix.target }}/typr-local/bin/${{ matrix.binary }}
+          python scripts/package_desktop_plugin.py --binary target/${{ matrix.target }}/release/${{ matrix.binary }} --target ${{ matrix.target }} --output "$TYPR_PLUGIN_OUTPUT"
+          python crates/mcp-server/tests/stdio.py "$TYPR_PLUGIN_OUTPUT/typr-local/bin/${{ matrix.binary }}"
       - uses: actions/setup-node@v4
         if: runner.os == 'macOS'
         with:
@@ -70,10 +74,12 @@ jobs:
         run: npm install --global --ignore-scripts @openai/codex@0.146.0
       - name: Install ZIP in clean host and retrieve fixture notes
         if: runner.os == 'macOS'
-        run: python crates/mcp-server/tests/stdio.py target/desktop-plugin/${{ matrix.target }}/typr-local/bin/${{ matrix.binary }} --plugin target/desktop-plugin/${{ matrix.target }}
+        run: python crates/mcp-server/tests/stdio.py "$TYPR_PLUGIN_OUTPUT/typr-local/bin/${{ matrix.binary }}" --plugin "$TYPR_PLUGIN_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: typr-desktop-plugin-${{ matrix.target }}
-          path: target/desktop-plugin/${{ matrix.target }}
+          path: |
+            ${{ env.TYPR_PLUGIN_OUTPUT }}/typr-local-${{ matrix.target }}.zip
+            ${{ env.TYPR_PLUGIN_OUTPUT }}/.agents
           include-hidden-files: true
           retention-days: 14
