@@ -1,6 +1,6 @@
-# Typr Local plugin terms
+# Typr plugin terms
 
-Effective date: October 23, 2026. Typr Local is maintained by Juan Manuel Ramos
+Effective date: October 23, 2026. Typr is published by Rhams LLC
 as part of [Typr OSS](https://github.com/juanmaramos/typr-oss).
 
 The plugin is free software under the GNU General Public License, version 3
@@ -10,7 +10,7 @@ grants you, including running, studying, modifying, and redistributing the
 software under that license. The license includes warranty and liability
 provisions; please read it.
 
-Typr Local provides read-only access to the local production Typr database.
+The Typr plugin provides read-only access to the local production Typr database.
 It requires a compatible desktop AI client and an initialized Typr OSS
 database. It cannot record meetings, change notes, or connect ChatGPT web.
 Results reflect stored records and can be incomplete. Check source records

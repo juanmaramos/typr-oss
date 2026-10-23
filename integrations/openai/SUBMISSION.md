@@ -1,4 +1,4 @@
-# Typr Local directory submission preparation
+# Typr directory submission preparation
 
 This is a desktop-only, bundled Rust stdio MCP plugin. No remote endpoint,
 OAuth application, reviewer login, or API key is required by the plugin.
@@ -48,7 +48,7 @@ quarantine to make a failing package pass.
 Directory approval is not required for
 [local marketplace installation](https://developers.openai.com/plugins/build/plugins#install-a-local-plugin-manually).
 See the [installation steps](README.md#install-for-local-testing). In the desktop
-app, restart after registration, find **Typr Local** under **Typr desktop** in
+app, restart after registration, find **Typr** under **Typr desktop** in
 Plugins, then enable or mention it in a local chat. This is the same bundled
 server shipped in the ZIP. It does not enable ChatGPT web.
 

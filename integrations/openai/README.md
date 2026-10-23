@@ -1,4 +1,4 @@
-# Typr Local desktop plugin
+# Typr desktop plugin
 
 This packages the existing read-only Rust MCP server using OpenAI's official
 [Agent Plugins layout](https://developers.openai.com/plugins/build/plugins).
@@ -80,7 +80,7 @@ of connecting to personal notes.
 For the ChatGPT desktop app, follow OpenAI's
 [local marketplace installation](https://developers.openai.com/plugins/build/plugins#install-a-local-plugin-manually):
 register the generated marketplace with the desktop host, restart when no work is
-active, then find **Typr Local** under **Typr desktop** in the Plugins Directory.
+active, then find **Typr** under **Typr desktop** in the Plugins Directory.
 Install it and test in a local chat. Listing/installation alone is not retrieval
 evidence. This plugin cannot connect ChatGPT web.
 

@@ -1,7 +1,7 @@
-# Typr Local plugin privacy
+# Typr plugin privacy
 
-Effective date: October 23, 2026. This notice covers the Typr Local desktop
-plugin maintained by Juan Manuel Ramos in the
+Effective date: October 23, 2026. This notice covers the Typr desktop
+plugin published by Rhams LLC in the
 [Typr OSS repository](https://github.com/juanmaramos/typr-oss). It does not
 describe every feature of the Typr desktop app or your AI client.
 
@@ -49,7 +49,7 @@ provider, or backup.
 
 ## Your controls and support
 
-Disable or uninstall Typr Local through your AI client's plugin settings to
+Disable or uninstall Typr through your AI client's plugin settings to
 stop future access through that plugin. Manage source records in Typr, and
 manage shared content, retention, and deletion through the AI client and
 provider. The plugin has no separate remote account to delete.
