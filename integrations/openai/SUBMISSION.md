@@ -25,8 +25,7 @@ Verify the hash against the receipt. Extract the inner ZIP to `typr-local/`
 beside `.agents/`, preserving executable modes, then run:
 
 ```sh
-codesign --verify --strict --verbose=2 /absolute/path/typr-local/bin/typr-mcp
-spctl --assess --type execute --verbose=2 /absolute/path/typr-local/bin/typr-mcp
+codesign --verify --strict --verbose=4 -R=notarized --check-notarization /absolute/path/typr-local/bin/typr-mcp
 python3 crates/mcp-server/tests/stdio.py /absolute/path/typr-local/bin/typr-mcp \
   --plugin /absolute/path/marketplace
 ```
@@ -34,10 +33,14 @@ python3 crates/mcp-server/tests/stdio.py /absolute/path/typr-local/bin/typr-mcp 
 Signing uses Developer ID Application, hardened runtime, and a secure
 timestamp. Notarization must report `Accepted`; exit status alone is not
 enough. Signing occurs outside Cargo's cache. The workflow verifies signature,
-Gatekeeper assessment, and fixture retrieval before uploading a signed
+notarization ticket, and fixture retrieval before uploading a signed
 artifact. It never repacks a ZIP after notarization. ZIPs and standalone Mach-O
 executables cannot carry a stapled ticket; Gatekeeper may need internet to
-retrieve the notarization ticket. Do not disable Gatekeeper or remove
+retrieve the notarization ticket. Apple recommends `codesign --check-notarization`
+for other code, including this standalone executable; `spctl --type execute`
+is intended for app assessment and can reject this file shape. These command
+checks do not replace a fresh-machine, quarantined download and desktop install
+test before publication. Do not disable Gatekeeper or remove
 quarantine to make a failing package pass.
 
 ## Test before submitting
@@ -111,4 +114,5 @@ items above.
 Sources: [desktop-only submissions](https://developers.openai.com/plugins/deploy/desktop-only),
 [submission fields and review](https://developers.openai.com/plugins/deploy/submission),
 [plugin guidelines](https://developers.openai.com/plugins/plugin-guidelines),
-[Apple notarization](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow).
+[Apple notarization](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow),
+[Apple DTS testing guidance](https://developer.apple.com/forums/thread/130379).

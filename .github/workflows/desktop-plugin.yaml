@@ -91,7 +91,7 @@ jobs:
         run: |
           python scripts/package_desktop_plugin.py --binary "$RUNNER_TEMP/typr-plugin-executable/${{ matrix.binary }}" --target ${{ matrix.target }} --output "$TYPR_PLUGIN_OUTPUT"
           python crates/mcp-server/tests/stdio.py "$TYPR_PLUGIN_OUTPUT/typr-local/bin/${{ matrix.binary }}"
-      - name: Notarize the exact macOS ZIP and assess the packaged executable
+      - name: Notarize the exact macOS ZIP and verify the packaged ticket
         if: github.event_name == 'workflow_dispatch' && inputs.sign_macos && runner.os == 'macOS'
         env:
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
@@ -105,8 +105,7 @@ jobs:
           DIGEST=$(shasum -a 256 "$ARCHIVE" | cut -d ' ' -f 1)
           xcrun notarytool submit "$ARCHIVE" --key "$RUNNER_TEMP/typr-plugin-notary/AuthKey.p8" --key-id "$APPLE_API_KEY_ID" --issuer "$APPLE_API_ISSUER" --wait --timeout 45m --output-format json > "$RUNNER_TEMP/typr-plugin-notary/result.json"
           python scripts/verify_desktop_plugin.py "$ARCHIVE" --result "$RUNNER_TEMP/typr-plugin-notary/result.json" --sha256 "$DIGEST" --receipt "$TYPR_PLUGIN_OUTPUT/notarization.json"
-          codesign --verify --strict --verbose=2 "$TYPR_PLUGIN_OUTPUT/typr-local/bin/typr-mcp"
-          spctl --assess --type execute --verbose=2 "$TYPR_PLUGIN_OUTPUT/typr-local/bin/typr-mcp"
+          codesign --verify --strict --verbose=4 -R=notarized --check-notarization "$TYPR_PLUGIN_OUTPUT/typr-local/bin/typr-mcp"
       - uses: actions/setup-node@v4
         if: runner.os == 'macOS'
         with:

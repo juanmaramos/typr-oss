@@ -51,7 +51,7 @@ do not preserve them for unpacked executable files.
 
 PR builds and ordinary manual runs produce unsigned test artifacts. An explicit
 manual run with `sign_macos=true` signs and notarizes both macOS packages,
-verifies the accepted ZIP digest and Gatekeeper assessment, and labels the
+verifies the accepted ZIP digest and executable notarization ticket, and labels the
 artifacts `signed-notarized`. Windows remains unsigned. See the
 [submission preparation](SUBMISSION.md) for verification, synthetic reviewer
 setup, and remaining publication gates. This workflow does not replace Typr's
