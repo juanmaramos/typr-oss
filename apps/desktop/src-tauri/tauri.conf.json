@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "productName": "Typr OSS Dev",
   "mainBinaryName": "Typr OSS Dev",
   "identifier": "com.typr.oss.dev",
