@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useTypr } from "@/contexts";
 import { resolveNoteTitle } from "@/lib/note-title";
 import { useAudioUploadStore } from "@/stores/audio-upload";
+import { useBackgroundEnhanceStore } from "@/stores/background-enhance";
 import { TemplateService } from "@/utils/template-service";
 import { commands as configCommands } from "@typr/plugin-config";
 import { commands as dbCommands, type Session } from "@typr/plugin-db";
@@ -54,6 +55,8 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
 
     console.log(`[BackgroundEnhance] Processing session ${session.id}`);
 
+    const progress = useBackgroundEnhanceStore.getState();
+    progress.setPhase(session.id, "starting");
     try {
       const [general, templateType] = await Promise.all([
         configCommands.getGeneralConfig(),
@@ -134,6 +137,7 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
         }
         if (chunk.type === "text-delta") {
           acc += chunk.textDelta;
+          if (chunk.textDelta) progress.setPhase(session.id, "streaming");
         }
         if (chunk.type === "finish") {
           finished = chunk.finishReason !== "error" && chunk.finishReason !== "length";
@@ -145,6 +149,7 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
         throw new Error();
       }
 
+      progress.setPhase(session.id, "finishing");
       const finalHtml = await miscCommands.opinionatedMdToHtml(acc);
 
       if (session.record_start && session.record_end) {
@@ -193,6 +198,8 @@ export function BackgroundEnhanceWorker({ children }: { children: React.ReactNod
       if (uploadState.status === "done" && uploadState.sessionId === session.id) {
         useAudioUploadStore.getState().setProgress({ status: "idle" });
       }
+    } finally {
+      progress.clear(session.id);
     }
   }, [isMainWindow, sessionsStore, queryClient]);
 
