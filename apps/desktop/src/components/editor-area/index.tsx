@@ -30,6 +30,7 @@ declare global {
   }
 }
 import { useAgentWritingFeature } from "@/hooks/use-agent-writing-feature";
+import { useBackgroundEnhanceStore } from "@/stores/background-enhance";
 import { useSelectionContext } from "@/stores/useSelectionContext";
 import {
   generateText,
@@ -420,6 +421,9 @@ export default function EditorArea({
       }
     },
   });
+  const backgroundPhase = useBackgroundEnhanceStore((s) => s.phases[sessionId]);
+  const isGeneratingAiNotes = isEnhancing || !!backgroundPhase;
+  const writingPhase = isEnhancing ? streamingPhase : backgroundPhase ?? "idle";
 
   useAutoEnhance({
     sessionId,
@@ -453,11 +457,11 @@ export default function EditorArea({
   // If the AI tab is active but there's no AI content and nothing is generating,
   // fall back to the private tab and persist that choice.
   useEffect(() => {
-    if (!hasAiNotes && !isEnhancing && activeTab === "ai") {
+    if (!hasAiNotes && !isGeneratingAiNotes && activeTab === "ai") {
       setShowRaw(true);
       setActiveTab("private");
     }
-  }, [hasAiNotes, isEnhancing, activeTab, setShowRaw]);
+  }, [hasAiNotes, isGeneratingAiNotes, activeTab, setShowRaw]);
 
   // Auto-switch to AI Notes tab when AI content first arrives for YouTube sessions.
   // Only reacts to the hasAiNotes transition (false → true), not to tab changes,
@@ -629,7 +633,7 @@ export default function EditorArea({
         onTemplateSelect={handleTemplateSelect}
         pendingTemplateId={pendingTemplateId}
         templates={popoverTemplatesQuery.data || []}
-        isGeneratingAiNotes={isEnhancing}
+        isGeneratingAiNotes={isGeneratingAiNotes}
         hasAiNotes={hasAiNotes}
       />
 
@@ -672,11 +676,11 @@ export default function EditorArea({
               )
               : <Renderer ref={editorRef} initialContent={noteContent} />}
             <AnimatePresence>
-              {isEnhancing && streamingPhase !== "idle" && (
+              {isGeneratingAiNotes && writingPhase !== "idle" && (
                 <WritingBarOverlay
                   sessionId={sessionId}
-                  phase={streamingPhase}
-                  onCancel={cancelEnhance}
+                  phase={writingPhase}
+                  onCancel={isEnhancing ? cancelEnhance : undefined}
                 />
               )}
             </AnimatePresence>
