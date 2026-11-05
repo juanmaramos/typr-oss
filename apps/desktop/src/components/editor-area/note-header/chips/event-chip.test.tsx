@@ -100,27 +100,31 @@ describe.each([["en", english], ["es", spanish]] as const)("meeting date in %s",
     await render();
     expect(host.textContent).toContain(formatSimpleDateWithTime(state.event.start_date));
   });
-  it("shows Now on a blank draft while keeping calendar linking accessible", async () => {
+  it("shows the creation date on a blank draft while keeping calendar linking accessible", async () => {
     state.session.record_start = null;
     state.session.raw_memo_html = " <p> </p> ";
     await render();
-    expect(host.textContent).toBe(locale === "es" ? "Ahora" : "Now");
+    expect(host.textContent).toBe(formatSimpleDateWithTime(state.session.created_at));
     const button = host.querySelector<HTMLButtonElement>("button");
-    expect(button?.getAttribute("aria-label")).toBe(
-      locale === "es" ? "Ahora: vincular evento del calendario" : "Now: link calendar event",
-    );
+    expect(button?.textContent).toBe(formatSimpleDateWithTime(state.session.created_at));
     await act(async () => button?.click());
     expect(document.querySelector("input[placeholder]")).not.toBeNull();
     expect(state.session.created_at).toBe("2026-05-15T15:00:43Z");
   });
-  it("shows the existing date after the draft gains content without changing its timestamp", async () => {
+  it("keeps the creation date while typing, clearing, and reopening a draft", async () => {
     state.session.record_start = null;
     await render();
-    expect(host.textContent).toBe(locale === "es" ? "Ahora" : "Now");
+    expect(host.textContent).toBe(formatSimpleDateWithTime(state.session.created_at));
     state.session.raw_memo_html = "<p>First note</p>";
     await render();
     expect(host.textContent).toContain(formatSimpleDateWithTime(state.session.created_at));
     expect(state.session.created_at).toBe("2026-05-15T15:00:43Z");
+    state.session.raw_memo_html = "<p></p>";
+    await render();
+    expect(host.textContent).toBe(formatSimpleDateWithTime(state.session.created_at));
+    await act(async () => root.render(null));
+    await render();
+    expect(host.textContent).toBe(formatSimpleDateWithTime(state.session.created_at));
   });
   it.each([
     { title: "Project notes" },

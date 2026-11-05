@@ -463,6 +463,14 @@ export default function EditorArea({
     }
   }, [hasAiNotes, isGeneratingAiNotes, activeTab, setShowRaw]);
 
+  // Open the summary when generation starts, without overriding later tab choices.
+  useEffect(() => {
+    if (isGeneratingAiNotes) {
+      setShowRaw(false);
+      setActiveTab("ai");
+    }
+  }, [isGeneratingAiNotes, setShowRaw]);
+
   // Auto-switch to AI Notes tab when AI content first arrives for YouTube sessions.
   // Only reacts to the hasAiNotes transition (false → true), not to tab changes,
   // so it never interferes with user-initiated tab switches.
@@ -676,7 +684,7 @@ export default function EditorArea({
               )
               : <Renderer ref={editorRef} initialContent={noteContent} />}
             <AnimatePresence>
-              {isGeneratingAiNotes && writingPhase !== "idle" && (
+              {!showRaw && isGeneratingAiNotes && writingPhase !== "idle" && (
                 <WritingBarOverlay
                   sessionId={sessionId}
                   phase={writingPhase}

@@ -8,7 +8,6 @@ import { useState } from "react";
 
 import { Icon } from "@/components/ui/icon";
 import { useTypr } from "@/contexts";
-import { isReusableDraftSession } from "@/lib/note-draft";
 import { commands as appleCalendarCommands } from "@typr/plugin-apple-calendar";
 import { commands as dbCommands, type Event } from "@typr/plugin-db";
 import { commands as miscCommands } from "@typr/plugin-misc";
@@ -38,12 +37,12 @@ export function EventChip({ sessionId }: EventChipProps) {
     sessionCreatedAt,
     recordStart,
     updateTitle,
-    session: currentSessionDetails,
+    sessionTitle,
   } = useSession(sessionId, (s) => ({
     sessionCreatedAt: s.session.created_at,
     recordStart: s.session.record_start,
     updateTitle: s.updateTitle,
-    session: s.session,
+    sessionTitle: s.session.title,
   }));
 
   const event = useQuery({
@@ -115,9 +114,9 @@ export function EventChip({ sessionId }: EventChipProps) {
       // Only invalidate sessions cache after individual queries are settled
       queryClient.invalidateQueries({ queryKey: ["sessions"] });
 
-      if (assignedEventId && updateTitle && currentSessionDetails && eventDetails?.name) {
+      if (assignedEventId && updateTitle && eventDetails?.name) {
         try {
-          if (!currentSessionDetails.title?.trim()) {
+          if (!sessionTitle?.trim()) {
             updateTitle(eventDetails.name);
             queryClient.invalidateQueries({ queryKey: ["session", sessionId] });
           }
@@ -171,7 +170,6 @@ export function EventChip({ sessionId }: EventChipProps) {
   };
 
   const date = event.data?.start_date ?? recordStart ?? sessionCreatedAt;
-  const isUnusedDraft = isReusableDraftSession(currentSessionDetails);
 
   if (onboardingSessionId === sessionId) {
     return (
@@ -258,11 +256,10 @@ export function EventChip({ sessionId }: EventChipProps) {
         <PopoverTrigger asChild>
           <button
             type="button"
-            aria-label={isUnusedDraft ? t`Now: link calendar event` : undefined}
             className={cn(noteHeaderChipClassName, "cursor-pointer")}
           >
             <Icon name="ri-calendar-line" className="h-4 w-4 text-muted-foreground" />
-            <span>{isUnusedDraft ? t`Now` : formatSimpleDateWithTime(date)}</span>
+            <span>{formatSimpleDateWithTime(date)}</span>
           </button>
         </PopoverTrigger>
 

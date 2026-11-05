@@ -5,6 +5,8 @@ import { I18nProvider } from "@lingui/react";
 import { act, createElement, type ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createStore, useStore, type StoreApi } from "zustand";
+import { useShallow } from "zustand/shallow";
 import type { Session } from "@typr/plugin-db";
 
 Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
@@ -36,10 +38,15 @@ vi.mock("@typr/utils/ai", () => ({
   streamText: mocks.streamText, getTemplateTypeForTask: async () => modelState.templateType, localProviderName: "local",
   modelProvider: async () => ({ languageModel: () => ({}) }), generateText: vi.fn(),
 }));
-const stores = { recorded: { getState: () => ({ refresh: mocks.refresh, setShowRaw: mocks.setShowRaw }) } };
+type TestNoteState = Omit<typeof noteState, "setShowRaw" | "refresh"> & {
+  session: Session;
+  setShowRaw: (showRaw: boolean) => void;
+  refresh: () => Promise<void>;
+};
+const stores: Record<string, StoreApi<TestNoteState>> = {};
 vi.mock("@typr/utils/contexts", () => ({
   useSessions: (selector: (state: object) => unknown) => selector({ sessions: stores }),
-  useSession: (id: string, selector: (state: object) => unknown) => selector({ ...noteState, session: { ...session, id } }),
+  useSession: (id: string, selector: (state: object) => unknown) => useStore(stores[id], useShallow(selector)),
 }));
 vi.mock("@/stores/audio-upload", () => ({ useAudioUploadStore: { getState: () => ({ progress: { status: "idle" } }) } }));
 vi.mock("@/hooks/use-agent-writing-feature", () => ({ useAgentWritingFeature: () => false }));
@@ -54,8 +61,11 @@ vi.mock("@/components/toast/shared", () => ({ enhanceFailedToast: vi.fn() }));
 vi.mock("@/components/right-panel/components/search/search-header", () => ({ SearchHeader: () => null }));
 vi.mock("@/components/editor-area/selection-actions", () => ({ SelectionActions: () => null }));
 vi.mock("@/components/editor-area/note-header", () => ({
-  NoteHeader: ({ isGeneratingAiNotes }: { isGeneratingAiNotes: boolean }) =>
-    createElement("header", { "data-generating": isGeneratingAiNotes }),
+  NoteHeader: ({ isGeneratingAiNotes, activeTab, onTabChange }: {
+    isGeneratingAiNotes: boolean; activeTab: string; onTabChange: (tab: "private" | "ai") => void;
+  }) => createElement("header", { "data-generating": isGeneratingAiNotes, "data-active-tab": activeTab },
+    createElement("button", { "data-tab": "private", onClick: () => onTabChange("private") }),
+    createElement("button", { "data-tab": "ai", onClick: () => onTabChange("ai") })),
 }));
 
 import { BackgroundEnhanceWorker } from "./background-enhance";
@@ -109,7 +119,25 @@ beforeEach(async () => {
   };
   mocks.listSessions.mockImplementation(async () => session.needs_enhance ? [session] : []);
   mocks.getSession.mockImplementation(async () => ({ ...session }));
-  mocks.saveRecordingSummary.mockImplementation(async () => { session.needs_enhance = false; return true; });
+  mocks.saveRecordingSummary.mockImplementation(async (_id, _words, _end, _previous, html) => {
+    session.needs_enhance = false;
+    session.enhanced_memo_html = html;
+    return true;
+  });
+  for (const id of Object.keys(stores)) delete stores[id];
+  for (const id of ["recorded", "another-note"]) {
+    stores[id] = createStore(() => ({
+      ...noteState, session: { ...session, id },
+      setShowRaw: (showRaw: boolean) => {
+        mocks.setShowRaw(showRaw);
+        stores[id].setState({ showRaw });
+      },
+      refresh: async () => {
+        await mocks.refresh();
+        stores[id].setState({ session: { ...session, id } });
+      },
+    }));
+  }
   mocks.getTemplate.mockResolvedValue(null);
   mocks.render.mockResolvedValue("prompt");
   mocks.streamText.mockImplementation(successfulStream);
@@ -142,15 +170,27 @@ describe("recording background summary completion", () => {
       await lastToken;
       yield { type: "finish", finishReason: "stop" };
     })() }));
-    mocks.saveRecordingSummary.mockImplementation(async () => { await saved; return true; });
+    mocks.saveRecordingSummary.mockImplementation(async (_id, _words, _end, _previous, html) => {
+      await saved;
+      session.enhanced_memo_html = html;
+      session.needs_enhance = false;
+      return true;
+    });
 
     await act(async () => vi.advanceTimersByTimeAsync(2_000));
     expect(host.textContent).toContain("Preparing notes");
+    expect(host.querySelector("header")?.getAttribute("data-active-tab")).toBe("ai");
+    expect(stores.recorded.getState().showRaw).toBe(false);
     expect(host.querySelector("header")?.getAttribute("data-generating")).toBe("true");
     expect(host.querySelector<HTMLButtonElement>("[data-pending-control]")?.disabled).toBe(true);
     expect(host.querySelector("[aria-label]")).toBeNull(); // Background work has no foreground cancel action.
 
     await act(async () => startWriting());
+    expect(host.textContent).toContain("Writing notes");
+    await act(async () => host.querySelector<HTMLButtonElement>('[data-tab="private"]')!.click());
+    expect(host.querySelector("header")?.getAttribute("data-active-tab")).toBe("private");
+    expect(host.querySelector('[data-session-id="recorded"]')).toBeNull();
+    await act(async () => host.querySelector<HTMLButtonElement>('[data-tab="ai"]')!.click());
     expect(host.textContent).toContain("Writing notes");
     await act(async () => render("another-note"));
     expect(host.querySelector('[data-session-id="another-note"]')).toBeNull();
@@ -159,19 +199,26 @@ describe("recording background summary completion", () => {
     await act(async () => render());
     expect(host.textContent).toContain("Writing notes");
 
+    await act(async () => host.querySelector<HTMLButtonElement>('[data-tab="private"]')!.click());
     await act(async () => finishWriting());
+    expect(host.querySelector("header")?.getAttribute("data-active-tab")).toBe("private");
+    expect(host.querySelector('[data-session-id="recorded"]')).toBeNull();
+    await act(async () => host.querySelector<HTMLButtonElement>('[data-tab="ai"]')!.click());
     expect(host.textContent).toContain("Finalizing");
     expect(mocks.saveRecordingSummary).toHaveBeenCalledTimes(1);
     await act(async () => finishSaving());
     expect(host.querySelector('[data-session-id="recorded"]')).toBeNull();
     expect(host.querySelector("header")?.getAttribute("data-generating")).toBe("false");
+    expect(host.querySelector("header")?.getAttribute("data-active-tab")).toBe("ai");
+    expect(stores.recorded.getState().showRaw).toBe(false);
   });
 
   it("clears progress when a stale summary is rejected", async () => {
     mocks.saveRecordingSummary.mockResolvedValueOnce(false);
     await act(async () => vi.advanceTimersByTimeAsync(2_000));
     expect(useBackgroundEnhanceStore.getState().phases.recorded).toBeUndefined();
-    expect(mocks.setShowRaw).not.toHaveBeenCalled();
+    expect(host.querySelector("header")?.getAttribute("data-active-tab")).toBe("private");
+    expect(stores.recorded.getState().session.enhanced_memo_html).toBeNull();
   });
 
   it("leaves recorded-session generation to the main window", async () => {
