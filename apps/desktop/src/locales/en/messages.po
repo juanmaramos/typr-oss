@@ -2497,7 +2497,7 @@ msgstr "Description"
 msgid "Deselect note"
 msgstr "Deselect note"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:216
+#: src/components/editor-area/note-header/chips/event-chip.tsx:214
 msgid "Detach event"
 msgstr "Detach event"
 
@@ -3040,7 +3040,7 @@ msgstr "Filipino"
 msgid "Finalizing"
 msgstr "Finalizing"
 
-#: src/components/editor-area/index.tsx:609
+#: src/components/editor-area/index.tsx:621
 #: src/components/right-panel/components/search/chat-search-header.tsx:119
 #: src/components/right-panel/components/search/search-header.tsx:112
 #: src/components/right-panel/views/transcript-view.tsx:328
@@ -3394,7 +3394,7 @@ msgstr "Job Title"
 msgid "John Doe"
 msgstr "John Doe"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:235
+#: src/components/editor-area/note-header/chips/event-chip.tsx:233
 msgid "Join meeting"
 msgstr "Join meeting"
 
@@ -3550,7 +3550,7 @@ msgstr "Loading available models..."
 msgid "Loading devices..."
 msgstr "Loading devices..."
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:287
+#: src/components/editor-area/note-header/chips/event-chip.tsx:284
 msgid "Loading events..."
 msgstr "Loading events..."
 
@@ -3964,7 +3964,7 @@ msgstr "No notes to brief"
 msgid "No organization"
 msgstr "No organization"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:312
+#: src/components/editor-area/note-header/chips/event-chip.tsx:309
 msgid "No past events found"
 msgstr "No past events found"
 
@@ -4082,14 +4082,6 @@ msgstr "Notes"
 #: src/components/settings-dialog/sidebar.tsx:32
 msgid "Notifications"
 msgstr "Notifications"
-
-#: src/components/editor-area/note-header/chips/event-chip.tsx:265
-msgid "Now"
-msgstr "Now"
-
-#: src/components/editor-area/note-header/chips/event-chip.tsx:261
-msgid "Now: link calendar event"
-msgstr "Now: link calendar event"
 
 #: src/components/editor-area/selection-actions.tsx:491
 msgid "Numbered list"
@@ -4716,7 +4708,7 @@ msgstr "Recent updates"
 msgid "Recording could not be started. Check your audio settings."
 msgstr "Recording could not be started. Check your audio settings."
 
-#: src/components/editor-area/index.tsx:891
+#: src/components/editor-area/index.tsx:903
 msgid "Recording too short"
 msgstr "Recording too short"
 
@@ -4991,7 +4983,7 @@ msgstr "Saving..."
 msgid "Search"
 msgstr "Search"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:276
+#: src/components/editor-area/note-header/chips/event-chip.tsx:273
 msgid "Search and link to past events..."
 msgstr "Search and link to past events..."
 
@@ -5462,7 +5454,7 @@ msgstr "Start recording"
 msgid "Start Recording"
 msgstr "Start Recording"
 
-#: src/components/editor-area/index.tsx:666
+#: src/components/editor-area/index.tsx:678
 msgid "Start taking notes..."
 msgstr "Start taking notes..."
 
@@ -6055,7 +6047,7 @@ msgstr "Typr - AI note taker"
 msgid "Typr needs Accessibility access to detect when calls end. Without access, recordings continue until you stop them."
 msgstr "Typr needs Accessibility access to detect when calls end. Without access, recordings continue until you stop them."
 
-#: src/components/editor-area/index.tsx:892
+#: src/components/editor-area/index.tsx:904
 msgid "Typr needs at least {wordsThreshold} words to enhance your note"
 msgstr "Typr needs at least {wordsThreshold} words to enhance your note"
 
@@ -6327,7 +6319,7 @@ msgstr "View changelog"
 msgid "View Changelog"
 msgstr "View Changelog"
 
-#: src/components/editor-area/note-header/chips/event-chip.tsx:240
+#: src/components/editor-area/note-header/chips/event-chip.tsx:238
 #: src/components/left-sidebar/events-list.tsx:283
 msgid "View in calendar"
 msgstr "View in calendar"
